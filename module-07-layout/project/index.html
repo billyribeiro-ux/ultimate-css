@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 7 Project — Zero Media Query Layout · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 7</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 7 · Project</p>
+      <h1>A Responsive Page With Zero Media Queries</h1>
+      <p class="lead">Build a complete marketing page using every primitive in this module. Container, stack, cluster, sidebar, grid, cover, and at least one container query. No viewport-width media queries anywhere in your CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <ol>
+        <li>Compose a hero with <code>.cover</code>.</li>
+        <li>A features section with <code>.container &gt; .grid</code>.</li>
+        <li>An article-plus-sidebar section with <code>.container &gt; .sidebar</code>.</li>
+        <li>A tag cloud with <code>.cluster</code>.</li>
+        <li>At least one card component that uses a container query to switch its internal layout at a specific inline-size.</li>
+        <li>No <code>@media (min-width: ...)</code> or <code>@media (max-width: ...)</code> anywhere. The only media queries permitted are <code>prefers-reduced-motion</code> and <code>prefers-color-scheme</code>.</li>
+      </ol>
+
+      <h2>The complete layout layer</h2>
+      <pre><code>@layer layout {
+  .container {
+    inline-size: min(var(--container-max, 72rem), 100%);
+    margin-inline: auto;
+    padding-inline: var(--container-gap, 1.5rem);
+  }
+
+  .stack { display: flex; flex-direction: column; gap: var(--stack-gap, 1rem); }
+  .stack &gt; * { margin-block: 0; }
+  .stack-lg { --stack-gap: 2rem; }
+
+  .cluster {
+    display: flex; flex-wrap: wrap;
+    gap: var(--cluster-gap, .5rem);
+    align-items: var(--cluster-align, center);
+    justify-content: var(--cluster-justify, flex-start);
+  }
+
+  .sidebar { display: flex; flex-wrap: wrap; gap: var(--sidebar-gap, 2rem); }
+  .sidebar &gt; :first-child { flex-basis: var(--sidebar-width, 18rem); flex-grow: 1; }
+  .sidebar &gt; :last-child  { flex-basis: 0; flex-grow: 999; min-inline-size: var(--sidebar-min, 50%); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min, 16rem)), 1fr));
+    gap: var(--grid-gap, 1rem);
+  }
+
+  .cover {
+    display: grid; place-items: center;
+    min-block-size: var(--cover-min-height, 100svh);
+    padding: var(--cover-padding, 2rem);
+  }
+
+  .cq-inline { container-type: inline-size; }
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — a full page composed from primitives</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-p { font-family: system-ui; color: oklch(20% 0.02 264); }
+          .demo-7-p .container { inline-size: min(60rem, 100%); margin-inline: auto; padding-inline: 1rem; }
+          .demo-7-p .stack { display: flex; flex-direction: column; gap: 1rem; }
+          .demo-7-p .cluster { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+          .demo-7-p .sidebar { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+          .demo-7-p .sidebar > :first-child { flex-basis: 12rem; flex-grow: 1; background: oklch(95% 0.01 275); padding: 1rem; border-radius: .5rem; }
+          .demo-7-p .sidebar > :last-child  { flex-basis: 0; flex-grow: 999; min-inline-size: 60%; }
+          .demo-7-p .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: .75rem; }
+          .demo-7-p .cover { display: grid; place-items: center; min-block-size: 12rem; padding: 1.5rem; background: linear-gradient(120deg, oklch(90% 0.08 220), oklch(92% 0.05 275)); border-radius: .5rem; text-align: center; }
+
+          .demo-7-p h2 { margin: 2rem 0 .75rem; font-size: 1.1rem; border-bottom: 1px solid oklch(85% 0.01 264); padding-bottom: .25rem; }
+          .demo-7-p .feat { padding: .75rem; background: #fff; border: 1px solid oklch(85% 0.01 264); border-radius: .375rem; font-size: .85rem; }
+          .demo-7-p .tag  { padding: .25rem .5rem; background: oklch(96% 0.01 275); border: 1px solid oklch(85% 0.02 275); border-radius: 999px; font-size: .75rem; }
+          .demo-7-p .card { container-type: inline-size; background: #fff; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; padding: .75rem; }
+          .demo-7-p .card .body { display: grid; gap: .5rem; }
+          @container (inline-size >= 20rem) {
+            .demo-7-p .card .body { grid-template-columns: 6rem 1fr; align-items: center; }
+          }
+          .demo-7-p .thumb { aspect-ratio: 4/3; background: oklch(80% 0.12 220); border-radius: .25rem; }
+          .demo-7-p h3 { margin: 0 0 .25rem; font-size: .95rem; }
+          .demo-7-p p  { margin: 0; font-size: .8rem; color: oklch(40% 0.02 264); }
+          .demo-7-p h1 { margin: 0; font-size: 1.5rem; }
+        </style>
+        <div class="demo-7-p">
+          <section class="cover">
+            <div class="stack" style="--stack-gap: .5rem; text-align: center;">
+              <h1>Zero media queries</h1>
+              <p>Every primitive composes into every screen size without a breakpoint.</p>
+              <div class="cluster" style="justify-content: center;">
+                <span class="tag">cover</span><span class="tag">stack</span><span class="tag">cluster</span>
+              </div>
+            </div>
+          </section>
+
+          <div class="container">
+            <h2>Features (grid)</h2>
+            <div class="grid">
+              <div class="feat">Container</div>
+              <div class="feat">Stack</div>
+              <div class="feat">Cluster</div>
+              <div class="feat">Sidebar</div>
+              <div class="feat">Grid</div>
+              <div class="feat">Cover</div>
+            </div>
+
+            <h2>Article + sidebar</h2>
+            <div class="sidebar">
+              <aside><strong>Nav</strong><p>Auto collapse when the main column cannot be at least 60% wide.</p></aside>
+              <main><strong>Article</strong><p>No media queries. The sidebar primitive's flex-grow trick does the work.</p></main>
+            </div>
+
+            <h2>Tag cloud (cluster)</h2>
+            <div class="cluster">
+              <span class="tag">css</span><span class="tag">layout</span><span class="tag">container-queries</span><span class="tag">oklch</span><span class="tag">tokens</span><span class="tag">pe7</span><span class="tag">primitives</span>
+            </div>
+
+            <h2>Container-aware card</h2>
+            <div class="grid" style="--grid-min: 14rem;">
+              <article class="card"><div class="body"><div class="thumb"></div><div><h3>Card</h3><p>Flips to two columns when its container is wide enough.</p></div></div></article>
+              <article class="card"><div class="body"><div class="thumb"></div><div><h3>Card</h3><p>Each card queries its own container size.</p></div></div></article>
+              <article class="card"><div class="body"><div class="thumb"></div><div><h3>Card</h3><p>Same CSS file, different layout per container.</p></div></div></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Your deliverable</h2>
+      <ol>
+        <li>Your <code>layout.css</code> — grep for <code>@media</code> and confirm only motion and color-scheme queries exist.</li>
+        <li>Four screenshots of the same page: phone width, tablet width, laptop width, wide desktop. Every layout primitive adapts without a breakpoint.</li>
+        <li>One screenshot showing the container-aware card in a wide grid and the same card in a narrow sidebar. Prove the card's layout changed based on its parent, not the viewport.</li>
+        <li>A short note: which primitive surprised you the most when you realised how little CSS it took?</li>
+      </ol>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Scratchpad — compose your own page</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;section class="cover"&gt;
+  &lt;div&gt;&lt;h1&gt;Hero&lt;/h1&gt;&lt;p&gt;A tagline.&lt;/p&gt;&lt;/div&gt;
+&lt;/section&gt;
+&lt;div class="container"&gt;
+  &lt;div class="grid"&gt;
+    &lt;article class="card"&gt;Card one&lt;/article&gt;
+    &lt;article class="card"&gt;Card two&lt;/article&gt;
+    &lt;article class="card"&gt;Card three&lt;/article&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .container { inline-size: min(60rem, 100%); margin-inline: auto; padding-inline: 1rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 1rem;
+  }
+  .cover {
+    display: grid;
+    place-items: center;
+    min-block-size: 12rem;
+    padding: 1.5rem;
+  }
+}
+
+body { font-family: system-ui; margin: 0; }
+.cover { background: linear-gradient(120deg, oklch(90% 0.08 220), oklch(92% 0.05 275)); text-align: center; }
+.card {
+  padding: .75rem;
+  background: #fff;
+  border: 1px solid oklch(85% 0.01 264);
+  border-radius: .375rem;
+}
+h1 { margin: 0; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-7.8-cover-grid-lanes-masonry.html">← Lesson 7.8</a>
+      <a href="../../module-08-components/index.html">Module 8 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

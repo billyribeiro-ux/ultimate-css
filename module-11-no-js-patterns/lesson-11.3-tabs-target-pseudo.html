@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 11.3 — Tabs: :target and URL Hash · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 11</a>
+      <span>Lesson 11.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 11.3</p>
+      <h1>Tabs: :target and URL Hash</h1>
+      <p class="lead"><code>:target</code> is the oldest trick in no-JS CSS, and still the right answer when tabs are deep-linkable. It is an anchor tag plus a pseudo-class. The trade-off is real — this lesson explains it honestly.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The pattern</h2>
+      <pre><code>&lt;nav&gt;
+  &lt;a href="#overview"&gt;Overview&lt;/a&gt;
+  &lt;a href="#usage"&gt;Usage&lt;/a&gt;
+  &lt;a href="#api"&gt;API&lt;/a&gt;
+&lt;/nav&gt;
+&lt;section id="overview" class="panel"&gt;…&lt;/section&gt;
+&lt;section id="usage"    class="panel"&gt;…&lt;/section&gt;
+&lt;section id="api"      class="panel"&gt;…&lt;/section&gt;</code></pre>
+      <pre><code>.panel         { display: none; }
+.panel:target  { display: block; }
+.panel:first-of-type { display: block; } /* default tab */
+.panel:first-of-type:not(:target) ~ .panel { display: none; }</code></pre>
+      <p><code>:target</code> matches the element whose ID equals the current URL fragment. Clicking an anchor updates the fragment, and the correct panel reveals. No JavaScript.</p>
+
+      <h2>The honest trade-offs</h2>
+      <ul>
+        <li><strong>URL history.</strong> Every tab click adds a history entry. Back-button behavior becomes "go to the previous tab", which is sometimes what you want and sometimes a bug. There is no way to switch this off in pure CSS.</li>
+        <li><strong>One tab group per page.</strong> The URL has one hash. If you need two independent tab groups on the same page, <code>:target</code> cannot carry two states.</li>
+        <li><strong>Scroll jumping.</strong> By default the browser scrolls to the targeted element. Fix with <code>scroll-margin-block-start</code> or prevent jumping by anchoring to a zero-height sibling.</li>
+        <li><strong>Focus management.</strong> After a tab click, focus moves to the panel. That is correct for screen reader users but different from what JavaScript tab libraries do.</li>
+      </ul>
+
+      <h2>When NOT to use it</h2>
+      <p>If the tabs control a deeply-nested piece of app state (a form step, a data view), use JavaScript. <code>:target</code> is for <em>navigational</em> tabs — sections of a document you might want to deep-link into. The question "would a user expect this tab to appear in the URL?" is the deciding factor.</p>
+
+      <h2>Browser support</h2>
+      <p><code>:target</code>: baseline since CSS2.1. Universal. No <code>@supports</code> needed.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — documentation tabs</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-11-3 { border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; overflow: hidden; }
+          .demo-11-3 nav { display: flex; background: oklch(96% 0.005 264); border-block-end: 1px solid oklch(85% 0.012 264); }
+          .demo-11-3 nav a { padding: .75rem 1rem; text-decoration: none; color: oklch(44% 0.020 264); font-weight: 600; }
+          .demo-11-3 nav a:hover { background: oklch(95% 0.04 275); color: oklch(40% 0.19 275); }
+          .demo-11-3 .panel { display: none; padding: 1rem; }
+          .demo-11-3 .panel:target { display: block; }
+          .demo-11-3 .panel:first-of-type { display: block; }
+          .demo-11-3 .panel:first-of-type:not(:target) ~ .panel { display: none; }
+          .demo-11-3 .panel h3 { margin: 0 0 .5rem; }
+        </style>
+        <div class="demo-11-3">
+          <nav>
+            <a href="#d113-a">Overview</a>
+            <a href="#d113-b">Usage</a>
+            <a href="#d113-c">API</a>
+          </nav>
+          <section id="d113-a" class="panel"><h3>Overview</h3><p>First tab content.</p></section>
+          <section id="d113-b" class="panel"><h3>Usage</h3><p>Second tab content.</p></section>
+          <section id="d113-c" class="panel"><h3>API</h3><p>Third tab content.</p></section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="tabs"&gt;
+  &lt;nav&gt;
+    &lt;a href="#home"&gt;Home&lt;/a&gt;
+    &lt;a href="#about"&gt;About&lt;/a&gt;
+    &lt;a href="#contact"&gt;Contact&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;section id="home"&gt;&lt;h3&gt;Home&lt;/h3&gt;&lt;p&gt;Welcome.&lt;/p&gt;&lt;/section&gt;
+  &lt;section id="about"&gt;&lt;h3&gt;About&lt;/h3&gt;&lt;p&gt;About us.&lt;/p&gt;&lt;/section&gt;
+  &lt;section id="contact"&gt;&lt;h3&gt;Contact&lt;/h3&gt;&lt;p&gt;hello@example.com&lt;/p&gt;&lt;/section&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.tabs { border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; overflow: hidden; }
+.tabs nav { display: flex; background: oklch(96% 0.005 264); }
+.tabs nav a {
+  padding: .75rem 1rem;
+  text-decoration: none;
+  color: oklch(44% 0.020 264);
+  border-block-end: 3px solid transparent;
+}
+.tabs nav a:hover { color: oklch(40% 0.19 275); }
+
+.tabs section { display: none; padding: 1rem; }
+.tabs section:target { display: block; }
+/* Default: show the first panel if nothing is targeted */
+.tabs section:first-of-type { display: block; }
+.tabs section:first-of-type:not(:target) ~ section { display: none; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add <code>scroll-margin-block-start: 2rem</code> to the panels. Click between tabs and observe that the browser no longer scroll-jumps to the top of the panel. One property, an entire UX complaint handled.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-11.2-accordion-details-summary.html">← Lesson 11.2</a>
+      <a href="./lesson-11.4-popover-modal-overlay.html">Lesson 11.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>
