@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 11 Project — No-JS Pattern Library · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 11</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Module 11 · Project</p>
+      <h1>No-JS Pattern Library</h1>
+      <p class="lead">Six production UI patterns, one page, zero JavaScript. Accordion, tabs, modal, TOC, carousel, dropdown. Open DevTools and search the HTML for <code>&lt;script&gt;</code> — you will not find one.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Deliver a single HTML file that demonstrates every pattern from Module 11. Each pattern must be keyboard-accessible and work with JavaScript disabled. Modern-browser enhancements (popover animation, <code>:target-current</code>, scroll markers) are wrapped in <code>@supports</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Pattern library</h2>
+      <div class="demo-frame">
+        <style>
+          .m11p { display: grid; gap: 2rem; font-family: system-ui; }
+          .m11p h3 { margin: 0 0 .5rem; font-size: 1rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(44% 0.020 264); }
+
+          /* Accordion */
+          .m11p details { border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; background: #fff; padding: .5rem 1rem; margin-block-end: .5rem; }
+          .m11p summary { list-style: none; cursor: pointer; font-weight: 600; }
+          .m11p summary::-webkit-details-marker { display: none; }
+
+          /* Tabs */
+          .m11p .tabs { border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; overflow: hidden; }
+          .m11p .tabs nav { display: flex; background: oklch(96% 0.005 264); }
+          .m11p .tabs nav a { padding: .6rem 1rem; text-decoration: none; color: oklch(44% 0.020 264); font-weight: 600; }
+          .m11p .tabs section { display: none; padding: 1rem; }
+          .m11p .tabs section:target { display: block; }
+          .m11p .tabs section:first-of-type { display: block; }
+          .m11p .tabs section:first-of-type:not(:target) ~ section { display: none; }
+
+          /* Modal */
+          .m11p [popover] {
+            margin: auto;
+            padding: 1.5rem;
+            border: 1px solid oklch(85% 0.012 264);
+            border-radius: .75rem;
+            max-inline-size: 20rem;
+            box-shadow: 0 20px 50px oklch(0% 0 0 / .2);
+            opacity: 1; transform: translateY(0);
+            transition: opacity 250ms, transform 250ms, display 250ms allow-discrete, overlay 250ms allow-discrete;
+          }
+          .m11p [popover]:not(:popover-open) { opacity: 0; transform: translateY(.5rem); }
+          @starting-style { .m11p [popover]:popover-open { opacity: 0; transform: translateY(.5rem); } }
+          .m11p [popover]::backdrop { background: oklch(0% 0 0 / .5); }
+          .m11p .open { padding: .5rem 1rem; background: oklch(48% 0.22 275); color: #fff; border: 0; border-radius: .5rem; cursor: pointer; font: 600 .875rem system-ui; }
+
+          /* TOC */
+          .m11p .toc { display: grid; grid-template-columns: 10rem 1fr; gap: 1rem; }
+          .m11p .toc aside ol { counter-reset: toc; list-style: none; padding: 0; margin: 0; display: grid; gap: .2rem; }
+          .m11p .toc aside li { counter-increment: toc; }
+          .m11p .toc aside a { display: block; padding: .25rem .5rem; text-decoration: none; color: oklch(44% 0.020 264); border-radius: .25rem; font-size: .875rem; }
+          .m11p .toc aside a::before { content: counter(toc) ". "; color: oklch(48% 0.22 275); font-weight: 700; }
+          .m11p .toc .body { display: grid; gap: .75rem; max-block-size: 12rem; overflow-y: auto; }
+          .m11p .toc .body section { padding: 1rem; background: oklch(96% 0.005 264); border-radius: .5rem; scroll-margin-block-start: .5rem; }
+          @supports selector(:target-current) {
+            .m11p .toc aside { scroll-target-group: auto; }
+            .m11p .toc aside a:target-current { background: oklch(48% 0.22 275); color: #fff; }
+            .m11p .toc aside a:target-current::before { color: #fff; }
+          }
+
+          /* Carousel */
+          .m11p .carousel { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-block-end: .5rem; }
+          .m11p .carousel &gt; .slide { flex: 0 0 80%; aspect-ratio: 16/9; scroll-snap-align: center; border-radius: .5rem; display: grid; place-items: center; color: #fff; font-weight: 700; }
+          .m11p .slide:nth-child(1) { background: oklch(58% 0.22 275); }
+          .m11p .slide:nth-child(2) { background: oklch(65% 0.17 150); }
+          .m11p .slide:nth-child(3) { background: oklch(60% 0.22 25); }
+          @supports (scroll-marker-group: after) {
+            .m11p .carousel { scroll-marker-group: after; }
+            .m11p .slide::scroll-marker { content: ""; inline-size: .7rem; block-size: .7rem; border-radius: 50%; background: oklch(85% 0.012 264); margin: .25rem; }
+            .m11p .slide::scroll-marker:target-current { background: oklch(48% 0.22 275); }
+          }
+
+          /* Dropdown via details + :has */
+          .m11p nav.menu { display: flex; gap: .5rem; align-items: center; }
+          .m11p nav.menu details { position: relative; border: 0; padding: 0; margin: 0; background: transparent; }
+          .m11p nav.menu summary { padding: .5rem .75rem; border: 1px solid oklch(85% 0.012 264); border-radius: .375rem; background: #fff; }
+          .m11p nav.menu details[open] .dd { display: grid; }
+          .m11p nav.menu .dd { display: none; position: absolute; inset-block-start: 100%; inset-inline-start: 0; margin-block-start: .25rem; padding: .5rem; min-inline-size: 10rem; background: #fff; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; box-shadow: 0 8px 24px oklch(0% 0 0 / .08); gap: .25rem; }
+          .m11p nav.menu .dd a { padding: .25rem .5rem; text-decoration: none; color: oklch(22% 0.018 264); border-radius: .25rem; }
+          .m11p nav.menu .dd a:hover { background: oklch(95% 0.04 275); }
+          .m11p nav.menu:has(details[open]) { background: oklch(98% 0.02 275); border-radius: .5rem; padding: .25rem; }
+        </style>
+
+        <div class="m11p">
+          <section>
+            <h3>Accordion</h3>
+            <details><summary>First item</summary><p>Body.</p></details>
+            <details><summary>Second item</summary><p>Body.</p></details>
+            <details><summary>Third item</summary><p>Body.</p></details>
+          </section>
+
+          <section>
+            <h3>Tabs (:target)</h3>
+            <div class="tabs">
+              <nav>
+                <a href="#p-one">One</a>
+                <a href="#p-two">Two</a>
+                <a href="#p-three">Three</a>
+              </nav>
+              <section id="p-one"><strong>One</strong><p>First tab content.</p></section>
+              <section id="p-two"><strong>Two</strong><p>Second tab content.</p></section>
+              <section id="p-three"><strong>Three</strong><p>Third tab content.</p></section>
+            </div>
+          </section>
+
+          <section>
+            <h3>Modal (popover)</h3>
+            <button class="open" popovertarget="pl-modal">Open modal</button>
+            <div id="pl-modal" popover>
+              <h3 style="margin:0 0 .5rem;">Zero-JS modal</h3>
+              <p>ESC and click-outside both close it.</p>
+              <button class="open" popovertarget="pl-modal" popovertargetaction="hide">Close</button>
+            </div>
+          </section>
+
+          <section>
+            <h3>Sticky TOC + scrollspy</h3>
+            <div class="toc">
+              <aside>
+                <ol>
+                  <li><a href="#pl-a">Alpha</a></li>
+                  <li><a href="#pl-b">Bravo</a></li>
+                  <li><a href="#pl-c">Charlie</a></li>
+                </ol>
+              </aside>
+              <div class="body">
+                <section id="pl-a"><strong>Alpha</strong><p>Scroll me.</p></section>
+                <section id="pl-b"><strong>Bravo</strong><p>Second.</p></section>
+                <section id="pl-c"><strong>Charlie</strong><p>Third.</p></section>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3>Carousel</h3>
+            <div class="carousel">
+              <div class="slide">One</div>
+              <div class="slide">Two</div>
+              <div class="slide">Three</div>
+            </div>
+          </section>
+
+          <section>
+            <h3>Dropdown (details + :has)</h3>
+            <nav class="menu">
+              <span style="font-weight:600;">Navigation</span>
+              <details>
+                <summary>Products</summary>
+                <div class="dd">
+                  <a href="#">Overview</a>
+                  <a href="#">Pricing</a>
+                  <a href="#">Changelog</a>
+                </div>
+              </details>
+            </nav>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Deliverable</h2>
+      <p>Verify three things: (1) the page works with JavaScript disabled in the browser — every pattern still functions; (2) every interactive element is reachable and usable by keyboard alone; (3) screen-reader announcements are sensible on the accordion and modal. That is your acceptance test.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-11.6-carousel-scroll-marker.html">← Lesson 11.6</a>
+      <a href="../../module-12-capstone/index.html">Module 12 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

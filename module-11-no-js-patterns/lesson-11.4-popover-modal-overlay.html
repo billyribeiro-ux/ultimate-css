@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 11.4 — Modal: popover + ::backdrop · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 11</a>
+      <span>Lesson 11.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 11.4</p>
+      <h1>Modal: popover + ::backdrop</h1>
+      <p class="lead">The <code>popover</code> attribute is the single biggest no-JS win of the last five years. It promotes any element to the top layer, handles ESC dismissal, light-dismiss, focus trapping, and keyboard navigation — for free. A modal that used to be 200 lines of JavaScript is now one HTML attribute.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The minimum modal</h2>
+      <pre><code>&lt;button popovertarget="my-modal"&gt;Open&lt;/button&gt;
+&lt;div id="my-modal" popover="auto"&gt;
+  &lt;h2&gt;Modal title&lt;/h2&gt;
+  &lt;p&gt;Modal body.&lt;/p&gt;
+  &lt;button popovertarget="my-modal" popovertargetaction="hide"&gt;Close&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+      <p>That's the whole thing. The button opens the popover. ESC closes it. Click outside closes it. Focus is managed. The element is rendered above every ancestor's stacking context. No JavaScript.</p>
+
+      <h2>popover="auto" vs popover="manual"</h2>
+      <ul>
+        <li><code>popover="auto"</code> (default when you write just <code>popover</code>) — light-dismiss on outside click, ESC dismissal, only one <code>auto</code> popover open at a time. Perfect for modals and dropdowns.</li>
+        <li><code>popover="manual"</code> — no light-dismiss, you control visibility via the <code>popovertarget</code> buttons. Use for persistent toolbars.</li>
+      </ul>
+
+      <h2>Styling the backdrop</h2>
+      <pre><code>[popover]::backdrop {
+  background: oklch(0% 0 0 / .5);
+  backdrop-filter: blur(4px);
+}</code></pre>
+      <p>The <code>::backdrop</code> pseudo-element exists only while the popover is open and sits between it and the rest of the page. Style it as you would any element.</p>
+
+      <h2>Smooth enter/exit</h2>
+      <p>Popovers use <code>display: none</code> when closed, which historically was not transitionable. The new <code>allow-discrete</code> flag fixes this:</p>
+      <pre><code>[popover] {
+  opacity: 1; transform: translateY(0);
+  transition:
+    opacity 250ms,
+    transform 250ms,
+    display 250ms allow-discrete,
+    overlay 250ms allow-discrete;
+}
+[popover]:not(:popover-open) { opacity: 0; transform: translateY(.5rem); }
+@starting-style {
+  [popover]:popover-open { opacity: 0; transform: translateY(.5rem); }
+}</code></pre>
+
+      <h2>Browser support</h2>
+      <p><code>popover</code>: Chrome 114+, Safari 17+, Firefox 125+. Baseline. <code>@starting-style</code> + <code>allow-discrete</code> for smooth exit: Chrome 117+, Safari 17.5+, Firefox 129+. Without these, the popover still opens and closes — it just snaps instead of fading.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — modal with backdrop</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-11-4 .open-btn { padding: .5rem 1rem; background: oklch(48% 0.22 275); color: #fff; border: 0; border-radius: .5rem; cursor: pointer; font: 600 .875rem system-ui; }
+          .demo-11-4 [popover] {
+            margin: auto;
+            padding: 1.5rem;
+            border: 1px solid oklch(85% 0.012 264);
+            border-radius: .75rem;
+            box-shadow: 0 20px 50px oklch(0% 0 0 / .25);
+            max-inline-size: 24rem;
+            opacity: 1; transform: translateY(0);
+            transition:
+              opacity 250ms, transform 250ms,
+              display 250ms allow-discrete,
+              overlay 250ms allow-discrete;
+          }
+          .demo-11-4 [popover]:not(:popover-open) { opacity: 0; transform: translateY(.5rem); }
+          @starting-style { .demo-11-4 [popover]:popover-open { opacity: 0; transform: translateY(.5rem); } }
+          .demo-11-4 [popover]::backdrop { background: oklch(0% 0 0 / .5); backdrop-filter: blur(2px); }
+          .demo-11-4 h3 { margin: 0 0 .5rem; }
+          .demo-11-4 .close { margin-block-start: 1rem; padding: .4rem .75rem; border-radius: .375rem; border: 1px solid oklch(85% 0.012 264); background: #fff; cursor: pointer; }
+        </style>
+        <div class="demo-11-4">
+          <button class="open-btn" popovertarget="d114-modal">Open modal</button>
+          <div id="d114-modal" popover>
+            <h3>Zero-JS modal</h3>
+            <p>ESC closes. Click outside closes. Focus is trapped. Everything works.</p>
+            <button class="close" popovertarget="d114-modal" popovertargetaction="hide">Close</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button popovertarget="dlg"&gt;Confirm delete&lt;/button&gt;
+&lt;div id="dlg" popover&gt;
+  &lt;h3&gt;Delete this item?&lt;/h3&gt;
+  &lt;p&gt;This cannot be undone.&lt;/p&gt;
+  &lt;div class="row"&gt;
+    &lt;button popovertarget="dlg" popovertargetaction="hide"&gt;Cancel&lt;/button&gt;
+    &lt;button class="danger" popovertarget="dlg" popovertargetaction="hide"&gt;Delete&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+button { padding: .5rem 1rem; border-radius: .5rem; border: 1px solid oklch(85% 0.012 264); background: #fff; cursor: pointer; font: inherit; }
+.danger { background: oklch(60% 0.22 25); color: #fff; border-color: transparent; }
+
+[popover] {
+  margin: auto;
+  padding: 1.5rem;
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .75rem;
+  box-shadow: 0 20px 50px oklch(0% 0 0 / .25);
+  max-inline-size: 22rem;
+
+  opacity: 1; transform: translateY(0);
+  transition:
+    opacity 250ms, transform 250ms,
+    display 250ms allow-discrete,
+    overlay 250ms allow-discrete;
+}
+[popover]:not(:popover-open) { opacity: 0; transform: translateY(.5rem); }
+@starting-style {
+  [popover]:popover-open { opacity: 0; transform: translateY(.5rem); }
+}
+[popover]::backdrop { background: oklch(0% 0 0 / .5); backdrop-filter: blur(3px); }
+.row { display: flex; gap: .5rem; justify-content: flex-end; margin-block-start: 1rem; }
+h3 { margin: 0; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Test the modal with keyboard only: Tab to the trigger, Enter to open, Tab through the modal controls (focus should stay inside), ESC to close. Every one of those behaviors is free. Every one of them is something you would have had to hand-write in JavaScript last year.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-11.3-tabs-target-pseudo.html">← Lesson 11.3</a>
+      <a href="./lesson-11.5-sticky-toc-counter-scrollspy.html">Lesson 11.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

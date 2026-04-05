@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 11.6 — Carousel: scroll-marker + snap · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 11</a>
+      <span>Lesson 11.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 11.6</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Carousel: scroll-marker + snap</h1>
+      <p class="lead">Every carousel library ever shipped reinvents the same four things: a scroll container, snap alignment, navigation dots, prev/next buttons. CSS now provides all four primitives. A production carousel is about fifteen lines of CSS and zero lines of JavaScript.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The base layer (universal)</h2>
+      <pre><code>.carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.carousel &gt; * {
+  flex: 0 0 90%;
+  scroll-snap-align: center;
+}</code></pre>
+      <p>Baseline since 2019. Works in every browser. Scrolls horizontally, snaps to each slide, supports touch and trackpad natively. This alone is a usable carousel.</p>
+
+      <h2>The enhancement layer</h2>
+      <pre><code>.carousel { scroll-marker-group: after; }
+.carousel &gt; *::scroll-marker {
+  content: "";
+  inline-size: .6rem; block-size: .6rem;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+}
+.carousel &gt; *::scroll-marker:target-current {
+  background: var(--color-primary);
+}
+.carousel::scroll-button(left),
+.carousel::scroll-button(right) {
+  content: "";
+  /* style prev/next buttons here */
+}</code></pre>
+      <p><code>scroll-marker-group: after</code> tells the browser "render a marker group after this scroller". Each snap child contributes a <code>::scroll-marker</code> pseudo-element — the dots. <code>::scroll-button(left)</code> and <code>::scroll-button(right)</code> generate prev/next buttons that are keyboard-focusable and automatically disabled at the ends.</p>
+
+      <h2>The :target-current dot</h2>
+      <p>The marker for the currently-snapped slide automatically matches <code>:target-current</code>, so you get the active-dot state without writing any tracking code. This is the same primitive we used for the TOC scrollspy in Lesson 11.5, applied to carousel slides.</p>
+
+      <h2>Graceful degradation</h2>
+      <p>Wrap the marker and button rules in <code>@supports (scroll-marker-group: after)</code>. In non-supporting browsers you still have a perfectly usable scroll-snap carousel — just without dots or explicit buttons. The user can still swipe, arrow-key, and scroll. Nothing is broken.</p>
+
+      <h2>Browser support</h2>
+      <p>Scroll snap: baseline. <code>scroll-marker-group</code>, <code>::scroll-marker</code>, <code>::scroll-button()</code>: Chrome 135+, Edge 135+. Safari and Firefox pending. Always the <code>@supports</code> wrap.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — image carousel</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-11-6 .carousel {
+            display: flex; gap: 1rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-block-end: 1rem;
+          }
+          .demo-11-6 .carousel &gt; .slide {
+            flex: 0 0 85%;
+            aspect-ratio: 16/9;
+            scroll-snap-align: center;
+            border-radius: .75rem;
+            display: grid; place-items: center;
+            color: #fff; font-weight: 700; font-size: 1.25rem;
+          }
+          .demo-11-6 .slide:nth-child(1) { background: oklch(58% 0.22 275); }
+          .demo-11-6 .slide:nth-child(2) { background: oklch(65% 0.17 150); }
+          .demo-11-6 .slide:nth-child(3) { background: oklch(60% 0.22 25); }
+          .demo-11-6 .slide:nth-child(4) { background: oklch(78% 0.16 85); }
+          @supports (scroll-marker-group: after) {
+            .demo-11-6 .carousel { scroll-marker-group: after; }
+            .demo-11-6 .slide::scroll-marker {
+              content: "";
+              inline-size: .7rem; block-size: .7rem;
+              border-radius: 50%;
+              background: oklch(85% 0.012 264);
+              margin: .25rem;
+            }
+            .demo-11-6 .slide::scroll-marker:target-current { background: oklch(48% 0.22 275); }
+          }
+        </style>
+        <div class="demo-11-6">
+          <div class="carousel">
+            <div class="slide">Indigo</div>
+            <div class="slide">Green</div>
+            <div class="slide">Red</div>
+            <div class="slide">Amber</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="carousel"&gt;
+  &lt;figure&gt;Slide one&lt;/figure&gt;
+  &lt;figure&gt;Slide two&lt;/figure&gt;
+  &lt;figure&gt;Slide three&lt;/figure&gt;
+  &lt;figure&gt;Slide four&lt;/figure&gt;
+  &lt;figure&gt;Slide five&lt;/figure&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.carousel figure {
+  flex: 0 0 80%;
+  margin: 0;
+  aspect-ratio: 16/9;
+  scroll-snap-align: center;
+  display: grid; place-items: center;
+  background: oklch(92% 0.008 264);
+  border-radius: .5rem;
+  font-size: 1.5rem; font-weight: 700;
+  color: oklch(33% 0.020 264);
+}
+
+@supports (scroll-marker-group: after) {
+  .carousel { scroll-marker-group: after; }
+  .carousel figure::scroll-marker {
+    content: "";
+    inline-size: .75rem; block-size: .75rem;
+    border-radius: 50%;
+    background: oklch(85% 0.012 264);
+    margin: .25rem;
+  }
+  .carousel figure::scroll-marker:target-current {
+    background: oklch(48% 0.22 275);
+  }
+  .carousel::scroll-button(left),
+  .carousel::scroll-button(right) {
+    content: "";
+    inline-size: 2rem; block-size: 2rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid oklch(85% 0.012 264);
+    cursor: pointer;
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Resize the preview and scroll the carousel. Observe that touch, mouse wheel, arrow keys, and the generated scroll buttons all drive the same snap container. A library would have needed a dozen event handlers. You wrote CSS.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-11.5-sticky-toc-counter-scrollspy.html">← Lesson 11.5</a>
+      <a href="./project/index.html">Module 11 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>
