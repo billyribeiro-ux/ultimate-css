@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.7 — @layer components · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.7</p>
+      <h1>@layer components</h1>
+      <p class="lead">Named UI pieces. This is where buttons, cards, dialogs, badges, and forms live. Each component has one responsibility, uses semantic tokens, and exposes its own customisation surface through scoped custom properties.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single responsibility</h2>
+      <p>A component in the components layer is a reusable, named piece of UI with a single semantic purpose. A <code>.btn</code> is an action trigger. A <code>.card</code> is a grouped content container. A <code>.badge</code> is a short status indicator. If a rule targets a named piece of UI, it belongs here. If it targets raw elements or layout primitives, it does not.</p>
+      <p>Components are always classes. Never elements, never IDs.</p>
+
+      <h2>Scoped custom properties — the core pattern</h2>
+      <p>Every component exposes its variable surface through custom properties namespaced to the component. Consumers theme the component by setting those properties. The component itself reads from them with sensible defaults:</p>
+      <pre><code>@layer components {
+  .btn {
+    --btn-bg:      var(--color-brand);
+    --btn-fg:      #fff;
+    --btn-padding: var(--space-2) var(--space-4);
+    --btn-radius:  var(--radius-md);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--btn-bg);
+    color:      var(--btn-fg);
+    padding:    var(--btn-padding);
+    border-radius: var(--btn-radius);
+    border: 0;
+  }
+
+  .btn.danger {
+    --btn-bg: var(--color-danger);
+  }
+
+  .btn.ghost {
+    --btn-bg: transparent;
+    --btn-fg: var(--color-brand);
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+  }
+}</code></pre>
+      <p>Notice what the <code>.danger</code> and <code>.ghost</code> variants do: they change <em>one custom property each</em>. They do not rewrite the whole rule. They do not fight specificity. They do not need <code>!important</code>. The component owns its customisation surface; variants are configuration, not override.</p>
+
+      <h2>The single responsibility test, applied</h2>
+      <p>Before shipping a component, answer: "What is this component's one job?" If you cannot say it in a single clause, the component is two components. Split them.</p>
+      <ul>
+        <li><strong>.btn</strong> → "trigger an action."</li>
+        <li><strong>.card</strong> → "group related content visually."</li>
+        <li><strong>.badge</strong> → "display a short status label."</li>
+        <li><strong>.dialog</strong> → "present modal content."</li>
+      </ul>
+      <p>A <code>.card-with-header-and-footer-and-buttons</code> is not a component. It is a layout of components. The individual pieces each live in the components layer; the composition lives in whichever page or feature uses them.</p>
+
+      <h2>What components must not contain</h2>
+      <ul>
+        <li>No element selectors at the top level. <code>.card h2 { ... }</code> is fine <em>inside</em> the card; <code>h2 { ... }</code> standalone is <code>base</code>.</li>
+        <li>No layout primitives. A card does not redefine <code>.stack</code>; it consumes it from layout.</li>
+        <li>No raw colour values. Every colour resolves through tokens.</li>
+        <li>No component reaching into another component by name. <code>.card .btn { ... }</code> is a code smell — it means the component is trying to own something it does not own.</li>
+        <li>No <code>!important</code>. If you need it, the architecture is wrong, not the rule.</li>
+      </ul>
+
+      <h2>Component files</h2>
+      <p>In practice, each component lives in its own file: <code>components/btn.css</code>, <code>components/card.css</code>, <code>components/dialog.css</code>. All of them are imported into the <code>components</code> layer via <code>@import url("./components/btn.css") layer(components);</code>. The file boundary and the layer boundary reinforce each other.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — button with scoped custom properties</h2>
+      <div class="demo-frame">
+        <style>
+          @layer tokens37, components37;
+          @layer tokens37 {
+            .demo-3-7 {
+              --color-brand: oklch(58% 0.22 275);
+              --color-danger: oklch(60% 0.22 25);
+              --space-2: .5rem; --space-4: 1rem;
+              --radius-md: .375rem;
+            }
+          }
+          @layer components37 {
+            .demo-3-7 .btn {
+              --btn-bg: var(--color-brand);
+              --btn-fg: #fff;
+              display: inline-flex; gap: var(--space-2);
+              background: var(--btn-bg); color: var(--btn-fg);
+              padding: var(--space-2) var(--space-4);
+              border-radius: var(--radius-md); border: 0;
+              font-family: system-ui;
+            }
+            .demo-3-7 .btn.danger { --btn-bg: var(--color-danger); }
+            .demo-3-7 .btn.ghost  { --btn-bg: transparent; --btn-fg: var(--color-brand);
+                                    box-shadow: inset 0 0 0 1px var(--color-brand); }
+          }
+          .demo-3-7 { font-family: system-ui; display: flex; gap: .5rem; }
+        </style>
+        <div class="demo-3-7">
+          <button class="btn">Primary</button>
+          <button class="btn danger">Danger</button>
+          <button class="btn ghost">Ghost</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="btn"&gt;Primary&lt;/button&gt;
+&lt;button class="btn danger"&gt;Danger&lt;/button&gt;
+&lt;button class="btn ghost"&gt;Ghost&lt;/button&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer tokens, components;
+
+@layer tokens {
+  :root {
+    --color-brand:  oklch(58% 0.22 275);
+    --color-danger: oklch(60% 0.22 25);
+    --space-2: .5rem;
+    --space-4: 1rem;
+    --radius-md: .375rem;
+  }
+}
+
+@layer components {
+  .btn {
+    --btn-bg: var(--color-brand);
+    --btn-fg: #fff;
+
+    display: inline-flex; align-items: center;
+    background: var(--btn-bg); color: var(--btn-fg);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md); border: 0;
+    font-family: system-ui; cursor: pointer;
+  }
+
+  .btn.danger { --btn-bg: var(--color-danger); }
+
+  .btn.ghost {
+    --btn-bg: transparent;
+    --btn-fg: var(--color-brand);
+    box-shadow: inset 0 0 0 1px var(--color-brand);
+  }
+}
+
+body { padding: 1rem; display: flex; gap: .5rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a new variant <code>.btn.success</code> that uses a green brand colour. You should only need to set <em>one</em> custom property to do it. If you find yourself rewriting the whole rule, you are fighting the component instead of configuring it — back up and try again.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.6-at-layer-layout.html">← Lesson 3.6</a>
+      <a href="./lesson-3.8-at-layer-animations.html">Lesson 3.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

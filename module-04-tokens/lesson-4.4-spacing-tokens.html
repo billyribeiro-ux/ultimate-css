@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.4 — Spacing Tokens · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.4</p>
+      <h1>Spacing Tokens</h1>
+      <p class="lead">A fixed T-shirt scale, always in <code>rem</code>, with semantic aliases for common uses. Spacing is where the discipline of tokens is most visible — and where raw numbers in a component hurt most.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why a scale, not free numbers</h2>
+      <p>The moment any component sets <code>padding: 0.625rem</code>, the design system has a hole in it. That value is not in the scale, which means no other component can match it, which means visual rhythm breaks in ways that are hard to see but impossible to unsee once you look. A scale prevents the hole by making only a small set of values legitimate.</p>
+      <p>The scale also makes design reviews fast. "Use <code>--space-4</code> here" is a conversation. "Use 0.9375rem" is not.</p>
+
+      <h2>The primitive scale</h2>
+      <p>PE7 uses a roughly 4px-grid scale. Every value is a <code>rem</code>, so the user's font-size preference scales the entire layout:</p>
+      <pre><code>:root {
+  --space-0:  0;
+  --space-1:  0.25rem;  /* 4px  */
+  --space-2:  0.5rem;   /* 8px  */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.25rem;  /* 20px */
+  --space-6:  1.5rem;   /* 24px */
+  --space-8:  2rem;     /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+}</code></pre>
+      <p>The numeric suffixes correspond to the value in 0.25rem units, so <code>--space-6</code> is 6 × 0.25rem = 1.5rem. That naming lets you do mental math without a lookup table.</p>
+
+      <h2>Why rem, not px</h2>
+      <p>Users who bump their browser font size up to 200% for readability should see your entire layout scale with them. <code>rem</code> units make this automatic; <code>px</code> units freeze the layout at the designer's font size. A single <code>padding: 20px</code> in a component is an accessibility bug waiting for a bad review.</p>
+
+      <h2>Semantic aliases</h2>
+      <p>Just like colour, spacing gets semantic aliases for common uses:</p>
+      <pre><code>:root {
+  --space-gutter:        var(--space-4);
+  --space-section:       var(--space-16);
+  --space-inline-inset:  var(--space-4);
+  --space-card-pad:      var(--space-4);
+  --space-field-gap:     var(--space-2);
+}</code></pre>
+      <p>Rebranding spacing is now a search-and-replace on a handful of semantic tokens. Reshaping the entire visual density of the product happens in one file.</p>
+
+      <h2>What never lives in the spacing scale</h2>
+      <ul>
+        <li>Arbitrary values. If a component needs a one-off, it needs a new scale stop first.</li>
+        <li>Pixel values. The scale is rem-only.</li>
+        <li>Negative values. Negative margins are a code smell; express the same idea with grid gaps or flex orderings.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — the scale, visualised</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-4-4 {
+            --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem;
+            --space-6: 1.5rem; --space-8: 2rem; --space-12: 3rem; --space-16: 4rem;
+            font-family: system-ui; padding: 1rem;
+          }
+          .demo-4-4 .row { display: flex; align-items: center; gap: .75rem; margin-block: .25rem; }
+          .demo-4-4 .bar { background: oklch(55% 0.22 290); height: .75rem; border-radius: .125rem; }
+          .demo-4-4 code { font-family: ui-monospace, monospace; font-size: .8rem; color: oklch(40% 0.02 264); }
+        </style>
+        <div class="demo-4-4">
+          <div class="row"><div class="bar" style="width: var(--space-1);"></div><code>--space-1 · 0.25rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-2);"></div><code>--space-2 · 0.5rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-3);"></div><code>--space-3 · 0.75rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-4);"></div><code>--space-4 · 1rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-6);"></div><code>--space-6 · 1.5rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-8);"></div><code>--space-8 · 2rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-12);"></div><code>--space-12 · 3rem</code></div>
+          <div class="row"><div class="bar" style="width: var(--space-16);"></div><code>--space-16 · 4rem</code></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="card"&gt;
+  &lt;h1&gt;Spacing tokens&lt;/h1&gt;
+  &lt;p&gt;Every gap, padding, and margin references a token. Change --space-4 once — everything tightens or loosens together.&lt;/p&gt;
+  &lt;button class="btn"&gt;Action&lt;/button&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+
+  --space-card-pad: var(--space-6);
+  --space-field-gap: var(--space-3);
+}
+
+body { font-family: system-ui; padding: var(--space-4); }
+.card {
+  padding: var(--space-card-pad);
+  background: oklch(96% 0.005 264);
+  border-radius: .5rem;
+  display: grid;
+  gap: var(--space-field-gap);
+  max-width: 40ch;
+}
+.card h1 { margin: 0; font-size: 1.25rem; }
+.card p  { margin: 0; line-height: 1.55; }
+.btn {
+  background: oklch(58% 0.22 275); color: #fff;
+  padding: var(--space-2) var(--space-4); border: 0;
+  border-radius: .375rem; font: inherit; justify-self: start;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--space-card-pad</code> from <code>var(--space-6)</code> to <code>var(--space-8)</code>. The card loosens. Now change <code>--space-4</code> itself — a primitive. What shifts? What does not? Articulate the division of labour between primitives and semantic aliases in one sentence.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-4.3-building-color-system-oklch.html">← Lesson 4.3</a>
+      <a href="./lesson-4.5-typography-tokens.html">Lesson 4.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

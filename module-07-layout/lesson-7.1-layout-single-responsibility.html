@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.1 — Layout's Single Responsibility · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.1</p>
+      <h1>Layout's Single Responsibility</h1>
+      <p class="lead">Every layout primitive answers exactly one question, and it never answers any other. This rule is what makes six small classes enough to build any real layout, and it is what makes layout CSS the most portable part of a PE7 stylesheet.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What layout does</h2>
+      <p>Layout decides the <em>spatial relationship</em> between children. Vertical or horizontal, one column or many, wrap or overflow, centred or aligned, near or far. Those are layout's questions. Everything else — colors, shadows, fonts, borders — is a component's question.</p>
+
+      <h2>The six primitives</h2>
+      <p>Six classes cover the vast majority of production layouts. They are deliberately few, deliberately boring, and deliberately composable.</p>
+      <ol>
+        <li><strong>container</strong> — "constrain inline width and centre inside the viewport."</li>
+        <li><strong>stack</strong> — "vertical flow with consistent gap."</li>
+        <li><strong>cluster</strong> — "horizontal flow that wraps when there is not enough room."</li>
+        <li><strong>sidebar</strong> — "a fixed-basis column next to a flexible column, collapsing to one column below a threshold."</li>
+        <li><strong>grid</strong> — "responsive columns that fit as many items as possible."</li>
+        <li><strong>cover</strong> — "full-viewport-height centred content."</li>
+      </ol>
+
+      <h2>Composition, not specialisation</h2>
+      <p>Every complex layout you need is a composition of these primitives. A documentation page is a <code>container &gt; stack</code>. A product listing is a <code>container &gt; stack &gt; grid</code>. A blog article is a <code>container &gt; sidebar &gt; stack + stack</code>. When you find yourself writing a new layout class for a specific page, you are specialising — and specialisation is almost always a composition you have not spotted yet.</p>
+
+      <h2>The anti-pattern: component-level layout</h2>
+      <p>A <code>.card</code> that writes its own <code>display: grid; grid-template-columns: 1fr 2fr;</code> is a component doing layout work. That is the anti-pattern this module exists to kill. When a card contains a layout, the layout should be a primitive class on a child element, not a rule on the card itself:</p>
+      <pre><code>&lt;!-- Wrong: card does layout --&gt;
+&lt;div class="card"&gt;
+  &lt;img ...&gt;
+  &lt;div&gt;
+    &lt;h3&gt;Title&lt;/h3&gt;
+    &lt;p&gt;Body&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Right: card is visual, layout is composed --&gt;
+&lt;div class="card sidebar"&gt;
+  &lt;img ...&gt;
+  &lt;div class="stack"&gt;
+    &lt;h3&gt;Title&lt;/h3&gt;
+    &lt;p&gt;Body&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+      <p>The "right" version reuses <code>.sidebar</code> and <code>.stack</code> — two layout primitives the rest of the page is already using. No special CSS is added for this particular card.</p>
+
+      <h2>Why zero visual opinions</h2>
+      <p>If <code>.stack</code> sets a background color, you cannot use it on a light section and a dark section. If <code>.grid</code> sets a font, you cannot use it inside a heading and a body. The moment a layout primitive has a visual opinion, it stops being reusable. Reusability is the entire point.</p>
+
+      <h2>Interface as custom properties</h2>
+      <p>Each primitive exposes its knobs as custom properties with sensible defaults:</p>
+      <pre><code>.stack { --stack-gap: var(--space-md); gap: var(--stack-gap); }
+.stack-lg { --stack-gap: var(--space-xl); }
+
+/* Consumer can also set it inline, or from a component */
+.hero &gt; .stack { --stack-gap: var(--space-2xl); }</code></pre>
+      <p>The component layer never overrides the primitive's property directly — it sets a custom property, and the primitive picks it up. This is the same contract pattern we introduced for buttons in Module 3.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — same HTML, different compositions</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-1 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-7-1 > section { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; background: #fff; }
+          .demo-7-1 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-7-1 .item { padding: .5rem .75rem; background: oklch(96% 0.01 275); border-radius: .375rem; border: 1px solid oklch(85% 0.02 275); }
+          .demo-7-1 .stack { display: flex; flex-direction: column; gap: .5rem; }
+          .demo-7-1 .cluster { display: flex; flex-wrap: wrap; gap: .5rem; }
+        </style>
+        <div class="demo-7-1">
+          <section>
+            <h4>stack composition</h4>
+            <div class="stack">
+              <div class="item">One</div>
+              <div class="item">Two</div>
+              <div class="item">Three</div>
+            </div>
+          </section>
+          <section>
+            <h4>cluster composition</h4>
+            <div class="cluster">
+              <div class="item">One</div>
+              <div class="item">Two</div>
+              <div class="item">Three</div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="stack"&gt;
+  &lt;div class="cluster"&gt;
+    &lt;span class="chip"&gt;CSS&lt;/span&gt;
+    &lt;span class="chip"&gt;HTML&lt;/span&gt;
+    &lt;span class="chip"&gt;Layered&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p&gt;Same children, two compositions.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .stack { display: flex; flex-direction: column; gap: 1rem; }
+  .cluster { display: flex; flex-wrap: wrap; gap: .5rem; }
+}
+
+@layer components {
+  .chip {
+    padding: .25rem .5rem;
+    background: oklch(96% 0.01 275);
+    border: 1px solid oklch(80% 0.02 275);
+    border-radius: 999px;
+    font-size: .8rem;
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+p { margin: 0; color: oklch(40% 0.02 264); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open any component in your last project. List every CSS property on that component. Cross out every property that is about visual appearance (color, font, shadow, border). What remains is layout. If what remains is more than two or three properties, that component has a layout primitive inside it waiting to be extracted.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 7</a>
+      <a href="./lesson-7.2-container-primitive.html">Lesson 7.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

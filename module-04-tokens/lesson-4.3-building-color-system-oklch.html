@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.3 — Building a Color System in OKLCH · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.3</p>
+      <h1>Building a Color System in OKLCH</h1>
+      <p class="lead">A palette is not a list of colours — it is a structure. A 9-stop scale per hue, semantic aliases pointing into those stops, and a dark mode that flips the scale, not the names.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The 9-stop scale, per hue</h2>
+      <p>For each brand hue, PE7 defines a 9-stop scale from <code>-50</code> (lightest) to <code>-900</code> (darkest). The lightness values are fixed across all hues so that a step across scales feels consistent. A typical scale:</p>
+      <pre><code>:root {
+  --purple-50:  oklch(97% 0.02 290);
+  --purple-100: oklch(93% 0.04 290);
+  --purple-200: oklch(86% 0.08 290);
+  --purple-300: oklch(78% 0.13 290);
+  --purple-400: oklch(68% 0.18 290);
+  --purple-500: oklch(55% 0.22 290);  /* base */
+  --purple-600: oklch(47% 0.22 290);
+  --purple-700: oklch(38% 0.19 290);
+  --purple-800: oklch(28% 0.14 290);
+  --purple-900: oklch(18% 0.08 290);
+}</code></pre>
+      <p><code>-500</code> is the "base" stop of the hue. Chroma usually peaks in the middle of the scale and tapers toward white and black, because near-white and near-black can only hold so much saturation before clipping.</p>
+
+      <h2>Repeat per hue</h2>
+      <p>You do the same thing for gray (chroma near 0, a cool or warm hue like 264), plus at least one accent per semantic status: success (green, H ≈ 150), warning (amber, H ≈ 85), danger (red, H ≈ 25).</p>
+      <pre><code>:root {
+  --gray-50:  oklch(98% 0.003 264);
+  /* ...through... */
+  --gray-900: oklch(14% 0.015 264);
+
+  --green-500: oklch(60% 0.17 150);
+  --amber-500: oklch(75% 0.15  85);
+  --red-500:   oklch(60% 0.22  25);
+}</code></pre>
+
+      <h2>Semantic aliases</h2>
+      <p>Primitives are never used directly by components. Semantic aliases name intentions and point into the scale:</p>
+      <pre><code>:root {
+  --color-brand:         var(--purple-500);
+  --color-brand-hover:   var(--purple-600);
+  --color-brand-muted:   var(--purple-100);
+
+  --color-surface:       var(--gray-50);
+  --color-surface-alt:   var(--gray-100);
+  --color-border:        var(--gray-200);
+  --color-text:          var(--gray-900);
+  --color-text-muted:    var(--gray-600);
+
+  --color-success:       var(--green-500);
+  --color-warning:       var(--amber-500);
+  --color-danger:        var(--red-500);
+
+  --color-focus:         var(--purple-400);
+}</code></pre>
+
+      <h2>Dark mode with <code>light-dark()</code></h2>
+      <p>Modern CSS has a first-class dark mode switch: the <code>light-dark()</code> function. It takes two values — one for light, one for dark — and resolves based on the <code>color-scheme</code> property. Combine it with semantic aliases and dark mode becomes a single pass through your semantic tokens, not a duplicate palette:</p>
+      <pre><code>:root {
+  color-scheme: light dark;
+
+  --color-surface: light-dark(var(--gray-50),  var(--gray-900));
+  --color-text:    light-dark(var(--gray-900), var(--gray-50));
+  --color-border:  light-dark(var(--gray-200), var(--gray-700));
+  --color-brand:   light-dark(var(--purple-500), var(--purple-400));
+}</code></pre>
+      <p>Notice that the <em>primitives</em> are unchanged. Only the <em>semantic aliases</em> switch. The brand token resolves to <code>purple-500</code> in light mode and <code>purple-400</code> in dark because a slightly lighter brand reads better against a dark surface. That tuning is the whole point of having semantic aliases.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — a scale, semantic aliases applied</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-4-3 {
+            --purple-50:  oklch(97% 0.02 290);
+            --purple-100: oklch(93% 0.04 290);
+            --purple-200: oklch(86% 0.08 290);
+            --purple-300: oklch(78% 0.13 290);
+            --purple-400: oklch(68% 0.18 290);
+            --purple-500: oklch(55% 0.22 290);
+            --purple-600: oklch(47% 0.22 290);
+            --purple-700: oklch(38% 0.19 290);
+            --purple-800: oklch(28% 0.14 290);
+            --purple-900: oklch(18% 0.08 290);
+            font-family: system-ui; padding: 1rem;
+          }
+          .demo-4-3 .scale { display: grid; grid-template-columns: repeat(10, 1fr); gap: .25rem; }
+          .demo-4-3 .stop { aspect-ratio: 1; border-radius: .25rem; }
+          .demo-4-3 .s50  { background: var(--purple-50); }
+          .demo-4-3 .s100 { background: var(--purple-100); }
+          .demo-4-3 .s200 { background: var(--purple-200); }
+          .demo-4-3 .s300 { background: var(--purple-300); }
+          .demo-4-3 .s400 { background: var(--purple-400); }
+          .demo-4-3 .s500 { background: var(--purple-500); }
+          .demo-4-3 .s600 { background: var(--purple-600); }
+          .demo-4-3 .s700 { background: var(--purple-700); }
+          .demo-4-3 .s800 { background: var(--purple-800); }
+          .demo-4-3 .s900 { background: var(--purple-900); }
+        </style>
+        <div class="demo-4-3">
+          <div class="scale">
+            <div class="stop s50"></div><div class="stop s100"></div><div class="stop s200"></div>
+            <div class="stop s300"></div><div class="stop s400"></div><div class="stop s500"></div>
+            <div class="stop s600"></div><div class="stop s700"></div><div class="stop s800"></div>
+            <div class="stop s900"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;h1&gt;Semantic tokens in action&lt;/h1&gt;
+  &lt;p&gt;Change the primitive purple-500 value and watch the brand shift everywhere.&lt;/p&gt;
+  &lt;button class="btn"&gt;Primary&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  /* Primitives */
+  --purple-400: oklch(68% 0.18 290);
+  --purple-500: oklch(55% 0.22 290);
+  --gray-50:    oklch(98% 0.003 264);
+  --gray-200:   oklch(90% 0.01 264);
+  --gray-900:   oklch(14% 0.015 264);
+
+  /* Semantic */
+  --color-surface: var(--gray-50);
+  --color-border:  var(--gray-200);
+  --color-text:    var(--gray-900);
+  --color-brand:   var(--purple-500);
+  --color-focus:   var(--purple-400);
+}
+
+body { font-family: system-ui; padding: 1rem; background: var(--color-surface); color: var(--color-text); }
+.card { padding: 1rem; background: #fff; border: 1px solid var(--color-border); border-radius: .5rem; max-width: 40ch; }
+.btn {
+  background: var(--color-brand); color: #fff;
+  padding: .5rem 1rem; border: 0; border-radius: .375rem;
+  font: inherit;
+}
+.btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Replace <code>--purple-500</code> with <code>oklch(60% 0.17 150)</code>. The brand rebrands to green in one edit, and the card, button, and focus ring all follow. Now try to do the same rebrand by pointing <code>--color-brand</code> directly at a primitive from a new scale — <code>--teal-500</code>. Which approach is more honest about what "rebranding" means?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-4.2-why-oklch.html">← Lesson 4.2</a>
+      <a href="./lesson-4.4-spacing-tokens.html">Lesson 4.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

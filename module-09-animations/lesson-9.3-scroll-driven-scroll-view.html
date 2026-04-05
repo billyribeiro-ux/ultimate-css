@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.3 — Scroll-Driven Animations · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.3</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Scroll-Driven Animations</h1>
+      <p class="lead">Scroll progress bars, reveal-on-scroll, parallax, sticky-until-past — for a decade these required IntersectionObserver plus requestAnimationFrame plus main-thread layout. The browser can now drive any animation directly from scroll position, off the main thread, in CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Two timelines</h2>
+      <p>Every scroll-driven animation binds to one of two timelines:</p>
+      <ul>
+        <li><strong><code>scroll()</code></strong> — progresses 0 → 100% as a scroll container scrolls from top to bottom. Perfect for reading progress bars.</li>
+        <li><strong><code>view()</code></strong> — progresses 0 → 100% as a specific element enters and exits the scrollport. Perfect for reveal-on-scroll.</li>
+      </ul>
+
+      <h2>Progress bar</h2>
+      <pre><code>.progress {
+  position: fixed; inset-block-start: 0; inset-inline: 0;
+  block-size: 4px; transform-origin: 0 50%;
+  animation: grow linear;
+  animation-timeline: scroll(root block);
+}
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }</code></pre>
+      <p>No event listener, no throttling, no main-thread work. The browser runs the animation on the compositor.</p>
+
+      <h2>Reveal on scroll</h2>
+      <pre><code>.reveal {
+  animation: fade-up linear;
+  animation-timeline: view();
+  animation-range: entry 0% entry 40%;
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(2rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}</code></pre>
+      <p><code>animation-range: entry 0% entry 40%</code> means "start the animation the moment the element enters the scrollport; finish it when it is 40% of the way in". The range syntax is the scroll-driven equivalent of a duration.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 115+, Edge 115+, Safari 26+, Firefox experimental. Always wrap in <code>@supports (animation-timeline: scroll())</code>. The fallback is: element is simply visible in its final state.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — scroll-driven progress</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-3 .scroller { block-size: 12rem; overflow-y: auto; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; position: relative; }
+          .demo-9-3 .bar { position: sticky; inset-block-start: 0; block-size: 4px; background: oklch(48% 0.22 275); transform-origin: 0 50%; transform: scaleX(0); }
+          .demo-9-3 .content { padding: 1rem; }
+          .demo-9-3 .content p { margin: 0 0 1rem; }
+          @supports (animation-timeline: scroll()) {
+            .demo-9-3 .scroller { scroll-timeline: --s block; }
+            .demo-9-3 .bar { animation: d93-grow linear both; animation-timeline: --s; }
+            @keyframes d93-grow { to { transform: scaleX(1); } }
+          }
+        </style>
+        <div class="demo-9-3">
+          <div class="scroller">
+            <div class="bar"></div>
+            <div class="content">
+              <p>Scroll this box. The bar at the top tracks your scroll position.</p>
+              <p>Line two. Line three. Line four. Line five. Line six.</p>
+              <p>Seven. Eight. Nine. Ten. Eleven.</p>
+              <p>Twelve. Thirteen. Fourteen. Fifteen. Sixteen.</p>
+              <p>Seventeen. Eighteen. Nineteen. Twenty. End.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="wrap"&gt;
+  &lt;section class="card"&gt;Card one&lt;/section&gt;
+  &lt;section class="card"&gt;Card two&lt;/section&gt;
+  &lt;section class="card"&gt;Card three&lt;/section&gt;
+  &lt;section class="card"&gt;Card four&lt;/section&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+.wrap { display: grid; gap: 3rem; padding-block: 3rem; }
+.card {
+  padding: 2rem;
+  background: oklch(95% 0.04 275);
+  border-radius: .75rem;
+  font-weight: 600;
+}
+
+@supports (animation-timeline: view()) {
+  .card {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(2rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>animation-range</code> to <code>cover 0% cover 100%</code>. Scroll through the preview and watch the animation now span the element's entire time in the viewport. Try <code>exit 0% exit 100%</code> — now the card only animates on the way out. Each keyword range is a different story the animation can tell about the element's relationship to the scrollport.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.2-at-starting-style.html">← Lesson 9.2</a>
+      <a href="./lesson-9.4-scroll-state-container-queries.html">Lesson 9.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

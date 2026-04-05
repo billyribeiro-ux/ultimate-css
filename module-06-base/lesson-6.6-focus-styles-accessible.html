@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.6 — Accessible Focus Styles · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.6</p>
+      <h1>Accessible Focus Styles</h1>
+      <p class="lead">Every keyboard user relies on focus rings to know where they are. Every designer complains that the default rings are ugly. The base layer reconciles both — a clean, high-contrast, intentional ring that appears only for keyboard users, satisfies WCAG, and matches your design tokens.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The :focus-visible split</h2>
+      <p>The pseudo-class <code>:focus</code> matches any focused element, whether focus came from a keyboard, a click, or a script. <code>:focus-visible</code> matches only when the browser decides the user needs a visible indicator — essentially, keyboard and programmatic focus, never clicks on a button. The base layer uses both.</p>
+      <pre><code>:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}</code></pre>
+      <p>The first rule draws the ring when the user needs it. The second rule explicitly removes the ring when <code>:focus-visible</code> is not active — this is necessary because setting <code>outline: none</code> on everything and then re-adding it for <code>:focus-visible</code> breaks browsers that have not implemented the pseudo-class. The "<code>:not(:focus-visible)</code>" pattern is the safe form.</p>
+
+      <h2>WCAG 2.4.11: focus contrast</h2>
+      <p>WCAG 2.2 requires focus indicators to meet a 3:1 contrast ratio against the adjacent background. A 1px outline in a light-grey color does not pass. The PE7 pattern uses a <code>--color-focus</code> token defined to be high-contrast in both light and dark modes — typically a saturated OKLCH around 55% lightness for light mode and 75% for dark.</p>
+
+      <h2>outline, not box-shadow</h2>
+      <p>A common trick is to use <code>box-shadow: 0 0 0 3px</code> as a focus ring because it can have rounded corners and color-mixing. Do not use it in base. <code>box-shadow</code> is part of the element's paint box and is clipped by <code>overflow: hidden</code>; a focus ring on a button inside a rounded-corner card can disappear entirely. <code>outline</code> is drawn outside the box and is never clipped — and as of 2023, <code>outline</code> supports the <code>border-radius</code> of its element, so the ring follows rounded corners natively.</p>
+
+      <h2>outline-offset</h2>
+      <p>A 3px offset pushes the ring away from the element so it reads as a halo rather than a border. On tight layouts reduce it to 2px; on roomy layouts increase it to 4px. This is a taste call, but never set it to 0 — a zero-offset outline is indistinguishable from a plain border when the element already has one.</p>
+
+      <h2>Skip links</h2>
+      <p>Not a base-layer rule, but worth knowing: every keyboard-navigable page benefits from a "skip to main content" link as the first focusable element. It lives in the components layer, not here.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — tab through these controls</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-6 { font-family: system-ui; display: flex; flex-wrap: wrap; gap: .75rem; padding: 1rem; }
+          .demo-6-6 button, .demo-6-6 a, .demo-6-6 input {
+            font: inherit; border: 1px solid oklch(80% 0.02 264); padding: .4rem .8rem; border-radius: .375rem; background: oklch(98% 0.005 264); color: oklch(20% 0.02 264); cursor: pointer;
+          }
+          .demo-6-6 :focus-visible {
+            outline: 2px solid oklch(60% 0.22 275);
+            outline-offset: 3px;
+          }
+          .demo-6-6 :focus:not(:focus-visible) { outline: none; }
+          .demo-6-6 a { text-decoration: none; }
+        </style>
+        <div class="demo-6-6">
+          <button>Tab to me</button>
+          <a href="#">Then me</a>
+          <input type="text" placeholder="And me">
+          <button>Click me (no ring)</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;form&gt;
+  &lt;input type="text" placeholder="Tab here first"&gt;
+  &lt;button type="button"&gt;Then here&lt;/button&gt;
+  &lt;a href="#"&gt;And here&lt;/a&gt;
+&lt;/form&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  :root {
+    --color-focus: oklch(60% 0.22 275);
+    --radius-sm: .25rem;
+  }
+
+  body { font-family: system-ui; padding: 1rem; }
+  form { display: flex; gap: .75rem; align-items: center; }
+  input, button { font: inherit; padding: .4rem .8rem; border: 1px solid #bbb; border-radius: .375rem; }
+  a { color: var(--color-focus); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+  :focus:not(:focus-visible) { outline: none; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Tab through the live preview. Every interactive element shows the ring. Click one of the buttons with your mouse. No ring. That is <code>:focus-visible</code> doing exactly the right thing — keyboard users see focus, mouse users do not get visual noise. Now set <code>--color-focus</code> to <code>oklch(85% 0.05 275)</code> and tab again. The ring is barely visible against the white background. That is a WCAG 2.4.11 failure. Restore the saturated value.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.5-logical-properties-reference.html">← Lesson 6.5</a>
+      <a href="./lesson-6.7-dark-mode-light-dark-oklch.html">Lesson 6.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

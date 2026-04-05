@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.7 — Container Queries &amp; Style Queries · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.7</p>
+      <h1>Container Queries &amp; Style Queries</h1>
+      <p class="lead">Media queries ask "how wide is the viewport?" — but a component does not live in a viewport, it lives in a container. Container queries ask the correct question: "how wide am I?" The same card shown in a sidebar and a full-width grid can use one CSS file and still look right in both.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The viewport-aware anti-pattern</h2>
+      <p>Media queries are blunt. A card that becomes a two-column layout at <code>@media (min-width: 40rem)</code> is correct when the card is full-viewport-width on a 40rem screen, and wrong when the same card is crammed into a 20rem sidebar on an 80rem screen. The component's layout depends on the component's box, not the browser's box.</p>
+
+      <h2>Container queries: two steps</h2>
+      <p>Container queries require two CSS rules — one to declare the container, one to query it.</p>
+      <pre><code>.card {
+  container-type: inline-size;
+}
+
+@container (inline-size &gt;= 30rem) {
+  .card .content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+}</code></pre>
+      <p><code>container-type: inline-size</code> tells the browser to track this element's inline size and make it queryable. <code>@container (inline-size &gt;= 30rem)</code> applies its rules when the nearest ancestor container reaches that size. No media query, no viewport dependence, no breakpoint list.</p>
+
+      <h2>container-name for disambiguation</h2>
+      <p>When components nest — a card inside a card — you often want to query a specific ancestor, not the nearest one. Name your containers:</p>
+      <pre><code>.card      { container: card / inline-size; }
+.article   { container: article / inline-size; }
+
+@container article (inline-size &gt;= 50rem) { ... }
+@container card    (inline-size &gt;= 30rem) { ... }</code></pre>
+      <p>The shorthand <code>container: name / type</code> sets both <code>container-name</code> and <code>container-type</code>.</p>
+
+      <h2>Component-aware, not viewport-aware</h2>
+      <p>The same card now renders differently when embedded in a wide grid cell versus a narrow sidebar cell — automatically, with one CSS file. You do not have to know where the card will be used to write its CSS. This is the property that media queries can never give you.</p>
+
+      <h2>Style queries</h2>
+      <p>Container queries can also query custom property values, not just sizes. A style query matches when a specific custom property on the container has a specific value.</p>
+      <pre><code>.layout { --layout: grid; }
+
+.layout[data-sidebar] { --layout: sidebar; }
+
+@container style(--layout: sidebar) {
+  .item { display: flex; }
+}
+@container style(--layout: grid) {
+  .item { display: block; }
+}</code></pre>
+      <p>Style queries let a component change its layout based on a parent's declarative mode — without JavaScript and without class toggles on every descendant. Browser support is younger than size queries; wrap in <code>@supports (container-type: inline-size) and ...</code> if you need fallbacks.</p>
+
+      <h2>Container query units</h2>
+      <p>Inside a container, you can use <code>cqi</code> (container query inline size) as a length unit — <code>font-size: 5cqi</code> scales with the container, not the viewport. Useful for hero text inside components that need to respond to container width. Think of <code>cqi</code> as "per-cent of container inline size."</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — the same card in two container widths</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-7 { font-family: system-ui; display: grid; grid-template-columns: 20rem 1fr; gap: 1rem; }
+          .demo-7-7 > section { padding: 1rem; border: 1px dashed oklch(80% 0.02 264); border-radius: .5rem; }
+          .demo-7-7 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-7-7 .card { container-type: inline-size; background: oklch(98% 0.005 264); border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; padding: .75rem; }
+          .demo-7-7 .card .body { display: grid; gap: .5rem; }
+          @container (inline-size >= 24rem) {
+            .demo-7-7 .card .body { grid-template-columns: 8rem 1fr; }
+          }
+          .demo-7-7 .thumb { background: oklch(80% 0.12 220); border-radius: .25rem; aspect-ratio: 4/3; }
+          .demo-7-7 h3 { margin: 0 0 .25rem; font-size: 1rem; }
+          .demo-7-7 p { margin: 0; font-size: .8rem; color: oklch(40% 0.02 264); }
+        </style>
+        <div class="demo-7-7">
+          <section>
+            <h4>Narrow container — stacked layout</h4>
+            <div class="card"><div class="body"><div class="thumb"></div><div><h3>Card title</h3><p>Same HTML, same CSS. The card decides its own layout.</p></div></div></div>
+          </section>
+          <section>
+            <h4>Wide container — side-by-side layout</h4>
+            <div class="card"><div class="body"><div class="thumb"></div><div><h3>Card title</h3><p>Same HTML, same CSS. The card saw it has room and switched to two columns.</p></div></div></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
+  &lt;article class="card"&gt;
+    &lt;div class="thumb"&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;p&gt;Component-aware card.&lt;/p&gt;&lt;/div&gt;
+  &lt;/article&gt;
+  &lt;article class="card"&gt;
+    &lt;div class="thumb"&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;p&gt;Same HTML each time.&lt;/p&gt;&lt;/div&gt;
+  &lt;/article&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+}
+
+@layer components {
+  .card {
+    container-type: inline-size;
+    display: grid;
+    gap: .5rem;
+    padding: .75rem;
+    background: oklch(98% 0.005 264);
+    border: 1px solid oklch(85% 0.01 264);
+    border-radius: .5rem;
+  }
+  @container (inline-size &gt;= 22rem) {
+    .card { grid-template-columns: 8rem 1fr; align-items: center; }
+  }
+  .thumb { aspect-ratio: 4/3; background: oklch(78% 0.14 220); border-radius: .25rem; }
+  h3 { margin: 0; font-size: 1rem; }
+  p  { margin: 0; font-size: .85rem; color: oklch(40% 0.02 264); }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Resize the preview. Notice that the two cards flip from stacked to side-by-side at different times, because each one's container reaches 22rem at a different moment. That is component-aware responsiveness. Then remove <code>container-type: inline-size</code> — the <code>@container</code> block stops matching, and both cards revert to stacked layout regardless of their width. The container declaration is what activates the query.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.6-grid-primitive.html">← Lesson 7.6</a>
+      <a href="./lesson-7.8-cover-grid-lanes-masonry.html">Lesson 7.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

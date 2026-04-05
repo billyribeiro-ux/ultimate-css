@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.4 — The Cluster Primitive · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.4</p>
+      <h1>The Cluster Primitive</h1>
+      <p class="lead">Cluster is horizontal flow that wraps. Tag clouds, breadcrumbs, button groups, chip lists, filter bars — any horizontally-arranged collection of items that must collapse to multiple rows when space runs out. Five lines of CSS, three custom-property knobs, and zero media queries.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <pre><code>.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cluster-gap, var(--space-sm));
+  align-items: var(--cluster-align, center);
+  justify-content: var(--cluster-justify, flex-start);
+}</code></pre>
+      <p>The non-obvious decisions: <code>flex-wrap: wrap</code> is the entire reason cluster exists; <code>align-items: center</code> is the right default because items in a cluster are usually different heights (a tag and an icon, for example); <code>justify-content: flex-start</code> packs items to the inline-start.</p>
+
+      <h2>Three knobs</h2>
+      <ul>
+        <li><code>--cluster-gap</code> — space between items and between wrapped rows.</li>
+        <li><code>--cluster-align</code> — cross-axis alignment. <code>center</code>, <code>baseline</code>, <code>start</code>.</li>
+        <li><code>--cluster-justify</code> — inline alignment. <code>flex-start</code>, <code>center</code>, <code>space-between</code>, <code>flex-end</code>.</li>
+      </ul>
+      <p><code>baseline</code> alignment is worth calling out specifically — for clusters of text items with different font sizes (a breadcrumb trail, say), baseline alignment makes the text read as a single line regardless of size variation.</p>
+
+      <h2>Use cases</h2>
+      <ol>
+        <li><strong>Tag cloud</strong>: default alignment, default justification, small gap.</li>
+        <li><strong>Breadcrumbs</strong>: baseline alignment, small gap, separators via pseudo-elements.</li>
+        <li><strong>Button group</strong>: center alignment, small gap, flex-end or flex-start justification.</li>
+        <li><strong>Form-field row</strong>: center alignment, medium gap, justify space-between for label/control pairs.</li>
+        <li><strong>Toolbar</strong>: center alignment, small gap, both start and end groupings via nested clusters.</li>
+      </ol>
+
+      <h2>Cluster vs grid</h2>
+      <p>Cluster wraps but does not align items into columns. Grid aligns into columns but does not naturally wrap in the same way. The test: if you want the second row to line up with the first, you want grid. If you want the second row to pack tightly regardless of the first row, you want cluster. Breadcrumbs wrap into cluster. A product listing wraps into grid.</p>
+
+      <h2>Row-gap vs column-gap</h2>
+      <p>A single <code>gap</code> value applies to both axes. If you want different wrap-row spacing from inline spacing — wider row gap to emphasise grouping when the cluster wraps — use the two-value form: <code>gap: 1rem 0.5rem</code> (row-gap, column-gap). This is useful for dense tag clouds on narrow screens.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — tags, breadcrumbs, button group</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-4 { font-family: system-ui; display: flex; flex-direction: column; gap: 1rem; }
+          .demo-7-4 .cluster { display: flex; flex-wrap: wrap; gap: var(--cluster-gap, .5rem); align-items: var(--cluster-align, center); }
+          .demo-7-4 .tag { padding: .25rem .5rem; background: oklch(96% 0.01 275); border: 1px solid oklch(80% 0.02 275); border-radius: 999px; font-size: .75rem; }
+          .demo-7-4 .crumb { font-size: .85rem; color: oklch(45% 0.02 264); }
+          .demo-7-4 .crumb + .crumb::before { content: "/ "; color: oklch(75% 0.01 264); }
+          .demo-7-4 button { font: inherit; padding: .35rem .75rem; border: 1px solid oklch(75% 0.02 264); background: #fff; border-radius: .25rem; }
+          .demo-7-4 h4 { margin: 0; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+        </style>
+        <div class="demo-7-4">
+          <div>
+            <h4>Tag cluster</h4>
+            <div class="cluster"><span class="tag">css</span><span class="tag">layout</span><span class="tag">primitives</span><span class="tag">container-queries</span><span class="tag">oklch</span><span class="tag">pe7</span></div>
+          </div>
+          <div>
+            <h4>Breadcrumbs (baseline)</h4>
+            <div class="cluster" style="--cluster-gap: .25rem; --cluster-align: baseline;">
+              <span class="crumb">Docs</span><span class="crumb">CSS</span><span class="crumb">Layout</span><span class="crumb">Cluster</span>
+            </div>
+          </div>
+          <div>
+            <h4>Button group (flex-end)</h4>
+            <div class="cluster" style="justify-content: flex-end; --cluster-gap: .5rem;">
+              <button>Cancel</button><button>Save draft</button><button>Publish</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="cluster"&gt;
+  &lt;span&gt;Docs&lt;/span&gt;
+  &lt;span&gt;CSS&lt;/span&gt;
+  &lt;span&gt;Layout&lt;/span&gt;
+  &lt;span&gt;Cluster&lt;/span&gt;
+&lt;/nav&gt;
+&lt;div class="cluster" style="--cluster-gap: .75rem; justify-content: space-between;"&gt;
+  &lt;strong&gt;Title&lt;/strong&gt;
+  &lt;button&gt;Action&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cluster-gap, .5rem);
+    align-items: var(--cluster-align, center);
+    justify-content: var(--cluster-justify, flex-start);
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+nav span { padding: .25rem .5rem; background: oklch(96% 0.01 275); border-radius: .25rem; font-size: .85rem; }
+button { font: inherit; padding: .35rem .75rem; border: 1px solid currentColor; background: none; border-radius: .25rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Resize the preview pane until the first cluster wraps. Watch how wrapping happens automatically with no media query. Now remove <code>flex-wrap: wrap</code>. The items overflow horizontally instead of wrapping. That one declaration is what separates cluster from a plain flex row.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.3-stack-primitive.html">← Lesson 7.3</a>
+      <a href="./lesson-7.5-sidebar-primitive.html">Lesson 7.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

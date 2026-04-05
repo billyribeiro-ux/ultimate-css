@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.6 — sibling-index() Staggered Motion · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.6</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>sibling-index() Staggered Motion</h1>
+      <p class="lead">Staggered animations — cards fading in one after the other — used to require hand-written <code>:nth-child(N)</code> rules for every index. <code>sibling-index()</code> and <code>sibling-count()</code> give CSS arithmetic access to the DOM's own ordering, making stagger a one-liner.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The old way</h2>
+      <pre><code>.card:nth-child(1) { animation-delay: 0ms; }
+.card:nth-child(2) { animation-delay: 60ms; }
+.card:nth-child(3) { animation-delay: 120ms; }
+/* ...and so on, forever */</code></pre>
+      <p>This works, but it is a maintenance trap. Add a card and you have to add a rule. Remove one and you have an orphan. The arithmetic is in the CSS but hidden inside hand-computed numbers.</p>
+
+      <h2>The new way</h2>
+      <pre><code>.card {
+  animation: fade-up 400ms ease-out both;
+  animation-delay: calc((sibling-index() - 1) * 60ms);
+}</code></pre>
+      <p>One rule. Works for 3 cards or 300. Add or remove cards freely. The arithmetic lives where it belongs — next to the property that consumes it.</p>
+
+      <h2>sibling-count() for dynamic sizing</h2>
+      <p><code>sibling-count()</code> returns the total number of siblings. Combine with <code>sibling-index()</code> to express fractions:</p>
+      <pre><code>.tick {
+  --t: calc(sibling-index() / sibling-count());
+  background: oklch(70% 0.15 calc(var(--t) * 360));
+}</code></pre>
+      <p>Every tick gets a hue proportional to its position — a full rainbow, auto-distributed, regardless of how many ticks exist.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 139+, Edge 139+. Safari and Firefox not yet. Wrap in <code>@supports (animation-delay: calc(sibling-index() * 1ms))</code>. Fallback: omit the stagger — all cards animate simultaneously, which is still a valid design choice.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — staggered fade-in</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-6 .row { display: flex; gap: .5rem; }
+          .demo-9-6 .tile {
+            inline-size: 3rem; block-size: 3rem; border-radius: .375rem;
+            background: oklch(48% 0.22 275);
+            animation: d96-in 500ms ease-out both;
+          }
+          @keyframes d96-in { from { opacity: 0; transform: translateY(1rem) scale(.9); } }
+          @supports (animation-delay: calc(sibling-index() * 1ms)) {
+            .demo-9-6 .tile { animation-delay: calc((sibling-index() - 1) * 80ms); }
+          }
+          @supports not (animation-delay: calc(sibling-index() * 1ms)) {
+            .demo-9-6 .tile:nth-child(1) { animation-delay: 0ms; }
+            .demo-9-6 .tile:nth-child(2) { animation-delay: 80ms; }
+            .demo-9-6 .tile:nth-child(3) { animation-delay: 160ms; }
+            .demo-9-6 .tile:nth-child(4) { animation-delay: 240ms; }
+            .demo-9-6 .tile:nth-child(5) { animation-delay: 320ms; }
+          }
+        </style>
+        <div class="demo-9-6">
+          <div class="row">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;ul class="list"&gt;
+  &lt;li&gt;Alpha&lt;/li&gt;
+  &lt;li&gt;Bravo&lt;/li&gt;
+  &lt;li&gt;Charlie&lt;/li&gt;
+  &lt;li&gt;Delta&lt;/li&gt;
+  &lt;li&gt;Echo&lt;/li&gt;
+  &lt;li&gt;Foxtrot&lt;/li&gt;
+&lt;/ul&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+.list { display: grid; gap: .5rem; list-style: none; padding: 0; }
+.list li {
+  padding: .75rem 1rem;
+  border-radius: .5rem;
+  color: #fff; font-weight: 600;
+  animation: slide-in 500ms ease-out both;
+}
+@keyframes slide-in { from { opacity: 0; transform: translateX(-1rem); } }
+
+@supports (animation-delay: calc(sibling-index() * 1ms)) {
+  .list li {
+    animation-delay: calc((sibling-index() - 1) * 80ms);
+    background: oklch(60% 0.18 calc((sibling-index() / sibling-count()) * 360));
+  }
+}
+
+@supports not (animation-delay: calc(sibling-index() * 1ms)) {
+  .list li { background: oklch(48% 0.22 275); }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add or remove <code>&lt;li&gt;</code> elements in the HTML pane. Confirm the stagger re-computes automatically and the hue stays evenly distributed no matter how many items exist. This is the value of arithmetic-over-indices — your design scales with your data.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.5-scroll-triggered-animations.html">← Lesson 9.5</a>
+      <a href="./lesson-9.7-view-transitions.html">Lesson 9.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

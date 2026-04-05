@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.7 — @property &amp; Typed Custom Properties · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.7</p>
+      <h1>@property &amp; Typed Custom Properties</h1>
+      <p class="lead">Plain custom properties are strings. Browsers cannot animate them because they do not know what a string "halfway between A and B" is. <code>@property</code> lets you give a custom property a type — and the moment you do, it becomes animatable like any built-in.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The limitation of plain custom properties</h2>
+      <p>Write <code>--angle: 0deg</code>, transition it to <code>360deg</code>, and nothing happens. The browser sees the custom property as an opaque string; it cannot interpolate from <code>"0deg"</code> to <code>"360deg"</code>. The transition goes from one string to the other instantly at the end.</p>
+      <p>This is the single biggest gap in plain custom properties. It blocks animated gradients, animated colour hues, animated rotation angles driven by variables — anything where the variable is the thing you want to tween.</p>
+
+      <h2>The <code>@property</code> at-rule</h2>
+      <p><code>@property</code> registers a custom property with the CSS engine and declares its type. Once typed, the browser can interpolate it during transitions and animations just like it would <code>opacity</code> or <code>translate</code>.</p>
+      <pre><code>@property --hue {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 290;
+}</code></pre>
+      <p>Three required descriptors:</p>
+      <ul>
+        <li><strong>syntax</strong> — a string describing the value type. Common values: <code>"&lt;number&gt;"</code>, <code>"&lt;length&gt;"</code>, <code>"&lt;percentage&gt;"</code>, <code>"&lt;color&gt;"</code>, <code>"&lt;angle&gt;"</code>, <code>"&lt;url&gt;"</code>, or the universal <code>"*"</code>.</li>
+        <li><strong>inherits</strong> — whether the property inherits down the DOM. <code>false</code> is almost always the right default for animation-driving variables.</li>
+        <li><strong>initial-value</strong> — a fallback the browser uses when the property is unset. Required unless <code>syntax</code> is <code>"*"</code>.</li>
+      </ul>
+
+      <h2>The canonical example — animate an OKLCH hue</h2>
+      <p>With plain variables you cannot animate the H channel of an OKLCH colour. With <code>@property</code> you can:</p>
+      <pre><code>@property --hue {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 290;
+}
+
+.hue-shift {
+  background: oklch(60% 0.18 var(--hue));
+  transition: --hue 2s ease-in-out;
+}
+
+.hue-shift:hover {
+  --hue: 150;
+}</code></pre>
+      <p>Hover the element and the background smoothly sweeps from purple (H = 290) to green (H = 150), passing through blue on the way — because the browser now interpolates the hue number as a number.</p>
+
+      <h2>Where <code>@property</code> lives in the architecture</h2>
+      <p><code>@property</code> declarations sit inside the <code>tokens</code> layer. They are data definitions, not selectors — they match the layer's single responsibility exactly. A typical PE7 tokens file registers every animation-driving variable at the top, then uses them throughout the rest of the codebase.</p>
+
+      <h2>Other uses that matter</h2>
+      <ul>
+        <li><strong>Animated conic gradients.</strong> Animate a <code>--angle</code> in a conic-gradient for spinner or progress visuals.</li>
+        <li><strong>Scroll-driven positioning.</strong> Scroll-linked animations can drive a typed length token that other rules reference.</li>
+        <li><strong>Typed guard against bad values.</strong> If a consumer passes <code>--space-4: red</code>, a typed property rejects the invalid value and falls back to the initial, preventing cascade-time disasters.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — hover to animate OKLCH hue</h2>
+      <div class="demo-frame">
+        <style>
+          @property --demo-hue {
+            syntax: "<number>";
+            inherits: false;
+            initial-value: 290;
+          }
+          .demo-4-7 { font-family: system-ui; padding: 1rem; }
+          .demo-4-7 .hue-box {
+            --demo-hue: 290;
+            background: oklch(60% 0.18 var(--demo-hue));
+            color: #fff; padding: 2rem; border-radius: .5rem;
+            transition: --demo-hue 2s cubic-bezier(.65, 0, .35, 1);
+            text-align: center; font-weight: 700;
+          }
+          .demo-4-7 .hue-box:hover { --demo-hue: 150; }
+        </style>
+        <div class="demo-4-7">
+          <div class="hue-box">Hover to sweep H from 290 → 150 in OKLCH</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="hue-box"&gt;Hover me&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@property --hue {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.hue-box {
+  --hue: 0;
+  background: oklch(65% 0.17 var(--hue));
+  color: #fff; font-family: system-ui;
+  padding: 3rem; border-radius: .5rem;
+  transition: --hue 3s cubic-bezier(.65, 0, .35, 1);
+  text-align: center; font-weight: 700;
+}
+.hue-box:hover { --hue: 330; }
+
+body { padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove the <code>@property --hue { ... }</code> block entirely and keep the rest of the CSS. Hover the box. What happens — and why? Put the block back. Then change <code>syntax: "&lt;number&gt;"</code> to <code>syntax: "*"</code>. Does the animation still work? Why not?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-4.6-motion-tokens.html">← Lesson 4.6</a>
+      <a href="./lesson-4.8-semantic-token-aliasing-at-scale.html">Lesson 4.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

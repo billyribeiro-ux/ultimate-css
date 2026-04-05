@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 9 Project — Motion System Demo · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 9</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Module 9 · Project</p>
+      <h1>Motion System Demo</h1>
+      <p class="lead">One page. One animations layer. Five motion patterns. One reduced-motion override that turns them all off. This is what a production motion system actually looks like.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Ship a demo page that exercises every motion primitive from this module: a scroll progress bar, scroll-driven section reveals, a staggered card grid, a modal with <code>@starting-style</code>, and a global <code>prefers-reduced-motion</code> kill-switch verified to strip everything.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Motion system showcase</h2>
+      <div class="demo-frame">
+        <style>
+          .m9p .scroller { block-size: 20rem; overflow-y: auto; border: 1px solid oklch(85% 0.012 264); border-radius: .75rem; position: relative; }
+          .m9p .bar { position: sticky; inset-block-start: 0; block-size: 4px; background: oklch(48% 0.22 275); transform-origin: 0 50%; transform: scaleX(0); z-index: 1; }
+          .m9p .content { padding: 1rem; display: grid; gap: 2rem; }
+          .m9p .section { padding: 1.5rem; background: oklch(96% 0.005 264); border-radius: .5rem; }
+          .m9p .section h3 { margin: 0 0 .5rem; }
+          .m9p .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+          .m9p .tile { aspect-ratio: 1; background: oklch(58% 0.22 275); border-radius: .375rem; animation: m9-in 500ms ease-out both; }
+          @keyframes m9-in { from { opacity: 0; transform: translateY(1rem); } }
+          @supports (animation-delay: calc(sibling-index() * 1ms)) {
+            .m9p .tile { animation-delay: calc((sibling-index() - 1) * 60ms); }
+          }
+          @supports (animation-timeline: scroll()) {
+            .m9p .scroller { scroll-timeline: --pg block; }
+            .m9p .bar { animation: m9-grow linear both; animation-timeline: --pg; }
+            @keyframes m9-grow { to { transform: scaleX(1); } }
+          }
+          @supports (animation-timeline: view()) {
+            .m9p .section {
+              animation: m9-reveal linear both;
+              animation-timeline: view();
+              animation-range: entry 0% entry 30%;
+            }
+            @keyframes m9-reveal { from { opacity: 0; transform: translateY(1rem); } }
+          }
+          .m9p [popover] {
+            padding: 1.5rem; border: 1px solid oklch(85% 0.012 264); border-radius: .75rem;
+            box-shadow: 0 20px 50px oklch(0% 0 0 / .15);
+            opacity: 1; transform: translateY(0);
+            transition: opacity 250ms, transform 250ms, overlay 250ms allow-discrete, display 250ms allow-discrete;
+          }
+          .m9p [popover]:not(:popover-open) { opacity: 0; transform: translateY(.5rem); }
+          @starting-style { .m9p [popover]:popover-open { opacity: 0; transform: translateY(.5rem); } }
+
+          @media (prefers-reduced-motion: reduce) {
+            .m9p *, .m9p *::before, .m9p *::after {
+              animation-duration: .01ms !important;
+              transition-duration: .01ms !important;
+            }
+          }
+        </style>
+        <div class="m9p">
+          <button popovertarget="m9modal" style="margin-block-end:1rem; padding:.5rem 1rem; background:oklch(48% 0.22 275); color:#fff; border:0; border-radius:.5rem; cursor:pointer;">Open modal</button>
+          <div id="m9modal" popover>
+            <h3 style="margin-top:0;">Modal with @starting-style</h3>
+            <p>Fades and slides on open and close.</p>
+            <button popovertarget="m9modal" popovertargetaction="hide">Close</button>
+          </div>
+          <div class="scroller">
+            <div class="bar"></div>
+            <div class="content">
+              <div class="section"><h3>Section one</h3><p>Scroll-driven reveal via <code>view()</code>.</p></div>
+              <div class="section"><h3>Section two</h3><p>The progress bar tracks your scroll.</p></div>
+              <div class="section">
+                <h3>Stagger grid</h3>
+                <div class="grid">
+                  <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                  <div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div>
+                </div>
+              </div>
+              <div class="section"><h3>Section four</h3><p>All motion defers to <code>prefers-reduced-motion</code>.</p></div>
+              <div class="section"><h3>Section five</h3><p>End of scroll area.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Deliverable</h2>
+      <p>Enable "Reduce motion" in your OS. Reload this page. Verify: progress bar does not animate, sections appear instantly, stagger is gone, modal toggles without animation. Then turn it back off and watch the whole system return. That verification is the deliverable — a working motion system is one you can confidently switch off.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-9.8-gsap-integration.html">← Lesson 9.8</a>
+      <a href="../../module-10-modern-logic/index.html">Module 10 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

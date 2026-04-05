@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.5 — Scroll-Triggered Animations · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.5</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Scroll-Triggered Animations</h1>
+      <p class="lead">Scroll-<em>driven</em> animations are scrubbed by scroll position. Scroll-<em>triggered</em> animations play their own duration the moment scroll enters a range. This distinction used to require a JavaScript library; it is now a pair of CSS declarations.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The difference, precisely</h2>
+      <ul>
+        <li><strong>Driven</strong> (Lesson 9.3): animation progress equals scroll progress. Scroll backwards, animation runs backwards.</li>
+        <li><strong>Triggered</strong>: scroll position is used only to <em>start</em> the animation. Once fired, the animation runs on its own clock.</li>
+      </ul>
+      <p>Both are useful; they answer different design questions. A reading progress bar must be driven. A one-shot fade-in "as the user scrolls into this section" is triggered — you don't want it scrubbing backwards when the user scrolls up.</p>
+
+      <h2>The syntax</h2>
+      <pre><code>@scroll-timeline --reveal {
+  source: selector("#scroller");
+  scroll-offsets: 0%, 100%;
+}
+
+.hero-title {
+  animation: fade-up 800ms ease-out both;
+  animation-trigger: --reveal play-forwards;
+}</code></pre>
+      <p>Declare a named timeline, then bind an animation to it via <code>animation-trigger</code>. The modes are <code>play-forwards</code> (fire once), <code>play</code> (fire every entry), and <code>alternate</code> (play forward on entry, reverse on exit).</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 145+ only as of early 2026. Very new. Always wrap in <code>@supports (animation-trigger: foo)</code>. Recommended fallback: use a scroll-driven <code>view()</code> animation with a small range, which achieves nearly the same effect in many more browsers. This lesson teaches the direction of the spec — do not ship triggered animations as the only path yet.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — triggered fade-in (with view() fallback)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-5 .scroller { block-size: 12rem; overflow-y: auto; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; padding: 1rem; }
+          .demo-9-5 .spacer { block-size: 10rem; }
+          .demo-9-5 .card { padding: 1.5rem; background: oklch(48% 0.22 275); color: #fff; border-radius: .5rem; font-weight: 700; }
+          @supports (animation-timeline: view()) {
+            .demo-9-5 .card {
+              animation: d95-in 500ms ease-out both;
+              animation-timeline: view();
+              animation-range: entry 0% entry 20%;
+            }
+            @keyframes d95-in { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
+          }
+        </style>
+        <div class="demo-9-5">
+          <div class="scroller">
+            <div class="spacer">Scroll down...</div>
+            <div class="card">This card reveals as it enters the scrollport.</div>
+            <div class="spacer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;div class="hero"&gt;Hero&lt;/div&gt;
+  &lt;h2 class="reveal"&gt;Section title&lt;/h2&gt;
+  &lt;p&gt;Section body.&lt;/p&gt;
+  &lt;div class="spacer"&gt;&lt;/div&gt;
+  &lt;h2 class="reveal"&gt;Another section&lt;/h2&gt;
+  &lt;p&gt;Keep scrolling.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; }
+.page { padding: 1rem; display: grid; gap: 2rem; }
+.hero { padding: 3rem 1rem; background: oklch(95% 0.04 275); border-radius: .5rem; font-weight: 700; }
+.spacer { block-size: 8rem; }
+
+/* Triggered: Chrome 145+ */
+@supports (animation-trigger: foo) {
+  @scroll-timeline --reveal-tl {
+    source: selector(":root");
+  }
+  .reveal {
+    animation: rise 600ms ease-out both;
+    animation-trigger: --reveal-tl play-forwards;
+  }
+}
+
+/* Fallback: driven by view() — widely supported */
+@supports ((animation-timeline: view()) and (not (animation-trigger: foo))) {
+  .reveal {
+    animation: rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>play-forwards</code> to <code>alternate</code>. Scroll up and down through the trigger range. The animation now plays forward on entry and reverses on exit. Decide which pattern your real design calls for — and note how the change is a single keyword.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.4-scroll-state-container-queries.html">← Lesson 9.4</a>
+      <a href="./lesson-9.6-sibling-index-stagger.html">Lesson 9.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

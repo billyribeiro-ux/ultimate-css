@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.4 — Scroll-State Container Queries · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.4</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Scroll-State Container Queries</h1>
+      <p class="lead">Detecting when a sticky element is "stuck" used to require a scroll listener plus bounding rect math. Detecting when a scroll-snap item is snapped required IntersectionObserver with root margins. Scroll-state container queries let the CSS engine answer both questions directly.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>A new container type</h2>
+      <pre><code>.sticky-header {
+  container-type: scroll-state;
+  position: sticky;
+  inset-block-start: 0;
+}
+
+@container scroll-state(stuck: top) {
+  .sticky-header { box-shadow: 0 4px 14px oklch(0% 0 0 / .08); }
+}</code></pre>
+      <p><code>container-type: scroll-state</code> turns the element into a container that exposes scroll-state conditions to descendants. <code>stuck: top</code> is true when the element is currently sticky-stuck to the top edge of its scroll container.</p>
+
+      <h2>Snap detection</h2>
+      <pre><code>.carousel-item { container-type: scroll-state; }
+@container scroll-state(snapped: x) {
+  .carousel-item .caption { opacity: 1; transform: translateY(0); }
+}</code></pre>
+      <p><code>snapped: x</code> is true when the item is the currently-snapped child on the x axis. Pair with a transition and the caption of the active slide fades in automatically as you scroll.</p>
+
+      <h2>Why this matters</h2>
+      <p>Two of the most common "I need JavaScript for this" UI patterns are now declarative: "raise the sticky header when it detaches from its section" and "highlight the active snap point". Both become two lines of CSS, both run off-main-thread, both respect reduced-motion by default.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 133+, Edge 133+. Safari and Firefox not yet. Always wrap in <code>@supports (container-type: scroll-state)</code>. The fallback is the non-stateful version of the component — it still works, just without the stateful styling.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — sticky header that reacts when stuck</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-4 .scroller { block-size: 12rem; overflow-y: auto; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; }
+          .demo-9-4 header {
+            position: sticky; inset-block-start: 0;
+            padding: .75rem 1rem;
+            background: #fff;
+            font-weight: 700;
+            border-block-end: 1px solid oklch(92% 0.008 264);
+            transition: box-shadow 200ms, background-color 200ms;
+          }
+          .demo-9-4 .content { padding: 1rem; display: grid; gap: 1rem; }
+          .demo-9-4 .content p { margin: 0; }
+          @supports (container-type: scroll-state) {
+            .demo-9-4 header { container-type: scroll-state; }
+            @container scroll-state(stuck: top) {
+              .demo-9-4 header { background: oklch(95% 0.04 275); box-shadow: 0 4px 14px oklch(0% 0 0 / .12); }
+            }
+          }
+        </style>
+        <div class="demo-9-4">
+          <div class="scroller">
+            <div class="content">
+              <p>Scroll down past the header.</p>
+            </div>
+            <header>Sticky header</header>
+            <div class="content">
+              <p>When the header sticks, it picks up a shadow and a tint — because a <code>scroll-state(stuck: top)</code> query matched.</p>
+              <p>Keep scrolling.</p>
+              <p>More content.</p>
+              <p>And more.</p>
+              <p>End.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scroller"&gt;
+  &lt;div&gt;Padding&lt;/div&gt;
+  &lt;h2 class="sticky"&gt;I detect my own stuck state&lt;/h2&gt;
+  &lt;p&gt;Paragraph one&lt;/p&gt;
+  &lt;p&gt;Paragraph two&lt;/p&gt;
+  &lt;p&gt;Paragraph three&lt;/p&gt;
+  &lt;p&gt;Paragraph four&lt;/p&gt;
+  &lt;p&gt;Paragraph five&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; }
+.scroller { block-size: 15rem; overflow-y: auto; padding: 1rem; }
+
+.sticky {
+  position: sticky;
+  inset-block-start: 0;
+  margin: 0;
+  padding: .5rem 1rem;
+  background: #fff;
+  border-radius: .5rem;
+  transition: box-shadow 200ms, background 200ms;
+}
+
+@supports (container-type: scroll-state) {
+  .sticky { container-type: scroll-state; }
+  @container scroll-state(stuck: top) {
+    .sticky {
+      background: oklch(48% 0.22 275);
+      color: #fff;
+      box-shadow: 0 4px 14px oklch(0% 0 0 / .15);
+    }
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a scroll-snap carousel inside a scroll-state container and use <code>@container scroll-state(snapped: x)</code> to fade in the caption of the currently-snapped slide. Compare the result to the IntersectionObserver version you wrote last year. Count the lines saved.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.3-scroll-driven-scroll-view.html">← Lesson 9.3</a>
+      <a href="./lesson-9.5-scroll-triggered-animations.html">Lesson 9.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

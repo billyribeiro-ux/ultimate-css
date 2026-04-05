@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.3 — The Stack Primitive · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.3</p>
+      <h1>The Stack Primitive</h1>
+      <p class="lead">Stack is vertical flow with a consistent gap between children. It is the single most-used primitive in any real project, and the simplest to implement — but it only works reliably when it cooperates with a reset that zeroes margins on prose elements.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <pre><code>.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap, var(--space-md));
+}</code></pre>
+      <p>Three declarations. Flex column gives you the axis; <code>gap</code> gives you the spacing; the custom property gives you the knob. Nothing else.</p>
+
+      <h2>Why flex and not block</h2>
+      <p>Block layout has <code>margin</code>-based spacing, and margins collapse. Two elements with <code>margin-block: 1rem</code> do not produce 2rem of space between them — they produce 1rem, because the margins overlap. That is fine for prose and catastrophic for layout. Flex gap does not collapse — the number you write is the number you get.</p>
+
+      <h2>The belt-and-suspenders reset</h2>
+      <p>Stack assumes its children have no block margins of their own. The PE7 reset already zeroes margins on prose elements (Lesson 5.3), but third-party content and certain user-generated HTML can introduce margins again. As a safety net, add an explicit override inside the primitive:</p>
+      <pre><code>.stack &gt; * {
+  margin-block: 0;
+}</code></pre>
+      <p>This is one of the few cases where a layout primitive touches its children directly. The rationale is defensive — a stack that silently misbehaves because a child imported its own margin is worse than a tiny specificity bump.</p>
+
+      <h2>Size variants as custom properties</h2>
+      <pre><code>.stack-sm { --stack-gap: var(--space-sm); }
+.stack-lg { --stack-gap: var(--space-xl); }
+.stack-xl { --stack-gap: var(--space-2xl); }</code></pre>
+      <p>Three variants are almost always enough. More than that and you are re-inventing a spacing scale that should live in tokens. If a component needs a custom gap, set <code>--stack-gap</code> from the component layer without writing a new variant:</p>
+      <pre><code>.hero .stack { --stack-gap: var(--space-3xl); }</code></pre>
+
+      <h2>Stack is not a vertical cluster</h2>
+      <p>Stack always flows in one direction. It does not wrap. If you need horizontal flow that wraps, that is <code>cluster</code> (Lesson 7.4). The two are deliberately separate — a single primitive that "sometimes wraps" adds a conditional that is almost always the wrong default.</p>
+
+      <h2>Nesting stacks</h2>
+      <p>Stacks nest cleanly. The outer stack has its gap; the inner stack has its own. Both can be overridden via custom properties at any level. This is how you build a form: an outer stack for the form sections, inner stacks inside each section for the fields.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — three stack sizes</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-3 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+          .demo-7-3 > section { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; }
+          .demo-7-3 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-7-3 .stack { display: flex; flex-direction: column; gap: var(--stack-gap, 1rem); }
+          .demo-7-3 .stack > * { margin-block: 0; }
+          .demo-7-3 .sm { --stack-gap: .25rem; }
+          .demo-7-3 .md { --stack-gap: 1rem; }
+          .demo-7-3 .lg { --stack-gap: 2rem; }
+          .demo-7-3 .item { padding: .4rem .6rem; background: oklch(96% 0.01 275); border: 1px solid oklch(85% 0.02 275); border-radius: .25rem; }
+        </style>
+        <div class="demo-7-3">
+          <section>
+            <h4>stack sm</h4>
+            <div class="stack sm"><div class="item">One</div><div class="item">Two</div><div class="item">Three</div></div>
+          </section>
+          <section>
+            <h4>stack md</h4>
+            <div class="stack md"><div class="item">One</div><div class="item">Two</div><div class="item">Three</div></div>
+          </section>
+          <section>
+            <h4>stack lg</h4>
+            <div class="stack lg"><div class="item">One</div><div class="item">Two</div><div class="item">Three</div></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;form class="stack stack-lg"&gt;
+  &lt;div class="stack stack-sm"&gt;
+    &lt;label&gt;Name&lt;/label&gt;
+    &lt;input type="text"&gt;
+  &lt;/div&gt;
+  &lt;div class="stack stack-sm"&gt;
+    &lt;label&gt;Email&lt;/label&gt;
+    &lt;input type="email"&gt;
+  &lt;/div&gt;
+  &lt;button&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-gap, 1rem);
+  }
+  .stack &gt; * { margin-block: 0; }
+  .stack-sm { --stack-gap: .25rem; }
+  .stack-lg { --stack-gap: 1.5rem; }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+label { font-size: .85rem; color: oklch(40% 0.02 264); }
+input { font: inherit; padding: .35rem; border: 1px solid oklch(80% 0.01 264); border-radius: .25rem; }
+button { font: inherit; padding: .4rem .8rem; border: 1px solid currentColor; background: none; border-radius: .25rem; align-self: flex-start; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add <code>&lt;p style="margin: 2rem 0"&gt;...&lt;/p&gt;</code> as a child of the outer stack and run. Without the <code>.stack &gt; * { margin-block: 0 }</code> rule, the paragraph's own margin disrupts the gap. With it, the stack stays consistent. This is why the defensive rule exists — third-party content cannot break your layout.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.2-container-primitive.html">← Lesson 7.2</a>
+      <a href="./lesson-7.4-cluster-primitive.html">Lesson 7.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

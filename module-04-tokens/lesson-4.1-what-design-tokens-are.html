@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.1 — What Design Tokens Are · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.1</p>
+      <h1>What Design Tokens Are</h1>
+      <p class="lead">A design token is a named design decision. That is the whole definition. Understanding the consequences of that single sentence separates teams that scale from teams that rebrand by rewriting every component.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The definition</h2>
+      <p>A design token is a name bound to a value, stored in one place, referenced from everywhere. <code>--color-brand</code> is a token. <code>#7c3aed</code> is not. The first is a <em>decision</em> your product has made and given a name to; the second is just data.</p>
+      <p>If you see a raw hex value anywhere in a component stylesheet, there is a missing token. The hex is a decision that never got named, so every consumer had to rediscover it, and tomorrow when the decision changes, every consumer has to be found and updated.</p>
+
+      <h2>Why naming is the whole point</h2>
+      <p>A name has three superpowers that a value does not:</p>
+      <ol>
+        <li><strong>Substitutability.</strong> Change the value behind the name once; every consumer updates for free.</li>
+        <li><strong>Intention.</strong> <code>--color-danger</code> tells you why the colour is used. <code>#ef4444</code> tells you nothing.</li>
+        <li><strong>Contracts across tools.</strong> Designers, developers, and documentation can all refer to the same name, and the meaning is stable even as the value drifts.</li>
+      </ol>
+      <p>These properties compound. A codebase with 200 tokens and no raw values is indefinitely renamable, rethemable, and refactorable. A codebase with 50 tokens and 5,000 scattered raw values is locked in place.</p>
+
+      <h2>The two-tier model: primitive and semantic</h2>
+      <p>PE7 tokens live in two tiers.</p>
+      <p><strong>Primitive tokens</strong> are the raw palette. They describe what things are:</p>
+      <pre><code>--purple-500: oklch(55% 0.22 290);
+--gray-900:   oklch(14% 0.015 264);
+--space-4:    1rem;
+--text-xl:    1.25rem;</code></pre>
+      <p>Primitives are stable. They rarely change. You add to them; you seldom rewrite them.</p>
+      <p><strong>Semantic tokens</strong> are named intentions that reference primitives. They describe what things are <em>for</em>:</p>
+      <pre><code>--color-brand:   var(--purple-500);
+--color-text:    var(--gray-900);
+--space-gutter:  var(--space-4);
+--text-heading:  var(--text-xl);</code></pre>
+      <p>Semantics are where rebranding happens. Point <code>--color-brand</code> at <code>--teal-500</code> and the entire product rebrands without touching a component. Point <code>--space-gutter</code> at <code>--space-6</code> and every gutter loosens without touching a layout rule.</p>
+
+      <h2>The rule consumers follow</h2>
+      <p>Components always reference semantic tokens, never primitives. If a component has <code>background: var(--purple-500)</code>, the rebranding contract is broken — the button will stay purple even when the brand moves to green. The right form is <code>background: var(--color-brand)</code>, and the semantic token is what gets repointed during a rebrand.</p>
+      <p>The only place primitives appear in consuming code is the tokens layer itself, aliasing them into semantic tokens. Nowhere else.</p>
+
+      <h2>A token is not just for colour</h2>
+      <p>Everything a designer makes a decision about is a candidate for a token. Spacing, typography, motion, radius, shadow, z-index, focus-ring width. If two places in your codebase need the same value and you would want them to change together during a redesign, that value deserves a name.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — primitive vs semantic</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-4-1 {
+            --purple-500: oklch(55% 0.22 290);
+            --green-500:  oklch(60% 0.17 150);
+            --color-brand: var(--purple-500);
+            font-family: system-ui; padding: 1rem;
+          }
+          .demo-4-1 .chip { display: inline-block; padding: .5rem 1rem; background: var(--color-brand); color: #fff; border-radius: .375rem; margin-right: .5rem; }
+          .demo-4-1 .alt { --color-brand: var(--green-500); }
+        </style>
+        <div class="demo-4-1">
+          <span class="chip">--color-brand → purple-500</span>
+          <span class="chip alt">rebrand: --color-brand → green-500</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="swatch"&gt;brand&lt;/div&gt;
+&lt;div class="swatch alt"&gt;rebrand&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  /* Primitive — raw decision */
+  --purple-500: oklch(55% 0.22 290);
+  --teal-500:   oklch(70% 0.12 190);
+
+  /* Semantic — what it's for */
+  --color-brand: var(--purple-500);
+}
+
+.swatch {
+  background: var(--color-brand);
+  color: #fff; font-family: system-ui;
+  padding: 1rem; margin: .25rem; border-radius: .375rem;
+  display: inline-block;
+}
+
+/* Rebrand — change the semantic alias only. */
+.alt { --color-brand: var(--teal-500); }
+
+body { padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>In the editor, change the <code>.swatch</code> rule to reference <code>var(--purple-500)</code> directly instead of <code>var(--color-brand)</code>. The first swatch still looks identical — but re-test the rebrand. What breaks, and what does this tell you about which variable components should reference?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 4</a>
+      <a href="./lesson-4.2-why-oklch.html">Lesson 4.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

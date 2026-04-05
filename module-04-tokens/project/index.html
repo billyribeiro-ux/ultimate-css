@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 4 Project — Complete Token System · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 4</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Module 4 · Project</p>
+      <h1>Complete Token System</h1>
+      <p class="lead">A single-page showcase for a full PE7 token layer: colour scale, spacing scale, type scale, motion preview, and a data-attribute theme switcher — every value driven by primitives, every consumer reading semantics.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Build a living style reference page that proves the token system is complete. The page itself must be styled using only tokens — no hex, no raw pixels, no magic numbers. Swap the theme; every section updates. That is the acceptance test.</p>
+
+      <h2>What is covered</h2>
+      <ul>
+        <li>Full 9-stop purple scale plus gray, green, amber, red.</li>
+        <li>Semantic aliases for surface, text, brand, status colours.</li>
+        <li>Spacing scale from <code>--space-1</code> through <code>--space-16</code>.</li>
+        <li>Type scale from <code>--text-xs</code> through <code>--text-4xl</code>.</li>
+        <li>Motion durations and easings with an animated demo.</li>
+        <li>Two themes switched via <code>[data-theme]</code> on the showcase root.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>The token system, rendered</h2>
+      <div class="demo-frame">
+        <style>
+          .token-showcase {
+            /* Primitives */
+            --purple-50:  oklch(97% 0.02 290);
+            --purple-100: oklch(93% 0.04 290);
+            --purple-200: oklch(86% 0.08 290);
+            --purple-300: oklch(78% 0.13 290);
+            --purple-400: oklch(68% 0.18 290);
+            --purple-500: oklch(55% 0.22 290);
+            --purple-600: oklch(47% 0.22 290);
+            --purple-700: oklch(38% 0.19 290);
+            --purple-800: oklch(28% 0.14 290);
+            --purple-900: oklch(18% 0.08 290);
+            --gray-50:  oklch(98% 0.003 264);
+            --gray-100: oklch(96% 0.005 264);
+            --gray-200: oklch(90% 0.01  264);
+            --gray-700: oklch(40% 0.02  264);
+            --gray-900: oklch(14% 0.015 264);
+            --green-500: oklch(60% 0.17 150);
+            --amber-500: oklch(75% 0.15  85);
+            --red-500:   oklch(60% 0.22  25);
+
+            /* Spacing */
+            --space-1:  .25rem;
+            --space-2:  .5rem;
+            --space-3:  .75rem;
+            --space-4:  1rem;
+            --space-6:  1.5rem;
+            --space-8:  2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+
+            /* Typography */
+            --font-body: system-ui, sans-serif;
+            --text-xs:  .75rem;
+            --text-sm:  .875rem;
+            --text-md:  1rem;
+            --text-lg:  1.125rem;
+            --text-xl:  1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --leading-tight: 1.15;
+            --leading-normal: 1.55;
+            --weight-regular: 400;
+            --weight-bold:    700;
+
+            /* Motion */
+            --motion-fast: 180ms;
+            --motion-md:   260ms;
+            --ease-out:    cubic-bezier(.2, .7, .3, 1);
+            --ease-spring: cubic-bezier(.3, 1.4, .5, 1);
+
+            /* Radius */
+            --radius-sm: .25rem;
+            --radius-md: .375rem;
+            --radius-lg: .5rem;
+
+            font-family: var(--font-body);
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+          }
+
+          /* Theme: light */
+          .token-showcase[data-theme="light"] {
+            --color-surface:     var(--gray-50);
+            --color-surface-alt: var(--gray-100);
+            --color-border:      var(--gray-200);
+            --color-text:        var(--gray-900);
+            --color-muted:       var(--gray-700);
+            --color-brand:       var(--purple-500);
+            --color-brand-hover: var(--purple-600);
+            --color-success:     var(--green-500);
+            --color-warning:     var(--amber-500);
+            --color-danger:      var(--red-500);
+          }
+          /* Theme: dark */
+          .token-showcase[data-theme="dark"] {
+            --color-surface:     var(--gray-900);
+            --color-surface-alt: oklch(22% 0.02 264);
+            --color-border:      oklch(30% 0.02 264);
+            --color-text:        var(--gray-50);
+            --color-muted:       oklch(70% 0.02 264);
+            --color-brand:       var(--purple-400);
+            --color-brand-hover: var(--purple-300);
+            --color-success:     var(--green-500);
+            --color-warning:     var(--amber-500);
+            --color-danger:      var(--red-500);
+          }
+
+          .token-showcase {
+            background: var(--color-surface);
+            color: var(--color-text);
+          }
+
+          .token-showcase .section { margin-block-end: var(--space-8); }
+          .token-showcase h2 { font-size: var(--text-xl); margin-block: 0 var(--space-3); font-weight: var(--weight-bold); }
+          .token-showcase h3 { font-size: var(--text-md); margin-block: 0 var(--space-2); color: var(--color-muted); font-weight: var(--weight-bold); }
+          .token-showcase .muted { color: var(--color-muted); font-size: var(--text-sm); }
+
+          /* Theme switcher */
+          .token-showcase .switcher {
+            display: flex; gap: var(--space-2); margin-block-end: var(--space-6);
+          }
+          .token-showcase .switcher .btn {
+            --btn-bg: var(--color-surface-alt);
+            --btn-fg: var(--color-text);
+            background: var(--btn-bg); color: var(--btn-fg);
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font: inherit; cursor: pointer;
+            transition: background var(--motion-fast) var(--ease-out);
+          }
+          .token-showcase .switcher .btn.active {
+            --btn-bg: var(--color-brand);
+            --btn-fg: #fff;
+            border-color: var(--color-brand);
+          }
+
+          /* Colour scale */
+          .token-showcase .scale { display: grid; grid-template-columns: repeat(10, 1fr); gap: var(--space-1); margin-block-end: var(--space-2); }
+          .token-showcase .scale .stop { aspect-ratio: 1; border-radius: var(--radius-sm); }
+          .token-showcase .semantics { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+          .token-showcase .chip { padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); font-size: var(--text-sm); color: #fff; }
+
+          /* Spacing scale */
+          .token-showcase .space-row { display: flex; align-items: center; gap: var(--space-3); margin-block: var(--space-1); }
+          .token-showcase .space-row .bar { background: var(--color-brand); height: .75rem; border-radius: var(--radius-sm); }
+          .token-showcase .space-row code { font-family: ui-monospace, monospace; font-size: var(--text-xs); color: var(--color-muted); }
+
+          /* Type scale */
+          .token-showcase .type-row { margin-block: var(--space-1); line-height: var(--leading-tight); }
+
+          /* Motion preview */
+          .token-showcase .motion-box {
+            display: inline-block;
+            background: var(--color-brand); color: #fff;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            transition: transform var(--motion-md) var(--ease-spring),
+                        background var(--motion-fast) var(--ease-out);
+          }
+          .token-showcase .motion-box:hover {
+            transform: translateY(-4px) scale(1.02);
+            background: var(--color-brand-hover);
+          }
+
+          /* Component showcase */
+          .token-showcase .card {
+            background: var(--color-surface-alt);
+            border: 1px solid var(--color-border);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            margin-block-start: var(--space-3);
+          }
+          .token-showcase .card h4 { margin: 0 0 var(--space-2); font-size: var(--text-lg); }
+          .token-showcase .card p  { margin: 0; color: var(--color-muted); font-size: var(--text-sm); text-wrap: pretty; }
+
+          .token-showcase .status-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-block-start: var(--space-2); }
+          .token-showcase .status { padding: var(--space-1) var(--space-3); border-radius: 999px; font-size: var(--text-xs); color: #fff; }
+          .token-showcase .status.success { background: var(--color-success); }
+          .token-showcase .status.warning { background: var(--color-warning); color: var(--gray-900); }
+          .token-showcase .status.danger  { background: var(--color-danger); }
+        </style>
+
+        <div class="token-showcase" data-theme="light">
+
+          <div class="switcher">
+            <button type="button" class="btn active">light</button>
+            <button type="button" class="btn">dark</button>
+            <span class="muted" style="align-self:center;">(the next section shows the dark twin — this project is static; a real switcher toggles <code>data-theme</code> in JS)</span>
+          </div>
+
+          <section class="section">
+            <h2>Colour · Primitive scale</h2>
+            <h3>purple · 50 → 900</h3>
+            <div class="scale">
+              <div class="stop" style="background: var(--purple-50);"></div>
+              <div class="stop" style="background: var(--purple-100);"></div>
+              <div class="stop" style="background: var(--purple-200);"></div>
+              <div class="stop" style="background: var(--purple-300);"></div>
+              <div class="stop" style="background: var(--purple-400);"></div>
+              <div class="stop" style="background: var(--purple-500);"></div>
+              <div class="stop" style="background: var(--purple-600);"></div>
+              <div class="stop" style="background: var(--purple-700);"></div>
+              <div class="stop" style="background: var(--purple-800);"></div>
+              <div class="stop" style="background: var(--purple-900);"></div>
+            </div>
+            <h3>Semantic aliases</h3>
+            <div class="semantics">
+              <span class="chip" style="background: var(--color-brand);">--color-brand</span>
+              <span class="chip" style="background: var(--color-success);">--color-success</span>
+              <span class="chip" style="background: var(--color-warning); color: var(--gray-900);">--color-warning</span>
+              <span class="chip" style="background: var(--color-danger);">--color-danger</span>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2>Spacing · T-shirt scale</h2>
+            <div class="space-row"><div class="bar" style="width: var(--space-1);"></div><code>--space-1 · 0.25rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-2);"></div><code>--space-2 · 0.5rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-3);"></div><code>--space-3 · 0.75rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-4);"></div><code>--space-4 · 1rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-6);"></div><code>--space-6 · 1.5rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-8);"></div><code>--space-8 · 2rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-12);"></div><code>--space-12 · 3rem</code></div>
+            <div class="space-row"><div class="bar" style="width: var(--space-16);"></div><code>--space-16 · 4rem</code></div>
+          </section>
+
+          <section class="section">
+            <h2>Typography · 1.25 scale</h2>
+            <p class="type-row" style="font-size: var(--text-4xl); font-weight: var(--weight-bold); text-wrap: balance;">Display — balanced headlines</p>
+            <p class="type-row" style="font-size: var(--text-3xl); font-weight: var(--weight-bold);">3xl heading</p>
+            <p class="type-row" style="font-size: var(--text-2xl); font-weight: var(--weight-bold);">2xl heading</p>
+            <p class="type-row" style="font-size: var(--text-xl);">xl subhead</p>
+            <p class="type-row" style="font-size: var(--text-lg);">lg body+</p>
+            <p class="type-row" style="font-size: var(--text-md);">md body baseline</p>
+            <p class="type-row" style="font-size: var(--text-sm); color: var(--color-muted);">sm caption</p>
+            <p class="type-row" style="font-size: var(--text-xs); color: var(--color-muted);">xs microcopy</p>
+          </section>
+
+          <section class="section">
+            <h2>Motion</h2>
+            <p class="muted">Hover the button — spring easing on transform, ease-out on colour.</p>
+            <div style="margin-block-start: var(--space-3);">
+              <button class="motion-box">Hover me</button>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2>Components referencing tokens</h2>
+            <div class="card">
+              <h4>Card component</h4>
+              <p>Every value in this card — padding, border, radius, background, text colour — resolves to a semantic token. Theme the system; this card follows.</p>
+              <div class="status-row">
+                <span class="status success">success</span>
+                <span class="status warning">warning</span>
+                <span class="status danger">danger</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="token-showcase" data-theme="dark" style="margin-block-start: 1rem;">
+          <section class="section">
+            <h2>Dark theme — same tokens, remapped semantics</h2>
+            <div class="card">
+              <h4>The primitives did not change.</h4>
+              <p>Only the semantic aliases (<code>--color-surface</code>, <code>--color-text</code>, <code>--color-brand</code>) point at different primitive stops. Every component inherits the switch for free.</p>
+              <div class="status-row">
+                <span class="status success">success</span>
+                <span class="status warning">warning</span>
+                <span class="status danger">danger</span>
+              </div>
+            </div>
+            <div style="margin-block-start: var(--space-3);">
+              <button class="motion-box">Hover me</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout success">
+      <h2>The architecture, end to end</h2>
+      <p>Everything above proves one thing: primitives are stable, semantics carry intent, components consume semantics, and themes are just a different set of semantic aliases. When a designer changes the brand hue, you edit one primitive. When the product adds high-contrast mode, you add one data-theme block. When a component needs a variant, you expose a component token. No specificity wars, no duplicated palettes, no rebrands that take a sprint.</p>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your turn — add a third theme</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div data-theme="light"&gt;&lt;div class="panel"&gt;Light&lt;button class="btn"&gt;Primary&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div data-theme="dark"&gt; &lt;div class="panel"&gt;Dark &lt;button class="btn"&gt;Primary&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div data-theme="hc"&gt;   &lt;div class="panel"&gt;HC   &lt;button class="btn"&gt;Primary&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --gray-50:  oklch(98% 0.003 264);
+  --gray-200: oklch(90% 0.01 264);
+  --gray-900: oklch(14% 0.015 264);
+  --purple-400: oklch(68% 0.18 290);
+  --purple-500: oklch(55% 0.22 290);
+
+  --space-4: 1rem;
+  --radius-md: .375rem;
+}
+
+[data-theme="light"] {
+  --color-surface: var(--gray-50);
+  --color-text:    var(--gray-900);
+  --color-brand:   var(--purple-500);
+  --color-border:  var(--gray-200);
+}
+[data-theme="dark"] {
+  --color-surface: var(--gray-900);
+  --color-text:    var(--gray-50);
+  --color-brand:   var(--purple-400);
+  --color-border:  oklch(30% 0.02 264);
+}
+/* High-contrast — tune me */
+[data-theme="hc"] {
+  --color-surface: #000;
+  --color-text:    #fff;
+  --color-brand:   oklch(85% 0.22 85);
+  --color-border:  #fff;
+}
+
+body { font-family: system-ui; padding: var(--space-4); display: grid; gap: var(--space-4); }
+.panel {
+  background: var(--color-surface); color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4); border-radius: var(--radius-md);
+  display: flex; gap: var(--space-4); align-items: center;
+}
+.btn {
+  --btn-bg: var(--color-brand);
+  background: var(--btn-bg); color: #000;
+  padding: .5rem 1rem; border: 0; border-radius: var(--radius-md); font: inherit;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-4.8-semantic-token-aliasing-at-scale.html">← Lesson 4.8</a>
+      <a href="../../index.html">Course home →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

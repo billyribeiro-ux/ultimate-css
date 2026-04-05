@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.2 — @starting-style: Enter Animations · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.2</p>
+      <h1>@starting-style: Enter Animations Without JavaScript</h1>
+      <p class="lead">CSS transitions only run between two values — and an element that did not exist a moment ago has no "before" value. <code>@starting-style</code> fixes that. It is how you finally animate elements as they appear, without waiting for a framework's mount hook.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The old problem</h2>
+      <p>Before <code>@starting-style</code>, animating something <em>into</em> the page required one of three ugly workarounds: a <code>@keyframes</code> animation that runs once; a JavaScript "add a class on next tick" dance; or a <code>transition</code> that fires only after a manual <code>requestAnimationFrame</code>. All three are symptoms of a missing primitive.</p>
+
+      <h2>The primitive</h2>
+      <pre><code>.dialog {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+@starting-style {
+  .dialog {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}</code></pre>
+      <p>The rules inside <code>@starting-style</code> are the element's "before" state. The browser applies them once when the element first becomes eligible for style — then immediately transitions to the regular values. The result is a proper enter animation with zero JavaScript.</p>
+
+      <h2>With popover and dialog</h2>
+      <p><code>@starting-style</code> composes perfectly with the <code>popover</code> attribute and <code>&lt;dialog&gt;</code>. The only additional requirement for elements that toggle <code>display: none</code> is <code>transition-behavior: allow-discrete</code>, which lets the browser animate the discrete <code>display</code> property:</p>
+      <pre><code>[popover] {
+  opacity: 1;
+  transition: opacity 300ms, display 300ms allow-discrete;
+}
+[popover]:not(:popover-open) { opacity: 0; }
+@starting-style {
+  [popover]:popover-open { opacity: 0; }
+}</code></pre>
+
+      <h2>Browser support</h2>
+      <p>Chrome 117+, Safari 17.5+, Firefox 129+. Production-ready in 2026. No <code>@supports</code> needed for the core feature, though it is polite to provide a fallback where the element simply appears without an enter animation in older browsers.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — element enter animation</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-2 details[open] .panel {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          .demo-9-2 .panel {
+            opacity: 0;
+            transform: translateY(.5rem);
+            transition: opacity 300ms, transform 300ms;
+            padding: 1rem;
+            background: oklch(95% 0.04 275);
+            border-radius: .5rem;
+            margin-block-start: .5rem;
+          }
+          @starting-style {
+            .demo-9-2 details[open] .panel {
+              opacity: 0;
+              transform: translateY(.5rem);
+            }
+          }
+        </style>
+        <div class="demo-9-2">
+          <details>
+            <summary style="cursor:pointer; font-weight:600;">Click to reveal</summary>
+            <div class="panel">This panel fades and slides in the first time it appears.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button popovertarget="dlg"&gt;Open popover&lt;/button&gt;
+&lt;div id="dlg" popover&gt;
+  &lt;h3&gt;I fade in&lt;/h3&gt;
+  &lt;p&gt;Opacity and transform animate from their @starting-style values.&lt;/p&gt;
+  &lt;button popovertarget="dlg" popovertargetaction="hide"&gt;Close&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+[popover] {
+  padding: 1.5rem;
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .75rem;
+  box-shadow: 0 20px 50px oklch(0% 0 0 / .15);
+
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 250ms,
+    transform 250ms,
+    overlay 250ms allow-discrete,
+    display 250ms allow-discrete;
+}
+[popover]:not(:popover-open) {
+  opacity: 0;
+  transform: translateY(.5rem);
+}
+@starting-style {
+  [popover]:popover-open {
+    opacity: 0;
+    transform: translateY(.5rem);
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove the <code>@starting-style</code> block from the editor. Open and close the popover. Then put it back. You will see the exact moment the enter animation appears and disappears — the clearest proof of why this primitive was missing.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.1-why-animations-own-layer.html">← Lesson 9.1</a>
+      <a href="./lesson-9.3-scroll-driven-scroll-view.html">Lesson 9.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

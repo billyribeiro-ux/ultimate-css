@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.6 — Motion Tokens · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.6</p>
+      <h1>Motion Tokens</h1>
+      <p class="lead">A scale of durations, a small vocabulary of easing curves, and a rule for which combination to use when. Motion is a language; tokens make it speakable.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why tokenise motion</h2>
+      <p>Left untouched, every component picks its own duration and easing. One button transitions in 150ms, another in 300ms, another uses <code>ease-in-out</code> for what should be an entrance. The product feels inconsistent in a way users perceive but cannot articulate. A motion scale forces the decisions to be made once, in one place, and then reused.</p>
+
+      <h2>The duration scale</h2>
+      <pre><code>:root {
+  --motion-instant: 80ms;
+  --motion-fast:    150ms;
+  --motion-md:      250ms;
+  --motion-slow:    400ms;
+  --motion-slower:  600ms;
+}</code></pre>
+      <p>Five stops is enough. Most products use two or three of them. <code>--motion-fast</code> for micro-interactions (button hover, focus ring). <code>--motion-md</code> for most UI state changes. <code>--motion-slow</code> for page or panel movements. The instant and slower values are reserved for edge cases.</p>
+
+      <h2>The easing vocabulary</h2>
+      <p>Easing is not a numeric scale — it is a short vocabulary with rules about when to use each:</p>
+      <pre><code>:root {
+  --ease-out:     cubic-bezier(0.2, 0.7, 0.3, 1);   /* decelerate */
+  --ease-in:      cubic-bezier(0.7, 0, 0.8, 0.3);   /* accelerate */
+  --ease-in-out:  cubic-bezier(0.65, 0, 0.35, 1);   /* symmetric  */
+  --ease-spring:  cubic-bezier(0.3, 1.4, 0.5, 1);   /* overshoot  */
+}</code></pre>
+
+      <h2>The use rules</h2>
+      <ul>
+        <li><strong>Enter:</strong> <code>--ease-out</code>. Things coming into view should decelerate. Dialogs opening, tooltips appearing, menus expanding.</li>
+        <li><strong>Exit:</strong> <code>--ease-in</code>. Things leaving should accelerate out. Dismissed toasts, closing overlays.</li>
+        <li><strong>State changes (reversible):</strong> <code>--ease-in-out</code>. Something toggling between two equal states — checked/unchecked, expanded/collapsed.</li>
+        <li><strong>Playful/delight moments:</strong> <code>--ease-spring</code>. Use sparingly; over-use feels cartoonish.</li>
+      </ul>
+
+      <h2>Semantic aliases</h2>
+      <pre><code>:root {
+  --transition-button: background var(--motion-fast) var(--ease-out),
+                       transform  var(--motion-fast) var(--ease-out);
+
+  --transition-dialog: opacity    var(--motion-md)   var(--ease-out),
+                       transform  var(--motion-md)   var(--ease-out);
+}</code></pre>
+      <p>A component then writes <code>transition: var(--transition-button);</code> and cannot accidentally diverge from the product's motion language.</p>
+
+      <h2>Reduced motion — the hard rule</h2>
+      <p>As covered in Lesson 3.8, <code>@media (prefers-reduced-motion: reduce)</code> inside the animations layer neutralises every transition and animation via the one legitimate <code>!important</code> in PE7. Motion tokens make that override a one-liner — all of them collapse to an effective zero duration, because the media query targets <code>transition-duration</code> and <code>animation-duration</code> directly.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — four easing curves, same duration</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-4-6 { font-family: system-ui; padding: 1rem; display: grid; gap: .5rem; }
+          .demo-4-6 .row { display: grid; grid-template-columns: 8rem 1fr; align-items: center; gap: .5rem; }
+          .demo-4-6 .track { background: oklch(93% 0.01 264); height: 1.25rem; border-radius: 999px; position: relative; overflow: hidden; }
+          .demo-4-6 .dot { position: absolute; inset-block: 0.125rem; inline-size: 1rem; background: oklch(55% 0.22 290); border-radius: 999px; left: 0; animation-duration: 1.8s; animation-iteration-count: infinite; animation-direction: alternate; }
+          .demo-4-6 .out  .dot { animation-name: run; animation-timing-function: cubic-bezier(.2,.7,.3,1); }
+          .demo-4-6 .in   .dot { animation-name: run; animation-timing-function: cubic-bezier(.7,0,.8,.3); }
+          .demo-4-6 .io   .dot { animation-name: run; animation-timing-function: cubic-bezier(.65,0,.35,1); }
+          .demo-4-6 .sp   .dot { animation-name: run; animation-timing-function: cubic-bezier(.3,1.4,.5,1); }
+          @keyframes run { to { left: calc(100% - 1rem); } }
+          .demo-4-6 code { font-family: ui-monospace, monospace; font-size: .8rem; }
+        </style>
+        <div class="demo-4-6">
+          <div class="row out"><code>--ease-out</code>    <div class="track"><div class="dot"></div></div></div>
+          <div class="row in"> <code>--ease-in</code>     <div class="track"><div class="dot"></div></div></div>
+          <div class="row io"> <code>--ease-in-out</code> <div class="track"><div class="dot"></div></div></div>
+          <div class="row sp"> <code>--ease-spring</code> <div class="track"><div class="dot"></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="btn"&gt;Hover me — --transition-button&lt;/button&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --motion-fast: 180ms;
+  --ease-out:    cubic-bezier(.2, .7, .3, 1);
+
+  --color-brand:       oklch(58% 0.22 275);
+  --color-brand-hover: oklch(52% 0.22 275);
+
+  --transition-button: background var(--motion-fast) var(--ease-out),
+                       transform  var(--motion-fast) var(--ease-out);
+}
+
+body { padding: 2rem; font-family: system-ui; }
+.btn {
+  background: var(--color-brand); color: #fff;
+  padding: .5rem 1rem; border: 0; border-radius: .375rem;
+  font: inherit; cursor: pointer;
+  transition: var(--transition-button);
+}
+.btn:hover {
+  background: var(--color-brand-hover);
+  transform: translateY(-2px);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the button's transition to use <code>--ease-spring</code>. Hover it. The overshoot feels playful. Now change it to <code>--ease-in</code> — the wrong easing for an entering state. Describe, in one sentence, why the motion feels "off" even though nothing else changed. That feeling is why easing deserves tokens.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-4.5-typography-tokens.html">← Lesson 4.5</a>
+      <a href="./lesson-4.7-at-property-typed-custom-props.html">Lesson 4.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 11.1 — No-JS Philosophy · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 11</a>
+      <span>Lesson 11.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 11.1</p>
+      <h1>No-JS Philosophy: Where the Line Sits</h1>
+      <p class="lead">The no-JS argument is not about purity. It is about picking the most durable implementation for each piece of UI. This lesson lays out the three-part test we use to decide, and draws the line precisely between what CSS now owns and where JavaScript is still essential.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three-part test</h2>
+      <p>For any UI pattern, ask these three questions in order. If the answer to all three is yes, prefer the no-JS implementation.</p>
+      <ol>
+        <li><strong>Is it more accessible?</strong> Native HTML and CSS give you keyboard handling, ARIA roles, focus trapping, and screen reader semantics for free — implementations custom-built in JavaScript need to reimplement every one of those and will get some of them wrong.</li>
+        <li><strong>Is it more performant?</strong> Zero-JS patterns ship zero JS. They boot instantly, work with JavaScript disabled, and eliminate a whole class of hydration bugs.</li>
+        <li><strong>Is it more maintainable?</strong> An HTML primitive has a stable spec. A JavaScript reimplementation is five packages deep in a dependency tree that expires on a 6-month cycle.</li>
+      </ol>
+
+      <h2>Where JavaScript is still essential</h2>
+      <p>This module is not a trick — there are categories where JavaScript is still the right answer, and it is important to name them:</p>
+      <ul>
+        <li><strong>Application state.</strong> A shopping cart, a form that builds up over multiple pages, a real-time collaborative editor. CSS cannot hold application state.</li>
+        <li><strong>Data fetching and mutation.</strong> Talking to an API, optimistic updates, cache invalidation.</li>
+        <li><strong>Dynamic ARIA announcements.</strong> <code>aria-live</code> regions. CSS can change what is visible; only JavaScript can change what a screen reader reads out at a specific moment.</li>
+        <li><strong>Complex timeline animation.</strong> Overlapping beats with interruption recovery (Lesson 9.8).</li>
+        <li><strong>Physics, gestures, inertia.</strong> Drag-with-momentum, custom pinch-zoom.</li>
+      </ul>
+
+      <h2>Where CSS now wins</h2>
+      <p>This is the module's scope:</p>
+      <ul>
+        <li>Accordions (<code>&lt;details&gt;/&lt;summary&gt;</code>)</li>
+        <li>Tabs (<code>:target</code>)</li>
+        <li>Modals and popovers (<code>popover</code> attribute)</li>
+        <li>Tables of contents with scrollspy (<code>:target-current</code>)</li>
+        <li>Carousels (<code>scroll-snap</code> + <code>scroll-marker-group</code>)</li>
+        <li>Dropdowns (<code>:has()</code> + <code>&lt;details&gt;</code>)</li>
+      </ul>
+
+      <h2>The honest trade-offs</h2>
+      <p>Every no-JS pattern has a cost. Anchor-based tabs put state in the URL — great for deep linking, awkward for multi-tab pages. <code>&lt;details&gt;</code> animation required <code>@starting-style</code> to become smooth. Popovers require a modern browser. Each lesson that follows names its trade-off explicitly. No sales pitches.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Decision table</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-11-1 table { inline-size: 100%; border-collapse: collapse; font: .875rem system-ui; }
+          .demo-11-1 th, .demo-11-1 td { text-align: start; padding: .5rem .75rem; border-block-end: 1px solid oklch(92% 0.008 264); }
+          .demo-11-1 th { background: oklch(96% 0.005 264); font-weight: 700; }
+          .demo-11-1 .css { color: oklch(55% 0.17 150); font-weight: 600; }
+          .demo-11-1 .js  { color: oklch(55% 0.22 275); font-weight: 600; }
+        </style>
+        <div class="demo-11-1">
+          <table>
+            <thead><tr><th>Pattern</th><th>Owner</th><th>Reason</th></tr></thead>
+            <tbody>
+              <tr><td>Accordion</td><td class="css">CSS</td><td>details/summary + @starting-style</td></tr>
+              <tr><td>Tabs (single-page)</td><td class="css">CSS</td><td>:target</td></tr>
+              <tr><td>Modal</td><td class="css">CSS</td><td>popover attribute</td></tr>
+              <tr><td>TOC scrollspy</td><td class="css">CSS</td><td>:target-current</td></tr>
+              <tr><td>Carousel</td><td class="css">CSS</td><td>scroll-marker-group</td></tr>
+              <tr><td>Dropdown</td><td class="css">CSS</td><td>details + :has()</td></tr>
+              <tr><td>Shopping cart</td><td class="js">JS</td><td>Application state</td></tr>
+              <tr><td>Data fetch</td><td class="js">JS</td><td>Network I/O</td></tr>
+              <tr><td>aria-live toast</td><td class="js">JS</td><td>Dynamic ARIA</td></tr>
+              <tr><td>Drag with inertia</td><td class="js">JS</td><td>Physics</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;details&gt;
+  &lt;summary&gt;Zero JavaScript accordion&lt;/summary&gt;
+  &lt;p&gt;Keyboard-accessible. Screen-reader-friendly.
+    Works with JS disabled. Ships today.&lt;/p&gt;
+&lt;/details&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+details {
+  padding: .75rem 1rem;
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .5rem;
+  background: #fff;
+}
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: oklch(22% 0.018 264);
+}
+details p { color: oklch(44% 0.020 264); margin: .5rem 0 0; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open a UI component in your current project — any widget you built or reached for a library for. Apply the three-part test. Is the JavaScript implementation actually buying you more accessibility, performance, or maintainability than the native primitive? Write down the honest answer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 11</a>
+      <a href="./lesson-11.2-accordion-details-summary.html">Lesson 11.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

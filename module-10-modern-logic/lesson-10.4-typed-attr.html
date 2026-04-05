@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10.4 — Typed attr() — HTML Data in CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 10</a>
+      <span>Lesson 10.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 10.4</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Typed attr() — HTML Data in CSS</h1>
+      <p class="lead"><code>attr()</code> has existed since CSS2, but until now it could only return a string for use in <code>content:</code>. The typed form lets it return numbers, lengths, colors, and percentages — feeding HTML data directly into any CSS property.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The old attr()</h2>
+      <pre><code>.item::after { content: attr(data-label); }</code></pre>
+      <p>Useful, but narrow. It only works in <code>content:</code>. You could not do <code>width: attr(data-width)</code> because the browser had no way to know whether that string represented a length, a number, or nonsense.</p>
+
+      <h2>The new typed attr()</h2>
+      <pre><code>.chart-bar {
+  inline-size: attr(data-value type(&lt;percentage&gt;), 0%);
+  background: oklch(70% 0.15 attr(data-hue type(&lt;number&gt;), 0));
+}</code></pre>
+      <p>The second argument of <code>attr()</code> is now a <code>type()</code> expression declaring the expected CSS syntax. The third argument is a fallback used if the attribute is missing or doesn't parse. Supported types include <code>&lt;number&gt;</code>, <code>&lt;length&gt;</code>, <code>&lt;percentage&gt;</code>, <code>&lt;color&gt;</code>, <code>&lt;angle&gt;</code>, and <code>&lt;length-percentage&gt;</code>.</p>
+
+      <h2>What this unlocks</h2>
+      <ul>
+        <li><strong>Data-driven visualizations.</strong> Bar charts, sparklines, progress indicators — all drawn purely from HTML attributes.</li>
+        <li><strong>Themed components.</strong> A single <code>&lt;div data-hue="275"&gt;</code> can drive its entire color palette through <code>oklch()</code>.</li>
+        <li><strong>Animation targets.</strong> Store end-state values in HTML and animate to them without JavaScript.</li>
+      </ul>
+
+      <h2>Progressive, not imperative</h2>
+      <p>Typed <code>attr()</code> is the right tool when the HTML is the source of truth for a value. When the value lives in JavaScript state, use a custom property set via <code>element.style.setProperty()</code>. The two approaches are complementary — the <code>attr()</code> path avoids a script trip.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 133+, Edge 133+. Safari and Firefox not yet. Wrap in <code>@supports</code>. Fallback: set the custom property from HTML via inline <code>style</code>, which is widely supported.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — data-hue driven swatches</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-10-4 { display: flex; gap: .5rem; }
+          .demo-10-4 .sw {
+            inline-size: 4rem; block-size: 4rem; border-radius: .5rem;
+            display: grid; place-items: center;
+            color: #fff; font-weight: 700;
+            background: oklch(60% 0.18 275);
+          }
+          @supports (background: oklch(60% 0.18 attr(data-hue type(&lt;number&gt;), 0))) {
+            .demo-10-4 .sw { background: oklch(60% 0.18 attr(data-hue type(&lt;number&gt;), 0)); }
+          }
+        </style>
+        <div class="demo-10-4">
+          <div class="sw" data-hue="275">275</div>
+          <div class="sw" data-hue="150">150</div>
+          <div class="sw" data-hue="25">25</div>
+          <div class="sw" data-hue="85">85</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="chart"&gt;
+  &lt;div class="bar" data-value="80"&gt;Alpha&lt;/div&gt;
+  &lt;div class="bar" data-value="55"&gt;Bravo&lt;/div&gt;
+  &lt;div class="bar" data-value="30"&gt;Charlie&lt;/div&gt;
+  &lt;div class="bar" data-value="95"&gt;Delta&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+.chart { display: grid; gap: .5rem; }
+
+.bar {
+  padding: .5rem .75rem;
+  color: #fff; font-weight: 600;
+  background: oklch(58% 0.22 275);
+  border-radius: .375rem;
+  inline-size: 50%;
+}
+
+@supports (inline-size: attr(data-value type(&lt;number&gt;), 0%)) {
+  .bar {
+    inline-size: calc(attr(data-value type(&lt;number&gt;), 0) * 1%);
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a second attribute — <code>data-hue</code> — to each bar. Use it to set the bar's background hue via <code>oklch(60% 0.18 attr(data-hue type(&lt;number&gt;), 0))</code>. A four-bar chart now draws itself with zero JavaScript and no repeated CSS.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-10.3-custom-at-function.html">← Lesson 10.3</a>
+      <a href="./lesson-10.5-container-style-queries.html">Lesson 10.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

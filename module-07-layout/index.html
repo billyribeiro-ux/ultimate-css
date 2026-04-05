@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 7 — @layer layout: Primitives &amp; Container Queries · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../index.html#modules">Modules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container lesson">
+    <nav class="crumbs" aria-label="Breadcrumbs">
+      <a href="../index.html">Course</a>
+      <span>Module 7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 7 · Layer</p>
+      <h1>@layer layout: Primitives &amp; Container Queries</h1>
+      <p class="lead">Layout is structural, not visual. A handful of reusable primitives — container, stack, cluster, sidebar, grid, cover — compose into every layout any application will ever need. Add container queries and you can build a modern responsive system without writing a single media query.</p>
+    </header>
+
+    <section class="lesson-body">
+      <h2>Module goal</h2>
+      <p>Learn the six structural primitives that cover 99% of real layouts, understand why they have no visual opinions, and use container queries to make them component-aware. The end state is a layout vocabulary you can reuse across projects without modification.</p>
+
+      <h2>The single-responsibility rule for layout</h2>
+      <p>Every rule in <code>@layer layout</code> answers exactly one question: "where do these children sit in relation to each other?" Not "what color are they," not "how big is their text," not "do they have a shadow" — only their spatial relationship. When a layout rule leaks visual opinion, it stops being reusable.</p>
+
+      <h2>Lessons</h2>
+      <ul class="lesson-list">
+        <li><a href="./lesson-7.1-layout-single-responsibility.html"><span class="num">7.1</span> Layout's Single Responsibility</a></li>
+        <li><a href="./lesson-7.2-container-primitive.html"><span class="num">7.2</span> The Container Primitive</a></li>
+        <li><a href="./lesson-7.3-stack-primitive.html"><span class="num">7.3</span> The Stack Primitive</a></li>
+        <li><a href="./lesson-7.4-cluster-primitive.html"><span class="num">7.4</span> The Cluster Primitive</a></li>
+        <li><a href="./lesson-7.5-sidebar-primitive.html"><span class="num">7.5</span> The Sidebar Primitive</a></li>
+        <li><a href="./lesson-7.6-grid-primitive.html"><span class="num">7.6</span> The Grid Primitive</a></li>
+        <li><a href="./lesson-7.7-container-queries.html"><span class="num">7.7</span> Container Queries &amp; Style Queries</a></li>
+        <li><a href="./lesson-7.8-cover-grid-lanes-masonry.html"><span class="num">7.8</span> Cover, Grid-Lanes, and Masonry</a></li>
+      </ul>
+
+      <h2>Module project</h2>
+      <p><a href="./project/index.html">A Responsive Page With Zero Media Queries</a> — build a complete page using every primitive in this module. No viewport-width media queries allowed.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../module-06-base/index.html">← Module 6</a>
+      <a href="./lesson-7.1-layout-single-responsibility.html">Start Lesson 7.1 →</a>
+    </nav>
+  </main>
+</body>
+</html>

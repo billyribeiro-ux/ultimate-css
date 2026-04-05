@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.8 — @layer animations · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.8</p>
+      <h1>@layer animations</h1>
+      <p class="lead">The highest layer in the stack. Motion logic, transitions, keyframes — and, critically, the <code>prefers-reduced-motion</code> override that must beat every animation in every component below it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why animations is the top layer</h2>
+      <p>Animations are applied on top of an already-styled component. If your button base class sets <code>background: var(--btn-bg)</code>, and a hover animation needs to interpolate that background, the animation rule must be able to override the base without fighting it. That is fine within a layer. But the <em>reason</em> animations sits at the very top is accessibility: when a user has <code>prefers-reduced-motion: reduce</code> set, your motion overrides <strong>must</strong> win, no matter which component tried to schedule a transition.</p>
+
+      <h2>Transitions and keyframes together</h2>
+      <pre><code>@layer animations {
+  /* Keyframes */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .6; }
+  }
+
+  /* Component transitions */
+  .btn     { transition: background var(--motion-fast) var(--ease-out),
+                         transform  var(--motion-fast) var(--ease-out); }
+  .btn:hover   { transform: translateY(-1px); }
+  .btn:active  { transform: translateY(0); }
+
+  .dialog  { animation: fade-in var(--motion-md) var(--ease-out); }
+
+  .skeleton { animation: pulse 1.2s var(--ease-in-out) infinite; }
+}</code></pre>
+
+      <h2>The reduced-motion override</h2>
+      <p>This is the one place in a PE7 codebase where <code>!important</code> is legitimate, and it is legitimate precisely because the layer is at the top <em>and</em> the accessibility requirement is absolute:</p>
+      <pre><code>@layer animations {
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration:   0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration:  0.01ms !important;
+      scroll-behavior:      auto    !important;
+    }
+  }
+}</code></pre>
+      <p>Why <code>!important</code> here? Because animations on individual elements can come from inline styles, JS-injected styles, or third-party libraries inside lower layers, and the accessibility default must win against all of them. This is the single exception to the "no <code>!important</code>" rule, and it is documented in every PE7 codebase as the only place it appears.</p>
+
+      <h2>Motion tokens</h2>
+      <p>Every duration and easing value references a motion token, same principle as colour and spacing. The vocabulary is small:</p>
+      <ul>
+        <li><code>--motion-fast</code> — 150ms, for micro-interactions.</li>
+        <li><code>--motion-md</code> — 250ms, for most UI transitions.</li>
+        <li><code>--motion-slow</code> — 400ms, for page-level moves.</li>
+        <li><code>--ease-out</code> — for things entering the viewport.</li>
+        <li><code>--ease-in</code> — for things exiting.</li>
+        <li><code>--ease-in-out</code> — for reversible state changes.</li>
+      </ul>
+      <p>Module 4 covers motion tokens in depth.</p>
+
+      <h2>What animations must not contain</h2>
+      <ul>
+        <li>No component shape or colour decisions that the component would otherwise own — only the transitioning of them.</li>
+        <li>No new custom properties for component appearance — those belong in components.</li>
+        <li>No <code>!important</code> outside the reduced-motion override.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — hover transition + reduced-motion</h2>
+      <div class="demo-frame">
+        <style>
+          @layer tokens38, components38, animations38;
+          @layer tokens38 {
+            .demo-3-8 { --motion-fast: 200ms; --ease-out: cubic-bezier(.2,.7,.3,1); --color-brand: oklch(58% 0.22 275); }
+          }
+          @layer components38 {
+            .demo-3-8 .btn { background: var(--color-brand); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .375rem; font-family: system-ui; }
+          }
+          @layer animations38 {
+            .demo-3-8 .btn { transition: transform var(--motion-fast) var(--ease-out), filter var(--motion-fast) var(--ease-out); }
+            .demo-3-8 .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+            @media (prefers-reduced-motion: reduce) {
+              .demo-3-8 *, .demo-3-8 *::before, .demo-3-8 *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+              }
+            }
+          }
+        </style>
+        <div class="demo-3-8">
+          <button class="btn">Hover me — animations layer transition</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="btn"&gt;Transition on hover&lt;/button&gt;
+&lt;p&gt;Toggle prefers-reduced-motion in your OS settings and reload.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer tokens, components, animations;
+
+@layer tokens {
+  :root {
+    --color-brand: oklch(58% 0.22 275);
+    --motion-fast: 200ms;
+    --ease-out: cubic-bezier(.2, .7, .3, 1);
+  }
+}
+
+@layer components {
+  .btn {
+    background: var(--color-brand); color: #fff;
+    padding: .5rem 1rem; border: 0; border-radius: .375rem;
+    font-family: system-ui; cursor: pointer;
+  }
+}
+
+@layer animations {
+  .btn { transition: transform var(--motion-fast) var(--ease-out); }
+  .btn:hover { transform: translateY(-2px); }
+
+  /* The one legitimate !important in PE7. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration:  0.01ms !important;
+    }
+  }
+}
+
+body { padding: 1rem; font-family: system-ui; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Move the <code>.btn { transition: ... }</code> rule out of the animations layer and into the components layer. It still works. Now explain, in one sentence, what breaks the moment a lower-layer library tries to disable that transition via <code>transition: none</code> inside its own component rule.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.7-at-layer-components.html">← Lesson 3.7</a>
+      <a href="./lesson-3.9-layer-boundaries-rules.html">Lesson 3.9 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

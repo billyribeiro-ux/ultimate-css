@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.8 — margin-trim and Text Refinements · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.8</p>
+      <h1>margin-trim and Text Refinements</h1>
+      <p class="lead">The last pass on base is a handful of modern properties that only turn on where they are supported: <code>margin-trim</code>, <code>hyphens</code>, <code>overflow-wrap</code>, <code>orphans</code>, and <code>widows</code>. Each one is small. Together they are the difference between prose that looks handmade and prose that looks auto-generated.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem margin-trim solves</h2>
+      <p>A common pattern: a card with 1rem of padding contains a heading and two paragraphs. Each paragraph has a <code>margin-block</code> for vertical rhythm. The first paragraph's top margin collides with the card's padding, adding unwanted space; the last paragraph's bottom margin does the same. Developers have worked around this for twenty years with <code>:first-child</code> and <code>:last-child</code> rules — messy and specific to each container.</p>
+      <pre><code>/* The old way */
+.card > :first-child { margin-block-start: 0; }
+.card > :last-child  { margin-block-end: 0; }</code></pre>
+      <p><code>margin-trim</code> fixes this at the container level. Set it on the card and the browser automatically removes the outermost margins of the first and last children:</p>
+      <pre><code>.card { margin-trim: block; }</code></pre>
+
+      <h2>@supports gating</h2>
+      <p><code>margin-trim</code> has partial browser support as of 2025 — stable in Safari and WebKit, shipping in Chromium behind a flag, experimental in Firefox. Wrap it in <code>@supports</code> so browsers without it fall back to the old <code>:first-child</code>/<code>:last-child</code> pattern:</p>
+      <pre><code>@supports (margin-trim: block) {
+  :where(section, article, aside, blockquote) {
+    margin-trim: block;
+  }
+}</code></pre>
+
+      <h2>hyphens and overflow-wrap</h2>
+      <p>Long words in narrow columns overflow. Two properties handle this:</p>
+      <pre><code>:where(p, li, dd) {
+  hyphens: auto;
+  overflow-wrap: break-word;
+}</code></pre>
+      <p><code>hyphens: auto</code> enables soft hyphenation at syllable boundaries — the browser knows where to break a word like "compartmentalisation" without making you type <code>&amp;shy;</code>. <code>overflow-wrap: break-word</code> is the last-resort rule: if a word cannot be hyphenated (a URL, a long hash, a token), break it anywhere rather than overflowing the container.</p>
+
+      <h2>orphans and widows</h2>
+      <p>In print typography, an orphan is a single word left on the last line of a paragraph; a widow is a single line of a paragraph left at the top of a page. The CSS properties <code>orphans</code> and <code>widows</code> let you request minimum counts — on multi-column and paginated layouts, the browser respects them. They are ignored on regular block layout, but setting them costs nothing and they apply in print stylesheets automatically.</p>
+      <pre><code>p { orphans: 3; widows: 3; }</code></pre>
+
+      <h2>The full base text-refinement block</h2>
+      <pre><code>@supports (margin-trim: block) {
+  :where(section, article, aside, blockquote, .card) {
+    margin-trim: block;
+  }
+}
+
+:where(p, li, dd) {
+  hyphens: auto;
+  overflow-wrap: break-word;
+  orphans: 3;
+  widows: 3;
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — a narrow card with and without trim</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-8 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-6-8 .card { padding: 1rem; background: oklch(97% 0.005 264); border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; max-inline-size: 24rem; }
+          .demo-6-8 .card h3 { margin-block: 1rem .5rem; font-size: 1rem; }
+          .demo-6-8 .card p  { margin-block: .75rem; font-size: .9rem; color: oklch(40% 0.02 264); hyphens: auto; overflow-wrap: break-word; }
+          .demo-6-8 .trimmed { margin-trim: block; }
+          .demo-6-8 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+        </style>
+        <div class="demo-6-8">
+          <div>
+            <h4>Without margin-trim</h4>
+            <div class="card">
+              <h3>Title</h3>
+              <p>Compartmentalisation and hyphenation help narrow paragraphs wrap cleanly.</p>
+              <p>Both first and last children leak extra margin into the padding.</p>
+            </div>
+          </div>
+          <div>
+            <h4>With margin-trim: block</h4>
+            <div class="card trimmed">
+              <h3>Title</h3>
+              <p>Compartmentalisation and hyphenation help narrow paragraphs wrap cleanly.</p>
+              <p>First and last margins collapse against the padding.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h3&gt;Hyphenation demo&lt;/h3&gt;
+  &lt;p&gt;Narrowcontentusingexceptionallylongwordsthatwouldotherwiseoverflow.&lt;/p&gt;
+  &lt;p&gt;Normal prose with some &lt;code&gt;long-technical-identifiers-as-well&lt;/code&gt; inline.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  body { font-family: system-ui; padding: 1rem; }
+  article {
+    inline-size: 16rem;
+    padding: 1rem;
+    background: oklch(97% 0.005 264);
+    border: 1px solid oklch(85% 0.01 264);
+    border-radius: .5rem;
+  }
+
+  @supports (margin-trim: block) {
+    :where(article) { margin-trim: block; }
+  }
+
+  :where(p, li) {
+    hyphens: auto;
+    overflow-wrap: break-word;
+    orphans: 3;
+    widows: 3;
+  }
+
+  p { margin-block: .75rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove <code>hyphens: auto</code> and <code>overflow-wrap: break-word</code> from the rules. The long made-up word in the first paragraph blows out of the container. Add them back. Every prose page you ever ship benefits from these two lines — they cost nothing and prevent a whole category of "text overflow" bug reports.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.7-dark-mode-light-dark-oklch.html">← Lesson 6.7</a>
+      <a href="./project/index.html">Module 6 project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

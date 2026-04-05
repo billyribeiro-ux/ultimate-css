@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.8 — Cover, Grid-Lanes, and Masonry · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.8</p>
+      <h1>Cover, Grid-Lanes, and Masonry</h1>
+      <p class="lead">Two more primitives round out the layout vocabulary. Cover is a full-height centred container for hero sections and splash screens. Grid-lanes masonry is the native CSS answer to Pinterest-style staggered grids — still early in browser support, so it ships behind an <code>@supports</code> fallback.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The cover primitive</h2>
+      <pre><code>.cover {
+  display: grid;
+  place-items: center;
+  min-block-size: var(--cover-min-height, 100svh);
+  padding: var(--space-xl);
+}</code></pre>
+      <p>Three decisions: grid with <code>place-items: center</code> for unambiguous two-axis centring; <code>100svh</code> for small-viewport-height (which excludes the mobile browser chrome, unlike <code>100vh</code>); generous padding so content never touches the edges.</p>
+
+      <h2>Why 100svh, not 100vh</h2>
+      <p>On mobile Safari and Chrome, <code>100vh</code> refers to the viewport height <em>without</em> the address bar — so a full-viewport hero is taller than the visible area on first load. When the user scrolls and the address bar collapses, the layout jumps. <code>100svh</code> refers to the <em>small</em> viewport height — the smallest viewport will ever be during the session — so the hero never needs to resize. There is also <code>lvh</code> (large) and <code>dvh</code> (dynamic) for other use cases.</p>
+
+      <h2>Cover with headlined content</h2>
+      <p>Cover centres exactly one thing by default. If you need a headline plus a sub-headline plus a call-to-action, wrap them in a stack inside the cover:</p>
+      <pre><code>&lt;section class="cover"&gt;
+  &lt;div class="stack" style="--stack-gap: 1.5rem; text-align: center;"&gt;
+    &lt;h1&gt;Hero headline&lt;/h1&gt;
+    &lt;p&gt;Tagline&lt;/p&gt;
+    &lt;a class="btn" href="#"&gt;Call to action&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+      <h2>Masonry via grid-lanes</h2>
+      <p>Masonry is the Pinterest-style staggered grid where items flow into whichever column has the most space. Historically it required JavaScript. CSS Grid Level 3 adds a native masonry mode through <code>grid-template-rows: masonry</code> (Firefox) and the newer <code>item-flow: row / column</code> / <code>grid-template-rows</code> proposal. The syntax is still stabilising.</p>
+      <pre><code>.masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-rows: masonry;
+  gap: var(--grid-gap, 1rem);
+}</code></pre>
+      <p>Masonry support is not universal. Wrap it in a feature query and fall back to a regular grid where the declaration is not recognised:</p>
+      <pre><code>.masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+
+@supports (grid-template-rows: masonry) {
+  .masonry { grid-template-rows: masonry; }
+}</code></pre>
+      <p>Browsers without masonry see a regular fitted grid — all items the same row height, which is a perfectly fine fallback. Browsers with masonry see the staggered layout. No feature detection in JavaScript, no polyfill, no complexity.</p>
+
+      <h2>Why these are the last two primitives</h2>
+      <p>Six primitives (container, stack, cluster, sidebar, grid, cover) cover 99% of layouts. Masonry is a specialised grid variant for a specific visual style. Cover is a specialised centring primitive for hero sections. They do not need to be separate classes in every project — add them when you need them, and only then.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — cover and a fallback masonry</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-8 { font-family: system-ui; display: grid; gap: 1rem; }
+          .demo-7-8 .cover {
+            display: grid; place-items: center;
+            min-block-size: 14rem;
+            padding: 1.5rem;
+            background: oklch(92% 0.05 220);
+            border-radius: .5rem;
+            text-align: center;
+          }
+          .demo-7-8 .cover h3 { margin: 0; font-size: 1.25rem; color: oklch(25% 0.05 220); }
+          .demo-7-8 .cover p { margin: .5rem 0 0; color: oklch(40% 0.05 220); font-size: .85rem; }
+          .demo-7-8 .masonry { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: .5rem; }
+          @supports (grid-template-rows: masonry) {
+            .demo-7-8 .masonry { grid-template-rows: masonry; }
+          }
+          .demo-7-8 .tile { background: oklch(94% 0.04 275); border: 1px solid oklch(85% 0.03 275); border-radius: .375rem; padding: .5rem; font-size: .75rem; }
+          .demo-7-8 .tile.tall { block-size: 6rem; }
+          .demo-7-8 .tile.short { block-size: 3rem; }
+        </style>
+        <div class="demo-7-8">
+          <div class="cover">
+            <div>
+              <h3>Cover primitive</h3>
+              <p>Two-axis centred, min-block-size controlled.</p>
+            </div>
+          </div>
+          <div class="masonry">
+            <div class="tile tall">Tile 1</div>
+            <div class="tile short">Tile 2</div>
+            <div class="tile tall">Tile 3</div>
+            <div class="tile short">Tile 4</div>
+            <div class="tile tall">Tile 5</div>
+            <div class="tile short">Tile 6</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;section class="cover"&gt;
+  &lt;div&gt;
+    &lt;h1&gt;Cover&lt;/h1&gt;
+    &lt;p&gt;Always centred, min-height controlled.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/section&gt;
+&lt;section class="masonry"&gt;
+  &lt;div class="tile" style="block-size: 6rem"&gt;Tall&lt;/div&gt;
+  &lt;div class="tile" style="block-size: 3rem"&gt;Short&lt;/div&gt;
+  &lt;div class="tile" style="block-size: 5rem"&gt;Medium&lt;/div&gt;
+  &lt;div class="tile" style="block-size: 4rem"&gt;Another&lt;/div&gt;
+&lt;/section&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .cover {
+    display: grid;
+    place-items: center;
+    min-block-size: var(--cover-min-height, 14rem);
+    padding: var(--cover-padding, 1.5rem);
+  }
+
+  .masonry {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: .5rem;
+  }
+  @supports (grid-template-rows: masonry) {
+    .masonry { grid-template-rows: masonry; }
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; margin: 0; }
+.cover { background: oklch(92% 0.04 220); border-radius: .5rem; margin-block-end: 1rem; text-align: center; }
+.tile { background: oklch(94% 0.04 275); border-radius: .375rem; padding: .5rem; font-size: .8rem; }
+h1 { margin: 0; }
+p  { margin: .25rem 0 0; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>In a browser that supports masonry (Firefox with flag, or Safari Technology Preview), the tiles pack tightly like a Pinterest grid. In a browser that does not, they render as a regular grid with uniform rows. Test in both — the <code>@supports</code> block is what lets you ship masonry today without breaking anything on browsers that have not shipped it yet.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.7-container-queries.html">← Lesson 7.7</a>
+      <a href="./project/index.html">Module 7 project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

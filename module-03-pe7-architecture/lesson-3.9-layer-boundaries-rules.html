@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.9 — Layer Boundaries: The 7 Non-Negotiables · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.9</p>
+      <h1>Layer Boundaries: The 7 Non-Negotiables</h1>
+      <p class="lead">Seven rules. Break any of them and the architecture stops paying you back. Each rule has a visible failure mode. Each one is enforceable in code review in under a minute.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Rule 1 — Every rule lives in exactly one layer</h2>
+      <p>No unlayered rules in a PE7 codebase. None. The unlayered escape hatch exists for legacy migration; a new project never uses it. If a rule does not live in a named layer, the architecture has a blind spot the size of that rule.</p>
+      <p><strong>Violation example:</strong></p>
+      <pre><code>/* root.css */
+@layer reset, tokens, base, layout, components, animations;
+
+/* UNLAYERED — wrong */
+.urgent-banner { background: red !important; }</code></pre>
+      <p>The unlayered rule will beat every layered rule in the project. Nobody will understand why their overrides fail.</p>
+
+      <h2>Rule 2 — Tokens contain no selectors that style elements</h2>
+      <p>The tokens layer only sets custom properties. No <code>color</code>, no <code>background</code>, no <code>margin</code>, no <code>font-size</code> applied to an element. Theme switches that set custom properties on a <code>[data-theme]</code> root are still tokens. Anything beyond that is not.</p>
+      <p><strong>Violation example:</strong> <code>@layer tokens { body { background: var(--color-surface); } }</code> — that rule belongs in <code>base</code>.</p>
+
+      <h2>Rule 3 — Base contains only element selectors</h2>
+      <p>If you write a class, an ID, or an attribute selector (other than accessibility pseudo-classes like <code>:focus-visible</code>) in the base layer, you have leaked component state into base.</p>
+      <p><strong>Violation example:</strong> <code>@layer base { .prose p { max-inline-size: 60ch; } }</code> — the <code>.prose</code> context makes this a component decision, not a base one. Either move it to a component or drop the class and apply to all <code>p</code>.</p>
+
+      <h2>Rule 4 — Layout sets no colours, fonts, borders, or shadows</h2>
+      <p>Layout arranges. Decoration is always components. This rule is the easiest to violate because it is often tempting to add "just a background" to a layout primitive for visual separation during development. Don't. The visible failure is that every consumer of the primitive gets the background whether they want it or not.</p>
+
+      <h2>Rule 5 — Components never reach into other components by name</h2>
+      <p>No <code>.card .btn { ... }</code>. No <code>.dialog .form-field { ... }</code>. A component is a sealed unit. If a button needs to look different inside a card, the right move is a modifier on the button (<code>.btn.compact</code>), not a descendant selector from the card.</p>
+      <p><strong>Violation example:</strong></p>
+      <pre><code>@layer components {
+  .card .btn { padding: .25rem .5rem; } /* WRONG — card is reaching in */
+  .btn.compact { padding: .25rem .5rem; } /* RIGHT — button owns its modifier */
+}</code></pre>
+
+      <h2>Rule 6 — No <code>!important</code> outside the reduced-motion override</h2>
+      <p>The only legitimate use of <code>!important</code> in a PE7 codebase is inside <code>@media (prefers-reduced-motion: reduce)</code> in the animations layer. Everywhere else, if you reach for <code>!important</code>, you have chosen the wrong layer. Move the rule up. Reaching for <code>!important</code> is a symptom; the disease is layer placement.</p>
+
+      <h2>Rule 7 — The declaration line is immutable at runtime</h2>
+      <p>You declare <code>@layer reset, tokens, base, layout, components, animations;</code> on line 1 of the root stylesheet, and then you never add a new top-level layer without a team-wide decision. Sub-layers inside existing layers are fine. A new peer to <code>components</code> is a design change to the architecture — it must be deliberate, documented, and rare.</p>
+
+      <h2>Enforcement in review</h2>
+      <p>Every one of these rules can be checked in a diff in seconds. "Is this rule inside a layer?" "Does it set a property on an element?" "Does it contain a class selector?" "Is there an <code>!important</code> and is it inside prefers-reduced-motion?" When a rule fails the check, the question is not "does it work" — it is "which layer does it belong in." The architecture tells you.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Illustration — a rule per violation</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-3-9 { font-family: ui-monospace, monospace; background: oklch(20% 0.02 264); color: oklch(92% 0.02 264); padding: 1rem; border-radius: .5rem; font-size: .8rem; line-height: 1.55; overflow: auto; }
+          .demo-3-9 .bad { color: oklch(70% 0.22 25); }
+          .demo-3-9 .good { color: oklch(75% 0.17 150); }
+          .demo-3-9 .c { color: oklch(60% 0.05 150); }
+        </style>
+        <pre class="demo-3-9"><span class="c">/* RULE 3 — base contains only element selectors */</span>
+<span class="bad">@layer base { .prose h2 { font-size: 2rem; } }</span>  <span class="c">/* class in base */</span>
+<span class="good">@layer base { h2 { font-size: 2rem; } }</span>          <span class="c">/* element only */</span>
+
+<span class="c">/* RULE 5 — components never reach into other components */</span>
+<span class="bad">@layer components { .card .btn { padding: .25rem; } }</span>
+<span class="good">@layer components { .btn.compact { padding: .25rem; } }</span>
+
+<span class="c">/* RULE 6 — no !important outside prefers-reduced-motion */</span>
+<span class="bad">@layer components { .btn { color: red !important; } }</span>
+<span class="good">@layer components { .btn.danger { color: var(--color-danger); } }</span></pre>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — spot the violations</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="prose"&gt;
+  &lt;h1&gt;Boundary violations&lt;/h1&gt;
+  &lt;p&gt;Each rule below breaks exactly one of the seven rules. Fix them.&lt;/p&gt;
+  &lt;button class="btn"&gt;Action&lt;/button&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, tokens, base, layout, components, animations;
+
+@layer tokens {
+  :root { --color-brand: oklch(58% 0.22 275); }
+  /* Violation of rule 2: this sets a property on an element */
+  body { background: oklch(96% 0.005 264); }
+}
+
+@layer base {
+  /* Violation of rule 3: class in base */
+  .prose p { max-inline-size: 60ch; }
+  h1 { font-size: 1.5rem; }
+}
+
+@layer components {
+  .btn { background: var(--color-brand); color: #fff;
+         padding: .5rem 1rem; border: 0; border-radius: .375rem; }
+  /* Violation of rule 6: !important outside prefers-reduced-motion */
+  .btn { background: oklch(60% 0.22 25) !important; }
+}
+
+/* Unlayered — violation of rule 1 */
+.prose { font-family: system-ui; padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>The editor above contains four deliberate violations (rules 1, 2, 3, and 6). Identify each one, then rewrite the stylesheet so every rule lives in its correct layer with no <code>!important</code> and no unlayered rules. Compare your answer with a teammate — if you both reached the same layout, the architecture is doing its job.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.8-at-layer-animations.html">← Lesson 3.8</a>
+      <a href="./project/index.html">Module 3 project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

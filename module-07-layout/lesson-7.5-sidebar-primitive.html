@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.5 — The Sidebar Primitive · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.5</p>
+      <h1>The Sidebar Primitive</h1>
+      <p class="lead">Sidebar is the classic "narrow column next to a wide column" layout — and the classic reason people reach for media queries. The PE7 sidebar collapses to one column automatically when space runs out, with no breakpoint specified anywhere. The technique is called the flex-grow-999 trick, and once you see it work you will never write a sidebar media query again.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <pre><code>.sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sidebar-gap, var(--space-xl));
+}
+.sidebar &gt; :first-child {
+  flex-basis: var(--sidebar-width, 18rem);
+  flex-grow: 1;
+}
+.sidebar &gt; :last-child {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: var(--sidebar-min, 50%);
+}</code></pre>
+
+      <h2>The flex-grow: 999 trick</h2>
+      <p>The sidebar has two children. The first (the "sidebar column") has a natural basis of 18rem and a grow factor of 1. The second (the "main column") has a basis of 0 and a grow factor of 999. Because of those numbers, the main column takes all available extra space whenever both fit on the same row — the sidebar stays at 18rem and the main expands to fill whatever is left.</p>
+      <p>When there is not enough room for both, <code>flex-wrap: wrap</code> kicks in. The main column's <code>min-inline-size: 50%</code> is the threshold: if the main cannot be at least 50% of the container, it wraps to its own row. Because the sidebar is in the first row alone now, and the main is in the second row alone, they render stacked. No media query.</p>
+
+      <h2>Why 999 and not 1</h2>
+      <p>With grow factors 1 and 1, flex distributes extra space evenly — both columns grow together. With 1 and 999, the ratio is so extreme that the first column effectively does not grow at all; it sits at its basis. You could use 99 or 9999; the number just needs to be large enough that the ratio is functionally "all for main, none for sidebar."</p>
+
+      <h2>The collapse threshold</h2>
+      <p><code>min-inline-size: 50%</code> on the main column defines when the layout collapses. Below that, wrap triggers. Change the threshold by changing the token:</p>
+      <pre><code>.narrow-sidebar { --sidebar-min: 35rem; }  /* collapse earlier */
+.wide-sidebar   { --sidebar-min: 70%; }    /* stay horizontal longer */</code></pre>
+
+      <h2>It responds to the container, not the viewport</h2>
+      <p>The collapse happens based on the container's inline-size, not the viewport's. That means a sidebar inside a narrow card collapses at the card's width, not at a global breakpoint. A sidebar inside a wide main column stays expanded longer. This is component-aware responsiveness — you get it for free, because the rule is about flex-basis, not about <code>@media</code>.</p>
+
+      <h2>Composition</h2>
+      <p>The sidebar's children are usually both stacks — a vertical menu in the sidebar column, a vertical article flow in the main column. Sidebar provides the two-column relationship; stack provides the vertical rhythm inside each column. Every complex documentation layout is some nesting of this pair.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — resize to watch the collapse</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-5 { font-family: system-ui; }
+          .demo-7-5 .sidebar { display: flex; flex-wrap: wrap; gap: 1rem; }
+          .demo-7-5 .sidebar > :first-child { flex-basis: 12rem; flex-grow: 1; background: oklch(94% 0.03 275); padding: 1rem; border-radius: .375rem; }
+          .demo-7-5 .sidebar > :last-child { flex-basis: 0; flex-grow: 999; min-inline-size: 60%; background: oklch(96% 0.005 264); padding: 1rem; border-radius: .375rem; }
+          .demo-7-5 h4 { margin: 0 0 .5rem; font-size: .8rem; color: oklch(30% 0.02 264); }
+          .demo-7-5 p { margin: 0; font-size: .85rem; color: oklch(40% 0.02 264); }
+        </style>
+        <div class="demo-7-5">
+          <div class="sidebar">
+            <aside>
+              <h4>Sidebar</h4>
+              <p>12rem basis, grow 1.</p>
+            </aside>
+            <main>
+              <h4>Main</h4>
+              <p>Resize this preview. When the main column cannot be at least 60% of the row, it wraps onto a new line and the sidebar takes the full row above it.</p>
+            </main>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="sidebar"&gt;
+  &lt;aside&gt;
+    &lt;h3&gt;Nav&lt;/h3&gt;
+    &lt;p&gt;18rem basis.&lt;/p&gt;
+  &lt;/aside&gt;
+  &lt;main&gt;
+    &lt;h3&gt;Article&lt;/h3&gt;
+    &lt;p&gt;The main column expands to fill everything else, and the layout collapses when there is not enough room for both.&lt;/p&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sidebar-gap, 1.5rem);
+  }
+  .sidebar &gt; :first-child {
+    flex-basis: var(--sidebar-width, 18rem);
+    flex-grow: 1;
+  }
+  .sidebar &gt; :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: var(--sidebar-min, 50%);
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+aside, main { padding: 1rem; border-radius: .375rem; }
+aside { background: oklch(94% 0.03 275); }
+main  { background: oklch(96% 0.005 264); }
+h3 { margin: 0 0 .25rem; font-size: 1rem; }
+p  { margin: 0; font-size: .85rem; color: oklch(40% 0.02 264); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>flex-grow: 999</code> to <code>flex-grow: 1</code> on the last child. The two columns now grow in a 1:1 ratio — the sidebar stretches to match the main column's width, which is usually not what you want. Change it back. Then change <code>min-inline-size: 50%</code> to <code>min-inline-size: 80%</code>. The layout collapses much earlier. That one number is your "breakpoint," expressed as content requirement instead of viewport width.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.4-cluster-primitive.html">← Lesson 7.4</a>
+      <a href="./lesson-7.6-grid-primitive.html">Lesson 7.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

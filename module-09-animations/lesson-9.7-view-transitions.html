@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.7 — View Transitions · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.7</p>
+      <h1>View Transitions</h1>
+      <p class="lead">A view transition is a snapshot-based morph between two DOM states. You tell the browser "I'm about to change the DOM" and it automatically animates the difference — position, size, opacity, color — between old and new. This is how native apps have felt for twenty years. The web finally has it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The mental model</h2>
+      <p>Without view transitions, changing the DOM is discontinuous — one frame it's state A, the next it's state B. With view transitions, the browser captures a bitmap of state A, applies the DOM change, captures state B, and then cross-fades between them on the compositor. You only write the animation rules for the transition itself.</p>
+
+      <h2>The two halves</h2>
+      <p><strong>JavaScript</strong> kicks it off — one function call:</p>
+      <pre><code>document.startViewTransition(() =&gt; {
+  // Make any DOM changes here.
+  list.classList.toggle("grid");
+});</code></pre>
+      <p><strong>CSS</strong> defines the animation via two pseudo-elements:</p>
+      <pre><code>::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 400ms;
+  animation-timing-function: var(--ease-out);
+}</code></pre>
+
+      <h2>Named transitions for morphing elements</h2>
+      <p>Give an element a <code>view-transition-name</code> and the browser will morph it from its old position to its new position, across the DOM change:</p>
+      <pre><code>.hero-image { view-transition-name: hero; }
+::view-transition-group(hero) { animation-duration: 500ms; }</code></pre>
+      <p>This is how you get the "card in a list expands into a full-screen detail view" feeling without writing a single line of animation code.</p>
+
+      <h2>Same-document vs cross-document</h2>
+      <p>Same-document view transitions (DOM changes within one page) are in Chrome, Safari, and Firefox. Cross-document (between navigations) is Chrome-only as of early 2026 but rapidly landing. This lesson focuses on same-document — production-ready now.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — layout morph on click</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-7 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+          .demo-9-7 .grid.list { grid-template-columns: 1fr; }
+          .demo-9-7 .item { padding: 1rem; background: oklch(48% 0.22 275); color: #fff; border-radius: .5rem; font-weight: 600; }
+          .demo-9-7 button { margin-block-end: .5rem; padding: .4rem .75rem; border-radius: .375rem; border: 1px solid oklch(85% 0.012 264); background: #fff; cursor: pointer; }
+          ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 350ms; }
+        </style>
+        <div class="demo-9-7">
+          <button id="d97-toggle">Toggle layout</button>
+          <div class="grid" id="d97-grid">
+            <div class="item">One</div>
+            <div class="item">Two</div>
+            <div class="item">Three</div>
+            <div class="item">Four</div>
+            <div class="item">Five</div>
+            <div class="item">Six</div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var btn = document.getElementById('d97-toggle');
+            var grid = document.getElementById('d97-grid');
+            if (!btn || !grid) return;
+            btn.addEventListener('click', function () {
+              var go = function () { grid.classList.toggle('list'); };
+              if (document.startViewTransition) document.startViewTransition(go);
+              else go();
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button id="toggle"&gt;Swap&lt;/button&gt;
+&lt;div id="box" class="a"&gt;Box&lt;/div&gt;
+&lt;script&gt;
+  const btn = document.getElementById('toggle');
+  const box = document.getElementById('box');
+  btn.addEventListener('click', () =&gt; {
+    const go = () =&gt; box.classList.toggle('a');
+    if (document.startViewTransition) document.startViewTransition(go);
+    else go();
+  });
+&lt;/script&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+button { margin-bottom: 1rem; padding: .4rem .75rem; }
+
+#box {
+  view-transition-name: box;
+  padding: 2rem;
+  background: oklch(48% 0.22 275);
+  color: #fff; font-weight: 700;
+  border-radius: .5rem;
+  inline-size: 6rem;
+}
+#box.a {
+  background: oklch(65% 0.17 150);
+  inline-size: 100%;
+  border-radius: 1.5rem;
+}
+
+::view-transition-group(box) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a second box with its own <code>view-transition-name</code>. Move it in the DOM inside the <code>startViewTransition</code> callback — from one container to another. The browser will morph it between parents automatically, which is the "shared element transition" pattern that used to require a choreography library.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.6-sibling-index-stagger.html">← Lesson 9.6</a>
+      <a href="./lesson-9.8-gsap-integration.html">Lesson 9.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

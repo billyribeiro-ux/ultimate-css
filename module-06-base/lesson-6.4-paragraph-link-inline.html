@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.4 — Paragraph, Link, and Inline Text · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.4</p>
+      <h1>Paragraph, Link, and Inline Text</h1>
+      <p class="lead">Prose is the hardest thing to style well because every decision compounds across thousands of words. Four small rules — a measure, a wrap mode, a decoration thickness, and an underline offset — make the difference between prose that reads and prose that tires the eye.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Measure: 65ch</h2>
+      <p>The "measure" is the width of a line of text. Typographic research converges on 60-75 characters as the sweet spot — shorter lines fatigue the eye with too many line breaks, longer lines lose the reader on the return sweep. The PE7 base sets the measure on every prose element, not on a wrapper class:</p>
+      <pre><code>p {
+  max-inline-size: var(--measure); /* e.g. 65ch */
+  text-wrap: pretty;
+  color: var(--color-text-secondary);
+}</code></pre>
+      <p>Setting it as a token means any layout can widen or narrow the measure globally for translation purposes — German prose, for example, runs longer than English and sometimes benefits from a 70ch measure.</p>
+
+      <h2>text-wrap: pretty</h2>
+      <p>Where <code>balance</code> optimises a small number of lines for visual evenness, <code>pretty</code> optimises a large number of lines to avoid bad line endings — short last lines, orphaned words, hyphenation clashes. It costs more to compute than default wrapping but the difference in legibility is visible on any page with more than a few paragraphs. Use it on <code>p</code>, not on headings.</p>
+
+      <h2>Links: the underline is a signal</h2>
+      <p>Default browser underlines sit on the baseline, cross descenders, and are one pixel thick regardless of font size. Three properties fix all three problems:</p>
+      <pre><code>a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration-thickness: 2px;
+}</code></pre>
+      <p><code>text-underline-offset</code> pushes the underline below the baseline so descenders on "g" and "y" pass above it. <code>text-decoration-thickness</code> scales with font metrics rather than device pixels. On hover the thickness doubles — a subtle affordance that does not rely on color alone, which matters for users with color vision deficiency.</p>
+
+      <h2>Inline text elements</h2>
+      <pre><code>strong, b { font-weight: var(--weight-bold); color: var(--color-text-primary); }
+em, i     { font-style: italic; }
+small     { font-size: var(--size-sm); color: var(--color-text-tertiary); }
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding-inline: 0.3em;
+  padding-block: 0.1em;
+  background-color: var(--color-code-bg);
+  border: 1px solid var(--color-code-border);
+  border-radius: var(--radius-sm);
+}</code></pre>
+      <p><code>strong</code> gets a color promotion as well as weight — this counters the visual "disappearance" of bold text against a grey paragraph color. Inline <code>code</code> uses <code>0.9em</code> rather than a fixed size so it always tracks the surrounding text.</p>
+
+      <h2>Why 0.9em and not var(--size-sm)?</h2>
+      <p>Inline code is relative to its container, not to a global size. A <code>code</code> inside an <code>h2</code> should scale with the heading; a <code>code</code> inside a <code>p</code> should scale with prose. <code>0.9em</code> achieves both; a token reference would force you to pick one. This is the only place in base where a non-token value is acceptable — and it is still relative.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — measure, pretty, and underline refinements</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-4 { font-family: system-ui; display: grid; grid-template-columns: 1fr; gap: 1rem; max-inline-size: 42rem; }
+          .demo-6-4 p { max-inline-size: 65ch; text-wrap: pretty; color: oklch(35% 0.02 264); margin: 0; }
+          .demo-6-4 a { color: oklch(55% 0.22 275); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+          .demo-6-4 strong { color: oklch(18% 0.02 264); }
+          .demo-6-4 code { font-family: ui-monospace, monospace; font-size: 0.9em; background: oklch(96% 0.01 264); border: 1px solid oklch(88% 0.01 264); border-radius: .25rem; padding: 0.1em 0.3em; }
+        </style>
+        <div class="demo-6-4">
+          <p>This paragraph is capped at <strong>65ch</strong>. The underline on <a href="#">this link</a> sits three pixels below the baseline so descenders pass over it. Inline <code>code</code> scales with the surrounding text.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;p&gt;A paragraph of prose long enough to wrap several times so the &lt;strong&gt;measure&lt;/strong&gt; takes effect. The browser uses &lt;code&gt;text-wrap: pretty&lt;/code&gt; to avoid awful last lines.&lt;/p&gt;
+  &lt;p&gt;Hover &lt;a href="#"&gt;this link&lt;/a&gt; and watch the underline thicken.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  :root {
+    --measure: 65ch;
+    --link: oklch(55% 0.22 275);
+    --link-hover: oklch(45% 0.22 275);
+    --muted: oklch(38% 0.02 264);
+  }
+
+  p {
+    max-inline-size: var(--measure);
+    text-wrap: pretty;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  a {
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: text-decoration-thickness .15s;
+  }
+  a:hover { color: var(--link-hover); text-decoration-thickness: 2px; }
+
+  strong { color: oklch(15% 0.02 264); font-weight: 700; }
+  code { font-family: ui-monospace, monospace; font-size: .9em; background: oklch(96% 0.01 264); padding: .1em .3em; border-radius: .25rem; }
+
+  body { font-family: system-ui; padding: 1rem; }
+  article { display: flex; flex-direction: column; gap: .75rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Set <code>--measure</code> to <code>200ch</code> and read the paragraph. Try to finish one sentence without losing your place on the return sweep. Now set it to <code>30ch</code>. Notice how both extremes slow you down. Somewhere between 60 and 75 is the comfort zone for English prose — the default token value is deliberately inside that range.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.3-heading-hierarchy-tokens.html">← Lesson 6.3</a>
+      <a href="./lesson-6.5-logical-properties-reference.html">Lesson 6.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

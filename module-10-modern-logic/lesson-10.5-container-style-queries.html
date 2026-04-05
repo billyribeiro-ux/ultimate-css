@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10.5 — Container Style Queries · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 10</a>
+      <span>Lesson 10.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 10.5</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Container Style Queries</h1>
+      <p class="lead">Container queries in Module 7 let a component react to its container's <em>size</em>. Style queries let it react to its container's <em>intent</em>: a parent declares a custom property, and any descendant can adapt. This is how you wire "parent says what it wants, child decides how to render it" without any new class names.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The pattern</h2>
+      <pre><code>.section { --layout: horizontal; container-name: section; container-type: inline-size; }
+.section-vertical { --layout: vertical; }
+
+@container section style(--layout: horizontal) {
+  .card-list { display: flex; gap: 1rem; }
+}
+@container section style(--layout: vertical) {
+  .card-list { display: grid; gap: .5rem; }
+}</code></pre>
+      <p>The parent decides its intent by setting a custom property. The child's layout adapts. No new class names leak into the child; the only contract is the property name.</p>
+
+      <h2>Why this is better than a parent class</h2>
+      <p>The traditional alternative is <code>.section.vertical .card-list</code> — a descendant selector that reaches down from the parent. That works, but it:</p>
+      <ul>
+        <li>Tightly couples the child to a specific parent class name.</li>
+        <li>Increases specificity on the child, making it harder to override.</li>
+        <li>Cannot be set from inline style — the parent must carry the class.</li>
+      </ul>
+      <p>Style queries invert this. The parent declares a property (which can come from inline style, a user setting, or a JavaScript state update), and the child decides independently whether that property's value matters to it.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 111+ for custom properties, Safari 18+, Firefox 128+. Production-ready for custom-property-based style queries. Queries on arbitrary CSS properties (not just custom) are still shipping — stick to <code>--name: value</code> form and you are safe.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — horizontal vs vertical via style query</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-10-5 .section {
+            --layout: horizontal;
+            container-name: d105;
+            container-type: inline-size;
+            padding: 1rem;
+            background: oklch(96% 0.005 264);
+            border-radius: .5rem;
+            margin-block-end: 1rem;
+          }
+          .demo-10-5 .section.v { --layout: vertical; }
+          .demo-10-5 .list { display: grid; gap: .5rem; }
+          .demo-10-5 .list &gt; * { padding: .5rem 1rem; background: oklch(48% 0.22 275); color: #fff; border-radius: .375rem; }
+          @supports (container-type: inline-size) {
+            @container d105 style(--layout: horizontal) {
+              .demo-10-5 .list { grid-auto-flow: column; grid-auto-columns: 1fr; }
+            }
+          }
+        </style>
+        <div class="demo-10-5">
+          <div class="section">
+            <strong>--layout: horizontal</strong>
+            <div class="list"><div>One</div><div>Two</div><div>Three</div></div>
+          </div>
+          <div class="section v">
+            <strong>--layout: vertical</strong>
+            <div class="list"><div>One</div><div>Two</div><div>Three</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;section class="panel" style="--density: compact;"&gt;
+  &lt;div class="item"&gt;Item A&lt;/div&gt;
+  &lt;div class="item"&gt;Item B&lt;/div&gt;
+  &lt;div class="item"&gt;Item C&lt;/div&gt;
+&lt;/section&gt;
+&lt;section class="panel" style="--density: comfortable;"&gt;
+  &lt;div class="item"&gt;Item A&lt;/div&gt;
+  &lt;div class="item"&gt;Item B&lt;/div&gt;
+  &lt;div class="item"&gt;Item C&lt;/div&gt;
+&lt;/section&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; display: grid; gap: 1rem; }
+
+.panel {
+  container-name: panel;
+  container-type: inline-size;
+  padding: 1rem;
+  background: oklch(96% 0.005 264);
+  border-radius: .5rem;
+  display: grid;
+  gap: .5rem;
+}
+.item {
+  background: oklch(48% 0.22 275);
+  color: #fff;
+  border-radius: .375rem;
+  padding: .5rem 1rem;
+}
+
+@supports (container-type: inline-size) {
+  @container panel style(--density: compact) {
+    .item { padding: .25rem .5rem; font-size: .75rem; }
+  }
+  @container panel style(--density: comfortable) {
+    .item { padding: 1rem 1.25rem; font-size: 1rem; }
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third <code>--density: dense</code> branch with even tighter padding. Change the parent's inline style without changing any markup inside it. Notice that the child's CSS file never had to learn a new class name — the intent contract stayed the same.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-10.4-typed-attr.html">← Lesson 10.4</a>
+      <a href="./lesson-10.6-target-current-scrollspy.html">Lesson 10.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

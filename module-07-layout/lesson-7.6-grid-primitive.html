@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.6 — The Grid Primitive · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.6</p>
+      <h1>The Grid Primitive</h1>
+      <p class="lead">A responsive grid that fits as many columns as possible at the largest allowable track width, and drops columns automatically when the container narrows. One line of CSS replaces thirty lines of breakpoint-based column math — and it works without a single media query.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <pre><code>.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--grid-min, 18rem), 1fr)
+  );
+  gap: var(--grid-gap, var(--space-md));
+}</code></pre>
+      <p>One declaration does all the work: <code>repeat(auto-fit, minmax(18rem, 1fr))</code>. Read it as: "repeat the column pattern as many times as fits. Each column is at minimum 18rem wide and can grow to an equal share of the available space."</p>
+
+      <h2>auto-fit vs auto-fill</h2>
+      <p>Both keywords tell the browser to create as many tracks as will fit. The difference is what they do with empty tracks:</p>
+      <ul>
+        <li><strong><code>auto-fill</code></strong> keeps empty tracks visible. If you ask for 18rem minimum and the container is 100rem wide, the browser creates five tracks even if you only have three items — the fourth and fifth are empty.</li>
+        <li><strong><code>auto-fit</code></strong> collapses empty tracks. Three items in a five-track-capable container get three tracks, each expanded to fill the extra space.</li>
+      </ul>
+      <p>Ninety percent of the time you want <code>auto-fit</code> — the grid adapts to how many items you have, not to how many items could theoretically fit. Use <code>auto-fill</code> when you need consistent column width regardless of item count (typically for an admin dashboard where the grid position of an item matters for alignment).</p>
+
+      <h2>minmax(min, max)</h2>
+      <p>The minimum is the narrowest column the grid will allow — when the container drops below one column worth of that minimum, the grid drops to one column. The maximum is <code>1fr</code>, which means "share remaining space equally." Together they say: "never narrower than 18rem, never wider than an even share."</p>
+
+      <h2>The overflow trap</h2>
+      <p>A common bug: setting <code>--grid-min: 20rem</code> inside a parent that is only 18rem wide. The minmax lower bound wins, and the item becomes 20rem — overflowing the parent. The fix is to use <code>min()</code> in the lower bound:</p>
+      <pre><code>grid-template-columns: repeat(
+  auto-fit,
+  minmax(min(100%, 18rem), 1fr)
+);</code></pre>
+      <p>Now the minimum is "the smaller of 100% of the parent and 18rem." In a 10rem parent, the column drops to 10rem and nothing overflows. Add this to the primitive in production — it costs nothing and prevents a real bug.</p>
+
+      <h2>Grid vs cluster</h2>
+      <p>Grid aligns items into columns. Cluster packs items into rows without column alignment. Use grid when the visual consistency of columns matters (product cards, photo galleries). Use cluster when items are different sizes and alignment would create ugly gaps (tag clouds, chip lists).</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — resize to watch the column count drop</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-6 { font-family: system-ui; }
+          .demo-7-6 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: .75rem; }
+          .demo-7-6 .item { padding: 1rem; background: oklch(96% 0.01 275); border: 1px solid oklch(85% 0.02 275); border-radius: .375rem; font-size: .85rem; }
+        </style>
+        <div class="demo-7-6">
+          <div class="grid">
+            <div class="item">Item one</div>
+            <div class="item">Item two</div>
+            <div class="item">Item three</div>
+            <div class="item">Item four</div>
+            <div class="item">Item five</div>
+            <div class="item">Item six</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
+  &lt;article&gt;Card one&lt;/article&gt;
+  &lt;article&gt;Card two&lt;/article&gt;
+  &lt;article&gt;Card three&lt;/article&gt;
+  &lt;article&gt;Card four&lt;/article&gt;
+  &lt;article&gt;Card five&lt;/article&gt;
+  &lt;article&gt;Card six&lt;/article&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--grid-min, 14rem)), 1fr)
+    );
+    gap: var(--grid-gap, 1rem);
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+article {
+  padding: 1rem;
+  background: oklch(96% 0.01 275);
+  border: 1px solid oklch(80% 0.02 275);
+  border-radius: .5rem;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>auto-fit</code> to <code>auto-fill</code> and run. Then reduce the number of items in the HTML from six to two. With <code>auto-fill</code>, the two items stay at 14rem each with empty space on the right. With <code>auto-fit</code>, the two items expand to share the full row. Most of the time you want the latter — but the choice is deliberate.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.5-sidebar-primitive.html">← Lesson 7.5</a>
+      <a href="./lesson-7.7-container-queries.html">Lesson 7.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

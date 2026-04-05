@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10.1 — :is() and :where(): Forgiving Lists · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 10</a>
+      <span>Lesson 10.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 10.1</p>
+      <h1>:is() and :where(): Forgiving Lists</h1>
+      <p class="lead">These two functions look identical and do almost the same thing. The one-character difference between them — specificity — is the reason every PE7 reset layer is written with <code>:where()</code> and every shortcut inside a layer is written with <code>:is()</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What they do</h2>
+      <p>Both take a selector list and match any element that matches any selector in the list:</p>
+      <pre><code>:is(h1, h2, h3) { font-family: var(--font-serif); }
+:where(ul, ol) { padding: 0; margin: 0; }</code></pre>
+      <p>Without <code>:is()</code> you would write <code>h1, h2, h3 { ... }</code>. That is fine for short lists. It becomes catastrophic when the list is nested: <code>main h1, main h2, main h3, article h1, article h2, article h3</code> — six selectors where <code>:is(main, article) :is(h1, h2, h3)</code> is two.</p>
+
+      <h2>The specificity difference</h2>
+      <ul>
+        <li><strong><code>:is()</code></strong> takes the specificity of its <em>highest-specificity</em> argument. <code>:is(.a, #b)</code> scores <code>1,0,0</code>.</li>
+        <li><strong><code>:where()</code></strong> always scores <code>0,0,0</code>, no matter what is inside it.</li>
+      </ul>
+
+      <h2>The PE7 rule</h2>
+      <blockquote>Use <code>:where()</code> when you want the rule to be easy to override. Use <code>:is()</code> when you want the rule to assert its own priority.</blockquote>
+      <p>Resets use <code>:where()</code> because the reset must lose to every other layer. Shortcut selectors inside a component use <code>:is()</code> because they should behave like their longhand equivalents.</p>
+
+      <h2>Forgiving parsing</h2>
+      <p>Both functions are <em>forgiving</em> — if one argument is a selector the browser does not understand, the rule drops only that argument, not the whole list. This is the only safe way to use a newer pseudo-class alongside older ones:</p>
+      <pre><code>:is(:has(img), :-webkit-any(.card)) { /* both paths tried, invalid ones skipped */ }</code></pre>
+      <p>Without forgiving lists, a single unknown selector invalidated the entire list and you lost the whole rule. That is the old CSS behavior, and it is why polyfills existed. It is gone.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — specificity comparison</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-10-1 p { font-family: system-ui; }
+          /* :where() scores 0,0,0 — any rule beats it */
+          :where(.demo-10-1 .isVsWhere) { color: oklch(60% 0.22 25); }
+          /* single element selector — 0,0,1 — still beats :where */
+          .demo-10-1 p { color: oklch(48% 0.22 275); }
+          /* :is() matches the highest arg */
+          :is(.demo-10-1 .isExample) { color: oklch(65% 0.17 150); }
+        </style>
+        <div class="demo-10-1">
+          <p class="isVsWhere">Wrapped in :where() — loses to <code>p { color }</code>, appears indigo.</p>
+          <p class="isExample">Wrapped in :is(.class) — scores 0,1,0, wins against p, appears green.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Heading one&lt;/h1&gt;
+  &lt;h2&gt;Heading two&lt;/h2&gt;
+  &lt;h3&gt;Heading three&lt;/h3&gt;
+  &lt;p&gt;Body paragraph.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+/* Reset-style: minimal specificity so later rules win easily */
+:where(h1, h2, h3) {
+  font-family: serif;
+  color: oklch(33% 0.020 264);
+}
+
+/* Assertive: takes the highest-specificity arg */
+article :is(h1, h2, h3) {
+  border-inline-start: 4px solid oklch(48% 0.22 275);
+  padding-inline-start: .5rem;
+}
+
+/* Try overriding the :where() rule easily — single selector wins */
+h1 { color: oklch(60% 0.22 25); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Replace <code>:where(h1, h2, h3)</code> with <code>:is(h1, h2, h3)</code> in the editor. Does the <code>h1 { color: ... }</code> override still work? It does — because both sides score <code>0,0,1</code>. Now wrap the <code>:is</code> in a class: <code>:is(.article h1, .article h2)</code>. The single-element override stops working. That is when you switch to <code>:where()</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 10</a>
+      <a href="./lesson-10.2-if-function.html">Lesson 10.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

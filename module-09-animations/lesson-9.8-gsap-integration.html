@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.8 — GSAP Integration: Division of Labor · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.8</p>
+      <h1>GSAP Integration: Division of Labor</h1>
+      <p class="lead">GSAP is an excellent library. It is also the wrong answer for at least half the problems it is still used to solve. This lesson draws the line — precisely — between what CSS should now own and what GSAP still does better than anything else.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What CSS now owns</h2>
+      <p>Every item on this list used to be a reason to reach for GSAP. None of them are anymore.</p>
+      <ul>
+        <li><strong>State transitions.</strong> <code>:hover</code>, <code>[aria-expanded]</code>, <code>:checked</code> — all native CSS transitions.</li>
+        <li><strong>Enter animations.</strong> <code>@starting-style</code>.</li>
+        <li><strong>Scroll reveals.</strong> <code>animation-timeline: view()</code>.</li>
+        <li><strong>Scroll progress bars.</strong> <code>animation-timeline: scroll()</code>.</li>
+        <li><strong>Sticky-stuck detection.</strong> <code>@container scroll-state(stuck: top)</code>.</li>
+        <li><strong>Layout morphs.</strong> View Transitions API.</li>
+        <li><strong>Staggered list animations.</strong> <code>sibling-index()</code>.</li>
+      </ul>
+
+      <h2>What GSAP still does better</h2>
+      <ol>
+        <li><strong>Complex timelines with tight synchronization.</strong> A hero sequence with ten overlapping beats, each with its own easing, interrupt-recoverable. CSS can do it, but GSAP's timeline API is still the best tool for the job.</li>
+        <li><strong>Pinned scrolling with forward/backward cleanup</strong> — ScrollTrigger's <code>pin: true</code> with <code>onLeaveBack</code> is still uniquely expressive.</li>
+        <li><strong>Physics and dynamic values.</strong> Draggable, InertiaPlugin — GSAP has no CSS equivalent for momentum-based motion.</li>
+        <li><strong>SVG path morphing.</strong> MorphSVG is genuinely unique.</li>
+      </ol>
+
+      <h2>The division-of-labor rule</h2>
+      <blockquote>If the animation is triggered by state, use CSS. If it is choreographed over time, use GSAP.</blockquote>
+      <p>That is the entire heuristic. State-driven motion belongs in CSS because state already lives there. Time-driven motion belongs in JS because JS is the language of time.</p>
+
+      <h2>gsap.matchMedia() for reduced motion</h2>
+      <p>If you do use GSAP, wrap every timeline in <code>gsap.matchMedia()</code> with the reduced-motion query so the library respects the same accessibility contract as the CSS layer:</p>
+      <pre><code>const mm = gsap.matchMedia();
+mm.add("(prefers-reduced-motion: no-preference)", () =&gt; {
+  gsap.timeline().from(".hero", { y: 40, opacity: 0 }).to(".hero", { scale: 1.05 });
+});</code></pre>
+      <p>Without this wrap, GSAP will animate regardless of user settings — and you will fail an accessibility audit.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Decision table</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-8 table { inline-size: 100%; border-collapse: collapse; font: .875rem system-ui; }
+          .demo-9-8 th, .demo-9-8 td { text-align: start; padding: .5rem .75rem; border-block-end: 1px solid oklch(92% 0.008 264); }
+          .demo-9-8 th { background: oklch(96% 0.005 264); font-weight: 700; }
+          .demo-9-8 .css { color: oklch(55% 0.17 150); font-weight: 600; }
+          .demo-9-8 .gsap { color: oklch(55% 0.22 275); font-weight: 600; }
+        </style>
+        <div class="demo-9-8">
+          <table>
+            <thead><tr><th>Pattern</th><th>Tool</th></tr></thead>
+            <tbody>
+              <tr><td>Button hover</td><td class="css">CSS</td></tr>
+              <tr><td>Modal enter/exit</td><td class="css">CSS</td></tr>
+              <tr><td>List stagger on page load</td><td class="css">CSS</td></tr>
+              <tr><td>Scroll progress bar</td><td class="css">CSS</td></tr>
+              <tr><td>Section reveal</td><td class="css">CSS</td></tr>
+              <tr><td>Hero sequence, 10 beats, overlapping</td><td class="gsap">GSAP</td></tr>
+              <tr><td>Pinned scroll chapters</td><td class="gsap">GSAP</td></tr>
+              <tr><td>Draggable with inertia</td><td class="gsap">GSAP</td></tr>
+              <tr><td>SVG path morph</td><td class="gsap">GSAP</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — pure CSS version of a pattern you'd have reached for GSAP for</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="stage"&gt;
+  &lt;h2 class="title"&gt;Hello&lt;/h2&gt;
+  &lt;p class="sub"&gt;A two-beat intro — CSS only&lt;/p&gt;
+  &lt;button class="cta"&gt;Call to action&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.stage &gt; * {
+  opacity: 0; transform: translateY(1rem);
+  animation: in 600ms ease-out forwards;
+}
+.stage .title { animation-delay:   0ms; }
+.stage .sub   { animation-delay: 150ms; }
+.stage .cta   { animation-delay: 300ms; padding: .5rem 1rem; background: oklch(48% 0.22 275); color: #fff; border: 0; border-radius: .5rem; font: 600 1rem system-ui; }
+
+@keyframes in { to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage &gt; * { animation: none; opacity: 1; transform: none; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Audit one page in your current project that uses GSAP. For each GSAP call, ask: "is this state-triggered or time-choreographed?" Move every state-triggered animation into CSS. Measure the resulting bundle-size reduction. You will usually find 60 to 90 percent of GSAP usage was a state transition in disguise.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.7-view-transitions.html">← Lesson 9.7</a>
+      <a href="./project/index.html">Module 9 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

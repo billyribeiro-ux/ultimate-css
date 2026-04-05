@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 10 Project — Modern Logic Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 10</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Module 10 · Project</p>
+      <h1>Modern Logic Showcase</h1>
+      <p class="lead">Every logic primitive from Module 10 on one page, each wrapped in <code>@supports</code> with a documented fallback. Read the inline CSS — this is a working template for shipping bleeding-edge CSS safely.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Build a showcase with: an <code>:is()</code>/<code>:where()</code> comparison, an <code>if()</code>-driven token, a typed <code>attr()</code> chart, a container style query, and a <code>:target-current</code> TOC with CSS counters. Every feature is opt-in via <code>@supports</code>; the page must render and function in the worst supported browser.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Showcase</h2>
+      <div class="demo-frame">
+        <style>
+          .m10p { display: grid; gap: 2rem; font-family: system-ui; }
+          .m10p h3 { margin: 0 0 .5rem; font-size: 1rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(44% 0.020 264); }
+
+          /* :is / :where */
+          .m10p .iswhere :is(strong, em) { color: oklch(40% 0.19 275); }
+          .m10p .iswhere :where(small) { color: oklch(44% 0.020 264); }
+
+          /* chart via typed attr */
+          .m10p .chart { display: grid; gap: .25rem; }
+          .m10p .chart .bar { padding: .25rem .5rem; color: #fff; background: oklch(58% 0.22 275); border-radius: .25rem; inline-size: 50%; font-size: .75rem; }
+          @supports (inline-size: attr(data-value type(&lt;number&gt;), 0%)) {
+            .m10p .chart .bar { inline-size: calc(attr(data-value type(&lt;number&gt;), 0) * 1%); background: oklch(60% 0.18 attr(data-hue type(&lt;number&gt;), 275)); }
+          }
+
+          /* style query */
+          .m10p .panel { container-name: m10panel; container-type: inline-size; padding: 1rem; background: oklch(96% 0.005 264); border-radius: .5rem; display: grid; gap: .5rem; }
+          .m10p .panel .tile { background: oklch(48% 0.22 275); color: #fff; padding: .5rem 1rem; border-radius: .375rem; }
+          @supports (container-type: inline-size) {
+            @container m10panel style(--density: compact) {
+              .m10p .panel .tile { padding: .25rem .5rem; font-size: .75rem; }
+            }
+          }
+
+          /* counters + target-current */
+          .m10p .toc { display: grid; grid-template-columns: 11rem 1fr; gap: 1rem; }
+          .m10p .toc nav ol { counter-reset: sec; list-style: none; padding: 0; margin: 0; }
+          .m10p .toc nav li { counter-increment: sec; }
+          .m10p .toc nav a { display: block; padding: .25rem .5rem; text-decoration: none; color: oklch(44% 0.020 264); border-radius: .25rem; }
+          .m10p .toc nav a::before { content: counter(sec) ". "; color: oklch(48% 0.22 275); font-weight: 700; }
+          .m10p .toc .body { display: grid; gap: 1rem; max-block-size: 12rem; overflow-y: auto; }
+          .m10p .toc .body section { padding: 1rem; background: oklch(96% 0.005 264); border-radius: .5rem; }
+          @supports selector(:target-current) {
+            .m10p .toc nav { scroll-target-group: auto; }
+            .m10p .toc nav a:target-current { background: oklch(48% 0.22 275); color: #fff; }
+            .m10p .toc nav a:target-current::before { color: #fff; }
+          }
+
+          /* if() driven motion */
+          .m10p .chip { display: inline-block; padding: .35rem .75rem; background: oklch(48% 0.22 275); color: #fff; border-radius: 9999px; font-size: .75rem; transition: transform 200ms; }
+          .m10p .chip:hover { transform: scale(1.05); }
+          @supports (color: if(media(min-width: 0): red; else: red)) {
+            .m10p .chip { transition-duration: if(media(prefers-reduced-motion: reduce): 0ms; else: 200ms); }
+          }
+        </style>
+
+        <div class="m10p">
+          <section>
+            <h3>:is() / :where()</h3>
+            <p class="iswhere"><strong>Bold</strong>, <em>italic</em>, <small>small print</small> — colored via forgiving lists.</p>
+          </section>
+
+          <section>
+            <h3>Typed attr() chart</h3>
+            <div class="chart">
+              <div class="bar" data-value="80" data-hue="275">Alpha 80</div>
+              <div class="bar" data-value="55" data-hue="150">Bravo 55</div>
+              <div class="bar" data-value="30" data-hue="25">Charlie 30</div>
+              <div class="bar" data-value="95" data-hue="85">Delta 95</div>
+            </div>
+          </section>
+
+          <section>
+            <h3>Container style query — compact density</h3>
+            <div class="panel" style="--density: compact;">
+              <div class="tile">Item A</div>
+              <div class="tile">Item B</div>
+              <div class="tile">Item C</div>
+            </div>
+          </section>
+
+          <section>
+            <h3>Counters + :target-current</h3>
+            <div class="toc">
+              <nav>
+                <ol>
+                  <li><a href="#m10-a">Intro</a></li>
+                  <li><a href="#m10-b">Setup</a></li>
+                  <li><a href="#m10-c">Finish</a></li>
+                </ol>
+              </nav>
+              <div class="body">
+                <section id="m10-a"><strong>Intro</strong><p>Scroll this panel.</p></section>
+                <section id="m10-b"><strong>Setup</strong><p>Second.</p></section>
+                <section id="m10-c"><strong>Finish</strong><p>Third.</p></section>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3>if()-driven motion</h3>
+            <span class="chip">Hover me (transition duration via if())</span>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Deliverable</h2>
+      <p>Open this file in three browsers: latest Chrome, latest Safari, latest Firefox. For each, note which features light up and which fall back. Your job is to verify the fallback behavior is acceptable — the page must <em>work</em> in the least-capable target, not just look good in the most-capable.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-10.6-target-current-scrollspy.html">← Lesson 10.6</a>
+      <a href="../../module-11-no-js-patterns/index.html">Module 11 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

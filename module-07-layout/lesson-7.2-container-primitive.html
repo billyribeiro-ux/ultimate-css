@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7.2 — The Container Primitive · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 7</a>
+      <span>Lesson 7.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 7.2</p>
+      <h1>The Container Primitive</h1>
+      <p class="lead">A container is the outer width constraint of any full-width layout. Four lines of CSS — no media queries — give you a responsive, centred, token-configurable container that adapts to any screen size without breakpoints.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <pre><code>.container {
+  inline-size: min(var(--container-max, 72rem), 100%);
+  margin-inline: auto;
+  padding-inline: var(--container-gap, var(--space-lg));
+}</code></pre>
+      <p>Three lines of declaration. That is the entire primitive.</p>
+
+      <h2>min() is the trick</h2>
+      <p><code>min(72rem, 100%)</code> returns whichever is smaller: the maximum width (72rem) on wide screens, or the full parent width (100%) on narrow screens. On a 1920px desktop the container is 72rem; on a 375px phone it is the full viewport minus the padding. No media query, no <code>max-width</code> separate from <code>width</code>, no breakpoints.</p>
+
+      <h2>margin-inline: auto</h2>
+      <p>Centres the container horizontally in its parent. Logical property, so in vertical writing modes it centres on the correct axis. In LTR and RTL the behaviour is identical — auto margins are symmetrical.</p>
+
+      <h2>padding-inline</h2>
+      <p>Gutter space between the container's content and the edge of the viewport. On narrow screens this prevents text from touching the edge; on wide screens it is visually absorbed by the <code>min()</code> constraint. Using a token (<code>--space-lg</code>) means the gutter matches your overall spacing scale.</p>
+
+      <h2>Custom property interface</h2>
+      <p>Both knobs are custom properties with defaults. A component or section can override either without writing a new class:</p>
+      <pre><code>.narrow-container { --container-max: 40rem; }
+.no-gutter { --container-gap: 0; }
+
+/* Or inline in HTML: */
+&lt;div class="container" style="--container-max: 50rem"&gt;...&lt;/div&gt;</code></pre>
+
+      <h2>Not a max-width</h2>
+      <p>Writing <code>max-width: 72rem; width: 100%;</code> achieves a similar result, but it is two declarations and two concepts. <code>inline-size: min(72rem, 100%)</code> is one declaration that explicitly states "whichever is smaller." The semantic is clearer, and <code>min()</code> nests cleanly inside other calculations.</p>
+
+      <h2>Containers do not stack</h2>
+      <p>A container inside a container is almost always a mistake. If you need nested width constraints, use a single container and let the inner layout primitives decide their own widths via <code>max-inline-size</code>. The rule: one container per top-level layout section.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — responsive container without media queries</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-7-2 { font-family: system-ui; }
+          .demo-7-2 .outer { background: oklch(96% 0.005 264); padding-block: .5rem; }
+          .demo-7-2 .container {
+            inline-size: min(40rem, 100%);
+            margin-inline: auto;
+            padding-inline: 1rem;
+            background: oklch(92% 0.05 220);
+            border: 2px dashed oklch(55% 0.18 220);
+            padding-block: .75rem;
+          }
+          .demo-7-2 p { margin: 0; font-size: .85rem; color: oklch(30% 0.02 264); }
+        </style>
+        <div class="demo-7-2">
+          <div class="outer">
+            <div class="container">
+              <p>Resize the preview pane. This container holds at 40rem wide until the viewport drops below it, then it becomes full width with side gutters.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="container"&gt;
+  &lt;h1&gt;Default container&lt;/h1&gt;
+  &lt;p&gt;72rem cap, auto gutters.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="container" style="--container-max: 32rem"&gt;
+  &lt;h1&gt;Narrow override&lt;/h1&gt;
+  &lt;p&gt;Same primitive, tighter constraint set inline.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer layout {
+  .container {
+    inline-size: min(var(--container-max, 72rem), 100%);
+    margin-inline: auto;
+    padding-inline: var(--container-gap, 1rem);
+  }
+}
+
+body { font-family: system-ui; margin: 0; background: oklch(96% 0.005 264); }
+.container {
+  margin-block: 1rem;
+  padding-block: 1rem;
+  background: #fff;
+  border: 1px dashed oklch(60% 0.18 220);
+}
+h1 { margin: 0 0 .25rem; font-size: 1.2rem; }
+p  { margin: 0; color: oklch(40% 0.02 264); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>In your last project, find the wrapper element that constrains main content width. Count how many rules or media queries it uses. Compare with the three lines above. The difference between your existing approach and this primitive is either redundant CSS or a missing <code>min()</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-7.1-layout-single-responsibility.html">← Lesson 7.1</a>
+      <a href="./lesson-7.3-stack-primitive.html">Lesson 7.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

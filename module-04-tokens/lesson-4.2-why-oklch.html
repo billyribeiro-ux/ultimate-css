@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.2 — Why OKLCH · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.2</p>
+      <h1>Why OKLCH</h1>
+      <p class="lead">Every colour system before OKLCH lies to you in subtle ways — about brightness, about hue, about what "same darkness" means. OKLCH is the first colour model in CSS where the numbers match what your eyes actually see.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problems you already have</h2>
+      <p><strong>Hex and RGB:</strong> three channels of red, green, and blue light. No relationship to human perception. <code>#808080</code> and <code>#ff0000</code> are both "50%" in some channel, but one is medium gray and the other is fully saturated red. You cannot reason about lightness or saturation from the numbers. You have to pick with a colour picker and hope.</p>
+      <p><strong>HSL:</strong> a step up. You get hue, saturation, and lightness — but the "lightness" is wrong. <code>hsl(240 100% 50%)</code> (blue) and <code>hsl(60 100% 50%)</code> (yellow) are both "50% lightness" on paper, but the yellow is visually far brighter. Build a palette by stepping the H channel while keeping L constant and you get a stripe that gets dramatically lighter and darker across the spectrum. HSL is perceptually uneven.</p>
+
+      <h2>What OKLCH is</h2>
+      <p>OKLCH has three components that <em>actually mean what you think they mean</em>:</p>
+      <ul>
+        <li><strong>L — Lightness.</strong> A percentage from 0% (black) to 100% (white). Two colours with the same L look equally bright, regardless of hue. This is the property HSL fakes and OKLCH gets right.</li>
+        <li><strong>C — Chroma.</strong> How saturated the colour is, roughly 0 to 0.4. Zero is gray; higher is more vivid. Unlike HSL's "saturation," C is bounded differently per hue and lightness — so you can exceed the displayable gamut if you push too far. That is a feature: it tells you when a colour is physically impossible to show.</li>
+        <li><strong>H — Hue.</strong> An angle from 0 to 360 degrees. 0 is pinkish-red, 90 is yellow-green, 180 is teal, 270 is blue-purple. Stepping the hue with L and C fixed produces a perceptually uniform colour wheel.</li>
+      </ul>
+      <p>Written: <code>oklch(55% 0.22 290)</code> → 55% lightness, chroma 0.22, hue 290 (purple).</p>
+
+      <h2>Perceptual uniformity, demonstrated</h2>
+      <p>The practical consequence: you can build a palette by picking one L and one C, then stepping H around the wheel, and every colour looks like it came from the same family. Below, every swatch has L = 65%, C = 0.17, and only H changes. Compare the visual evenness to what you would get from stepping HSL — where the yellow would scorch your eyes and the blue would sink into the background.</p>
+
+      <h2>Practical reasons PE7 standardises on it</h2>
+      <ul>
+        <li><strong>Predictable scales.</strong> A 9-stop scale from L = 95% down to L = 15% produces visually even steps you can design against.</li>
+        <li><strong>Accessible text contrast.</strong> Because L is perceptually correct, you can pick text colours by lightness difference and trust the result.</li>
+        <li><strong>Dark mode for free.</strong> Invert L across your palette and the result actually looks like the same brand in the dark.</li>
+        <li><strong>Wide-gamut ready.</strong> OKLCH can express colours outside sRGB, so P3-display hardware shows you colours RGB syntax cannot reach.</li>
+      </ul>
+      <p>From Module 4 onward, every colour in the course is written in OKLCH. Hex and HSL appear only as counter-examples.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — perceptually uniform hue sweep</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-4-2 { display: grid; grid-template-columns: repeat(12, 1fr); gap: .25rem; padding: 1rem; background: oklch(20% 0.02 264); border-radius: .5rem; }
+          .demo-4-2 .swatch { aspect-ratio: 1; border-radius: .25rem; }
+          .demo-4-2 .s1  { background: oklch(65% 0.17 0); }
+          .demo-4-2 .s2  { background: oklch(65% 0.17 30); }
+          .demo-4-2 .s3  { background: oklch(65% 0.17 60); }
+          .demo-4-2 .s4  { background: oklch(65% 0.17 90); }
+          .demo-4-2 .s5  { background: oklch(65% 0.17 120); }
+          .demo-4-2 .s6  { background: oklch(65% 0.17 150); }
+          .demo-4-2 .s7  { background: oklch(65% 0.17 180); }
+          .demo-4-2 .s8  { background: oklch(65% 0.17 210); }
+          .demo-4-2 .s9  { background: oklch(65% 0.17 240); }
+          .demo-4-2 .s10 { background: oklch(65% 0.17 270); }
+          .demo-4-2 .s11 { background: oklch(65% 0.17 300); }
+          .demo-4-2 .s12 { background: oklch(65% 0.17 330); }
+        </style>
+        <div class="demo-4-2" aria-label="Twelve colours stepping hue while holding L and C constant">
+          <div class="swatch s1"></div><div class="swatch s2"></div><div class="swatch s3"></div>
+          <div class="swatch s4"></div><div class="swatch s5"></div><div class="swatch s6"></div>
+          <div class="swatch s7"></div><div class="swatch s8"></div><div class="swatch s9"></div>
+          <div class="swatch s10"></div><div class="swatch s11"></div><div class="swatch s12"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="row"&gt;
+  &lt;div class="sw a"&gt;&lt;/div&gt;&lt;div class="sw b"&gt;&lt;/div&gt;&lt;div class="sw c"&gt;&lt;/div&gt;
+  &lt;div class="sw d"&gt;&lt;/div&gt;&lt;div class="sw e"&gt;&lt;/div&gt;&lt;div class="sw f"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Change L or C on the shared rule below.
+   Notice: all six swatches still look like one family. */
+
+.sw {
+  width: 5rem; height: 5rem; border-radius: .5rem; display: inline-block;
+}
+
+.a { background: oklch(60% 0.18   0); } /* red     */
+.b { background: oklch(60% 0.18  60); } /* orange  */
+.c { background: oklch(60% 0.18 140); } /* green   */
+.d { background: oklch(60% 0.18 200); } /* cyan    */
+.e { background: oklch(60% 0.18 260); } /* blue    */
+.f { background: oklch(60% 0.18 320); } /* magenta */
+
+body { padding: 1rem; background: oklch(98% 0.003 264); }
+.row { display: flex; gap: .5rem; flex-wrap: wrap; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Rewrite every swatch in HSL instead of OKLCH, keeping the same lightness and saturation (<code>hsl(H 60% 60%)</code> is a reasonable starting point). Run it. Identify which swatches look dramatically out of family with the others — that visual unevenness is exactly what OKLCH fixes.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-4.1-what-design-tokens-are.html">← Lesson 4.1</a>
+      <a href="./lesson-4.3-building-color-system-oklch.html">Lesson 4.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 6 Project — A Documentation Site's Base Layer · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 6</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 6 · Project</p>
+      <h1>A Documentation Site's Base Layer</h1>
+      <p class="lead">One base.css, zero classes. Prove it by rendering the same prose page in both light and dark mode and showing that the only thing your CSS references is tokens and element selectors.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <ol>
+        <li>Assemble every rule from lessons 6.2 through 6.8 into a single <code>base.css</code>.</li>
+        <li>Apply it to the documentation HTML below. No class selectors may appear in the file.</li>
+        <li>Verify that the same HTML renders correctly in light mode, dark mode, LTR, and RTL — without any new CSS.</li>
+      </ol>
+
+      <h2>The complete base layer</h2>
+      <pre><code>@layer base {
+  :root {
+    color-scheme: light dark;
+
+    --font-sans: system-ui, sans-serif;
+    --font-mono: ui-monospace, monospace;
+    --measure: 65ch;
+    --radius-sm: .25rem;
+    --radius-md: .5rem;
+
+    --color-surface:       light-dark(oklch(99% 0.003 264), oklch(14% 0.02 264));
+    --color-text-primary:  light-dark(oklch(18% 0.02 264), oklch(95% 0.01 264));
+    --color-text-secondary:light-dark(oklch(38% 0.02 264), oklch(80% 0.01 264));
+    --color-text-heading:  light-dark(oklch(12% 0.02 264), oklch(98% 0.01 264));
+    --color-link:          light-dark(oklch(55% 0.22 275), oklch(72% 0.18 275));
+    --color-link-hover:    light-dark(oklch(45% 0.22 275), oklch(80% 0.18 275));
+    --color-focus:         light-dark(oklch(60% 0.22 275), oklch(75% 0.18 275));
+    --color-code-bg:       light-dark(oklch(96% 0.01 264), oklch(22% 0.02 264));
+    --color-border:        light-dark(oklch(88% 0.01 264), oklch(30% 0.02 264));
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--color-text-heading);
+    text-wrap: balance;
+  }
+  h1 { font-size: 2.25rem; letter-spacing: -.02em; }
+  h2 { font-size: 1.75rem; letter-spacing: -.015em; }
+  h3 { font-size: 1.375rem; }
+
+  p {
+    max-inline-size: var(--measure);
+    text-wrap: pretty;
+    color: var(--color-text-secondary);
+  }
+
+  a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  a:hover { color: var(--color-link-hover); text-decoration-thickness: 2px; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: .9em;
+    background: var(--color-code-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding-inline: .3em;
+  }
+
+  blockquote {
+    border-inline-start: 3px solid var(--color-link);
+    padding-inline-start: 1rem;
+    font-style: italic;
+    max-inline-size: var(--measure);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+  :focus:not(:focus-visible) { outline: none; }
+
+  :where(p, li) { hyphens: auto; overflow-wrap: break-word; orphans: 3; widows: 3; }
+
+  @supports (margin-trim: block) {
+    :where(article, section, blockquote) { margin-trim: block; }
+  }
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Live comparison — same HTML, light and dark</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-p { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-6-p > article { padding: 1.25rem; border-radius: .5rem; border: 1px solid oklch(80% 0.01 264); font-family: system-ui; display: flex; flex-direction: column; gap: .75rem; }
+          .demo-6-p .light { color-scheme: light; background: oklch(99% 0.003 264); color: oklch(18% 0.02 264); }
+          .demo-6-p .dark  { color-scheme: dark;  background: oklch(14% 0.02 264); color: oklch(95% 0.01 264); }
+          .demo-6-p h1 { font-size: 1.4rem; margin: 0; text-wrap: balance; color: inherit; font-weight: 700; }
+          .demo-6-p h2 { font-size: 1.1rem; margin: 0; color: inherit; font-weight: 700; }
+          .demo-6-p p  { margin: 0; max-inline-size: 50ch; text-wrap: pretty; color: inherit; opacity: .85; }
+          .demo-6-p a  { color: light-dark(oklch(55% 0.22 275), oklch(72% 0.18 275)); }
+          .demo-6-p code { font-family: ui-monospace, monospace; font-size: .9em; background: light-dark(oklch(96% 0.01 264), oklch(22% 0.02 264)); padding: .1em .3em; border-radius: .25rem; }
+          .demo-6-p blockquote { margin: 0; border-inline-start: 3px solid light-dark(oklch(55% 0.22 275), oklch(72% 0.18 275)); padding-inline-start: .75rem; font-style: italic; opacity: .85; }
+        </style>
+        <div class="demo-6-p">
+          <article class="light">
+            <h1>Getting started</h1>
+            <h2>Installation</h2>
+            <p>Install the package with <code>npm install @pe7/css</code>. Import the stylesheet from <a href="#">the CDN</a> or bundle it with your build.</p>
+            <blockquote>Tokens carry the theme. Base carries the typography. Components carry the look.</blockquote>
+          </article>
+          <article class="dark">
+            <h1>Getting started</h1>
+            <h2>Installation</h2>
+            <p>Install the package with <code>npm install @pe7/css</code>. Import the stylesheet from <a href="#">the CDN</a> or bundle it with your build.</p>
+            <blockquote>Tokens carry the theme. Base carries the typography. Components carry the look.</blockquote>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Deliverable</h2>
+      <ol>
+        <li>Your <code>base.css</code> — grep it for <code>\.</code> (a literal dot). Any match is a class selector that should not be there.</li>
+        <li>Two screenshots of the same documentation HTML rendered in light and dark mode. Prove the only difference between them is the resolved tokens.</li>
+        <li>One screenshot of the LTR version and one of the RTL version. Prove that no new CSS was required.</li>
+        <li>A list of every <code>@supports</code>-gated feature in your base and a short note on what browsers fall back to.</li>
+      </ol>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Scratchpad — paste and experiment</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Base layer audit&lt;/h1&gt;
+  &lt;p&gt;Grep this file for the letter-dot to confirm no class rules leaked in.&lt;/p&gt;
+  &lt;h2&gt;API&lt;/h2&gt;
+  &lt;p&gt;Use &lt;code&gt;@layer base&lt;/code&gt; around every rule.&lt;/p&gt;
+  &lt;blockquote&gt;One bridge, many layouts.&lt;/blockquote&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  :root {
+    color-scheme: light dark;
+    --bg: light-dark(oklch(99% 0.003 264), oklch(14% 0.02 264));
+    --text: light-dark(oklch(18% 0.02 264), oklch(95% 0.01 264));
+    --accent: light-dark(oklch(55% 0.22 275), oklch(72% 0.18 275));
+  }
+
+  body { font-family: system-ui; background: var(--bg); color: var(--text); padding: 1rem; }
+  article { display: flex; flex-direction: column; gap: .75rem; max-inline-size: 55ch; }
+  h1, h2 { margin: 0; text-wrap: balance; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.1rem; }
+  p { margin: 0; text-wrap: pretty; }
+  code { font-family: ui-monospace, monospace; background: light-dark(#f0f0f0, #333); padding: .1em .3em; border-radius: .2rem; }
+  blockquote { margin: 0; border-inline-start: 3px solid var(--accent); padding-inline-start: .75rem; font-style: italic; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-6.8-margin-trim-text-details.html">← Lesson 6.8</a>
+      <a href="../../module-07-layout/index.html">Module 7 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

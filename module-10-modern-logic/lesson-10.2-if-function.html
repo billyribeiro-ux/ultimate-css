@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10.2 — The if() Function · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 10</a>
+      <span>Lesson 10.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 10.2</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>The if() Function</h1>
+      <p class="lead">CSS has had conditional rules forever — <code>@media</code>, <code>@supports</code>, <code>@container</code>. What it has never had is a conditional <em>value</em>. <code>if()</code> changes that: it lets you pick a single value inline based on media, support, or style conditions.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The syntax</h2>
+      <pre><code>:root {
+  --motion: if(
+    media(prefers-reduced-motion: reduce): 0ms;
+    else: var(--dur-fast)
+  );
+}</code></pre>
+      <p>Three branches: a condition function, a value for that branch, and an <code>else</code>. The conditions available are <code>media()</code>, <code>supports()</code>, and <code>style()</code> — matching the three kinds of at-rules.</p>
+
+      <h2>Why this matters</h2>
+      <p>Before <code>if()</code>, expressing "use 200ms normally, 0ms with reduced motion" required two rules with duplicated selectors inside a media query. Multiplied across dozens of tokens, it turned the tokens file into a source-order minefield. <code>if()</code> collapses it to one declaration:</p>
+      <pre><code>--dur-modal: if(media(prefers-reduced-motion: reduce): 0ms; else: 300ms);
+--layout:    if(media(min-width: 50rem): grid; else: block);
+--shadow:    if(supports(filter: drop-shadow(0 0 0 red)): drop-shadow(0 4px 8px #0002); else: 0 4px 8px #0002);</code></pre>
+
+      <h2>style() conditions</h2>
+      <p>The most powerful form queries the value of another custom property on the same element:</p>
+      <pre><code>.card {
+  --elevation: 2;
+  box-shadow: if(style(--elevation: 2): 0 4px 14px #0002; else: 0 1px 2px #0001);
+}</code></pre>
+      <p>This is a precursor to container style queries (Lesson 10.5) at the property level rather than the container level.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 137+ (stable), Edge 137+. Safari and Firefox still implementing. Wrap in <code>@supports (color: if(media(min-width: 0): red; else: red))</code> or fall through to explicit media queries.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-10-2 .box {
+            --pad: 1rem;
+            padding: var(--pad);
+            background: oklch(95% 0.04 275);
+            border-radius: .5rem;
+          }
+          @media (prefers-color-scheme: dark) {
+            .demo-10-2 .box { background: oklch(22% 0.018 264); color: oklch(98% 0.003 264); }
+          }
+        </style>
+        <div class="demo-10-2">
+          <div class="box">
+            <strong>Conditional value demo</strong>
+            <p style="margin:.5rem 0 0;">The <code>if()</code> function lets this kind of branching live inline with the declaration. In browsers that support it, the one-line form replaces separate media queries.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="modal"&gt;
+  &lt;h3&gt;I have conditional motion&lt;/h3&gt;
+  &lt;p&gt;Transition duration is 300ms normally, 0ms under reduced-motion.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+@supports (color: if(media(min-width: 0): red; else: red)) {
+  :root {
+    --dur-modal: if(media(prefers-reduced-motion: reduce): 0ms; else: 300ms);
+  }
+  .modal {
+    transition: transform var(--dur-modal) ease-out, opacity var(--dur-modal);
+  }
+}
+
+@supports not (color: if(media(min-width: 0): red; else: red)) {
+  :root { --dur-modal: 300ms; }
+  @media (prefers-reduced-motion: reduce) { :root { --dur-modal: 0ms; } }
+  .modal { transition: transform var(--dur-modal), opacity var(--dur-modal); }
+}
+
+.modal {
+  padding: 1rem;
+  background: oklch(95% 0.04 275);
+  border-radius: .5rem;
+  max-inline-size: 20rem;
+}
+.modal:hover { transform: translateY(-2px); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Find one token in your tokens file that has a different value under <code>prefers-color-scheme: dark</code> or <code>prefers-reduced-motion: reduce</code>. Collapse it to a single <code>if()</code> declaration with a documented <code>@supports</code> fallback. Notice how the token definition now lives in exactly one place.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-10.1-is-where-forgiving-lists.html">← Lesson 10.1</a>
+      <a href="./lesson-10.3-custom-at-function.html">Lesson 10.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

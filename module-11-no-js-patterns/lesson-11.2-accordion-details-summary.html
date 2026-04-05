@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 11.2 — Accordion: details/summary + @starting-style · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 11</a>
+      <span>Lesson 11.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 11.2</p>
+      <h1>Accordion: details/summary + @starting-style</h1>
+      <p class="lead">The accordion is the perfect no-JS pattern because it has a built-in element for it. <code>&lt;details&gt;</code> handles the open/close state, keyboard handling, ARIA, and focus. Your job is the paint — and animating the transition smoothly, which is where <code>@starting-style</code> comes in.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The minimum version</h2>
+      <pre><code>&lt;details&gt;
+  &lt;summary&gt;Question&lt;/summary&gt;
+  &lt;p&gt;Answer.&lt;/p&gt;
+&lt;/details&gt;</code></pre>
+      <p>This works already. Clicking or pressing Enter on the summary toggles <code>open</code>. Screen readers announce the state. No CSS required. No JavaScript required. The lesson is what you add <em>on top</em>.</p>
+
+      <h2>Styling the summary</h2>
+      <pre><code>summary {
+  list-style: none;       /* remove the default disclosure triangle */
+  cursor: pointer;
+  display: flex; justify-content: space-between;
+}
+summary::-webkit-details-marker { display: none; } /* Safari holdout */
+summary::after {
+  content: "";
+  inline-size: .5rem; block-size: .5rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 200ms;
+}
+details[open] summary::after { transform: rotate(45deg); }</code></pre>
+
+      <h2>Animating the panel</h2>
+      <p>The panel's content uses <code>interpolate-size: allow-keywords</code> (Chrome 129+) so <code>height: auto</code> becomes animatable, plus <code>@starting-style</code> to define the enter-from state:</p>
+      <pre><code>details[open] .panel {
+  block-size: auto;
+  opacity: 1;
+  transition: block-size 300ms, opacity 300ms;
+  interpolate-size: allow-keywords;
+}
+@starting-style {
+  details[open] .panel { block-size: 0; opacity: 0; }
+}</code></pre>
+
+      <h2>Browser support</h2>
+      <p><code>&lt;details&gt;</code>: baseline everywhere since 2020. <code>@starting-style</code>: Chrome 117+, Safari 17.5+, Firefox 129+. <code>interpolate-size: allow-keywords</code>: Chrome 129+ only in early 2026 — Firefox and Safari will follow. Always provide the non-animated fallback; the accordion still works without smooth height animation.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — FAQ accordion</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-11-2 { display: grid; gap: .5rem; max-inline-size: 32rem; }
+          .demo-11-2 details { border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; background: #fff; overflow: hidden; }
+          .demo-11-2 summary { list-style: none; cursor: pointer; padding: .75rem 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+          .demo-11-2 summary::-webkit-details-marker { display: none; }
+          .demo-11-2 summary::after {
+            content: "";
+            inline-size: .5rem; block-size: .5rem;
+            border-inline-end: 2px solid oklch(48% 0.22 275);
+            border-block-end: 2px solid oklch(48% 0.22 275);
+            transform: rotate(45deg);
+            transition: transform 200ms;
+          }
+          .demo-11-2 details[open] summary::after { transform: rotate(-135deg); }
+          .demo-11-2 details p { margin: 0; padding: 0 1rem 1rem; color: oklch(44% 0.020 264); }
+        </style>
+        <div class="demo-11-2">
+          <details><summary>What is @layer?</summary><p>A cascade primitive that creates named priority buckets. See Module 2.</p></details>
+          <details><summary>When did :has() ship?</summary><p>Chrome 105 (Aug 2022), Safari 15.4 (Mar 2022), Firefox 121 (Dec 2023).</p></details>
+          <details><summary>Do I still need BEM?</summary><p>Not with @scope. See Module 8.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;details&gt;
+  &lt;summary&gt;Click me&lt;/summary&gt;
+  &lt;div class="panel"&gt;
+    &lt;p&gt;The panel fades and grows on open.&lt;/p&gt;
+    &lt;p&gt;Try keyboard navigation — Tab, then Enter.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/details&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+details {
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .5rem;
+  max-inline-size: 24rem;
+  overflow: hidden;
+}
+summary {
+  list-style: none;
+  cursor: pointer;
+  padding: .75rem 1rem;
+  font-weight: 600;
+  background: oklch(96% 0.005 264);
+}
+summary::-webkit-details-marker { display: none; }
+
+.panel { padding: 1rem; }
+.panel p { margin: 0 0 .5rem; }
+
+details[open] .panel {
+  animation: d112-in 300ms ease-out;
+}
+@keyframes d112-in {
+  from { opacity: 0; transform: translateY(-.5rem); }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a second <code>&lt;details&gt;</code> group and wire them with the <code>name</code> attribute (<code>&lt;details name="faq"&gt;</code>) so only one opens at a time — the exclusive-accordion behavior. This was the last JavaScript-only accordion feature; it is now declarative HTML.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-11.1-no-js-philosophy.html">← Lesson 11.1</a>
+      <a href="./lesson-11.3-tabs-target-pseudo.html">Lesson 11.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

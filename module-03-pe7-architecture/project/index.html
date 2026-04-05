@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 3 Project — Scaffold a PE7 Stack · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 3</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Module 3 · Project</p>
+      <h1>Scaffold a PE7 Stack</h1>
+      <p class="lead">Stand up the complete six-layer architecture for a fictional three-page documentation site. Every layer gets a representative rule. Every rule obeys its boundary. The result is a single-file scaffold you could drop into a real project tomorrow.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>You are starting a docs site for an internal API. Three pages: home, reference, changelog. You do not need to implement the full site — you need to stand up the CSS architecture so that every future rule has a correct home before a single page is built. That is the discipline the architecture rewards.</p>
+      <p>Your deliverable is the single <code>root.css</code> equivalent shown below, populated with enough sample rules in each layer to prove the boundaries. Anything you add later must fit into the existing layers.</p>
+
+      <h2>The rules of engagement</h2>
+      <ol>
+        <li>Every rule lives inside a named layer. No exceptions.</li>
+        <li>Tokens layer: only custom properties.</li>
+        <li>Base layer: only element selectors.</li>
+        <li>Layout layer: only structural classes; no colours or fonts.</li>
+        <li>Components layer: classes only, scoped custom properties for variants.</li>
+        <li>Animations layer: transitions, keyframes, and the reduced-motion override.</li>
+        <li>No <code>!important</code> except inside <code>prefers-reduced-motion</code>.</li>
+      </ol>
+
+      <h2>The scaffold in action</h2>
+    </section>
+
+    <section class="demo">
+      <h2>Rendered scaffold</h2>
+      <div class="demo-frame">
+        <style>
+          @layer reset-p3, tokens-p3, base-p3, layout-p3, components-p3, animations-p3;
+
+          @layer reset-p3 {
+            .pe7-scaffold :where(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
+            .pe7-scaffold :where(h1, h2, h3, h4) { font-size: inherit; font-weight: inherit; }
+            .pe7-scaffold :where(ul) { list-style: none; }
+            .pe7-scaffold :where(button) { background: transparent; border: 0; font: inherit; cursor: pointer; }
+          }
+
+          @layer tokens-p3 {
+            .pe7-scaffold {
+              --gray-50:  oklch(98% 0.003 264);
+              --gray-100: oklch(96% 0.005 264);
+              --gray-700: oklch(40% 0.02 264);
+              --gray-900: oklch(14% 0.015 264);
+              --purple-500: oklch(55% 0.22 290);
+              --purple-600: oklch(48% 0.22 290);
+
+              --color-surface: var(--gray-50);
+              --color-surface-alt: var(--gray-100);
+              --color-text: var(--gray-900);
+              --color-muted: var(--gray-700);
+              --color-brand: var(--purple-500);
+              --color-brand-hover: var(--purple-600);
+
+              --space-2: .5rem;
+              --space-3: .75rem;
+              --space-4: 1rem;
+              --space-6: 1.5rem;
+
+              --text-sm: .875rem;
+              --text-md: 1rem;
+              --text-xl: 1.25rem;
+              --text-3xl: 2rem;
+
+              --radius-sm: .25rem;
+              --radius-md: .375rem;
+
+              --motion-fast: 180ms;
+              --ease-out: cubic-bezier(.2,.7,.3,1);
+            }
+          }
+
+          @layer base-p3 {
+            .pe7-scaffold { font-family: system-ui; color: var(--color-text); background: var(--color-surface); padding: var(--space-6); border-radius: .5rem; line-height: 1.55; }
+            .pe7-scaffold h1 { font-size: var(--text-3xl); margin-block-end: var(--space-4); text-wrap: balance; }
+            .pe7-scaffold h2 { font-size: var(--text-xl); margin-block-end: var(--space-3); }
+            .pe7-scaffold p  { max-inline-size: 60ch; margin-block-end: var(--space-3); text-wrap: pretty; }
+            .pe7-scaffold a  { color: var(--color-brand); }
+          }
+
+          @layer layout-p3 {
+            .pe7-scaffold .stack   { display: grid; gap: var(--space-4); }
+            .pe7-scaffold .cluster { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+            .pe7-scaffold .grid    { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
+          }
+
+          @layer components-p3 {
+            .pe7-scaffold .btn {
+              --btn-bg: var(--color-brand);
+              --btn-fg: #fff;
+              background: var(--btn-bg); color: var(--btn-fg);
+              padding: var(--space-2) var(--space-4);
+              border-radius: var(--radius-md);
+              font-size: var(--text-sm);
+              display: inline-flex; align-items: center; gap: var(--space-2);
+            }
+            .pe7-scaffold .btn.ghost { --btn-bg: transparent; --btn-fg: var(--color-brand); box-shadow: inset 0 0 0 1px var(--color-brand); }
+            .pe7-scaffold .card {
+              background: var(--color-surface-alt);
+              padding: var(--space-4);
+              border-radius: var(--radius-md);
+            }
+            .pe7-scaffold .card h3 { font-size: var(--text-xl); margin-block-end: var(--space-2); }
+            .pe7-scaffold .card p  { color: var(--color-muted); font-size: var(--text-sm); margin: 0; }
+            .pe7-scaffold .badge {
+              display: inline-block; padding: .125rem .5rem; border-radius: 999px;
+              background: var(--color-brand); color: #fff; font-size: .75rem;
+            }
+          }
+
+          @layer animations-p3 {
+            .pe7-scaffold .btn { transition: background var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); }
+            .pe7-scaffold .btn:hover { background: var(--color-brand-hover); transform: translateY(-1px); }
+            @media (prefers-reduced-motion: reduce) {
+              .pe7-scaffold *, .pe7-scaffold *::before, .pe7-scaffold *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+              }
+            }
+          }
+        </style>
+
+        <div class="pe7-scaffold">
+          <div class="stack">
+            <header class="stack">
+              <span class="badge">v2.3</span>
+              <h1>Internal API Docs</h1>
+              <p>Three pages, six layers, zero ambiguity about where the next rule belongs.</p>
+              <div class="cluster">
+                <a href="#" class="btn">Get started</a>
+                <a href="#" class="btn ghost">API reference</a>
+              </div>
+            </header>
+            <div class="grid">
+              <article class="card"><h3>Home</h3><p>Entry point and onboarding.</p></article>
+              <article class="card"><h3>Reference</h3><p>Every endpoint, every parameter.</p></article>
+              <article class="card"><h3>Changelog</h3><p>Versioned history and migrations.</p></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout success">
+      <h2>The contract, one page</h2>
+      <p>Every rule above lives in exactly one of six layers, and you can verify it by reading. Tokens hold only custom properties. Base uses only element selectors. Layout has no colour or typography. Components carry their own variable surface through scoped custom properties. Animations own every transition and the reduced-motion override. Reset is invisible — which is how you know it is doing its job.</p>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your turn — extend the scaffold</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="stack"&gt;
+  &lt;h1&gt;Extend this scaffold&lt;/h1&gt;
+  &lt;p&gt;Add a new .alert component. Add a new motion token. Add a new color alias. Each addition belongs in exactly one layer.&lt;/p&gt;
+  &lt;button class="btn"&gt;Primary&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, tokens, base, layout, components, animations;
+
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
+  :where(button) { background: transparent; border: 0; font: inherit; cursor: pointer; }
+}
+
+@layer tokens {
+  :root {
+    --color-brand: oklch(58% 0.22 275);
+    --color-surface: oklch(98% 0.003 264);
+    --color-text: oklch(14% 0.015 264);
+    --space-3: .75rem;
+    --space-4: 1rem;
+    --radius-md: .375rem;
+    --motion-fast: 180ms;
+    --ease-out: cubic-bezier(.2,.7,.3,1);
+  }
+}
+
+@layer base {
+  body { font-family: system-ui; color: var(--color-text); background: var(--color-surface); padding: var(--space-4); }
+  h1 { font-size: 1.75rem; margin-block-end: var(--space-3); }
+  p  { max-inline-size: 60ch; margin-block-end: var(--space-3); }
+}
+
+@layer layout {
+  .stack { display: grid; gap: var(--space-3); }
+}
+
+@layer components {
+  .btn {
+    --btn-bg: var(--color-brand);
+    background: var(--btn-bg); color: #fff;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+  }
+}
+
+@layer animations {
+  .btn { transition: transform var(--motion-fast) var(--ease-out); }
+  .btn:hover { transform: translateY(-1px); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-3.9-layer-boundaries-rules.html">← Lesson 3.9</a>
+      <a href="../../module-04-tokens/index.html">Module 4 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

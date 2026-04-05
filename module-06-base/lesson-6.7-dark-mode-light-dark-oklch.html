@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.7 — Dark Mode with light-dark() and OKLCH · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.7</p>
+      <h1>Dark Mode with light-dark() and OKLCH</h1>
+      <p class="lead">Dark mode does not belong in every component. It belongs in one place: the token layer. One function — <code>light-dark()</code> — expresses both values in a single declaration, and OKLCH makes sure the dark palette feels like the light palette rather than looking like a broken copy of it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>light-dark() at the token level</h2>
+      <p>The <code>light-dark()</code> function takes two color values and picks one based on the element's current <code>color-scheme</code>. Combined with <code>color-scheme: light dark</code> on <code>:root</code>, it gives you automatic dark mode with zero media queries.</p>
+      <pre><code>:root {
+  color-scheme: light dark;
+
+  --color-surface: light-dark(oklch(99% 0.003 264), oklch(15% 0.02 264));
+  --color-text-primary: light-dark(oklch(18% 0.02 264), oklch(95% 0.01 264));
+  --color-primary: light-dark(oklch(55% 0.22 275), oklch(70% 0.18 275));
+}</code></pre>
+      <p>Every other layer — base, components, utilities — uses the tokens without caring which mode is active. That is the whole technique. The base layer never writes a <code>@media (prefers-color-scheme: dark)</code> block. Tokens carry the complexity so the rest of the codebase stays simple.</p>
+
+      <h2>Why OKLCH matters for dark mode</h2>
+      <p>sRGB is perceptually non-uniform — a 10% lightness drop in blue looks very different from a 10% lightness drop in yellow. When you invert a palette from light to dark in sRGB, saturated colors become either washed out or neon-bright. OKLCH is perceptually uniform: <code>oklch(55% 0.22 275)</code> and <code>oklch(70% 0.18 275)</code> share a hue angle and the eye reads them as the "same color, different weight."</p>
+      <p>A practical heuristic for dark-mode color derivation:</p>
+      <ul>
+        <li><strong>Surfaces</strong>: flip lightness. A 99% light surface becomes an 15% dark surface.</li>
+        <li><strong>Text</strong>: flip lightness, drop chroma slightly. A 18%/0.02 text becomes a 95%/0.01 text.</li>
+        <li><strong>Accents</strong>: raise lightness by 10-15% and drop chroma by 10-20%. A saturated <code>55%/0.22</code> primary becomes <code>70%/0.18</code> in dark mode — the hue is recognisable, the contrast is maintained, and the eye does not burn.</li>
+      </ul>
+
+      <h2>Forcing a mode</h2>
+      <p>Sometimes you want a permanent dark section — a marketing hero, a code editor panel, a fullscreen presentation. Force <code>color-scheme</code> on the ancestor and every descendant token flips:</p>
+      <pre><code>.dark-section { color-scheme: dark; }
+.light-section { color-scheme: light; }</code></pre>
+      <p>Because <code>light-dark()</code> resolves against the nearest <code>color-scheme</code>, this works without any media query override — the tokens see the scheme and return the dark variant inside <code>.dark-section</code>, the light variant everywhere else.</p>
+
+      <h2>Fallbacks</h2>
+      <p><code>light-dark()</code> is supported in all current browsers. For older browsers, the pre-PE7 pattern is a <code>@media (prefers-color-scheme: dark)</code> block that redefines the same tokens on <code>:root</code>. Wrap it in <code>@supports not (color: light-dark(white, black))</code> if you want progressive enhancement.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — same page, light and dark</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-7 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-family: system-ui; }
+          .demo-6-7 > section { padding: 1rem; border-radius: .5rem; border: 1px solid oklch(80% 0.01 264); }
+          .demo-6-7 .light { color-scheme: light; background: light-dark(oklch(99% 0.003 264), oklch(15% 0.02 264)); color: light-dark(oklch(18% 0.02 264), oklch(95% 0.01 264)); }
+          .demo-6-7 .dark  { color-scheme: dark;  background: light-dark(oklch(99% 0.003 264), oklch(15% 0.02 264)); color: light-dark(oklch(18% 0.02 264), oklch(95% 0.01 264)); }
+          .demo-6-7 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+          .demo-6-7 a { color: light-dark(oklch(55% 0.22 275), oklch(72% 0.18 275)); }
+        </style>
+        <div class="demo-6-7">
+          <section class="light">
+            <h4>color-scheme: light</h4>
+            <p>One token set, rendered light. <a href="#">A link</a>.</p>
+          </section>
+          <section class="dark">
+            <h4>color-scheme: dark</h4>
+            <p>Same token set, rendered dark. <a href="#">A link</a>.</p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;section class="force-light"&gt;
+  &lt;h1&gt;Light&lt;/h1&gt;
+  &lt;p&gt;Forced light regardless of OS preference.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section class="force-dark"&gt;
+  &lt;h1&gt;Dark&lt;/h1&gt;
+  &lt;p&gt;Forced dark via color-scheme.&lt;/p&gt;
+&lt;/section&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  :root {
+    color-scheme: light dark;
+    --bg:    light-dark(oklch(98% 0.005 264), oklch(16% 0.02 264));
+    --text:  light-dark(oklch(18% 0.02 264), oklch(94% 0.01 264));
+    --accent: light-dark(oklch(55% 0.22 275), oklch(72% 0.18 275));
+  }
+
+  body { font-family: system-ui; margin: 0; }
+  section { padding: 1rem; background: var(--bg); color: var(--text); }
+  h1 { color: var(--accent); margin: 0 0 .25rem; }
+  p  { margin: 0; }
+
+  .force-light { color-scheme: light; }
+  .force-dark  { color-scheme: dark; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove the <code>.force-light</code> and <code>.force-dark</code> classes from the HTML. Both sections now follow your OS preference. Toggle your system dark mode on and off and watch them change in lockstep. Then change <code>--accent</code> to use a sRGB hex pair like <code>light-dark(#6b46ff, #9b7bff)</code> and compare how the hue drifts between modes. OKLCH keeps the hue stable; hex approximations do not.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.6-focus-styles-accessible.html">← Lesson 6.6</a>
+      <a href="./lesson-6.8-margin-trim-text-details.html">Lesson 6.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

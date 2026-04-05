@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10.6 — :target-current and CSS Counters · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 10</a>
+      <span>Lesson 10.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 10.6</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>:target-current and CSS Counters</h1>
+      <p class="lead">Two long-standing "needs JavaScript" patterns — table-of-contents scrollspy and auto-numbered sections — now belong to CSS. <code>:target-current</code> picks the currently-active section of a scroll-target group; CSS counters number anything.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>:target-current scrollspy</h2>
+      <pre><code>.toc {
+  scroll-target-group: auto;
+}
+.toc a:target-current {
+  color: var(--color-primary);
+  font-weight: 600;
+}</code></pre>
+      <p>Declare the navigation as a scroll target group. The browser tracks which section the page is scrolled to — based on the hash fragments the anchors point at — and matches <code>:target-current</code> on the corresponding anchor. No scroll listener, no <code>Array.from(sections)</code>, no threshold tweaking.</p>
+
+      <h2>CSS counters for auto-numbering</h2>
+      <p>Counters are baseline in every browser going back a decade. If you have not used them, now is the time:</p>
+      <pre><code>ol.steps { counter-reset: step; list-style: none; padding: 0; }
+ol.steps li { counter-increment: step; }
+ol.steps li::before { content: counter(step) ". "; color: var(--color-primary); font-weight: 700; }</code></pre>
+      <p>You can reset, increment, and display counters across the document. Combine with nested counters for section.subsection numbering, or with <code>counters()</code> (plural) for full outline strings.</p>
+
+      <h2>Why mix them?</h2>
+      <p>Counters are your universal baseline — they work everywhere. <code>:target-current</code> is the progressive enhancement on top. A sticky TOC with counter-numbered items and <code>:target-current</code> highlighting gives you a complete reading companion that degrades gracefully: in older browsers, numbering still works; only the active highlight is lost.</p>
+
+      <h2>Browser support</h2>
+      <p><code>scroll-target-group</code> and <code>:target-current</code>: Chrome 133+, Edge 133+. Safari and Firefox pending. Wrap in <code>@supports selector(:target-current)</code>. CSS counters: baseline, no wrap needed.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — numbered TOC</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-10-6 { display: grid; grid-template-columns: 12rem 1fr; gap: 1rem; }
+          .demo-10-6 nav ol { counter-reset: toc; list-style: none; padding: 0; margin: 0; display: grid; gap: .25rem; }
+          .demo-10-6 nav li { counter-increment: toc; }
+          .demo-10-6 nav a {
+            display: block;
+            padding: .25rem .5rem;
+            text-decoration: none;
+            color: oklch(44% 0.020 264);
+            border-radius: .25rem;
+          }
+          .demo-10-6 nav a::before { content: counter(toc) ". "; color: oklch(48% 0.22 275); font-weight: 700; }
+          .demo-10-6 nav a:hover { background: oklch(95% 0.04 275); color: oklch(40% 0.19 275); }
+          .demo-10-6 .content { display: grid; gap: 1rem; max-block-size: 14rem; overflow: auto; padding-inline-end: .5rem; }
+          .demo-10-6 .content section { padding: 1rem; background: oklch(96% 0.005 264); border-radius: .5rem; }
+          .demo-10-6 .content h3 { margin: 0; }
+          @supports selector(:target-current) {
+            .demo-10-6 nav { scroll-target-group: auto; }
+            .demo-10-6 nav a:target-current { background: oklch(48% 0.22 275); color: #fff; }
+            .demo-10-6 nav a:target-current::before { color: #fff; }
+          }
+        </style>
+        <div class="demo-10-6">
+          <nav>
+            <ol>
+              <li><a href="#d106-a">Intro</a></li>
+              <li><a href="#d106-b">Setup</a></li>
+              <li><a href="#d106-c">Core concept</a></li>
+              <li><a href="#d106-d">Conclusion</a></li>
+            </ol>
+          </nav>
+          <div class="content">
+            <section id="d106-a"><h3>Intro</h3><p>Scroll this panel to see :target-current fire.</p></section>
+            <section id="d106-b"><h3>Setup</h3><p>Second section body.</p></section>
+            <section id="d106-c"><h3>Core concept</h3><p>Third section body.</p></section>
+            <section id="d106-d"><h3>Conclusion</h3><p>Final section body.</p></section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;ol class="steps"&gt;
+  &lt;li&gt;Install&lt;/li&gt;
+  &lt;li&gt;Configure&lt;/li&gt;
+  &lt;li&gt;Run&lt;/li&gt;
+  &lt;li&gt;Ship&lt;/li&gt;
+&lt;/ol&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: .5rem;
+}
+.steps li {
+  counter-increment: step;
+  padding: .5rem 1rem;
+  background: oklch(96% 0.005 264);
+  border-radius: .5rem;
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+.steps li::before {
+  content: counter(step);
+  inline-size: 1.75rem; block-size: 1.75rem;
+  display: grid; place-items: center;
+  background: oklch(48% 0.22 275);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: .875rem;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Nest an ordered list inside one of the steps. Use <code>counters(step, ".")</code> to produce <code>1.1</code>, <code>1.2</code>, <code>2.1</code>-style numbering. This is the CSS equivalent of a fully-outlined document, generated at paint time.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-10.5-container-style-queries.html">← Lesson 10.5</a>
+      <a href="./project/index.html">Module 10 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

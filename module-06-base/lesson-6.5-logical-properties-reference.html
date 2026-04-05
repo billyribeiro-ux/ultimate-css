@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.5 — Logical Properties Reference · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.5</p>
+      <h1>Logical Properties Reference</h1>
+      <p class="lead">Physical properties hard-code the assumption that text runs left-to-right and top-to-bottom. Logical properties adapt to the writing mode at runtime. In PE7 we never write physical properties in base — and the payoff is that flipping <code>dir="rtl"</code> on a page mirrors every layout automatically.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Physical to logical mapping</h2>
+      <div class="support-table">
+      <table>
+        <thead><tr><th>Physical (avoid in base)</th><th>Logical (prefer)</th><th>In LTR</th><th>In RTL / vertical</th></tr></thead>
+        <tbody>
+          <tr><td><code>margin-top</code></td><td><code>margin-block-start</code></td><td>top</td><td>top / inline-start</td></tr>
+          <tr><td><code>margin-bottom</code></td><td><code>margin-block-end</code></td><td>bottom</td><td>bottom / inline-end</td></tr>
+          <tr><td><code>margin-left</code></td><td><code>margin-inline-start</code></td><td>left</td><td>right</td></tr>
+          <tr><td><code>margin-right</code></td><td><code>margin-inline-end</code></td><td>right</td><td>left</td></tr>
+          <tr><td><code>padding-top/bottom</code></td><td><code>padding-block</code></td><td>vertical</td><td>vertical</td></tr>
+          <tr><td><code>padding-left/right</code></td><td><code>padding-inline</code></td><td>horizontal</td><td>horizontal (mirrored)</td></tr>
+          <tr><td><code>width</code></td><td><code>inline-size</code></td><td>horizontal</td><td>writing-mode aware</td></tr>
+          <tr><td><code>height</code></td><td><code>block-size</code></td><td>vertical</td><td>writing-mode aware</td></tr>
+          <tr><td><code>max-width</code></td><td><code>max-inline-size</code></td><td>horizontal cap</td><td>inline cap</td></tr>
+          <tr><td><code>top / bottom</code></td><td><code>inset-block-start / -end</code></td><td>top/bottom</td><td>inset direction aware</td></tr>
+          <tr><td><code>left / right</code></td><td><code>inset-inline-start / -end</code></td><td>left/right</td><td>mirrored</td></tr>
+          <tr><td><code>border-left</code></td><td><code>border-inline-start</code></td><td>left edge</td><td>right edge in RTL</td></tr>
+          <tr><td><code>text-align: left</code></td><td><code>text-align: start</code></td><td>left</td><td>right in RTL</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>Shorthands matter</h2>
+      <p>The shorthands <code>margin-block</code> and <code>margin-inline</code> accept one or two values:</p>
+      <pre><code>margin-block: 1rem;          /* both block edges */
+margin-block: 1rem 2rem;     /* start, end */
+padding-inline: var(--gutter);/* both inline edges */
+border-inline-start: 3px solid var(--color-primary);</code></pre>
+      <p>Prefer the shorthands when you are setting both edges, and the full name when you are setting one edge. Never mix physical and logical on the same element — debugging mixed rules is painful.</p>
+
+      <h2>The PE7 rule</h2>
+      <p>In the base and layout layers, write logical properties exclusively. In components, the same rule applies unless the component has a documented reason to use a physical property (a decorative ornament pinned visually to the left edge regardless of writing mode, for example). Utilities may use physical properties for terse class names, but they are still logical-first.</p>
+
+      <h2>Demo: flip dir="rtl" and watch the whole layout mirror</h2>
+      <p>The live demo below uses only logical properties. Toggle between LTR and RTL and watch the whole layout mirror without a single media query or JavaScript rule.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — LTR and RTL side by side</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-5 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-6-5 > section { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; background: #fff; }
+          .demo-6-5 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-6-5 .card { padding-inline: 1rem; padding-block: .75rem; border-inline-start: 4px solid oklch(55% 0.22 275); background: oklch(96% 0.01 275); margin-block: .5rem; max-inline-size: 30ch; }
+          .demo-6-5 .card p { margin: 0; text-align: start; }
+        </style>
+        <div class="demo-6-5">
+          <section dir="ltr">
+            <h4>dir="ltr"</h4>
+            <div class="card"><p>Left-to-right. The accent bar appears on the left, text aligns left.</p></div>
+          </section>
+          <section dir="rtl">
+            <h4>dir="rtl"</h4>
+            <div class="card"><p>Right-to-left. The accent bar moves to the right, text aligns right. Same CSS.</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article dir="ltr"&gt;
+  &lt;div class="card"&gt;&lt;p&gt;Change dir to rtl and re-run.&lt;/p&gt;&lt;/div&gt;
+&lt;/article&gt;
+&lt;article dir="rtl"&gt;
+  &lt;div class="card"&gt;&lt;p&gt;Same CSS mirrors automatically.&lt;/p&gt;&lt;/div&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  body { font-family: system-ui; padding: 1rem; }
+
+  /* Everything logical. No left, no right, no top, no bottom. */
+  article {
+    max-inline-size: 40ch;
+    margin-block: .75rem;
+  }
+  .card {
+    padding-block: .75rem;
+    padding-inline: 1rem;
+    border-inline-start: 4px solid oklch(55% 0.22 275);
+    background: oklch(96% 0.01 275);
+  }
+  .card p { margin: 0; text-align: start; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Grep your current project for <code>margin-left</code>, <code>padding-right</code>, <code>text-align: left</code>, and <code>width:</code> on layout elements. Every match is a bug waiting for an Arabic or Hebrew translation. Replace them with logical equivalents and your entire site becomes RTL-capable without touching a single component.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.4-paragraph-link-inline.html">← Lesson 6.4</a>
+      <a href="./lesson-6.6-focus-styles-accessible.html">Lesson 6.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

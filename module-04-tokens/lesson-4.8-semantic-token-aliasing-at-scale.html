@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4.8 — Semantic Token Aliasing at Scale · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 4</a>
+      <span>Lesson 4.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 4.8</p>
+      <h1>Semantic Token Aliasing at Scale</h1>
+      <p class="lead">Two tiers are enough for most projects. Three tiers are the right answer the moment the product has per-component theming, user-selectable themes, or tightly customised surfaces. The third tier is component tokens, and they inherit their defaults from semantic tokens.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three-tier model</h2>
+      <ol>
+        <li><strong>Primitive tokens</strong> — raw values. <code>--purple-500</code>, <code>--gray-100</code>, <code>--space-4</code>. Stable, rarely touched.</li>
+        <li><strong>Semantic tokens</strong> — product intentions. <code>--color-brand</code>, <code>--color-surface</code>, <code>--space-gutter</code>. Repointed during rebrands.</li>
+        <li><strong>Component tokens</strong> — per-component surfaces. <code>--btn-bg</code>, <code>--card-padding</code>, <code>--dialog-radius</code>. Scoped to the component; default from semantic tokens; overridable by variants and consumers.</li>
+      </ol>
+      <p>The chain runs top to bottom:</p>
+      <pre><code>--purple-500: oklch(55% 0.22 290);    /* primitive */
+--color-brand: var(--purple-500);      /* semantic  */
+.btn { --btn-bg: var(--color-brand); } /* component */</code></pre>
+      <p>Each tier has one job. Primitives are data. Semantics are meaning. Component tokens are the public API of the component.</p>
+
+      <h2>Theme switching with data attributes</h2>
+      <p>A theme is a remapping of semantic tokens. Primitives stay stable; semantics point at different primitives per theme. The canonical pattern uses a <code>data-theme</code> attribute on the root:</p>
+      <pre><code>:root {
+  --gray-50:  oklch(98% 0.003 264);
+  --gray-900: oklch(14% 0.015 264);
+  --purple-400: oklch(68% 0.18 290);
+  --purple-500: oklch(55% 0.22 290);
+}
+
+:root[data-theme="light"] {
+  --color-surface: var(--gray-50);
+  --color-text:    var(--gray-900);
+  --color-brand:   var(--purple-500);
+}
+
+:root[data-theme="dark"] {
+  --color-surface: var(--gray-900);
+  --color-text:    var(--gray-50);
+  --color-brand:   var(--purple-400);
+}</code></pre>
+      <p>Flipping <code>document.documentElement.dataset.theme = "dark"</code> switches every component that reads semantic tokens, in one line of JavaScript, with no re-render.</p>
+
+      <h2>Component tokens give consumers a knob</h2>
+      <p>A button component exposes <code>--btn-bg</code> as its public interface. By default it comes from a semantic token. Consumers can override it per instance without writing a new class:</p>
+      <pre><code>.btn {
+  --btn-bg: var(--color-brand);
+  --btn-fg: #fff;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+
+/* Variant — one property changes */
+.btn.danger { --btn-bg: var(--color-danger); }
+
+/* Ad-hoc override via inline style or parent scope */
+.marketing-hero .btn { --btn-bg: var(--color-accent); }</code></pre>
+      <p>The component's internals never change. The consumer never rewrites a rule. The customisation surface is the set of component tokens the component chose to expose, and exposing that surface is a deliberate API decision.</p>
+
+      <h2>The rules for the three tiers</h2>
+      <ul>
+        <li>Components only consume component tokens and semantic tokens — never primitives.</li>
+        <li>Semantic tokens only reference primitives, never component tokens.</li>
+        <li>Theme switches only remap semantic tokens. They do not touch primitives or components.</li>
+        <li>A component's exposed token surface is part of its public contract. Renaming <code>--btn-bg</code> is a breaking change, same as renaming a function.</li>
+      </ul>
+
+      <h2>When two tiers are enough</h2>
+      <p>Small products, single theme, no per-instance customisation — skip component tokens. The consumer writes <code>.btn { background: var(--color-brand); }</code> and ships. The moment you need a second theme, per-feature overrides, or a design system used by multiple apps, add the third tier. Adding it later is straightforward; skipping it when you need it is painful.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — theme switch via data-attribute</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-4-8 {
+            --gray-50:  oklch(98% 0.003 264);
+            --gray-200: oklch(90% 0.01 264);
+            --gray-900: oklch(14% 0.015 264);
+            --purple-400: oklch(68% 0.18 290);
+            --purple-500: oklch(55% 0.22 290);
+            font-family: system-ui; padding: 1rem;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+          }
+          .demo-4-8 [data-theme="light"] {
+            --color-surface: var(--gray-50);
+            --color-text: var(--gray-900);
+            --color-brand: var(--purple-500);
+            --color-border: var(--gray-200);
+          }
+          .demo-4-8 [data-theme="dark"] {
+            --color-surface: var(--gray-900);
+            --color-text: var(--gray-50);
+            --color-brand: var(--purple-400);
+            --color-border: oklch(30% 0.02 264);
+          }
+          .demo-4-8 .panel {
+            background: var(--color-surface); color: var(--color-text);
+            border: 1px solid var(--color-border);
+            padding: 1rem; border-radius: .5rem;
+          }
+          .demo-4-8 .panel .btn {
+            --btn-bg: var(--color-brand);
+            background: var(--btn-bg); color: #fff;
+            padding: .5rem 1rem; border: 0; border-radius: .375rem; font: inherit; margin-top: .5rem;
+          }
+        </style>
+        <div class="demo-4-8">
+          <div data-theme="light"><div class="panel"><strong>Light theme</strong><br>Same component, remapped semantics.<br><button class="btn">Primary</button></div></div>
+          <div data-theme="dark"><div class="panel"><strong>Dark theme</strong><br>Primitives unchanged. Semantics switched.<br><button class="btn">Primary</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div data-theme="light"&gt;
+  &lt;div class="panel"&gt;Light &lt;button class="btn"&gt;Primary&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div data-theme="dark"&gt;
+  &lt;div class="panel"&gt;Dark &lt;button class="btn"&gt;Primary&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --gray-50:  oklch(98% 0.003 264);
+  --gray-900: oklch(14% 0.015 264);
+  --purple-400: oklch(68% 0.18 290);
+  --purple-500: oklch(55% 0.22 290);
+}
+
+[data-theme="light"] {
+  --color-surface: var(--gray-50);
+  --color-text:    var(--gray-900);
+  --color-brand:   var(--purple-500);
+}
+[data-theme="dark"] {
+  --color-surface: var(--gray-900);
+  --color-text:    var(--gray-50);
+  --color-brand:   var(--purple-400);
+}
+
+body { font-family: system-ui; padding: 1rem; display: grid; gap: 1rem; }
+.panel {
+  background: var(--color-surface); color: var(--color-text);
+  padding: 1rem; border-radius: .5rem;
+}
+.btn {
+  --btn-bg: var(--color-brand);
+  background: var(--btn-bg); color: #fff;
+  padding: .5rem 1rem; border: 0; border-radius: .375rem; font: inherit;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third theme — <code>data-theme="hc"</code> for high contrast — that increases the lightness gap between surface and text. You should not need to touch the <code>.panel</code> or <code>.btn</code> rules at all. If you do, the architecture has leaked.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-4.7-at-property-typed-custom-props.html">← Lesson 4.7</a>
+      <a href="./project/index.html">Module 4 project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>
