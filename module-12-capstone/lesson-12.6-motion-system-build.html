@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.6 — Motion System Build · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.6</p>
+      <h1>Motion System Build</h1>
+      <p class="lead">Add the animation layer to Prism. Every motion the design requires has a dedicated CSS technique — and every scroll-driven / experimental feature is wrapped in <code>@supports</code> with an invisible graceful fallback.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What you are building</h2>
+      <ul>
+        <li><strong>Hero entrance</strong> — headline + CTAs animate in via <code>@starting-style</code> (Module 9.2).</li>
+        <li><strong>Section reveals</strong> — feature and testimonial sections fade-up using <code>animation-timeline: view()</code> with <code>animation-range: entry 0% entry 40%</code>.</li>
+        <li><strong>Card stagger</strong> — feature cards delay via <code>sibling-index()</code>.</li>
+        <li><strong>Sticky nav shadow</strong> — <code>@container scroll-state(stuck: top)</code> adds a shadow when the nav is stuck.</li>
+        <li><strong>FAQ open</strong> — <code>details[open]</code> animates its content via <code>@starting-style</code>.</li>
+        <li><strong>Reduced motion override</strong> — global <code>prefers-reduced-motion</code> rule in the animations layer disables all of the above with the one legitimate <code>!important</code>.</li>
+      </ul>
+
+      <h2>The support wrapper</h2>
+      <p>Every modern motion feature in the capstone is wrapped:</p>
+      <pre><code>@supports (animation-timeline: view()) {
+  .feature-card { animation: fade-up var(--dur-moderate) var(--ease-out) both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+}</code></pre>
+      <p>In Firefox (which does not yet ship scroll timelines at the time of writing), the supports block is skipped. The cards still render — just without the reveal. That is the entire point of progressive enhancement.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — @starting-style entrance</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-12-6 {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: oklch(48% 0.22 275);
+            color: white;
+            border-radius: .5rem;
+            font-weight: 600;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 600ms cubic-bezier(0,0,.2,1), transform 600ms cubic-bezier(0,0,.2,1);
+          }
+          @starting-style {
+            .demo-12-6 { opacity: 0; transform: translateY(1rem); }
+          }
+        </style>
+        <div class="demo-12-6">Enter animation with zero JS</div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;ul class="cards"&gt;
+  &lt;li&gt;Feature one&lt;/li&gt;
+  &lt;li&gt;Feature two&lt;/li&gt;
+  &lt;li&gt;Feature three&lt;/li&gt;
+  &lt;li&gt;Feature four&lt;/li&gt;
+&lt;/ul&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; background: oklch(98% 0.003 264); }
+.cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.cards li {
+  padding: 1rem;
+  background: white;
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .5rem;
+}
+
+/* Staggered entrance — requires sibling-index() support */
+@supports (animation-delay: calc(sibling-index() * 100ms)) {
+  .cards li {
+    animation: fade-up 400ms cubic-bezier(0,0,.2,1) both;
+    animation-delay: calc((sibling-index() - 1) * 100ms);
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(1rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Enable <code>prefers-reduced-motion</code> in your OS settings. Reload. Confirm all motion stops. Then reload the Prism capstone page — its reduced-motion override must do the same. This is an accessibility requirement, not an opinion.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.5-component-library-build.html">← Lesson 12.5</a>
+      <a href="./lesson-12.7-no-js-integration.html">Lesson 12.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

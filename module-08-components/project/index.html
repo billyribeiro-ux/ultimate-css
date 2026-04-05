@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 8 Project — Component Library Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 8</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Module 8 · Project</p>
+      <h1>Component Library Showcase</h1>
+      <p class="lead">Every component from Module 8, working together on one page, under one token contract. Read the inline CSS — this is the shape of a real components layer.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Build a single showcase page containing: button variants, scoped cards, a form with <code>:has()</code> validation, an anchor-positioned tooltip, and a native CSS carousel. Every component must expose a token API, no inline styles, no utility classes, no JavaScript.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Showcase</h2>
+      <div class="demo-frame">
+        <style>
+          .showcase { display: grid; gap: 2rem; font-family: system-ui; }
+          .showcase h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(44% 0.020 264); margin: 0 0 .5rem; }
+          .showcase .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+          /* Button */
+          .showcase .btn {
+            --btn-bg: oklch(48% 0.22 275); --btn-bg-hover: oklch(40% 0.19 275);
+            --btn-color: #fff; --btn-border: transparent;
+            padding: .5rem 1rem; background: var(--btn-bg); color: var(--btn-color);
+            border: 1px solid var(--btn-border); border-radius: .5rem;
+            font: 600 .875rem system-ui; cursor: pointer;
+          }
+          .showcase .btn:hover { background: var(--btn-bg-hover); }
+          .showcase .btn-ghost  { --btn-bg: transparent; --btn-color: oklch(40% 0.19 275); --btn-border: oklch(85% 0.012 264); --btn-bg-hover: oklch(95% 0.04 275); }
+          .showcase .btn-danger { --btn-bg: oklch(60% 0.22 25); --btn-bg-hover: oklch(52% 0.22 25); }
+
+          /* Card */
+          .showcase .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .showcase .card {
+            --card-bg: #fff; --card-accent: oklch(48% 0.22 275);
+            background: var(--card-bg);
+            border: 1px solid oklch(85% 0.012 264);
+            border-top: 3px solid var(--card-accent);
+            border-radius: .5rem; padding: 1rem;
+          }
+          .showcase .card.success { --card-accent: oklch(65% 0.17 150); }
+          @supports (selector(@scope)) {
+            @scope (.showcase .card) {
+              h3 { margin: 0 0 .25rem; color: oklch(22% 0.018 264); font-size: 1rem; }
+              p  { margin: 0; color: oklch(44% 0.020 264); font-size: .875rem; }
+            }
+          }
+
+          /* Form */
+          .showcase form { display: grid; gap: .75rem; max-inline-size: 20rem; }
+          .showcase .field {
+            --field-accent: oklch(85% 0.012 264);
+            display: grid; gap: .2rem;
+            padding: .5rem .75rem;
+            border: 2px solid var(--field-accent); border-radius: .5rem;
+          }
+          .showcase .field span { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--field-accent); }
+          .showcase .field input { border: 0; outline: 0; font: inherit; background: transparent; }
+          .showcase .field:has(input:focus) { --field-accent: oklch(48% 0.22 275); }
+          .showcase .field:has(input:invalid:not(:placeholder-shown)) { --field-accent: oklch(60% 0.22 25); }
+          .showcase .field:has(input:valid:not(:placeholder-shown))   { --field-accent: oklch(55% 0.17 150); }
+
+          /* Tooltip */
+          .showcase .tip-btn { anchor-name: --tipbtn; padding: .4rem .75rem; background: #fff; border: 1px solid oklch(85% 0.012 264); border-radius: .375rem; cursor: pointer; }
+          @supports (anchor-name: --x) {
+            .showcase .tip {
+              position: absolute;
+              position-anchor: --tipbtn;
+              position-area: top center;
+              position-try-fallbacks: flip-block;
+              margin-block-end: .5rem;
+              background: oklch(22% 0.018 264); color: #fff;
+              padding: .35rem .6rem; border-radius: .25rem;
+              font-size: .75rem; white-space: nowrap;
+            }
+          }
+          @supports not (anchor-name: --x) { .showcase .tip { display: inline-block; background: #222; color: #fff; padding: .25rem .5rem; border-radius: .25rem; font-size: .75rem; margin-inline-start: .5rem; } }
+
+          /* Carousel */
+          .showcase .carousel { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-block-end: .5rem; }
+          .showcase .carousel &gt; .slide { flex: 0 0 70%; aspect-ratio: 16/9; scroll-snap-align: center; border-radius: .5rem; display: grid; place-items: center; color: #fff; font-weight: 700; }
+          .showcase .slide:nth-child(1) { background: oklch(58% 0.22 275); }
+          .showcase .slide:nth-child(2) { background: oklch(65% 0.17 150); }
+          .showcase .slide:nth-child(3) { background: oklch(60% 0.22 25); }
+          @supports (scroll-marker-group: after) {
+            .showcase .carousel { scroll-marker-group: after; }
+            .showcase .slide::scroll-marker { content:""; inline-size:.6rem; block-size:.6rem; border-radius:50%; background:oklch(85% 0.012 264); margin:.25rem; }
+            .showcase .slide::scroll-marker:target-current { background: oklch(48% 0.22 275); }
+          }
+        </style>
+
+        <div class="showcase">
+          <section>
+            <h2>Buttons</h2>
+            <div class="row">
+              <button class="btn">Primary</button>
+              <button class="btn btn-ghost">Ghost</button>
+              <button class="btn btn-danger">Danger</button>
+            </div>
+          </section>
+
+          <section>
+            <h2>Cards (scoped)</h2>
+            <div class="cards">
+              <div class="card"><h3>Default card</h3><p>Scoped headings and paragraphs.</p></div>
+              <div class="card success"><h3>Success variant</h3><p>Token override only.</p></div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Form with :has() validation</h2>
+            <form>
+              <label class="field"><span>Email</span><input type="email" placeholder="you@example.com" required></label>
+              <label class="field"><span>Username</span><input type="text" pattern="[a-z0-9]{4,}" placeholder="lowercase, 4+" required></label>
+            </form>
+          </section>
+
+          <section>
+            <h2>Anchored tooltip</h2>
+            <div style="padding-block: 2rem;">
+              <button class="tip-btn">Help</button>
+              <div class="tip">Positioned with CSS anchor positioning</div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Native carousel</h2>
+            <div class="carousel">
+              <div class="slide">One</div>
+              <div class="slide">Two</div>
+              <div class="slide">Three</div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Deliverable</h2>
+      <p>Fork this file. Add a sixth component of your own — a modal, a tabs control, a toast — built with the same discipline: one class entry, scoped token API, <code>@scope</code> for internals, modern selectors for state. No JavaScript. Document its token API in a comment block at the top.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-8.9-navigation-scroll-marker.html">← Lesson 8.9</a>
+      <a href="../../module-09-animations/index.html">Module 9 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

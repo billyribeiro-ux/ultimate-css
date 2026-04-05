@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.2 — Six Layers, Single Responsibilities · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.2</p>
+      <h1>Six Layers, Single Responsibilities</h1>
+      <p class="lead">One job per layer. If a layer owns two jobs, it owns none. The discipline is the architecture.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The declaration</h2>
+      <pre><code>@layer reset, tokens, base, layout, components, animations;</code></pre>
+      <p>Six names, in priority order, from weakest to strongest. Memorise the order. It is not arbitrary — each layer can legitimately override everything below it and never needs to reach above.</p>
+
+      <h2>The six responsibilities</h2>
+      <ol>
+        <li><strong>reset</strong> — eliminate browser defaults. Zero specificity. Wraps every selector in <code>:where()</code>. Never paints, never sizes. Just removes UA opinions so the layers above get a clean slate. Detail: Lesson 3.3.</li>
+        <li><strong>tokens</strong> — single source of truth for design decisions. Only custom properties on <code>:root</code> or theme roots. No selectors that target elements. No type selectors. No class selectors that style something. This layer is <em>data</em>, not styling. Detail: Lesson 3.4.</li>
+        <li><strong>base</strong> — styles for raw HTML elements using tokens. <code>body</code>, <code>h1</code>–<code>h6</code>, <code>p</code>, <code>a</code>, <code>button</code>, form elements. Element selectors only. No classes. This is "what does an unstyled HTML document look like when the design system is applied." Detail: Lesson 3.5.</li>
+        <li><strong>layout</strong> — structural primitives. Stack, cluster, grid, frame, center. No colors, no fonts, no decoration — just the arrangement of things in space. Classes only, and always <em>structural</em> classes. Detail: Lesson 3.6.</li>
+        <li><strong>components</strong> — the named UI pieces: buttons, cards, dialogs, badges, forms. Uses tokens, inherits from base, sits inside layout primitives. Each component has one responsibility and its own scoped custom properties. Detail: Lesson 3.7.</li>
+        <li><strong>animations</strong> — keyframes, transitions, and motion behaviour. The highest priority because accessibility demands it: <code>prefers-reduced-motion</code> lives here and must be able to override anything below. Detail: Lesson 3.8.</li>
+      </ol>
+
+      <h2>The test of single responsibility</h2>
+      <p>For each layer, ask: "If I delete this layer entirely, what breaks, and can I describe it in one sentence?" If the answer is a short sentence, the layer is doing one job. If the answer sprawls, the layer is doing too much — and that is where the next migration will get stuck.</p>
+      <ul>
+        <li>Delete <code>reset</code> → UA defaults come back.</li>
+        <li>Delete <code>tokens</code> → nothing has a value for its custom properties.</li>
+        <li>Delete <code>base</code> → raw HTML elements look unstyled.</li>
+        <li>Delete <code>layout</code> → elements stop being arranged.</li>
+        <li>Delete <code>components</code> → named UI pieces lose their identity.</li>
+        <li>Delete <code>animations</code> → everything is static.</li>
+      </ul>
+      <p>Each description is one clause. That is the shape of a healthy layer.</p>
+
+      <h2>Why this order specifically</h2>
+      <p>Reset must be the weakest because everything else intentionally overrides it. Tokens sit next because they are pure data — nothing collides with them. Base comes after tokens because base <em>uses</em> tokens. Layout comes after base because layout may need to set, say, <code>display: grid</code> on a <code>section</code> that base already styled. Components come after layout because a component lives <em>inside</em> a layout primitive and may need to adjust its own structural properties. Animations come last because reduced-motion overrides must beat everything.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — the stack, populated</h2>
+      <div class="demo-frame">
+        <style>
+          @layer reset32, tokens32, base32, layout32, components32, animations32;
+          @layer reset32 { .demo-3-2 :where(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; } }
+          @layer tokens32 { .demo-3-2 { --c-brand: oklch(58% 0.22 275); --sp-4: 1rem; } }
+          @layer base32 { .demo-3-2 { font-family: system-ui; padding: var(--sp-4); } .demo-3-2 h4 { font-size: 1.125rem; } }
+          @layer layout32 { .demo-3-2 .stack { display: grid; gap: var(--sp-4); } }
+          @layer components32 { .demo-3-2 .btn { background: var(--c-brand); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .375rem; } }
+          @layer animations32 { .demo-3-2 .btn { transition: filter 200ms ease; } .demo-3-2 .btn:hover { filter: brightness(1.1); } }
+        </style>
+        <div class="demo-3-2">
+          <div class="stack">
+            <h4>Six layers, one rendered result</h4>
+            <button class="btn">Hover me — animations layer owns the transition</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="stack"&gt;
+  &lt;h1&gt;PE7 stack&lt;/h1&gt;
+  &lt;p&gt;Each rule below is tagged with its correct layer. Move one into the wrong layer and see what breaks.&lt;/p&gt;
+  &lt;button class="btn"&gt;Press&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, tokens, base, layout, components, animations;
+
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; margin: 0; }
+}
+
+@layer tokens {
+  :root {
+    --c-brand: oklch(58% 0.22 275);
+    --sp-4: 1rem;
+  }
+}
+
+@layer base {
+  body { font-family: system-ui; padding: var(--sp-4); }
+  h1   { font-size: 1.5rem; margin-block-end: var(--sp-4); }
+}
+
+@layer layout {
+  .stack { display: grid; gap: var(--sp-4); }
+}
+
+@layer components {
+  .btn {
+    background: var(--c-brand); color: #fff;
+    padding: .5rem 1rem; border: 0; border-radius: .375rem;
+  }
+}
+
+@layer animations {
+  .btn { transition: filter 200ms ease; }
+  .btn:hover { filter: brightness(1.1); }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Move the <code>.btn</code> rule from <code>components</code> into <code>base</code>. The page still renders — but name, in one sentence, the property of the architecture you just violated. Then move <code>body { padding: ... }</code> into <code>layout</code>. Which rule is now in the wrong layer, and why?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.1-why-architecture-matters.html">← Lesson 3.1</a>
+      <a href="./lesson-3.3-at-layer-reset.html">Lesson 3.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

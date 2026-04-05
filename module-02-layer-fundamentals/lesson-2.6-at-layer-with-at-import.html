@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.6 — @layer with @import · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.6</p>
+      <h1>@layer with @import</h1>
+      <p class="lead">The feature that finally makes third-party CSS safe. You can drop an entire vendor stylesheet into a named layer in a single line, without editing the file or hoping its authors were polite with specificity.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The syntax</h2>
+      <p>Append <code>layer(name)</code> to any <code>@import</code> statement. Every rule in the imported file joins that layer:</p>
+      <pre><code>@import url("normalize.css") layer(reset);
+@import url("bootstrap.css") layer(vendor);
+@import url("./components.css") layer(components);</code></pre>
+      <p>The file you are importing does not need to know about layers. It can be a ten-year-old vendor stylesheet full of IDs and <code>!important</code>. Wrap it in a layer at import time and it becomes a well-behaved citizen of your cascade.</p>
+
+      <h2>Why this is the killer feature</h2>
+      <p>Before layers, the only way to neutralise a misbehaving third-party stylesheet was to match or exceed its specificity, usually with your own <code>!important</code>. That started specificity wars that destroyed codebases. Now, you assign the library to a low layer and forget about it. Your author components in a higher layer always win.</p>
+
+      <h2>The strict rule about placement</h2>
+      <p><code>@import</code> statements — layered or not — must appear at the top of the stylesheet, before any other rule except <code>@charset</code> and <code>@layer</code> declarations. Put an <code>@import</code> after a regular rule and browsers silently drop it. This bites people. Watch for it.</p>
+
+      <h2>The recommended pattern</h2>
+      <p>Declare your full layer order first. Then list your imports, each assigned to its layer. Then populate the remaining layers inline. Your root stylesheet looks like this:</p>
+      <pre><code>/* 1. Declare order */
+@layer reset, tokens, base, layout, components, animations;
+
+/* 2. Assign imports to layers */
+@import url("modern-normalize.css") layer(reset);
+@import url("./tokens.css")         layer(tokens);
+@import url("./base.css")           layer(base);
+
+/* 3. Inline rules continue below */
+@layer components { /* ... */ }</code></pre>
+      <p>That is the entire contract. The order at the top is law. Everything after is plumbing.</p>
+
+      <h2>Anonymous import layers</h2>
+      <p>You can also write <code>@import url(...) layer;</code> with no name. That creates a single-use anonymous layer for that file. Useful for genuinely throwaway imports, but avoid it in architecture — named layers are always easier to reason about.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — conceptual layout</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-2-6 { font-family: ui-monospace, monospace; background: oklch(96% 0.005 264); padding: 1rem; border-radius: .5rem; color: oklch(25% 0.02 264); font-size: .85rem; line-height: 1.6; }
+          .demo-2-6 .k { color: oklch(55% 0.22 290); font-weight: 700; }
+          .demo-2-6 .c { color: oklch(50% 0.02 264); }
+        </style>
+        <pre class="demo-2-6"><span class="c">/* Root stylesheet — real-world skeleton */</span>
+<span class="k">@layer</span> reset, tokens, base, layout, components, animations;
+
+<span class="k">@import</span> url("normalize.css")        layer(reset);
+<span class="k">@import</span> url("./tokens.css")          layer(tokens);
+<span class="k">@import</span> url("./base.css")            layer(base);
+<span class="k">@import</span> url("./components.css")      layer(components);
+
+<span class="c">/* Everything declared at the top wins over imports above. */</span></pre>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="btn"&gt;Simulated third-party button&lt;/button&gt;
+&lt;p&gt;Our @layer components override would neutralise the vendor style.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* The editor sandbox cannot @import, so we simulate:
+   imagine the @layer vendor block comes from a library file. */
+
+@layer vendor, components;
+
+@layer vendor {
+  /* Imagine: @import url("library.css") layer(vendor); */
+  body #root .btn { background: oklch(60% 0.22 25) !important; color: #fff; }
+}
+
+@layer components {
+  .btn { background: oklch(58% 0.22 275); color: #fff; }
+}
+
+.btn { padding: .5rem 1rem; border: 0; border-radius: .375rem; font-family: system-ui; }
+body { font-family: system-ui; padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>The vendor rule in the editor above uses <code>body #root .btn !important</code> — specificity <code>1,2,1</code> plus importance. Your components rule is <code>.btn</code> — <code>0,1,0</code>, no importance. Under the classic cascade, yours could never win. Under layers, it wins trivially. Delete the <code>@layer components</code> block wrapper and watch what happens without layers. Re-wrap it. Explain the before/after in one sentence.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-2.5-unlayered-styles-escape-hatch.html">← Lesson 2.5</a>
+      <a href="./lesson-2.7-sub-layers.html">Lesson 2.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

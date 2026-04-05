@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.3 — Heading Hierarchy from Tokens · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.3</p>
+      <h1>Heading Hierarchy from Tokens</h1>
+      <p class="lead">The reset flattened every heading to body size. The base layer rebuilds the hierarchy — not with magic numbers, but with token references that respond to a single scale change. Plus one modern property that replaces manual line breaks: <code>text-wrap: balance</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Shared heading rule</h2>
+      <p>All six headings share behaviour: a font-family, a weight, a tight line-height, a specific color, and balanced wrapping. Write that once:</p>
+      <pre><code>:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-text-heading);
+  text-wrap: balance;
+}</code></pre>
+      <p>The <code>:where()</code> wrapper keeps specificity at <code>0,0,0</code> even though the selector list is long — so downstream components can override any of these properties with a plain element selector.</p>
+
+      <h2>Per-level sizes</h2>
+      <p>Sizes are the only thing that varies between heading levels. Bind each to its scale token, not to a pixel value:</p>
+      <pre><code>h1 { font-size: var(--size-4xl); letter-spacing: -0.02em; }
+h2 { font-size: var(--size-3xl); letter-spacing: -0.015em; }
+h3 { font-size: var(--size-2xl); letter-spacing: -0.01em; }
+h4 { font-size: var(--size-xl); }
+h5 { font-size: var(--size-lg); }
+h6 { font-size: var(--size-md); }</code></pre>
+      <p>Negative letter-spacing is an opinion: larger type at default tracking looks loose, and pulling it in a fraction of an em makes display-size headlines feel intentional. The effect is invisible at smaller sizes, which is why only h1-h3 carry it.</p>
+
+      <h2>text-wrap: balance</h2>
+      <p>Before <code>text-wrap: balance</code>, designers asked developers to insert <code>&lt;br&gt;</code> tags in headlines so a two-line title would break evenly rather than leaving one word on the second line. <code>balance</code> makes the browser do it automatically, re-flowing on resize. It works best on short headings (under ten words) — longer than that, performance degrades and the browser falls back to normal wrapping.</p>
+
+      <h2>Why the shared rule is first</h2>
+      <p>Cascade order matters inside a layer. The shared <code>:where(h1..h6)</code> rule lists all six headings; the per-level rules are plain element selectors. When both match an <code>h1</code>, the per-level rule (specificity <code>0,0,1</code>) wins over the shared rule (specificity <code>0,0,0</code>) regardless of source order. Source order only matters between rules of equal specificity.</p>
+
+      <h2>What we do not set</h2>
+      <ul>
+        <li>No <code>margin</code> — the layout layer's stack primitive handles spacing via <code>gap</code>.</li>
+        <li>No <code>text-transform</code> — that is a component opinion.</li>
+        <li>No <code>text-decoration</code> — headings are not links.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — balanced vs default wrapping</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-3 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-6-3 > section { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; inline-size: 20rem; max-inline-size: 100%; }
+          .demo-6-3 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-6-3 h1 { margin: 0; font-size: 1.5rem; line-height: 1.15; letter-spacing: -0.015em; color: oklch(20% 0.02 264); font-weight: 700; }
+          .demo-6-3 .balanced h1 { text-wrap: balance; }
+        </style>
+        <div class="demo-6-3">
+          <section>
+            <h4>Default wrapping</h4>
+            <h1>A long headline that naturally wraps awkwardly</h1>
+          </section>
+          <section class="balanced">
+            <h4>text-wrap: balance</h4>
+            <h1>A long headline that naturally wraps awkwardly</h1>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Headlines balance on their own&lt;/h1&gt;
+  &lt;h2&gt;Subheads follow the same token scale&lt;/h2&gt;
+  &lt;h3&gt;And nothing below uses hard-coded pixel values&lt;/h3&gt;
+  &lt;p&gt;Resize the preview pane to see balancing update live.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  :root {
+    --font-sans: system-ui, sans-serif;
+    --size-xl:  1.25rem;
+    --size-2xl: 1.5rem;
+    --size-3xl: 2rem;
+    --heading:  oklch(20% 0.02 264);
+  }
+
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--heading);
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  h1 { font-size: var(--size-3xl); letter-spacing: -0.02em; }
+  h2 { font-size: var(--size-2xl); letter-spacing: -0.015em; }
+  h3 { font-size: var(--size-xl); }
+
+  body { font-family: var(--font-sans); padding: 1rem; max-inline-size: 28rem; }
+  article { display: flex; flex-direction: column; gap: .75rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--size-3xl</code> from <code>2rem</code> to <code>3rem</code> and re-run. Every h1 on the page scales in proportion, and nothing else moves. Now try the same change in a codebase that uses raw pixel values — you will find the pixel values in eight different files. That difference is why tokens exist.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.2-body-root-defaults.html">← Lesson 6.2</a>
+      <a href="./lesson-6.4-paragraph-link-inline.html">Lesson 6.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1.5 — The !important Death Spiral · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 1</a>
+      <span>Lesson 1.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 1.5</p>
+      <h1>The !important Death Spiral</h1>
+      <p class="lead"><code>!important</code> is the nuclear option. It feels like a solution. It is an escalation.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>How !important inverts the cascade</h2>
+      <p>An <code>!important</code> declaration beats all non-<code>!important</code> declarations regardless of specificity. An <code>!important</code> in a low-specificity rule beats a non-<code>!important</code> in a high-specificity rule. The hierarchy is flipped.</p>
+
+      <h2>The trap</h2>
+      <p>When <code>!important</code> is used to fix a specificity problem, the only way to override it is with another <code>!important</code>. Which requires a higher-specificity selector to break ties between the two <code>!important</code> declarations. Which creates an arms race with no winner.</p>
+
+      <h2>Legitimate uses</h2>
+      <ul>
+        <li><strong>Accessibility overrides.</strong> <code>prefers-reduced-motion</code> disabling all animations — Module 3, Lesson 3.8.</li>
+        <li><strong>User stylesheets.</strong> End users overriding author styles for readability.</li>
+        <li><strong>Utility-first systems</strong> that explicitly design for it.</li>
+      </ul>
+
+      <h2>The architectural fix</h2>
+      <p>If you find yourself reaching for <code>!important</code> to make something work, you are not fixing the problem — you are adding debt. The problem is that the cascade has no way to understand your authoring intent. <code>@layer</code> is the fix.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — the arms race</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-1-5 #banner.banner { background: oklch(58% 0.22 275); }
+          .demo-1-5 .banner { background: oklch(65% 0.17 150) !important; }
+        </style>
+        <div id="banner" class="banner demo-1-5" style="padding:1rem; border-radius:.5rem; color:white;">
+          ID + class (1,1,0) should win over .banner (0,1,0)… but <code>!important</code> on the class wins anyway.
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div id="box" class="alert"&gt;Who wins?&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* ID + class = 1,1,0. Should win. */
+#box.alert {
+  background: steelblue;
+  color: white;
+  padding: 1rem;
+}
+
+/* Just a class = 0,1,0. But with !important. */
+.alert {
+  background: crimson !important;
+}
+
+/* To override this, your only option is another !important
+   on a higher-specificity selector. The arms race has begun. */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout danger">
+      <h2>Mini-exercise</h2>
+      <p>Count the <code>!important</code> declarations in a CSS file from a project you have worked on. For each one, write down what it was overriding. How many of them exist purely to fight another <code>!important</code>? That ratio is a proxy for how much the codebase would benefit from <code>@layer</code>.</p>
+    </section>
+
+    <section class="callout success">
+      <h2>Module 1 complete</h2>
+      <p>You now understand, from lived experience, exactly what problem <code>@layer</code> solves. Continue to the module project to diagnose a real broken stylesheet — or jump straight to Module 2 to meet the solution.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-1.4-source-order-fragility.html">← Lesson 1.4</a>
+      <a href="./project/index.html">Module 1 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

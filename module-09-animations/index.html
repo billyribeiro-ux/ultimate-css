@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 9 — @layer animations · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../index.html#modules">Modules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container lesson">
+    <nav class="crumbs" aria-label="Breadcrumbs">
+      <a href="../index.html">Course</a>
+      <span>Module 9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 9 · Motion</p>
+      <h1>@layer animations: Scroll, Motion, and Transitions</h1>
+      <p class="lead">Motion belongs in its own layer — the highest in the stack — because motion is the concern most likely to be overridden for accessibility, and the one that benefits most from being centralized. This module teaches the modern motion primitives: <code>@starting-style</code>, scroll-driven animations, scroll-state container queries, scroll triggers, <code>sibling-index()</code> stagger, and view transitions.</p>
+    </header>
+
+    <section class="lesson-body">
+      <h2>Module goal</h2>
+      <p>Build a complete motion system that lives in one layer, responds to <code>prefers-reduced-motion</code> in one place, and handles nine out of ten common animation needs without a single imperative JavaScript call. Understand where GSAP still belongs — and where it does not.</p>
+
+      <h2>Lessons</h2>
+      <ul class="lesson-list">
+        <li><a href="./lesson-9.1-why-animations-own-layer.html"><span class="num">9.1</span> Why Animations Own Their Layer</a></li>
+        <li><a href="./lesson-9.2-at-starting-style.html"><span class="num">9.2</span> @starting-style: Enter Animations</a></li>
+        <li><a href="./lesson-9.3-scroll-driven-scroll-view.html"><span class="num">9.3</span> Scroll-Driven Animations</a></li>
+        <li><a href="./lesson-9.4-scroll-state-container-queries.html"><span class="num">9.4</span> Scroll-State Container Queries</a></li>
+        <li><a href="./lesson-9.5-scroll-triggered-animations.html"><span class="num">9.5</span> Scroll-Triggered Animations</a></li>
+        <li><a href="./lesson-9.6-sibling-index-stagger.html"><span class="num">9.6</span> sibling-index() Staggered Motion</a></li>
+        <li><a href="./lesson-9.7-view-transitions.html"><span class="num">9.7</span> View Transitions</a></li>
+        <li><a href="./lesson-9.8-gsap-integration.html"><span class="num">9.8</span> GSAP Integration: Division of Labor</a></li>
+      </ul>
+
+      <h2>Module project</h2>
+      <p><a href="./project/index.html">Motion System Demo</a> — a single page combining scroll progress, section reveals, stagger, modals, and a reduced-motion override, all wired through one animations layer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../module-08-components/index.html">← Module 8</a>
+      <a href="./lesson-9.1-why-animations-own-layer.html">Start Lesson 9.1 →</a>
+    </nav>
+  </main>
+</body>
+</html>

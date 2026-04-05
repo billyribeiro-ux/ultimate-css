@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.4 — @layer tokens · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.4</p>
+      <h1>@layer tokens</h1>
+      <p class="lead">Pure data. No selectors that target elements. No styling. The tokens layer is a dictionary of named design decisions, nothing more — and that restriction is exactly what makes it powerful.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single responsibility</h2>
+      <p>The tokens layer defines custom properties on root scopes. That is its whole job. If a rule in this layer sets <em>any</em> standard CSS property — color, font-size, margin — on <em>any</em> element, the boundary has been violated. This layer is a lookup table.</p>
+      <p>Why this purity matters: if tokens can paint, they become indistinguishable from base, and "what value is the brand colour" becomes "well, it depends on which rule fires last." A dictionary that can also paint is not a dictionary.</p>
+
+      <h2>Primitive vs semantic</h2>
+      <p>PE7 tokens have two tiers. Primitives are the raw values; semantic tokens are the named intentions that reference them.</p>
+      <pre><code>@layer tokens {
+  :root {
+    /* Primitives — raw palette */
+    --purple-500: oklch(55% 0.22 290);
+    --purple-600: oklch(48% 0.22 290);
+    --gray-100:   oklch(96% 0.005 264);
+    --gray-900:   oklch(14% 0.015 264);
+
+    /* Semantic — what the app means by these values */
+    --color-brand:         var(--purple-500);
+    --color-brand-hover:   var(--purple-600);
+    --color-surface:       var(--gray-100);
+    --color-text:          var(--gray-900);
+  }
+}</code></pre>
+      <p>Components never reference primitives. They reference semantic tokens. That way, rebranding means changing the semantic aliases, not touching a single component.</p>
+
+      <h2>The six token categories</h2>
+      <ul>
+        <li><strong>Color</strong> — brand, surface, text, border, status (success, warning, danger).</li>
+        <li><strong>Spacing</strong> — a numeric scale (<code>--space-1</code> through <code>--space-12</code>), often T-shirt aliased (<code>--space-xs</code>, <code>--space-md</code>).</li>
+        <li><strong>Type</strong> — family, size scale, weight scale, line-height scale, letter-spacing.</li>
+        <li><strong>Motion</strong> — duration scale, easing functions, predefined transitions.</li>
+        <li><strong>Radius</strong> — a small scale from <code>--radius-sm</code> to <code>--radius-full</code>.</li>
+        <li><strong>Z-index</strong> — named stacking tiers so no component has to guess at magic numbers.</li>
+      </ul>
+      <p>Module 4 covers each category in depth. For now, know that every token in your codebase belongs to exactly one of these six categories. If you invent a seventh, stop and ask whether it is really a token or actually a component decision.</p>
+
+      <h2>What the tokens layer must not contain</h2>
+      <ul>
+        <li>No element selectors. <code>body { --color-brand: ... }</code> is tokens. <code>body { background: ... }</code> is base.</li>
+        <li>No class selectors that style something. <code>[data-theme="dark"] { --color-bg: ... }</code> is tokens (it only sets custom properties). <code>.card { --card-bg: ... }</code> is components.</li>
+        <li>No <code>@media</code> wrapping visual changes. A media query that changes token values is fine; a media query that changes layout is <em>layout</em>.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — tokens as data, applied from elsewhere</h2>
+      <div class="demo-frame">
+        <style>
+          @layer tokens34, base34;
+          @layer tokens34 {
+            .demo-3-4 {
+              --purple-500: oklch(55% 0.22 290);
+              --gray-100: oklch(96% 0.005 264);
+              --gray-900: oklch(14% 0.015 264);
+              --color-brand: var(--purple-500);
+              --color-surface: var(--gray-100);
+              --color-text: var(--gray-900);
+              --space-4: 1rem;
+            }
+          }
+          @layer base34 {
+            .demo-3-4 { background: var(--color-surface); color: var(--color-text); padding: var(--space-4); font-family: system-ui; border-radius: .5rem; }
+            .demo-3-4 strong { color: var(--color-brand); }
+          }
+        </style>
+        <div class="demo-3-4">
+          The <strong>tokens layer</strong> defined <code>--color-brand</code>. The base layer used it. Neither layer knows about the other's details.
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Tokens are data&lt;/h1&gt;
+  &lt;p&gt;Change a primitive — every consumer updates for free.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer tokens, base;
+
+@layer tokens {
+  :root {
+    /* Primitives */
+    --purple-500: oklch(55% 0.22 290);
+    --gray-100:   oklch(96% 0.005 264);
+    --gray-900:   oklch(14% 0.015 264);
+    --space-4:    1rem;
+
+    /* Semantic */
+    --color-brand:   var(--purple-500);
+    --color-surface: var(--gray-100);
+    --color-text:    var(--gray-900);
+  }
+}
+
+@layer base {
+  body {
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-family: system-ui;
+    padding: var(--space-4);
+  }
+  h1 { color: var(--color-brand); margin: 0 0 var(--space-4); }
+  p  { margin: 0; line-height: 1.5; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--purple-500</code> to <code>oklch(60% 0.22 25)</code> (red). The h1 turns red without touching a single base rule. Now try to move the <code>h1 { color: ... }</code> rule into the tokens layer. The code still works — but name the architectural property you just violated, and explain in one sentence why future you will regret it.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.3-at-layer-reset.html">← Lesson 3.3</a>
+      <a href="./lesson-3.5-at-layer-base.html">Lesson 3.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

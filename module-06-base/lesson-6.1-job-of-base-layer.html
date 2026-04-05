@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.1 — The Job of the Base Layer · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.1</p>
+      <h1>The Job of the Base Layer</h1>
+      <p class="lead">Between your design tokens and your first component lies a quiet layer that does all the work nobody notices. Base exists to turn raw HTML into a readable document using tokens alone. Get this layer right and components become trivial; get it wrong and every component re-implements typography.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The bridge</h2>
+      <p>Tokens are numbers without meaning — <code>--size-base: 1rem</code> doesn't know what a paragraph is. Components are meaning without defaults — a <code>.card</code> doesn't know what a heading looks like. Base is the bridge. It takes the tokens and paints them onto every element in the HTML vocabulary: <code>h1</code> through <code>h6</code>, <code>p</code>, <code>a</code>, <code>code</code>, <code>table</code>, <code>blockquote</code>, and so on.</p>
+
+      <h2>Three rules, always</h2>
+      <ol>
+        <li><strong>No classes.</strong> Every selector is an element, a pseudo-element, or an attribute selector on an element. <code>h1</code>, <code>p</code>, <code>a:hover</code>, <code>code</code>, <code>::selection</code>. If you need a class, write a component.</li>
+        <li><strong>No hard-coded values.</strong> Every length, color, and font comes from a token. No <code>font-size: 18px</code>; always <code>font-size: var(--size-lg)</code>. No <code>#333</code>; always <code>color: var(--color-text-primary)</code>.</li>
+        <li><strong>Logical properties only.</strong> <code>margin-block</code> instead of <code>margin-top/bottom</code>, <code>max-inline-size</code> instead of <code>max-width</code>. This is covered in depth in Lesson 6.5.</li>
+      </ol>
+
+      <h2>Why these rules exist</h2>
+      <p>The constraint is what makes base reusable. Two projects with different components but the same token scale can share the same base file verbatim. Two projects with different languages — one LTR, one RTL — can share base because logical properties adapt to writing mode. A project that needs a dark mode can flip it by redefining tokens alone, because base never touches a raw color.</p>
+
+      <h2>What belongs in base</h2>
+      <ul>
+        <li>Root and body defaults (font-family, color, background, color-scheme).</li>
+        <li>Heading sizes and weights, bound to tokens.</li>
+        <li>Paragraph measure, link styles, inline text (<code>strong</code>, <code>em</code>, <code>code</code>, <code>small</code>).</li>
+        <li>List indentation, blockquote styling, horizontal rules.</li>
+        <li>Table defaults.</li>
+        <li>Focus styles via <code>:focus-visible</code>.</li>
+        <li>Selection color.</li>
+      </ul>
+
+      <h2>What does not belong in base</h2>
+      <ul>
+        <li>Anything that targets a class. That is a component.</li>
+        <li>Anything that sets a fixed pixel value. That is a missing token.</li>
+        <li>Layout primitives like <code>.stack</code> or <code>.grid</code>. Those live in <code>@layer layout</code>.</li>
+        <li>Visual polish like shadows on cards or hover states on buttons. Those are components.</li>
+      </ul>
+
+      <h2>The anti-pattern</h2>
+      <p>The most common mistake is writing base rules that target classes: <code>.prose h1 { ... }</code>, <code>.article p { ... }</code>. That is a component dressed as base. It works — until a second project, a second theme, or a second layout wants the same typography without the wrapping class. By keeping base element-only, every project gets the typography for free.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — base vs component responsibility</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-1 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-6-1 > section { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; background: #fff; }
+          .demo-6-1 h4 { margin: 0 0 .5rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-6-1 .base h1 { font-size: 1.4rem; color: oklch(25% 0.02 264); margin: 0; }
+          .demo-6-1 .base p { margin: 0; color: oklch(40% 0.02 264); max-inline-size: 45ch; }
+          .demo-6-1 .base a { color: oklch(55% 0.22 275); }
+          .demo-6-1 .card { padding: .75rem; border-radius: .5rem; background: oklch(96% 0.01 275); border-inline-start: 3px solid oklch(55% 0.22 275); }
+        </style>
+        <div class="demo-6-1">
+          <section class="base">
+            <h4>Base only</h4>
+            <h1>Doc title</h1>
+            <p>Prose rendered by element-only rules. No wrapper classes. Works in any context.</p>
+            <a href="#">A link</a>
+          </section>
+          <section class="base">
+            <h4>Base + a component on top</h4>
+            <div class="card">
+              <h1>Card title</h1>
+              <p>The card is a class in components. The typography inside it is unchanged — it came from base.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Only elements, no classes&lt;/h1&gt;
+  &lt;p&gt;Base sets typography once. Components never repeat it.&lt;/p&gt;
+  &lt;p&gt;Remove the card wrapper; the prose looks identical.&lt;/p&gt;
+&lt;/article&gt;
+&lt;div class="card"&gt;
+  &lt;article&gt;
+    &lt;h1&gt;Inside a component&lt;/h1&gt;
+    &lt;p&gt;Same h1 and p rules apply.&lt;/p&gt;
+  &lt;/article&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base, components;
+
+@layer base {
+  /* Element-only. No classes. Tokens only. */
+  :root { --text: oklch(25% 0.02 264); --muted: oklch(45% 0.02 264); --accent: oklch(55% 0.22 275); }
+  body { font-family: system-ui; color: var(--text); padding: 1rem; }
+  h1 { font-size: 1.25rem; margin: 0; }
+  p  { margin: 0; color: var(--muted); max-inline-size: 45ch; }
+}
+
+@layer components {
+  .card {
+    padding: .75rem;
+    background: oklch(96% 0.01 275);
+    border-inline-start: 3px solid var(--accent);
+    border-radius: .5rem;
+    margin-block-start: 1rem;
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open the base CSS of any project you worked on recently. Count the number of rules that target a class. That count is the number of rules that should not have been in base. Write them down — Module 8 will show you where they actually belong.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 6</a>
+      <a href="./lesson-6.2-body-root-defaults.html">Lesson 6.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

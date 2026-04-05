@@ -1,0 +1,158 @@
+/* =============================================================
+   @layer tokens — Design tokens for the course shell
+   OKLCH color, fluid type, motion, radius, z-index, light-dark()
+   ============================================================= */
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* ---------- Primitive color scales (OKLCH) ---------- */
+
+    /* Neutral / slate */
+    --slate-50:  oklch(98% 0.003 264);
+    --slate-100: oklch(96% 0.005 264);
+    --slate-200: oklch(92% 0.008 264);
+    --slate-300: oklch(85% 0.012 264);
+    --slate-400: oklch(70% 0.015 264);
+    --slate-500: oklch(55% 0.018 264);
+    --slate-600: oklch(44% 0.020 264);
+    --slate-700: oklch(33% 0.020 264);
+    --slate-800: oklch(22% 0.018 264);
+    --slate-900: oklch(14% 0.015 264);
+    --slate-950: oklch(8%  0.012 264);
+
+    /* Brand / indigo */
+    --indigo-100: oklch(95% 0.04 275);
+    --indigo-200: oklch(88% 0.08 275);
+    --indigo-300: oklch(78% 0.13 275);
+    --indigo-400: oklch(68% 0.18 275);
+    --indigo-500: oklch(58% 0.22 275);
+    --indigo-600: oklch(48% 0.22 275);
+    --indigo-700: oklch(40% 0.19 275);
+    --indigo-800: oklch(30% 0.14 275);
+    --indigo-900: oklch(20% 0.09 275);
+
+    /* Accent / teal */
+    --teal-300: oklch(80% 0.12 190);
+    --teal-500: oklch(65% 0.15 190);
+    --teal-700: oklch(45% 0.13 190);
+
+    /* Danger / amber / success */
+    --red-500:   oklch(60% 0.22 25);
+    --amber-500: oklch(78% 0.16 85);
+    --green-500: oklch(65% 0.17 150);
+
+    /* ---------- Semantic color tokens (light-dark) ---------- */
+
+    --color-surface:            light-dark(var(--slate-50),  var(--slate-950));
+    --color-surface-raised:     light-dark(#fff,             var(--slate-900));
+    --color-surface-sunken:     light-dark(var(--slate-100), var(--slate-900));
+    --color-surface-overlay:    light-dark(#fff,             var(--slate-800));
+
+    --color-text-primary:       light-dark(var(--slate-900), var(--slate-100));
+    --color-text-secondary:     light-dark(var(--slate-700), var(--slate-300));
+    --color-text-tertiary:      light-dark(var(--slate-500), var(--slate-400));
+    --color-text-heading:       light-dark(var(--slate-950), var(--slate-50));
+    --color-text-on-primary:    light-dark(#fff,             var(--slate-950));
+
+    --color-border:             light-dark(var(--slate-200), var(--slate-800));
+    --color-border-strong:      light-dark(var(--slate-300), var(--slate-700));
+
+    --color-primary:            light-dark(var(--indigo-600), var(--indigo-400));
+    --color-primary-hover:      light-dark(var(--indigo-700), var(--indigo-300));
+    --color-primary-subtle:     light-dark(var(--indigo-100), var(--indigo-900));
+
+    --color-accent:             light-dark(var(--teal-700),  var(--teal-300));
+
+    --color-link:               var(--color-primary);
+    --color-link-hover:         var(--color-primary-hover);
+    --color-focus:              light-dark(var(--indigo-600), var(--indigo-300));
+
+    --color-danger:             var(--red-500);
+    --color-warning:            var(--amber-500);
+    --color-success:            var(--green-500);
+
+    --color-code-bg:            light-dark(var(--slate-100), var(--slate-900));
+    --color-code-border:        var(--color-border);
+
+    /* ---------- Spacing (rem based) ---------- */
+    --space-2xs: 0.25rem;
+    --space-xs:  0.5rem;
+    --space-sm:  0.75rem;
+    --space-md:  1rem;
+    --space-lg:  1.5rem;
+    --space-xl:  2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+    --space-4xl: 6rem;
+
+    /* ---------- Typography ---------- */
+    --font-sans:  "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-serif: Georgia, "Times New Roman", serif;
+    --font-mono:  "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --size-xs:   0.75rem;
+    --size-sm:   0.875rem;
+    --size-base: 1rem;
+    --size-md:   1.125rem;
+    --size-lg:   1.25rem;
+    --size-xl:   1.5rem;
+    --size-2xl:  1.875rem;
+    --size-3xl:  2.25rem;
+    --size-4xl:  3rem;
+
+    --leading-tight:  1.15;
+    --leading-snug:   1.35;
+    --leading-normal: 1.6;
+    --leading-loose:  1.8;
+
+    --weight-regular:  400;
+    --weight-medium:   500;
+    --weight-semibold: 600;
+    --weight-bold:     700;
+
+    /* ---------- Motion ---------- */
+    --dur-instant:  50ms;
+    --dur-fast:     120ms;
+    --dur-base:     200ms;
+    --dur-moderate: 300ms;
+    --dur-slow:     500ms;
+
+    --ease-out:    cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-in:     cubic-bezier(0.4, 0.0, 1, 1);
+    --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ---------- Radius ---------- */
+    --radius-sm:   0.25rem;
+    --radius-md:   0.5rem;
+    --radius-lg:   0.75rem;
+    --radius-xl:   1rem;
+    --radius-full: 9999px;
+
+    /* ---------- Elevation ---------- */
+    --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.06);
+    --shadow-md: 0 4px 14px oklch(0% 0 0 / 0.10);
+    --shadow-lg: 0 20px 50px oklch(0% 0 0 / 0.18);
+
+    /* ---------- Layout ---------- */
+    --container-max: 72rem;
+    --container-gap: var(--space-lg);
+    --measure:       65ch;
+
+    /* ---------- z-index ---------- */
+    --z-base:    0;
+    --z-raised:  10;
+    --z-overlay: 100;
+    --z-modal:   1000;
+    --z-toast:   2000;
+  }
+
+  /* @property registrations for animatable tokens */
+  @property --color-primary {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: oklch(58% 0.22 275);
+  }
+}

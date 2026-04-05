@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.2 — Box Model Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.2</p>
+      <h1>Box Model Reset</h1>
+      <p class="lead">The default <code>box-sizing: content-box</code> is an accident of history that nobody actually wants. Exactly one line of reset CSS fixes it for every element, every pseudo-element, and every third-party widget on the page.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem, stated precisely</h2>
+      <p>In <code>content-box</code> the <code>width</code> you set is the width of the content alone. Padding and border are added <em>outside</em> that number. A column declared <code>width: 33.333%</code> with <code>padding: 1rem</code> is no longer 33.333% wide — it is 33.333% plus two rems. Three of them in a row overflow their parent.</p>
+      <p>In <code>border-box</code> the width you set includes padding and border. The column you asked for is the column you get. This is what every layout system, every grid framework, and every competent developer has silently wished for since 2001.</p>
+
+      <h2>The rule</h2>
+      <pre><code>@layer reset {
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+}</code></pre>
+      <p>Three targets: every element, every <code>::before</code>, and every <code>::after</code>. The pseudo-elements are not optional — framework components use them for icons, arrows, and dividers, and they inherit nothing by default. Miss them and you get mysterious half-pixel drift in tab indicators and tooltip arrows.</p>
+
+      <h2>Why :where() and not the universal selector alone</h2>
+      <p>The universal selector <code>*</code> already has zero specificity, so the wrapper is redundant <em>for this rule</em>. We use <code>:where()</code> anyway for consistency with the rest of the reset layer. Every reset rule looks the same. No exceptions, no special cases, no "well, this one doesn't need it" conversations in code review.</p>
+
+      <h2>Why not inherit?</h2>
+      <p>Some older resets write <code>html { box-sizing: border-box; } *, *::before, *::after { box-sizing: inherit; }</code>. The inherit pattern was a workaround for third-party widgets that set their own <code>box-sizing</code> on internal elements. Modern third-party CSS either behaves correctly or is already broken in ways a reset cannot fix. The direct form is simpler and wins.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — three-column layout, before and after</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-2 { font-family: system-ui; }
+          .demo-5-2 h4 { margin: 1rem 0 .5rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-5-2 .row { display: flex; outline: 2px dashed oklch(60% 0.22 25); }
+          .demo-5-2 .row > div { width: 33.333%; padding: 1rem; background: oklch(92% 0.05 220); border: 2px solid oklch(55% 0.18 220); }
+          .demo-5-2 .broken > div { box-sizing: content-box; }
+          .demo-5-2 .fixed  > div { box-sizing: border-box; }
+        </style>
+        <div class="demo-5-2">
+          <h4>Broken — content-box (default)</h4>
+          <div class="row broken"><div>col 1</div><div>col 2</div><div>col 3</div></div>
+          <h4>Fixed — border-box via reset</h4>
+          <div class="row fixed"><div>col 1</div><div>col 2</div><div>col 3</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="row"&gt;
+  &lt;div&gt;col 1&lt;/div&gt;
+  &lt;div&gt;col 2&lt;/div&gt;
+  &lt;div&gt;col 3&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Toggle the reset block on and off and watch the
+   last column either fit or overflow. */
+
+@layer reset {
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+}
+
+body { font-family: system-ui; margin: 1rem; }
+.row { display: flex; outline: 2px dashed crimson; }
+.row &gt; div {
+  width: 33.333%;
+  padding: 1rem;
+  border: 2px solid steelblue;
+  background: oklch(92% 0.05 220);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Delete the <code>@layer reset</code> block from the editor above and run. Predict the overflow pixel count before you check. (Hint: two borders and two paddings per column, times three columns, minus the parent's own width.) This is exactly the arithmetic your colleagues are doing in their head every time they write <code>calc(33.333% - 2rem)</code>. A reset makes that arithmetic unnecessary.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.1-what-a-reset-is.html">← Lesson 5.1</a>
+      <a href="./lesson-5.3-typography-reset.html">Lesson 5.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

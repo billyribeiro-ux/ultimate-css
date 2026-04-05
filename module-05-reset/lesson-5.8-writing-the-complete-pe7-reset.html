@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.8 — Writing the Complete PE7 Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.8</p>
+      <h1>Writing the Complete PE7 Reset</h1>
+      <p class="lead">Every rule we introduced in lessons 5.2 through 5.7, assembled into a single file. Each block carries an inline comment explaining why it exists — a reset without justification rots into cargo culting.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The assembled file</h2>
+      <p>This is the reset that ships with the PE7 course shell. Every line is cross-referenced to the lesson that justifies it, and every selector is wrapped in <code>:where()</code>. There are no surprises — if a rule is not in this list, it does not belong in the reset layer.</p>
+      <pre><code>/* =============================================================
+   @layer reset — PE7 production reset
+   Every rule wraps selectors in :where() for zero specificity.
+   Justifications reference Module 5 lessons.
+   ============================================================= */
+
+@layer reset {
+  /* 5.2 — Box model reset */
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+
+  /* 5.3 — Typography: neutralise heading and prose margins */
+  :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+    margin: 0;
+  }
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  /* 5.3 — Opt-in list stripping */
+  :where(ul[role="list"], ol[role="list"]) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* 5.5 — Media elements as blocks, constrained to parent */
+  :where(img, picture, video, canvas, svg) {
+    display: block;
+    max-inline-size: 100%;
+  }
+  :where(img, video) {
+    block-size: auto;
+  }
+
+  /* 5.4 — Form / interactive inheritance */
+  :where(button, input, select, textarea) {
+    font: inherit;
+    color: inherit;
+  }
+  :where(button) {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  :where(textarea) {
+    resize: vertical;
+  }
+  :where(fieldset) {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* 5.3 — Body baseline */
+  :where(body) {
+    min-block-size: 100svh;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 5.6 — Motion reset (accessibility) */
+  @media (prefers-reduced-motion: reduce) {
+    :where(*, *::before, *::after) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}</code></pre>
+
+      <h2>What is not in this file</h2>
+      <ul>
+        <li>No <code>font-family</code>. That is the base layer's job (Lesson 6.2).</li>
+        <li>No <code>color</code> or <code>background-color</code>. That is the base layer's job, driven by tokens.</li>
+        <li>No <code>:focus</code> or <code>:focus-visible</code> rules. Those belong in base (Lesson 6.6).</li>
+        <li>No <code>ul { list-style: none }</code> without the <code>role="list"</code> opt-in. That would be an accessibility regression.</li>
+        <li>No <code>outline: 0</code> anywhere. Removing focus outlines in reset is a WCAG failure.</li>
+      </ul>
+
+      <h2>Line count</h2>
+      <p>The complete reset is under 60 lines including comments. If your reset is longer than that, it is probably doing work that belongs in base. If it is shorter, something was omitted — check the list above.</p>
+
+      <h2>Ordering inside the layer</h2>
+      <p>Because every rule has zero specificity and the layer ordering is unambiguous, the source order <em>within</em> the reset layer is irrelevant for the cascade. We still group rules by concern — box model, typography, media, forms, motion — because humans read source files and grouping is for humans.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — reset applied to raw HTML</h2>
+      <div class="demo-frame">
+        <style>
+          @layer demo58-reset;
+          @layer demo58-reset {
+            .demo-5-8 :where(h1, h2, h3, p) { margin: 0; }
+            .demo-5-8 :where(h1, h2, h3) { font-size: inherit; font-weight: inherit; }
+            .demo-5-8 :where(button) { background: none; border: none; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+            .demo-5-8 :where(img, svg) { display: block; max-inline-size: 100%; }
+          }
+          .demo-5-8 { font-family: system-ui; display: flex; flex-direction: column; gap: .5rem; padding: 1rem; background: oklch(98% 0.005 264); border-radius: .5rem; }
+          .demo-5-8 h1 { font-size: 1rem; }
+          .demo-5-8 button { text-decoration: underline; color: oklch(50% 0.2 275); }
+        </style>
+        <div class="demo-5-8">
+          <h1>After reset, h1 is body-size</h1>
+          <h2>h2 is body-size too</h2>
+          <p>Zero margin on every prose element.</p>
+          <p>Layout gap is the layout layer's job.</p>
+          <button>Button is a text link until components styles it</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Complete reset applied&lt;/h1&gt;
+  &lt;p&gt;Every opinion removed. The base layer rebuilds from tokens.&lt;/p&gt;
+  &lt;button&gt;Chromeless button&lt;/button&gt;
+  &lt;svg viewBox="0 0 80 40" width="80" height="40"&gt;&lt;rect width="80" height="40" fill="teal"/&gt;&lt;/svg&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, base;
+
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; }
+  :where(h1, h2, h3, h4, h5, h6, p) { margin: 0; }
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit; font-weight: inherit; line-height: inherit;
+  }
+  :where(button, input, select, textarea) { font: inherit; color: inherit; }
+  :where(button) { background: none; border: none; padding: 0; cursor: pointer; }
+  :where(img, svg) { display: block; max-inline-size: 100%; }
+}
+
+@layer base {
+  body { font-family: system-ui; padding: 1rem; }
+  article { display: flex; flex-direction: column; gap: .5rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Copy the complete reset from this lesson into a new <code>reset.css</code> file in your own project. Remove your existing reset. Run your app. Anything that breaks is telling you that a rule you thought was in reset was actually doing base-layer work. Move it to base.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.7-taming-third-party-css.html">← Lesson 5.7</a>
+      <a href="./project/index.html">Module 5 project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

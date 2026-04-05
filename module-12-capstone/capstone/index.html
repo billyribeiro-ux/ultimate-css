@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prism — Design system hosting for engineering teams</title>
+  <meta name="description" content="Prism is design system hosting for engineering teams. Version, preview, and ship your tokens and components from one place.">
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#top">prism<span>.</span></a>
+      <nav aria-label="Primary">
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#testimonials">Customers</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+      <div class="cluster">
+        <a class="btn btn-ghost" href="#signin">Sign in</a>
+        <a class="btn" href="#signup">Start free</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <span class="hero-eyebrow">New · v4.0 released</span>
+        <h1>Ship design systems the way you ship code.</h1>
+        <p class="lead">Prism is the first design system host that versions your tokens, previews your components in every theme, and deploys to production in one command.</p>
+        <div class="hero-cta">
+          <a class="btn btn-lg" href="#signup">Start free — no card required</a>
+          <a class="btn btn-ghost btn-lg" href="#demo">Watch the demo</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="container stack-2xl">
+        <div class="section-header">
+          <h2>Everything a design system needs. Nothing it doesn't.</h2>
+          <p>Six features that remove 90% of the work between a design decision and production code.</p>
+        </div>
+        <div class="grid features-grid" style="--grid-min: 18rem;">
+
+          <article class="feature-card">
+            <div class="icon">T</div>
+            <h3>Token versioning</h3>
+            <p>Every token change is a git commit. Roll back a breaking color change across every product in seconds.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">C</div>
+            <h3>Component previews</h3>
+            <p>See every component in every theme, every breakpoint, every state — before you merge.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">D</div>
+            <h3>Dark mode first</h3>
+            <p>Every token is defined for light and dark from day one. Theme switching is a CSS variable change.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">A</div>
+            <h3>Accessibility audits</h3>
+            <p>Contrast, focus visibility, and motion safety are checked on every pull request.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">S</div>
+            <h3>Framework-free</h3>
+            <p>Prism outputs raw CSS variables and web components. No React lock-in. No build step.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="icon">G</div>
+            <h3>Git-native</h3>
+            <p>Prism lives in your repo. Branches, PRs, reviews — it all just works.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="section" id="pricing">
+      <div class="container stack-2xl">
+        <div class="section-header">
+          <h2>Priced to scale with your team.</h2>
+          <p>Start free. Upgrade when you ship your first production token.</p>
+        </div>
+        <div class="grid" style="--grid-min: 18rem;">
+
+          <article class="pricing-card">
+            <span class="tier">Starter</span>
+            <div class="price">$0 <span>/ month</span></div>
+            <p>For individual developers and solo designers.</p>
+            <ul>
+              <li>Up to 50 tokens</li>
+              <li>3 components</li>
+              <li>Public previews</li>
+              <li>Community support</li>
+            </ul>
+            <a class="btn btn-ghost" href="#signup">Start free</a>
+          </article>
+
+          <article class="pricing-card popular">
+            <span class="tier">Team</span>
+            <div class="price">$29 <span>/ user / month</span></div>
+            <p>For product teams shipping to production.</p>
+            <ul>
+              <li>Unlimited tokens</li>
+              <li>Unlimited components</li>
+              <li>Private previews</li>
+              <li>Accessibility audits</li>
+              <li>Priority support</li>
+            </ul>
+            <a class="btn" href="#signup">Start 14-day trial</a>
+          </article>
+
+          <article class="pricing-card">
+            <span class="tier">Enterprise</span>
+            <div class="price">Custom</div>
+            <p>For organizations with multiple products.</p>
+            <ul>
+              <li>Everything in Team</li>
+              <li>SSO &amp; SCIM</li>
+              <li>On-premise option</li>
+              <li>Dedicated support engineer</li>
+              <li>99.99% SLA</li>
+            </ul>
+            <a class="btn btn-ghost" href="#contact">Talk to sales</a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="section" id="testimonials">
+      <div class="container stack-2xl">
+        <div class="section-header">
+          <h2>Trusted by teams who ship.</h2>
+          <p>From design-led startups to enterprise platforms.</p>
+        </div>
+        <div class="grid" style="--grid-min: 22rem;">
+
+          <figure class="testimonial">
+            <blockquote>"Prism made our design system usable. Before, it lived in a Figma file no engineer ever opened. Now every token is in the repo and every commit passes through our design review."</blockquote>
+            <figcaption class="author">
+              <div class="avatar">AR</div>
+              <div><strong>Amira Rahman</strong> · Staff Engineer, Orbit</div>
+            </figcaption>
+          </figure>
+
+          <figure class="testimonial">
+            <blockquote>"We replaced three internal tools with Prism and our design-to-production cycle went from two weeks to two days. Accessibility audits on every PR changed how we think about contrast."</blockquote>
+            <figcaption class="author">
+              <div class="avatar">JK</div>
+              <div><strong>Jun Kawasaki</strong> · Head of Design, Figment</div>
+            </figcaption>
+          </figure>
+
+          <figure class="testimonial">
+            <blockquote>"Zero framework lock-in was the killer feature. Our mobile app, web app, and docs site all consume the same Prism output without touching a single bundler."</blockquote>
+            <figcaption class="author">
+              <div class="avatar">LP</div>
+              <div><strong>Lena Petrov</strong> · CTO, Terrace</div>
+            </figcaption>
+          </figure>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="container stack-2xl">
+        <div class="section-header">
+          <h2>Questions, answered.</h2>
+        </div>
+        <div class="faq" style="max-inline-size: 48rem; margin-inline: auto; inline-size: 100%;">
+
+          <details>
+            <summary>Do I need a framework to use Prism?</summary>
+            <p>No. Prism outputs raw CSS custom properties and standards-compliant web components. It works with React, Vue, Svelte, Angular, or plain HTML — or all of them at once.</p>
+          </details>
+
+          <details>
+            <summary>How does Prism handle dark mode?</summary>
+            <p>Every semantic color token is defined with <code>light-dark()</code>. Dark mode follows the user's OS preference by default, with no class toggling or JavaScript required.</p>
+          </details>
+
+          <details>
+            <summary>Can I self-host Prism?</summary>
+            <p>Yes. The Enterprise plan includes an on-premise option with Docker images and a documented install path.</p>
+          </details>
+
+          <details>
+            <summary>What browsers does Prism output support?</summary>
+            <p>Prism output targets Chrome, Firefox, Safari, and Edge — all evergreen versions. Modern features like container queries, <code>@layer</code>, and OKLCH are required.</p>
+          </details>
+
+          <details>
+            <summary>Is there a free tier?</summary>
+            <p>Yes. The Starter plan is free forever for up to 50 tokens and 3 components — enough for individual developers and small side projects.</p>
+          </details>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>prism. — design system hosting for engineering teams</div>
+      <div class="cluster">
+        <a href="#privacy">Privacy</a>
+        <a href="#terms">Terms</a>
+        <a href="#security">Security</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- COOKIE CONSENT — popover API, no JS -->
+  <div id="cookies" popover class="cookie-banner">
+    <p>We use a single cookie to remember you selected a theme. No tracking, no analytics.</p>
+    <div class="cluster">
+      <button class="btn btn-ghost" popovertarget="cookies" popovertargetaction="hide">Decline</button>
+      <button class="btn" popovertarget="cookies" popovertargetaction="hide">Accept</button>
+    </div>
+  </div>
+
+</body>
+</html>

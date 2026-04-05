@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.6 — Anchor Positioning &amp; Tooltips · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.6</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Anchor Positioning &amp; Tooltips</h1>
+      <p class="lead">Popper.js exists because CSS used to be unable to position one element relative to another without a common parent. That is no longer true. CSS anchor positioning replaces an entire category of JavaScript libraries with five declarative lines.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem</h2>
+      <p>A tooltip must: (1) appear next to its trigger, (2) escape its ancestor's <code>overflow: hidden</code>, (3) flip to the opposite side when it would clip the viewport, and (4) update on scroll and resize. The old answer was Popper.js plus a mutation observer. The new answer is anchor positioning plus <code>popover</code>.</p>
+
+      <h2>The four primitives</h2>
+      <ol>
+        <li><strong><code>anchor-name: --trigger</code></strong> on the element to anchor to.</li>
+        <li><strong><code>position-anchor: --trigger</code></strong> on the element being positioned.</li>
+        <li><strong><code>position-area: top center</code></strong> to pick a side relative to the anchor.</li>
+        <li><strong><code>position-try-fallbacks: flip-block</code></strong> so the browser flips when the default side would clip.</li>
+      </ol>
+
+      <h2>Combined with popover</h2>
+      <p>The <code>popover</code> attribute promotes an element to the top layer — it renders above every ancestor's stacking context, is dismissed by ESC and light-dismiss automatically, and is keyboard-accessible for free. Anchor positioning + popover is the complete replacement:</p>
+      <pre><code>&lt;button popovertarget="tip"&gt;Help&lt;/button&gt;
+&lt;div id="tip" popover style="anchor-name: none; position-anchor: --btn"&gt;Tooltip text&lt;/div&gt;</code></pre>
+
+      <h2>Browser support</h2>
+      <p>Chrome 125+, Edge 125+. Safari and Firefox still catching up. Always wrap in <code>@supports (anchor-name: --x)</code> and provide a fixed-position fallback, or fall through to a plain <code>title</code> attribute for non-supporting browsers.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — anchored tooltip</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-6 { padding: 2rem; }
+          .demo-8-6 .tip-btn {
+            anchor-name: --tipbtn;
+            padding: .5rem 1rem; border: 1px solid oklch(85% 0.012 264);
+            background: #fff; border-radius: .375rem; cursor: pointer;
+          }
+          .demo-8-6 .tip {
+            position: absolute;
+            position-anchor: --tipbtn;
+            position-area: top center;
+            margin-block-end: .5rem;
+            padding: .4rem .6rem;
+            background: oklch(22% 0.018 264);
+            color: #fff; font-size: .75rem;
+            border-radius: .25rem;
+            white-space: nowrap;
+          }
+          @supports not (position-anchor: --x) {
+            .demo-8-6 .tip { position: static; display: inline-block; margin-inline-start: .5rem; }
+          }
+        </style>
+        <div class="demo-8-6">
+          <button class="tip-btn">Hover or focus me</button>
+          <div class="tip">Anchored above the trigger</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;p&gt;Some paragraph text with an &lt;button class="ref"&gt;explanation&lt;/button&gt; inline.&lt;/p&gt;
+&lt;div class="tooltip" role="tooltip"&gt;This is the tooltip body.&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+p { line-height: 1.8; }
+
+.ref {
+  anchor-name: --ref;
+  background: oklch(95% 0.04 275);
+  border: 1px solid oklch(78% 0.13 275);
+  color: oklch(40% 0.19 275);
+  padding: .1rem .4rem; border-radius: .25rem; cursor: help;
+}
+
+@supports (anchor-name: --x) {
+  .tooltip {
+    position: absolute;
+    position-anchor: --ref;
+    position-area: top center;
+    position-try-fallbacks: flip-block;
+    margin-block-end: .5rem;
+    background: oklch(22% 0.018 264);
+    color: #fff;
+    padding: .5rem .75rem;
+    border-radius: .375rem;
+    font-size: .8rem;
+    max-inline-size: 16rem;
+  }
+}
+
+@supports not (anchor-name: --x) {
+  .tooltip { display: inline-block; background: #222; color: #fff; padding: .5rem; border-radius: .25rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>position-area</code> to <code>bottom end</code>. Then add a second fallback: <code>position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline</code>. Resize the preview until you see the tooltip flip to stay on-screen — all without a line of JavaScript.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.5-card-component-at-scope.html">← Lesson 8.5</a>
+      <a href="./lesson-8.7-form-component-has-validation.html">Lesson 8.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

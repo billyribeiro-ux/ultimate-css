@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.1 — What a Reset Actually Is · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.1</p>
+      <h1>What a Reset Actually Is</h1>
+      <p class="lead">Reset, normalize, and baseline are three different tools with three different jobs. Pick the wrong one and you will spend the rest of the project fighting your own foundation. In PE7 we want a reset — specifically, a subtractive reset with zero specificity.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Three strategies, one foundation</h2>
+      <ul>
+        <li><strong>Reset</strong> — remove everything the browser gives you. Margins, padding, list styles, heading sizes: gone. You rebuild the world in the base layer. Eric Meyer's reset is the classic example.</li>
+        <li><strong>Normalize</strong> — keep the browser's decisions but smooth out the differences between vendors. This is <em>addition</em>, not subtraction, and it bakes opinions into the foundation.</li>
+        <li><strong>Baseline</strong> — a reset plus a few opinionated defaults (sensible typography, sensible form chrome). Halfway between the other two.</li>
+      </ul>
+
+      <h2>Why PE7 picks reset</h2>
+      <p>Normalize hides the user agent stylesheet behind a layer of "sensible" author decisions. That is exactly the wrong thing for a layered architecture: every layer above reset now has to reason about <em>both</em> the UA styles <em>and</em> normalize's patches. A pure reset leaves only one question for the base layer to answer: "what should this element look like in this project?"</p>
+
+      <h2>Reset is subtraction</h2>
+      <p>If a rule in your reset adds a color, a shadow, a font family, or any visual opinion, it does not belong in reset. It belongs in base. The reset layer exists to remove, not to decorate. This is the rule that keeps the architecture honest.</p>
+
+      <h2>:where() and zero specificity</h2>
+      <p>Every rule in the PE7 reset wraps its selector list in <code>:where()</code>. The functional pseudo-class <code>:where()</code> evaluates to specificity <code>0,0,0</code> regardless of what it contains. That means a plain <code>.card</code> in your components layer — specificity <code>0,1,0</code> — always outranks the reset, even without <code>@layer</code> priority doing any work. <code>:where()</code> is a belt-and-suspenders guarantee.</p>
+
+      <h2>A concrete contrast</h2>
+      <pre><code>/* Bad: reset that will fight you later */
+* { margin: 0; padding: 0; }
+ul { list-style: none; }
+
+/* PE7 reset: zero specificity, layered, deliberate */
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; }
+  :where(h1, h2, h3, p) { margin: 0; }
+  :where(ul[role="list"]) { list-style: none; padding: 0; }
+}</code></pre>
+      <p>The first form forces unauthored <code>&lt;ul&gt;</code> elements in article content to lose their bullets — an accessibility regression. The PE7 form only strips lists that are semantically marked as non-list UI (the <code>role="list"</code> opt-in), and it costs zero specificity so overriding it is trivial.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Live demo — three strategies side by side</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-1 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; font-family: system-ui; }
+          .demo-5-1 > div { border: 1px solid oklch(85% 0.01 264); padding: 1rem; border-radius: .5rem; }
+          .demo-5-1 h4 { margin: 0 0 .5rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-5-1 .raw h1 { /* UA only */ }
+          .demo-5-1 .normalize h1 { font-size: 2em; margin: .67em 0; }
+          .demo-5-1 .reset :where(h1) { font-size: inherit; font-weight: inherit; margin: 0; }
+          .demo-5-1 .reset :where(p) { margin: 0; }
+          .demo-5-1 h1 { font-size: 2em; }
+        </style>
+        <div class="demo-5-1">
+          <div class="raw">
+            <h4>Raw UA</h4>
+            <h1>Title</h1>
+            <p>Paragraph text.</p>
+          </div>
+          <div class="normalize">
+            <h4>Normalize (patched UA)</h4>
+            <h1>Title</h1>
+            <p>Paragraph text.</p>
+          </div>
+          <div class="reset">
+            <h4>Reset (subtractive)</h4>
+            <h1>Title</h1>
+            <p>Paragraph text.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Bullets stay, heading flattens&lt;/h1&gt;
+  &lt;p&gt;Reset only strips opt-in structures.&lt;/p&gt;
+  &lt;ul&gt;&lt;li&gt;Article list keeps bullets&lt;/li&gt;&lt;li&gt;Accessibility preserved&lt;/li&gt;&lt;/ul&gt;
+  &lt;ul role="list"&gt;&lt;li&gt;Navigation list loses them&lt;/li&gt;&lt;li&gt;Because role=list opted in&lt;/li&gt;&lt;/ul&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* PE7-style reset fragment. Zero specificity.
+   Watch the two &lt;ul&gt;s behave differently. */
+
+@layer reset {
+  :where(h1, p) { margin: 0; }
+  :where(h1) { font-size: inherit; font-weight: inherit; }
+  :where(ul[role="list"]) { list-style: none; padding: 0; }
+}
+
+@layer base {
+  body { font-family: system-ui; padding: 1rem; }
+  h1 { font-size: 1.25rem; border-bottom: 2px solid #333; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take any reset you have used in a previous project. For every rule in it, decide: does this rule <em>subtract</em> a browser default, or does it <em>add</em> a visual opinion? Every rule that adds an opinion belongs in base, not reset. Count how many rules you need to move. That count is a measure of how much architectural debt your old foundation carries.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 5</a>
+      <a href="./lesson-5.2-box-model-reset.html">Lesson 5.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

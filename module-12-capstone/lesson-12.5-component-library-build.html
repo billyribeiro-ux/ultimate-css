@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.5 — Component Library Build · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.5</p>
+      <h1>Component Library Build</h1>
+      <p class="lead">Build every component Prism needs, using <code>@scope</code> for internal styling and component-scoped custom properties for the variant API.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The component list</h2>
+      <ul>
+        <li><strong>nav</strong> — sticky bar with anchor-positioned dropdown</li>
+        <li><strong>hero</strong> — gradient heading, CTA pair</li>
+        <li><strong>feature-card</strong> — responsive via container queries</li>
+        <li><strong>pricing-card</strong> — three tiers, a "popular" variant using only a custom property override</li>
+        <li><strong>testimonial-slide</strong> — carousel slide inside a <code>::scroll-marker</code>-enabled list</li>
+        <li><strong>faq-item</strong> — built on <code>&lt;details&gt;/&lt;summary&gt;</code></li>
+        <li><strong>cookie-banner</strong> — <code>popover</code> API</li>
+        <li><strong>footer</strong> — cluster layout</li>
+      </ul>
+
+      <h2>The component contract</h2>
+      <p>Every component: one class at the root, a documented custom property API, <code>@scope</code> for internal element styling, zero JavaScript for state. Variants override only custom properties — never specificity.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — pricing card with a "popular" variant override</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-12-5 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; font-family: system-ui; }
+          .demo-12-5 .pricing-card {
+            --card-bg: oklch(98% 0.003 264);
+            --card-border: oklch(85% 0.012 264);
+            --card-accent: oklch(14% 0.015 264);
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: .75rem;
+            color: oklch(14% 0.015 264);
+          }
+          .demo-12-5 .pricing-card.popular {
+            --card-bg: oklch(95% 0.04 275);
+            --card-border: oklch(48% 0.22 275);
+            --card-accent: oklch(48% 0.22 275);
+          }
+          .demo-12-5 .pricing-card h3 { margin: 0 0 .25rem; color: var(--card-accent); }
+          .demo-12-5 .pricing-card .price { font-size: 2rem; font-weight: 700; }
+        </style>
+        <div class="demo-12-5">
+          <div class="pricing-card"><h3>Starter</h3><div class="price">$9</div></div>
+          <div class="pricing-card popular"><h3>Pro</h3><div class="price">$29</div></div>
+          <div class="pricing-card"><h3>Team</h3><div class="price">$79</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="cards"&gt;
+  &lt;article class="pricing-card"&gt;
+    &lt;h3&gt;Starter&lt;/h3&gt;
+    &lt;p class="price"&gt;$9&lt;/p&gt;
+    &lt;button class="btn"&gt;Choose&lt;/button&gt;
+  &lt;/article&gt;
+  &lt;article class="pricing-card popular"&gt;
+    &lt;h3&gt;Pro&lt;/h3&gt;
+    &lt;p class="price"&gt;$29&lt;/p&gt;
+    &lt;button class="btn"&gt;Choose&lt;/button&gt;
+  &lt;/article&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* Base component — defines the custom property API */
+.pricing-card {
+  --card-bg: oklch(98% 0.003 264);
+  --card-border: oklch(85% 0.012 264);
+  --card-accent: oklch(14% 0.015 264);
+  --card-btn-bg: oklch(14% 0.015 264);
+  --card-btn-color: white;
+
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: .75rem;
+}
+.pricing-card h3 { margin: 0 0 .5rem; color: var(--card-accent); }
+.pricing-card .price { font-size: 2rem; font-weight: 700; margin: 0 0 1rem; }
+.pricing-card .btn {
+  background: var(--card-btn-bg);
+  color: var(--card-btn-color);
+  padding: .5rem 1rem;
+  border-radius: .375rem;
+}
+
+/* Variant — overrides only custom properties */
+.pricing-card.popular {
+  --card-bg: oklch(95% 0.04 275);
+  --card-border: oklch(48% 0.22 275);
+  --card-accent: oklch(48% 0.22 275);
+  --card-btn-bg: oklch(48% 0.22 275);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third variant — <code>.pricing-card.enterprise</code> — by overriding only the four custom properties. Zero new rules on <code>h3</code>, <code>.price</code>, or <code>.btn</code>. If you find yourself writing new selectors, you are escalating. Revisit.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.4-layout-primitives-build.html">← Lesson 12.4</a>
+      <a href="./lesson-12.6-motion-system-build.html">Lesson 12.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

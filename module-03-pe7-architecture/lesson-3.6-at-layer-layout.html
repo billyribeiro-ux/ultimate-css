@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.6 — @layer layout · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.6</p>
+      <h1>@layer layout</h1>
+      <p class="lead">Arrangement in space. Nothing else. The layout layer holds structural primitives — stack, cluster, grid, center, frame — and it is forbidden from ever setting a colour or a font.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single responsibility</h2>
+      <p>The layout layer arranges things in two dimensions. It decides what is a row, what is a column, what is a grid, how many tracks, what the gap is, what the inline size is. It does not decide what those things look like.</p>
+      <p>If you can delete every rule in the layout layer and the page still has the right colours, fonts, and decorations — just wrong arrangement — the layer is doing its job.</p>
+
+      <h2>Primitive vocabulary</h2>
+      <p>PE7 ships a small, deliberate vocabulary of layout primitives. Every project uses roughly the same ones. Module 5 covers each in detail. Here is the preview:</p>
+      <ul>
+        <li><strong>stack</strong> — vertical flow with a consistent gap between children.</li>
+        <li><strong>cluster</strong> — horizontal flow that wraps, for rows of tags, buttons, breadcrumbs.</li>
+        <li><strong>grid</strong> — auto-fit responsive grid for card layouts.</li>
+        <li><strong>center</strong> — horizontally centered content with a max inline size.</li>
+        <li><strong>frame</strong> — aspect-ratio container for media.</li>
+        <li><strong>switcher</strong> — a row that collapses to a column below a container breakpoint.</li>
+        <li><strong>sidebar</strong> — main-content-plus-sidebar that collapses sensibly.</li>
+      </ul>
+      <p>Every layout need in a normal product application composes from these. If you find yourself reaching for a one-off layout in a component, stop — the right move is usually to add a new primitive to the layout layer.</p>
+
+      <h2>Canonical primitives</h2>
+      <pre><code>@layer layout {
+  .stack {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+
+  .center {
+    box-sizing: content-box;
+    max-inline-size: var(--measure-wide);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+
+  .frame {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+}</code></pre>
+      <p>Notice: every value comes from a token. The <em>structure</em> is the layout layer's decision. The <em>spacing</em> is still a tokens responsibility that layout consumes.</p>
+
+      <h2>What layout must not contain</h2>
+      <ul>
+        <li>No colours. Not even background for "visual separation." That is components.</li>
+        <li>No typography. A layout primitive does not set <code>font-family</code> or <code>font-size</code>.</li>
+        <li>No borders or shadows. Those are decoration — components own decoration.</li>
+        <li>No element selectors. Layout is classes only.</li>
+        <li>No component names. A <code>.card-grid</code> rule is a component, not a layout primitive. The layer is <code>.grid</code>; the component reuses it.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — stack, cluster, grid</h2>
+      <div class="demo-frame">
+        <style>
+          @layer tokens36, layout36, components36;
+          @layer tokens36 {
+            .demo-3-6 { --space-3: .75rem; --space-4: 1rem; }
+          }
+          @layer layout36 {
+            .demo-3-6 .stack   { display: grid; gap: var(--space-4); }
+            .demo-3-6 .cluster { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+            .demo-3-6 .grid    { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
+          }
+          @layer components36 {
+            .demo-3-6 .box { background: oklch(90% 0.02 275); padding: var(--space-3); border-radius: .375rem; text-align: center; }
+            .demo-3-6 .pill { background: oklch(58% 0.22 275); color: #fff; padding: .25rem .75rem; border-radius: 999px; font-size: .8rem; }
+          }
+          .demo-3-6 { font-family: system-ui; }
+        </style>
+        <div class="demo-3-6">
+          <div class="stack">
+            <div class="cluster">
+              <span class="pill">stack</span><span class="pill">cluster</span><span class="pill">grid</span><span class="pill">center</span>
+            </div>
+            <div class="grid">
+              <div class="box">1</div><div class="box">2</div><div class="box">3</div><div class="box">4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="stack"&gt;
+  &lt;div class="cluster"&gt;
+    &lt;span class="pill"&gt;one&lt;/span&gt;
+    &lt;span class="pill"&gt;two&lt;/span&gt;
+    &lt;span class="pill"&gt;three&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="grid"&gt;
+    &lt;div class="box"&gt;A&lt;/div&gt;
+    &lt;div class="box"&gt;B&lt;/div&gt;
+    &lt;div class="box"&gt;C&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer tokens, layout, components;
+
+@layer tokens {
+  :root { --space-3: .75rem; --space-4: 1rem; }
+}
+
+@layer layout {
+  .stack   { display: grid; gap: var(--space-4); }
+  .cluster { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .grid    { display: grid; gap: var(--space-4);
+             grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
+}
+
+@layer components {
+  .pill { background: oklch(58% 0.22 275); color: #fff;
+          padding: .25rem .75rem; border-radius: 999px; }
+  .box  { background: oklch(90% 0.02 275); padding: var(--space-3);
+          border-radius: .375rem; text-align: center; }
+}
+
+body { font-family: system-ui; padding: var(--space-4); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add <code>background: oklch(90% 0.02 264);</code> to the <code>.stack</code> rule inside the layout layer. It works. The page has a background now. Describe in one sentence which rule you just broke, and why the page will still "look fine" on this page but the decision will cost you later.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.5-at-layer-base.html">← Lesson 3.5</a>
+      <a href="./lesson-3.7-at-layer-components.html">Lesson 3.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

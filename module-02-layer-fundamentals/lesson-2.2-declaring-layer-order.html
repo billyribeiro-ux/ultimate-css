@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.2 — Declaring Layer Order · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.2</p>
+      <h1>Declaring Layer Order</h1>
+      <p class="lead">The single line that defines your entire architecture. Once you write it, where the rules physically live in the file stops mattering — the declaration freezes the priority order.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The declaration form</h2>
+      <p>A bare <code>@layer</code> statement with a list of names — and nothing else — declares the layers and <strong>their priority order</strong>, from lowest to highest:</p>
+      <pre><code>@layer reset, tokens, base, layout, components, animations;</code></pre>
+      <p>Read that line out loud: "<em>reset</em> is the lowest priority layer, <em>animations</em> is the highest, and everything in between is stacked in the order written." That order is now locked for the rest of the document. It does not matter where you populate each layer or how late in the file you do it.</p>
+
+      <h2>Last-wins</h2>
+      <p>The rule is dead simple: the layer named <em>last</em> in the declaration has the highest priority. First in the list is weakest. If you want <code>animations</code> to override <code>components</code>, put it after <code>components</code>. That is the entire API.</p>
+
+      <h2>Physical position is irrelevant — once declared</h2>
+      <p>Before the declaration line exists, CSS falls back to "layers are ordered by first appearance." That means a layer referenced lower in the file beats one referenced higher. That is fragile — add one import and your cascade flips.</p>
+      <p>The fix is to <em>always</em> put the bare declaration at the top of your entry stylesheet. Once declared, you can populate layers in any order, in any file, loaded at any time, and the priority stays fixed. This is what makes <code>@layer</code> scale.</p>
+
+      <h2>Best practice</h2>
+      <p>Declare all your layers on line 1 of your root stylesheet, even the ones you are not using yet. It costs nothing. It prevents every "why did adding a file break my cascade" bug.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — declaration freezes the order</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-2-2 { font-family: system-ui; padding: .5rem; }
+          @layer a2, b2;
+          /* b2 is populated FIRST in source order, but declared SECOND — so b2 wins. */
+          @layer b2 { .demo-2-2 .box { background: oklch(58% 0.22 275); color: #fff; } }
+          @layer a2 { .demo-2-2 .box { background: oklch(65% 0.17 150); color: #fff; } }
+          .demo-2-2 .box { padding: 1rem; border-radius: .375rem; }
+        </style>
+        <div class="demo-2-2">
+          <div class="box">b2 is populated first in the file, but declared second. It still wins. You see indigo.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="box"&gt;Swap the declaration order on line 1. Watch the color flip.&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* The bare declaration locks priority: last name = highest. */
+@layer reset, components;
+
+/* Populated out of order on purpose. */
+@layer components {
+  .box { background: oklch(58% 0.22 275); color: #fff; }
+}
+
+@layer reset {
+  .box { background: oklch(65% 0.17 150); color: #fff; }
+}
+
+.box { padding: 1rem; border-radius: .5rem; font-family: system-ui; }
+body { padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Swap the names on the first line to <code>@layer components, reset;</code> and run. The box should turn green. Then delete the first line entirely. What happens and why?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-2.1-what-is-at-layer.html">← Lesson 2.1</a>
+      <a href="./lesson-2.3-populating-layers.html">Lesson 2.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

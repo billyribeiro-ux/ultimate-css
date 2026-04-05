@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 6 — @layer base: Typography, Logic, Dark Mode · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../index.html#modules">Modules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container lesson">
+    <nav class="crumbs" aria-label="Breadcrumbs">
+      <a href="../index.html">Course</a>
+      <span>Module 6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 6 · Layer</p>
+      <h1>@layer base: Typography, Logic, Dark Mode</h1>
+      <p class="lead">The base layer is where raw HTML becomes a usable document. It sits between tokens and components and has one job: turn every element in the user-agent vocabulary into something readable using only the design tokens from Module 4. No classes. No hard-coded values. No exceptions.</p>
+    </header>
+
+    <section class="lesson-body">
+      <h2>Module goal</h2>
+      <p>Write a complete base layer that a documentation site could ship with tomorrow — responsive typography driven by tokens, logical properties throughout, focus styles that meet WCAG, automatic dark mode via OKLCH, and prose refinements gated by <code>@supports</code>.</p>
+
+      <h2>The single-author rule</h2>
+      <p>Every selector in base matches a raw HTML element. No <code>.class</code>, no <code>#id</code>, no <code>[data-*]</code>. If a rule needs a class, it belongs in components. This constraint is what keeps base from growing into a second component layer — and it is the reason base can be written once and reused across projects that share a token system.</p>
+
+      <h2>Lessons</h2>
+      <ul class="lesson-list">
+        <li><a href="./lesson-6.1-job-of-base-layer.html"><span class="num">6.1</span> The Job of the Base Layer</a></li>
+        <li><a href="./lesson-6.2-body-root-defaults.html"><span class="num">6.2</span> :root and body Defaults</a></li>
+        <li><a href="./lesson-6.3-heading-hierarchy-tokens.html"><span class="num">6.3</span> Heading Hierarchy from Tokens</a></li>
+        <li><a href="./lesson-6.4-paragraph-link-inline.html"><span class="num">6.4</span> Paragraph, Link, and Inline Text</a></li>
+        <li><a href="./lesson-6.5-logical-properties-reference.html"><span class="num">6.5</span> Logical Properties Reference</a></li>
+        <li><a href="./lesson-6.6-focus-styles-accessible.html"><span class="num">6.6</span> Accessible Focus Styles</a></li>
+        <li><a href="./lesson-6.7-dark-mode-light-dark-oklch.html"><span class="num">6.7</span> Dark Mode with light-dark() and OKLCH</a></li>
+        <li><a href="./lesson-6.8-margin-trim-text-details.html"><span class="num">6.8</span> margin-trim and Text Refinements</a></li>
+      </ul>
+
+      <h2>Module project</h2>
+      <p><a href="./project/index.html">A Documentation Site's Base Layer</a> — one base file, light and dark rendering, prose-grade typography, zero classes.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../module-05-reset/index.html">← Module 5</a>
+      <a href="./lesson-6.1-job-of-base-layer.html">Start Lesson 6.1 →</a>
+    </nav>
+  </main>
+</body>
+</html>

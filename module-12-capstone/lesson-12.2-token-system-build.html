@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.2 — Token System Build · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.2</p>
+      <h1>Token System Build</h1>
+      <p class="lead">The tokens layer is the first file you write and the only place design decisions live. Build it before anything else touches it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What you are building</h2>
+      <p>A complete <code>capstone/css/tokens.css</code> file with: OKLCH primitive scales for neutral and brand colors, semantic colors with <code>light-dark()</code>, 9-stop spacing, 6-stop type scale, motion durations and easings, radii, and z-index.</p>
+
+      <h2>The single rule</h2>
+      <p>Every subsequent file in the capstone references this layer exclusively. If a property value in <code>base.css</code>, <code>components.css</code>, or any other file is <em>not</em> a <code>var(--token)</code> reference, that is a bug — not a convenience.</p>
+
+      <h2>Verify</h2>
+      <p>Load the tokens file with no other CSS. The page should be entirely unstyled, but every custom property should be readable in DevTools' Computed panel on <code>:root</code>. This is the checkpoint before Lesson 12.3.</p>
+
+      <h2>View the result</h2>
+      <p>Open <a href="./capstone/css/tokens.css"><code>capstone/css/tokens.css</code></a> to see the finished file.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — color swatches from tokens</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-12-2 { display: grid; grid-template-columns: repeat(9, 1fr); gap: .25rem; }
+          .demo-12-2 > div { aspect-ratio: 1; border-radius: .25rem; }
+          .demo-12-2 .s1 { background: oklch(95% 0.04 275); }
+          .demo-12-2 .s2 { background: oklch(88% 0.08 275); }
+          .demo-12-2 .s3 { background: oklch(78% 0.13 275); }
+          .demo-12-2 .s4 { background: oklch(68% 0.18 275); }
+          .demo-12-2 .s5 { background: oklch(58% 0.22 275); }
+          .demo-12-2 .s6 { background: oklch(48% 0.22 275); }
+          .demo-12-2 .s7 { background: oklch(40% 0.19 275); }
+          .demo-12-2 .s8 { background: oklch(30% 0.14 275); }
+          .demo-12-2 .s9 { background: oklch(20% 0.09 275); }
+        </style>
+        <div class="demo-12-2">
+          <div class="s1"></div><div class="s2"></div><div class="s3"></div>
+          <div class="s4"></div><div class="s5"></div><div class="s6"></div>
+          <div class="s7"></div><div class="s8"></div><div class="s9"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scale"&gt;
+  &lt;div class="s1"&gt;&lt;/div&gt;&lt;div class="s2"&gt;&lt;/div&gt;&lt;div class="s3"&gt;&lt;/div&gt;
+  &lt;div class="s4"&gt;&lt;/div&gt;&lt;div class="s5"&gt;&lt;/div&gt;&lt;div class="s6"&gt;&lt;/div&gt;
+  &lt;div class="s7"&gt;&lt;/div&gt;&lt;div class="s8"&gt;&lt;/div&gt;&lt;div class="s9"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Change only the hue value (the third number) and watch
+   the scale stay perceptually consistent. OKLCH does the work. */
+
+:root { --h: 275; }
+
+.scale { display: grid; grid-template-columns: repeat(9, 1fr); gap: .25rem; padding: 1rem; }
+.scale > div { aspect-ratio: 1; border-radius: .25rem; }
+
+.s1 { background: oklch(95% 0.04 var(--h)); }
+.s2 { background: oklch(88% 0.08 var(--h)); }
+.s3 { background: oklch(78% 0.13 var(--h)); }
+.s4 { background: oklch(68% 0.18 var(--h)); }
+.s5 { background: oklch(58% 0.22 var(--h)); }
+.s6 { background: oklch(48% 0.22 var(--h)); }
+.s7 { background: oklch(40% 0.19 var(--h)); }
+.s8 { background: oklch(30% 0.14 var(--h)); }
+.s9 { background: oklch(20% 0.09 var(--h)); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--h</code> to <code>150</code> (teal) or <code>25</code> (red). Watch how the entire scale stays perceptually consistent — L and C values unchanged, only H rotated. This is the single reason OKLCH is architecturally superior to hex for design systems.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.1-project-brief-architecture-planning.html">← Lesson 12.1</a>
+      <a href="./lesson-12.3-reset-and-base-layers.html">Lesson 12.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

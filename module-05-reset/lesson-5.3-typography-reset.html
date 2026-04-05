@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.3 — Typography Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.3</p>
+      <h1>Typography Reset</h1>
+      <p class="lead">The user agent stylesheet ships six differently sized headings, default paragraph margins, and a collection of inherited quirks. Reset strips every opinion so the base layer can rebuild typography from tokens.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Headings inherit, not default</h2>
+      <p>The UA sizes <code>h1</code> through <code>h6</code> using magic numbers that predate the web. Worse, those sizes cascade independently of your design tokens — a base font size change does not flow through to headings. The fix is to make headings <em>inherit</em> font properties from their parent, then let the base layer apply token-driven sizes explicitly.</p>
+      <pre><code>:where(h1, h2, h3, h4, h5, h6) {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}</code></pre>
+      <p>After this rule, an <code>h1</code> looks identical to a <code>span</code> — which is exactly what you want in a reset. It is now the base layer's exclusive job to describe what headings look like.</p>
+
+      <h2>Margin: zero, globally</h2>
+      <p>The UA puts margin-block on paragraphs, headings, figures, blockquotes, and definition list elements. Those margins collapse, cascade, and interfere with gap-based layouts. Remove them all, then let the stack primitive in the layout layer reintroduce spacing via <code>gap</code>.</p>
+      <pre><code>:where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+  margin: 0;
+}</code></pre>
+
+      <h2>Lists: opt-in stripping</h2>
+      <p>Never strip bullets from every list. Screen readers announce "list" based on both the element and its style — when you remove <code>list-style</code>, some assistive technologies stop announcing the list. The right pattern is to strip only lists explicitly marked as UI structures with <code>role="list"</code>.</p>
+      <pre><code>:where(ul[role="list"], ol[role="list"]) {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}</code></pre>
+
+      <h2>Body-level baselines</h2>
+      <p>Two rules on <code>body</code> are worth pre-paying: guaranteeing a full-viewport-height minimum so sticky footers work, and enabling better font rendering. Neither is subtraction in the strict sense, but both are universally wanted before any visual decision is made.</p>
+      <pre><code>:where(body) {
+  min-block-size: 100svh;
+  text-rendering: optimizeLegibility;
+}</code></pre>
+
+      <h2>Small, sub, sup</h2>
+      <p>The <code>&lt;small&gt;</code> element has a UA rule of <code>font-size: 80%</code>. That is a baked-in opinion. Leave it — the base layer may reassign it, but it does not need to be reset first because it is already proportional.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — before and after typography reset</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-3 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-5-3 > div { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; background: #fff; }
+          .demo-5-3 h4 { margin: 0 0 .5rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-5-3 .after :where(h1, h2, h3, p) { margin: 0; }
+          .demo-5-3 .after :where(h1, h2, h3) { font-size: inherit; font-weight: inherit; line-height: inherit; }
+        </style>
+        <div class="demo-5-3">
+          <div class="before">
+            <h4>Before reset (UA defaults)</h4>
+            <h1>h1</h1><h2>h2</h2><h3>h3</h3>
+            <p>A paragraph with margin.</p>
+            <p>Another paragraph.</p>
+          </div>
+          <div class="after">
+            <h4>After reset</h4>
+            <h1>h1</h1><h2>h2</h2><h3>h3</h3>
+            <p>A paragraph, no margin.</p>
+            <p>Another paragraph.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;After the reset every heading is plain&lt;/h1&gt;
+  &lt;h2&gt;Until the base layer restyles it&lt;/h2&gt;
+  &lt;p&gt;Paragraphs have no margin. Spacing is the layout layer's problem now.&lt;/p&gt;
+  &lt;ul&gt;&lt;li&gt;Article list: bullets intact&lt;/li&gt;&lt;/ul&gt;
+  &lt;ul role="list"&gt;&lt;li&gt;Opt-in nav list: bullets gone&lt;/li&gt;&lt;/ul&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset {
+  :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote) {
+    margin: 0;
+  }
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+  :where(ul[role="list"], ol[role="list"]) {
+    list-style: none;
+    padding: 0;
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+article { display: flex; flex-direction: column; gap: .75rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Delete <code>font-size: inherit</code> from the heading rule and run. Headings jump back to UA sizes. Now try adding a conflicting rule in a higher layer — notice that you do not need any specificity tricks to override the reset. That is the <code>:where()</code> guarantee working.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.2-box-model-reset.html">← Lesson 5.2</a>
+      <a href="./lesson-5.4-form-interactive-reset.html">Lesson 5.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

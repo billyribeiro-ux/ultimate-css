@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.9 — Navigation &amp; Scroll Marker Carousels · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.9</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Navigation &amp; Scroll Marker Carousels</h1>
+      <p class="lead">Two of the most common UI patterns — a primary nav with dropdowns and a horizontal carousel with dots — are both now native CSS. The nav uses <code>:has()</code>. The carousel uses <code>scroll-marker-group</code>, <code>::scroll-button()</code>, <code>::scroll-marker</code>, and <code>:target-current</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Nav dropdowns with :has()</h2>
+      <p>A navigation bar with a <code>&lt;details&gt;</code>-powered dropdown:</p>
+      <pre><code>nav:has(details[open]) { /* dim other items, raise z-index, etc. */ }
+nav details[open] &gt; summary { color: var(--color-primary); }</code></pre>
+      <p>The entire nav responds to the open state of any descendant dropdown. No event listener, no "is-dropdown-open" class, no state machine.</p>
+
+      <h2>Native carousels: the four new primitives</h2>
+      <p>The 2025 CSS carousel feature set turns a plain scroll container into a dotted, buttoned carousel with zero JavaScript:</p>
+      <ol>
+        <li><strong><code>scroll-marker-group: after</code></strong> on the scroller. The browser generates a marker group after the scroller.</li>
+        <li><strong><code>::scroll-marker</code></strong> pseudo-elements on each snap child become the dots.</li>
+        <li><strong><code>::scroll-button(left)</code></strong> and <strong><code>::scroll-button(right)</code></strong> generate prev/next buttons.</li>
+        <li><strong><code>:target-current</code></strong> matches the marker for the currently-snapped item — style the active dot.</li>
+      </ol>
+
+      <h2>The full carousel</h2>
+      <pre><code>.carousel {
+  scroll-snap-type: x mandatory;
+  overflow-x: auto;
+  scroll-marker-group: after;
+  display: flex;
+}
+.carousel &gt; * {
+  scroll-snap-align: center;
+  flex: 0 0 100%;
+}
+.carousel &gt; *::scroll-marker {
+  content: "";
+  inline-size: .6rem; block-size: .6rem;
+  border-radius: 50%;
+  background: var(--color-border-strong);
+}
+.carousel &gt; *::scroll-marker:target-current {
+  background: var(--color-primary);
+}
+.carousel::scroll-button(left),
+.carousel::scroll-button(right) {
+  content: "";
+  /* style the arrow buttons */
+}</code></pre>
+
+      <h2>Browser support</h2>
+      <p>Carousel primitives: Chrome 135+, Edge 135+. Safari and Firefox not yet. Always wrap in <code>@supports (scroll-marker-group: after)</code> — the fallback is a plain <code>overflow-x: auto; scroll-snap-type: x mandatory</code> carousel, which is still usable (just without dots or buttons).</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — scrollable gallery (CSS-only)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-9 .carousel {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-block-end: 1rem;
+          }
+          .demo-8-9 .carousel &gt; .slide {
+            flex: 0 0 80%;
+            aspect-ratio: 16/9;
+            scroll-snap-align: center;
+            border-radius: .75rem;
+            display: grid; place-items: center;
+            color: #fff; font-weight: 700; font-size: 1.25rem;
+          }
+          .demo-8-9 .slide:nth-child(1) { background: oklch(58% 0.22 275); }
+          .demo-8-9 .slide:nth-child(2) { background: oklch(65% 0.17 150); }
+          .demo-8-9 .slide:nth-child(3) { background: oklch(60% 0.22 25); }
+          .demo-8-9 .slide:nth-child(4) { background: oklch(78% 0.16 85); }
+          @supports (scroll-marker-group: after) {
+            .demo-8-9 .carousel { scroll-marker-group: after; }
+            .demo-8-9 .slide::scroll-marker { content: ""; inline-size: .6rem; block-size: .6rem; border-radius: 50%; background: oklch(85% 0.012 264); margin: .25rem; }
+            .demo-8-9 .slide::scroll-marker:target-current { background: oklch(48% 0.22 275); }
+          }
+        </style>
+        <div class="demo-8-9">
+          <div class="carousel">
+            <div class="slide">Slide 1</div>
+            <div class="slide">Slide 2</div>
+            <div class="slide">Slide 3</div>
+            <div class="slide">Slide 4</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="carousel"&gt;
+  &lt;article&gt;One&lt;/article&gt;
+  &lt;article&gt;Two&lt;/article&gt;
+  &lt;article&gt;Three&lt;/article&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.carousel {
+  display: flex; gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+.carousel article {
+  flex: 0 0 80%;
+  aspect-ratio: 16/9;
+  scroll-snap-align: center;
+  display: grid; place-items: center;
+  border-radius: .5rem;
+  background: oklch(92% 0.008 264);
+  font-size: 2rem; font-weight: 700;
+  color: oklch(33% 0.020 264);
+}
+
+@supports (scroll-marker-group: after) {
+  .carousel { scroll-marker-group: after; }
+  .carousel article::scroll-marker {
+    content: "";
+    inline-size: .75rem; block-size: .75rem;
+    border-radius: 50%;
+    background: oklch(85% 0.012 264);
+    margin: .25rem;
+  }
+  .carousel article::scroll-marker:target-current {
+    background: oklch(48% 0.22 275);
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add <code>::scroll-button(left)</code> and <code>::scroll-button(right)</code> pseudo-elements to the carousel. Make them circular, position them at the edges. Notice that the buttons are keyboard-accessible and disabled at the ends automatically.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.8-customizable-select-base-select.html">← Lesson 8.8</a>
+      <a href="./project/index.html">Module 8 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

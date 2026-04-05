@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.1 — What Belongs in @layer components · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.1</p>
+      <h1>What Belongs in @layer components</h1>
+      <p class="lead">A component is not "styled HTML". A component is a named contract: a public API of CSS custom properties, a protected internal implementation, and a set of states. If your rule doesn't fit that description, it doesn't belong here.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The definition</h2>
+      <p>In the PE7 stack, a component is a CSS object that satisfies four rules:</p>
+      <ol>
+        <li><strong>It has exactly one class name</strong> as its entry point — the component's identity. No element selectors at the top level.</li>
+        <li><strong>It exposes a scoped custom property API.</strong> Consumers never set <code>background-color</code>; they set <code>--btn-bg</code>. The component's internals derive from tokens.</li>
+        <li><strong>It is <em>scoped</em></strong>. Its internals cannot leak outward and its consumers cannot accidentally depend on private descendants.</li>
+        <li><strong>It owns its states</strong> — <code>:hover</code>, <code>:focus-visible</code>, <code>:disabled</code>, <code>[aria-expanded]</code>, <code>:has()</code> conditions — not JavaScript.</li>
+      </ol>
+
+      <h2>Why utilities are not components</h2>
+      <p>A utility class like <code>.mt-4</code> changes exactly one declaration. It has no states, no internals, no API. Utilities belong in a utilities layer above components. Mixing them is how you end up with <code>.btn.mt-4.bg-red.flex</code> — a class list that screams "I gave up on naming things". Components and utilities serve different purposes and live in different layers.</p>
+
+      <h2>The "one class name" discipline</h2>
+      <p>When a component's public entry is a single class, refactoring is trivial: rename the class, every consumer breaks loudly. When the entry is <code>article.post &gt; header .title</code>, refactoring means grepping the entire codebase for four selectors in order. The one-class rule is not dogma — it is the thing that makes the component survive its second year.</p>
+
+      <h2>The scoped custom property API</h2>
+      <p>Every component declares its knobs at the root:</p>
+      <pre><code>.btn {
+  --btn-bg:       var(--color-primary);
+  --btn-bg-hover: var(--color-primary-hover);
+  --btn-color:    var(--color-text-on-primary);
+  background-color: var(--btn-bg);
+}</code></pre>
+      <p>Variants then only override the tokens:</p>
+      <pre><code>.btn-danger { --btn-bg: var(--color-danger); --btn-bg-hover: oklch(52% 0.22 25); }</code></pre>
+      <p>This is the single most important habit in the entire components layer. It means there is exactly one place the button's visual identity is defined, and exactly one way to extend it.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Live demo</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-1 .pill {
+            --pill-bg: oklch(95% 0.04 275);
+            --pill-fg: oklch(40% 0.19 275);
+            display: inline-block;
+            padding: .5rem 1rem;
+            background: var(--pill-bg);
+            color: var(--pill-fg);
+            border-radius: 9999px;
+            font-weight: 600;
+          }
+          .demo-8-1 .pill-success { --pill-bg: oklch(92% 0.07 150); --pill-fg: oklch(35% 0.13 150); }
+          .demo-8-1 .pill-danger  { --pill-bg: oklch(92% 0.07 25);  --pill-fg: oklch(40% 0.19 25);  }
+        </style>
+        <div class="demo-8-1" style="display:flex; gap:.75rem;">
+          <span class="pill">Default</span>
+          <span class="pill pill-success">Success</span>
+          <span class="pill pill-danger">Danger</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="demo"&gt;
+  &lt;span class="badge"&gt;Default&lt;/span&gt;
+  &lt;span class="badge badge-info"&gt;Info&lt;/span&gt;
+  &lt;span class="badge badge-warning"&gt;Warning&lt;/span&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* A proper component: one class entry, scoped
+   custom property API, variants override only tokens. */
+
+.demo { display: flex; gap: .75rem; font-family: system-ui; }
+
+.badge {
+  --badge-bg: oklch(92% 0.008 264);
+  --badge-fg: oklch(22% 0.018 264);
+  display: inline-block;
+  padding: .35rem .75rem;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  border-radius: .5rem;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.badge-info    { --badge-bg: oklch(92% 0.05 240); --badge-fg: oklch(30% 0.15 240); }
+.badge-warning { --badge-bg: oklch(94% 0.10 85);  --badge-fg: oklch(35% 0.15 85);  }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Pick one component you have already shipped in a real project. Write down its public API as a list of custom properties — no more than six. If you cannot, the component is not yet a component; it is a snapshot of CSS that happens to work.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 8</a>
+      <a href="./lesson-8.2-at-scope-component-isolation.html">Lesson 8.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

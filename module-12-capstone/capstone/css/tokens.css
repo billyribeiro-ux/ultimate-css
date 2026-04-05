@@ -1,0 +1,115 @@
+/* =============================================================
+   Prism capstone — tokens
+   ============================================================= */
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* Primitive: neutral */
+    --slate-50:  oklch(98% 0.003 264);
+    --slate-100: oklch(96% 0.005 264);
+    --slate-200: oklch(92% 0.008 264);
+    --slate-300: oklch(85% 0.012 264);
+    --slate-400: oklch(70% 0.015 264);
+    --slate-500: oklch(55% 0.018 264);
+    --slate-700: oklch(33% 0.020 264);
+    --slate-800: oklch(22% 0.018 264);
+    --slate-900: oklch(14% 0.015 264);
+    --slate-950: oklch(8%  0.012 264);
+
+    /* Primitive: brand indigo */
+    --indigo-100: oklch(95% 0.04 275);
+    --indigo-300: oklch(78% 0.13 275);
+    --indigo-500: oklch(58% 0.22 275);
+    --indigo-600: oklch(48% 0.22 275);
+    --indigo-700: oklch(40% 0.19 275);
+
+    /* Primitive: accent teal */
+    --teal-400: oklch(72% 0.13 190);
+    --teal-600: oklch(55% 0.15 190);
+
+    /* Semantic colors with light-dark */
+    --color-surface:         light-dark(var(--slate-50), var(--slate-950));
+    --color-surface-raised:  light-dark(#fff, var(--slate-900));
+    --color-surface-sunken:  light-dark(var(--slate-100), var(--slate-900));
+    --color-text:            light-dark(var(--slate-900), var(--slate-100));
+    --color-text-muted:      light-dark(var(--slate-700), var(--slate-400));
+    --color-heading:         light-dark(var(--slate-950), #fff);
+    --color-border:          light-dark(var(--slate-200), var(--slate-800));
+    --color-border-strong:   light-dark(var(--slate-300), var(--slate-700));
+    --color-primary:         light-dark(var(--indigo-600), var(--indigo-300));
+    --color-primary-hover:   light-dark(var(--indigo-700), var(--indigo-500));
+    --color-primary-subtle:  light-dark(var(--indigo-100), oklch(25% 0.10 275));
+    --color-on-primary:      light-dark(#fff, var(--slate-950));
+    --color-accent:          light-dark(var(--teal-600), var(--teal-400));
+    --color-focus:           var(--color-primary);
+
+    /* Spacing */
+    --space-2xs: 0.25rem;
+    --space-xs:  0.5rem;
+    --space-sm:  0.75rem;
+    --space-md:  1rem;
+    --space-lg:  1.5rem;
+    --space-xl:  2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+    --space-4xl: 6rem;
+    --space-5xl: 8rem;
+
+    /* Type */
+    --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+    --size-xs:   0.75rem;
+    --size-sm:   0.875rem;
+    --size-base: 1rem;
+    --size-md:   1.125rem;
+    --size-lg:   1.25rem;
+    --size-xl:   1.5rem;
+    --size-2xl:  1.875rem;
+    --size-3xl:  2.25rem;
+    --size-4xl:  3rem;
+    --size-5xl:  clamp(2.75rem, 6vw + 1rem, 4.5rem);
+
+    --leading-tight:  1.1;
+    --leading-snug:   1.35;
+    --leading-normal: 1.6;
+
+    --weight-regular:  400;
+    --weight-medium:   500;
+    --weight-semibold: 600;
+    --weight-bold:     700;
+
+    /* Motion */
+    --dur-fast:     120ms;
+    --dur-base:     200ms;
+    --dur-moderate: 300ms;
+    --dur-slow:     500ms;
+    --ease-out:    cubic-bezier(0,0,.2,1);
+    --ease-in:     cubic-bezier(.4,0,1,1);
+    --ease-in-out: cubic-bezier(.4,0,.2,1);
+
+    /* Radius */
+    --radius-sm:   0.375rem;
+    --radius-md:   0.5rem;
+    --radius-lg:   0.75rem;
+    --radius-xl:   1rem;
+    --radius-full: 9999px;
+
+    /* Elevation */
+    --shadow-sm: 0 1px 2px oklch(0% 0 0 / .06);
+    --shadow-md: 0 8px 24px oklch(0% 0 0 / .10);
+    --shadow-lg: 0 24px 60px oklch(0% 0 0 / .18);
+
+    /* Layout */
+    --container-max: 72rem;
+    --container-gap: var(--space-lg);
+    --measure: 65ch;
+
+    /* z-index */
+    --z-base:    0;
+    --z-raised:  10;
+    --z-overlay: 100;
+    --z-modal:   1000;
+  }
+}

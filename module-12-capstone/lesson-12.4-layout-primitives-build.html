@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.4 — Layout Primitives Build · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.4</p>
+      <h1>Layout Primitives Build</h1>
+      <p class="lead">Build every layout primitive the capstone needs. With layout applied on top of base, the page structure is correct at all viewport sizes without a single media query.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What you are building</h2>
+      <p><code>capstone/css/layout.css</code> containing: <code>.container</code>, <code>.stack</code> (with <code>.stack-lg</code> / <code>.stack-xl</code> variants), <code>.cluster</code>, <code>.grid</code>, <code>.cover</code>. Every primitive exposes custom properties. Zero visual styling.</p>
+
+      <h2>Container query contexts</h2>
+      <p>Mark the feature-card wrapper and testimonial-slide wrapper with <code>container-type: inline-size</code> so those components can adapt to their container width in Lesson 12.5 — not the viewport.</p>
+
+      <h2>Verify</h2>
+      <p>With tokens + reset + base + layout applied but <em>no</em> components yet, the page is a structured skeleton: hero centered, features in a responsive grid, pricing cards in a grid, footer clustered. The structure is correct. Nothing is yet styled visually.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — auto-fit grid that reflows without media queries</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-12-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+          .demo-12-4 > div {
+            padding: 1rem;
+            border: 1px solid oklch(85% 0.012 264);
+            border-radius: .5rem;
+            background: oklch(98% 0.003 264);
+            color: oklch(14% 0.015 264);
+          }
+        </style>
+        <div class="demo-12-4">
+          <div>Card A</div><div>Card B</div><div>Card C</div><div>Card D</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;section class="stack"&gt;
+  &lt;h2&gt;Features&lt;/h2&gt;
+  &lt;div class="grid"&gt;
+    &lt;div class="card"&gt;One&lt;/div&gt;
+    &lt;div class="card"&gt;Two&lt;/div&gt;
+    &lt;div class="card"&gt;Three&lt;/div&gt;
+    &lt;div class="card"&gt;Four&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  padding: 1rem;
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .5rem;
+  background: oklch(98% 0.003 264);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Resize the editor preview iframe. The grid reflows from 4 columns to 2 to 1 without a media query — purely because of <code>auto-fit</code> and <code>minmax()</code>. That is the entire idea behind the layout layer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.3-reset-and-base-layers.html">← Lesson 12.3</a>
+      <a href="./lesson-12.5-component-library-build.html">Lesson 12.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

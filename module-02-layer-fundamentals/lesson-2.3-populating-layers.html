@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.3 — Populating Layers · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.3</p>
+      <h1>Populating Layers</h1>
+      <p class="lead">Declaration is half the story. Now you put rules inside. There are three ways to populate a layer, and one of them is the technique that makes cross-file architecture actually work.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Form 1 — block syntax</h2>
+      <p>The most common form. Name the layer, open a block, write rules inside:</p>
+      <pre><code>@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+}</code></pre>
+      <p>Every rule between the braces belongs to that layer. If the layer has not been declared yet, this statement both creates and populates it.</p>
+
+      <h2>Form 2 — reopening a layer</h2>
+      <p>You can write <code>@layer reset { ... }</code> as many times as you want, in as many files as you want. All of those blocks merge into the same layer. This is how you split a layer across files without losing its priority:</p>
+      <pre><code>/* reset.css */
+@layer reset { html { line-height: 1.5; } }
+
+/* typography.css */
+@layer reset { h1, h2, h3 { margin-block: 0; } }</code></pre>
+      <p>Both blocks contribute to <code>reset</code>. The layer is still one bucket — reopening never creates a new one.</p>
+
+      <h2>Form 3 — nested inside @media</h2>
+      <p><code>@layer</code> blocks nest cleanly inside conditional rules. The priority stays the same; only the applicability is conditional.</p>
+      <pre><code>@media (min-width: 48rem) {
+  @layer layout {
+    .grid { grid-template-columns: repeat(12, 1fr); }
+  }
+}</code></pre>
+
+      <h2>Unlayered vs layered</h2>
+      <p>Any rule you write <em>outside</em> of an <code>@layer</code> block is "unlayered." Unlayered rules have a special status — they beat every layered rule, no matter how highly prioritised. That is not a bug; it is the escape hatch, covered in Lesson 2.5.</p>
+      <p>For now, the rule: if it is inside a layer block, it is layered. If it is not, it is unlayered and will win. Be deliberate about which you choose.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — three blocks, one layer</h2>
+      <div class="demo-frame">
+        <style>
+          @layer reset3, components3;
+          @layer reset3 { .demo-2-3 p { margin: 0; } }
+          @layer components3 { .demo-2-3 .card { background: oklch(96% 0.005 264); padding: 1rem; border-radius: .5rem; } }
+          @layer components3 { .demo-2-3 .card h4 { color: oklch(58% 0.22 275); margin: 0 0 .5rem; } }
+          .demo-2-3 { font-family: system-ui; }
+        </style>
+        <div class="demo-2-3">
+          <div class="card">
+            <h4>Two @layer components3 blocks, one layer</h4>
+            <p>Both blocks merge. The card background and heading color both live in the same <code>components3</code> layer.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="card"&gt;
+  &lt;h2&gt;Reopening layers&lt;/h2&gt;
+  &lt;p&gt;Add a third @layer components block below and give the h2 a new color.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, components;
+
+@layer reset {
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui; padding: 1rem; }
+}
+
+@layer components {
+  .card { background: oklch(96% 0.005 264); padding: 1rem; border-radius: .5rem; }
+}
+
+/* Reopen the layer — same bucket, new rules. */
+@layer components {
+  .card h2 { color: oklch(58% 0.22 275); }
+  .card p  { color: oklch(40% 0.02 264); margin-top: .5rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Move the <code>body { padding: 1rem; }</code> rule <em>outside</em> the <code>@layer reset</code> block. Then add a competing <code>body { padding: 4rem; }</code> rule inside a new <code>@layer components</code> block. Which padding wins, and why? (Hint: re-read the final paragraph of the lesson.)</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-2.2-declaring-layer-order.html">← Lesson 2.2</a>
+      <a href="./lesson-2.4-layer-priority-vs-specificity.html">Lesson 2.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

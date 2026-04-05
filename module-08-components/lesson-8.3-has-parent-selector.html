@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.3 — :has() — The Parent Selector · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.3</p>
+      <h1>:has() — The Parent Selector</h1>
+      <p class="lead">For twenty years the answer to "can you style a parent based on its child?" was "no, use JavaScript". The answer is now yes. <code>:has()</code> is the single biggest reduction in JavaScript-for-styling this decade.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What :has() actually is</h2>
+      <p><code>:has()</code> is a functional pseudo-class that matches an element <em>if</em> its argument matches something inside it. It is a real selector, not a hint — the browser's style engine resolves it during normal matching.</p>
+      <pre><code>.card:has(img)          { /* cards that contain an image */ }
+.card:has(&gt; img)        { /* cards whose direct child is an image */ }
+.field:has(input:invalid) { /* fields containing an invalid input */ }
+form:has(:focus)        { /* a form any of whose inputs is focused */ }</code></pre>
+
+      <h2>The pattern this kills</h2>
+      <p>Before <code>:has()</code>, this was the canonical JavaScript pattern:</p>
+      <pre><code>const field = document.querySelector('.field');
+const input = field.querySelector('input');
+input.addEventListener('input', () =&gt; {
+  field.classList.toggle('is-invalid', !input.checkValidity());
+});</code></pre>
+      <p>That whole pattern — thousands of event handlers in every codebase — is now:</p>
+      <pre><code>.field:has(input:invalid:not(:placeholder-shown)) {
+  --field-border: var(--color-danger);
+  --field-label:  var(--color-danger);
+}</code></pre>
+      <p>Zero listeners. Zero state. Zero stale DOM.</p>
+
+      <h2>Real patterns</h2>
+      <ul>
+        <li><code>article:has(&gt; figure:first-child)</code> — articles that lead with an image get a different layout.</li>
+        <li><code>nav:has(.dropdown[open])</code> — dim the nav while a dropdown is open.</li>
+        <li><code>tr:has(input[type="checkbox"]:checked)</code> — highlight selected rows.</li>
+        <li><code>body:has(dialog[open])</code> — prevent background scroll while any dialog is open.</li>
+        <li><code>.card:not(:has(img))</code> — text-only cards get extra padding.</li>
+      </ul>
+
+      <h2>Specificity</h2>
+      <p><code>:has()</code> takes on the highest specificity of its argument. <code>div:has(.primary)</code> scores <code>0,1,1</code>. Wrap in <code>:where()</code> to neutralize: <code>:where(:has(.primary))</code> scores <code>0,0,0</code>.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 105+, Safari 15.4+, Firefox 121+. Production-ready. No <code>@supports</code> wrap needed — this is baseline in 2026.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — cards with and without images</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-3 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-8-3 .card { padding: 1rem; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; background: #fff; }
+          .demo-8-3 .card:has(img) { border-color: oklch(58% 0.22 275); background: oklch(98% 0.02 275); }
+          .demo-8-3 .card:not(:has(img)) { padding: 2rem; font-style: italic; color: oklch(44% 0.020 264); }
+          .demo-8-3 .ph { display: block; inline-size: 100%; block-size: 4rem; background: oklch(92% 0.008 264); border-radius: .25rem; margin-bottom: .5rem; }
+        </style>
+        <div class="demo-8-3">
+          <div class="grid">
+            <div class="card">
+              <img class="ph" alt="">
+              <strong>With image</strong>
+              <p>Indigo border applied via :has(img).</p>
+            </div>
+            <div class="card">
+              <strong>Text only</strong>
+              <p>Italicized and padded via :not(:has(img)).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;label class="field"&gt;
+  &lt;span&gt;Email&lt;/span&gt;
+  &lt;input type="email" placeholder="you@example.com" required&gt;
+&lt;/label&gt;
+&lt;label class="field"&gt;
+  &lt;span&gt;Name&lt;/span&gt;
+  &lt;input type="text" required placeholder="Your name"&gt;
+&lt;/label&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Type something invalid in the email field.
+   The WHOLE field (label + border) turns red —
+   with zero JavaScript. */
+
+body { font-family: system-ui; padding: 1rem; }
+.field {
+  --field-border: oklch(85% 0.012 264);
+  --field-label:  oklch(33% 0.020 264);
+  display: block;
+  margin-bottom: 1rem;
+  padding: .75rem;
+  border: 2px solid var(--field-border);
+  border-radius: .5rem;
+}
+.field span { display: block; font-weight: 600; color: var(--field-label); margin-bottom: .25rem; }
+.field input { inline-size: 100%; padding: .5rem; border: 1px solid #ccc; border-radius: .25rem; }
+
+.field:has(input:invalid:not(:placeholder-shown)) {
+  --field-border: oklch(60% 0.22 25);
+  --field-label:  oklch(60% 0.22 25);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Find one <code>classList.toggle</code> call in your own codebase whose only job is to drive a visual state. Rewrite it as a <code>:has()</code> rule. Delete the JavaScript. Verify it still works.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.2-at-scope-component-isolation.html">← Lesson 8.2</a>
+      <a href="./lesson-8.4-button-component-variants.html">Lesson 8.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

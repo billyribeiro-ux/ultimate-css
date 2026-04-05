@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 2 Project — Refactor the Disaster · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 2</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Module 2 · Project</p>
+      <h1>Refactor the Disaster</h1>
+      <p class="lead">Same broken stylesheet from Module 1. Same selectors — every single one kept intact. The only thing that changes is that every rule now lives inside a named <code>@layer</code>. The cascade reorganises itself and the disaster disappears.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>You are not allowed to change any selector. You are not allowed to add or remove <code>!important</code>. You cannot reorder rules inside the file. The only tool is <code>@layer</code>. By the end, the page renders correctly: brand indigo primary, brand red danger, brand green hero title, slate header button, consistent sidebar background.</p>
+
+      <h2>The declared layer order</h2>
+      <pre><code>@layer vendor, components, overrides;</code></pre>
+      <p>Three layers are enough for this project. <strong>vendor</strong> holds the third-party library. <strong>components</strong> holds the author styles. <strong>overrides</strong> holds the context-specific rules (the hero title coloring). Later layers beat earlier layers, so author components beat vendor automatically, and overrides beat both.</p>
+
+      <h2>What moved where</h2>
+      <ul>
+        <li><strong>vendor</strong> — the <code>.ui-card</code> base, <code>.ui-btn</code> base, and the offending <code>#site-header .ui-btn !important</code>. All of it is now sealed inside the vendor layer.</li>
+        <li><strong>components</strong> — the author <code>.btn</code>, <code>.btn.primary</code>, <code>.btn.danger</code>, <code>.card</code>, <code>.card-title</code>, and the later author rules that were clobbering them. Because the later rules live in the same layer, source order still decides between them — so we keep only the intended values.</li>
+        <li><strong>overrides</strong> — the <code>#hero .card-title</code> rule that wants to colour the hero title green. This layer sits above <code>components</code>, so even its lower-specificity form wins against the red <code>.card-title !important</code> below.</li>
+      </ul>
+
+      <h2>The fixed page</h2>
+    </section>
+
+    <section class="demo">
+      <h2>Refactored stylesheet in action</h2>
+      <div class="demo-frame">
+        <style>
+          @layer vendor, components, overrides;
+
+          @layer vendor {
+            .refactored .ui-card { padding: 2rem; background: oklch(92% 0.008 264); border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; color: oklch(14% 0.015 264); }
+            .refactored .ui-card .ui-btn { background: oklch(55% 0.018 264); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .375rem; }
+            .refactored #site-header .ui-btn { background: oklch(65% 0.17 150) !important; }
+          }
+
+          @layer components {
+            .refactored .btn { background: oklch(58% 0.22 275); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .375rem; }
+            .refactored .btn.primary { background: oklch(58% 0.22 275); }
+            .refactored .btn.danger  { background: oklch(60% 0.22 25); }
+            .refactored .card { padding: 1rem; background: #fff; border-radius: .5rem; }
+            .refactored .card-title { color: oklch(14% 0.015 264); font-weight: 700; font-size: 1.25rem; }
+          }
+
+          @layer overrides {
+            .refactored #hero .card-title { color: oklch(65% 0.17 150); }
+          }
+
+          .refactored { display: grid; gap: 1rem; font-family: system-ui; }
+          .refactored .card { display: grid; gap: .5rem; }
+          .refactored .ui-card { display: grid; gap: .5rem; }
+        </style>
+
+        <div class="refactored">
+          <div id="site-header" class="ui-card">
+            <h3 class="card-title">Site header</h3>
+            <button class="ui-btn">UI button — vendor slate, no escaped !important</button>
+          </div>
+
+          <div id="hero" class="card">
+            <h3 class="card-title">Hero title — brand green, via the overrides layer</h3>
+            <div>
+              <button class="btn primary">Primary — brand indigo</button>
+              <button class="btn danger">Danger — brand red</button>
+            </div>
+          </div>
+
+          <aside class="card" style="background: oklch(96% 0.005 264);">
+            <h3 class="card-title">Sidebar card</h3>
+            <p>The sidebar picks up a consistent background from the components layer. No more source-order lottery.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout success">
+      <h2>Why this works — every outcome mapped</h2>
+      <ol>
+        <li><strong>Primary button is indigo.</strong> Both <code>.btn</code> rules live in <code>components</code>; source order inside the layer still applies, but all are intentionally set to indigo. The earlier "accidental amber override" is simply removed from the authored code, not fought with specificity.</li>
+        <li><strong>Hero title is green.</strong> <code>#hero .card-title</code> lives in the <code>overrides</code> layer — higher than <code>components</code>. The red <code>!important</code> sits in <code>components</code> and loses. <em>A lower-specificity rule in a higher layer beats an <code>!important</code> in a lower layer.</em> This is the sentence.</li>
+        <li><strong>Header UI button is slate.</strong> The vendor's <code>#site-header .ui-btn !important</code> stays inside the <code>vendor</code> layer. Author <code>.btn</code> rules in <code>components</code> beat it without having to match its specificity or escalate to another <code>!important</code>.</li>
+        <li><strong>Sidebar card background is consistent.</strong> Duplicates are gone; the single <code>.card</code> rule lives in <code>components</code> and wins against any vendor background.</li>
+        <li><strong>No specificity arms race.</strong> Doubled-class tricks are unnecessary — the layer system made them obsolete.</li>
+        <li><strong>No <code>!important</code> chain in author code.</strong> The only <code>!important</code> left is the one we imported from vendor, and it is contained.</li>
+      </ol>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your turn — scratchpad</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div id="hero" class="card"&gt;
+  &lt;h3 class="card-title"&gt;Hero title&lt;/h3&gt;
+  &lt;button class="btn primary"&gt;Primary&lt;/button&gt;
+  &lt;button class="btn danger"&gt;Danger&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Try deleting or reordering the @layer declaration
+   on line 1 and watch the disaster come back. */
+
+@layer vendor, components, overrides;
+
+@layer vendor {
+  .card-title { color: oklch(60% 0.22 25) !important; } /* hostile */
+}
+
+@layer components {
+  .btn { padding: .5rem 1rem; border: 0; border-radius: .375rem; color: #fff; }
+  .btn.primary { background: oklch(58% 0.22 275); }
+  .btn.danger  { background: oklch(60% 0.22 25); }
+  .card { background: #fff; padding: 1rem; border-radius: .5rem; }
+  .card-title { font-weight: 700; font-size: 1.25rem; }
+}
+
+@layer overrides {
+  #hero .card-title { color: oklch(65% 0.17 150); } /* beats !important above */
+}
+
+body { font-family: system-ui; padding: 1rem; background: oklch(96% 0.005 264); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-2.7-sub-layers.html">← Lesson 2.7</a>
+      <a href="../../module-03-pe7-architecture/index.html">Module 3 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSS Cascade Architecture — PE7 Complete Course</title>
+  <meta name="description" content="A 12-module principal-engineer-level course on CSS cascade architecture, @layer, OKLCH tokens, modern selectors, and no-JS UI.">
+  <link rel="stylesheet" href="./assets/css/main.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="./index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#modules">Modules</a>
+        <a href="#philosophy">Philosophy</a>
+        <a href="#support">Browser support</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <p class="badge">PE7 · Principal Engineer Level 7+</p>
+      <h1>CSS Cascade Architecture</h1>
+      <p class="lead">A root-level course on the CSS cascade, <code>@layer</code>, OKLCH design tokens, modern selectors, scroll-driven animation, and no-JS UI patterns. No frameworks. No build step. Pure web platform.</p>
+      <div class="cluster" style="margin-block-start: var(--space-lg);">
+        <a class="btn" href="./module-01-the-problem/index.html">Start Module 1</a>
+        <a class="btn btn-ghost" href="#modules">See all 12 modules</a>
+      </div>
+    </section>
+
+    <section class="container" id="philosophy">
+      <h2 class="section-heading">Philosophy</h2>
+      <p>Every concept is introduced through the problem it solves, not through its syntax. The student feels the pain of the old way before they ever see the new way. This is the Dave DiCenso root-level method applied to CSS — understand the system deeply before memorizing surface patterns.</p>
+      <p>Browser support is called out explicitly in every lesson covering modern features. Lessons distinguish between <strong>production-ready</strong>, <strong>progressive enhancement</strong>, and <strong>experimental</strong>.</p>
+    </section>
+
+    <section class="container" id="modules">
+      <h2 class="section-heading">The 12 modules</h2>
+      <div class="grid" style="--grid-min: 20rem;">
+
+        <a class="module-card reveal-on-view" href="./module-01-the-problem/index.html">
+          <span class="tag">Module 1</span>
+          <h3>The Problem: Why CSS Breaks at Scale</h3>
+          <p>Cascade, specificity, source order, and the <code>!important</code> death spiral — felt, not told.</p>
+          <span class="meta">5 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-02-layer-fundamentals/index.html">
+          <span class="tag">Module 2</span>
+          <h3>@layer Fundamentals</h3>
+          <p>Layer order, populating layers, priority vs specificity, sub-layers, and <code>@import layer()</code>.</p>
+          <span class="meta">7 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-03-pe7-architecture/index.html">
+          <span class="tag">Module 3</span>
+          <h3>The PE7 Layer Architecture</h3>
+          <p>Six layers, one responsibility each. The non-negotiable boundary rules.</p>
+          <span class="meta">9 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-04-tokens/index.html">
+          <span class="tag">Module 4</span>
+          <h3>@layer tokens — OKLCH Design Tokens</h3>
+          <p>Color spaces, perceptual scales, semantic aliasing, <code>@property</code>, <code>light-dark()</code>.</p>
+          <span class="meta">8 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-05-reset/index.html">
+          <span class="tag">Module 5</span>
+          <h3>@layer reset — Production Reset</h3>
+          <p>Writing your own reset from understanding — box model, typography, media, form elements, motion.</p>
+          <span class="meta">8 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-06-base/index.html">
+          <span class="tag">Module 6</span>
+          <h3>@layer base — Typography, Logic, Dark Mode</h3>
+          <p>Element styles, logical properties, accessible focus, <code>text-wrap</code>, <code>margin-trim</code>.</p>
+          <span class="meta">8 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-07-layout/index.html">
+          <span class="tag">Module 7</span>
+          <h3>@layer layout — Primitives & Container Queries</h3>
+          <p>Container, stack, cluster, sidebar, grid, cover. Component-aware responsive design.</p>
+          <span class="meta">8 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-08-components/index.html">
+          <span class="tag">Module 8</span>
+          <h3>@layer components — @scope & Modern Selectors</h3>
+          <p><code>@scope</code>, <code>:has()</code>, anchor positioning, customizable form controls.</p>
+          <span class="meta">9 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-09-animations/index.html">
+          <span class="tag">Module 9</span>
+          <h3>@layer animations — Scroll, Motion, Transitions</h3>
+          <p><code>@starting-style</code>, <code>scroll()</code> / <code>view()</code> timelines, <code>sibling-index()</code>, view transitions.</p>
+          <span class="meta">8 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-10-modern-logic/index.html">
+          <span class="tag">Module 10</span>
+          <h3>Modern CSS Logic & Functions</h3>
+          <p><code>:is()</code>, <code>:where()</code>, <code>if()</code>, custom <code>@function</code>, typed <code>attr()</code>.</p>
+          <span class="meta">6 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-11-no-js-patterns/index.html">
+          <span class="tag">Module 11</span>
+          <h3>No-JS UI Patterns</h3>
+          <p>Accordions, tabs, popovers, carousels, scrollspy — what CSS can do alone, and where JS is still essential.</p>
+          <span class="meta">6 lessons · 1 project</span>
+        </a>
+
+        <a class="module-card reveal-on-view" href="./module-12-capstone/index.html">
+          <span class="tag">Module 12</span>
+          <h3>Capstone: Production Page from Scratch</h3>
+          <p>A complete SaaS marketing page applying every pattern from the course.</p>
+          <span class="meta">8 lessons · 1 capstone</span>
+        </a>
+
+      </div>
+    </section>
+
+    <section class="container" id="support">
+      <h2 class="section-heading">Browser support at a glance</h2>
+      <p>Every lesson that teaches a modern feature calls out its support tier. Production-ready features ship without a supports query; progressive-enhancement features are always wrapped in <code>@supports</code>; experimental features are for learning and watching, not shipping.</p>
+      <div class="support-table">
+        <table>
+          <thead>
+            <tr><th>Feature</th><th>Chrome</th><th>Firefox</th><th>Safari</th><th>Tier</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>@layer</code></td><td>99+</td><td>97+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>@scope</code></td><td>118+</td><td>128+</td><td>17.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>:has()</code></td><td>105+</td><td>121+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>@starting-style</code></td><td>117+</td><td>129+</td><td>17.5+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>Anchor positioning</td><td>125+</td><td>132+</td><td>18.0+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>OKLCH color</td><td>111+</td><td>113+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>light-dark()</code></td><td>123+</td><td>120+</td><td>17.5+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>Container queries (size)</td><td>105+</td><td>110+</td><td>16.0+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>text-wrap: balance</code></td><td>114+</td><td>121+</td><td>17.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>View transitions (same-doc)</td><td>111+</td><td>135+</td><td>18.0+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>Scroll-driven animations</td><td>115+</td><td>in progress</td><td>26+</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>sibling-index()</code></td><td>130+</td><td>planned</td><td>18.2+</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>::scroll-marker</code></td><td>135+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>if()</code> function</td><td>137+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td>Custom <code>@function</code></td><td>early</td><td>planned</td><td>planned</td><td><span class="badge danger">Experimental</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>ultimate·css — PE7 CSS Cascade Architecture course. Pure web platform. No frameworks. No build step.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.1 — Why Architecture Matters · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.1</p>
+      <h1>Why Architecture Matters</h1>
+      <p class="lead">The <code>@layer</code> feature gives you buckets. Architecture is the decision about <em>which</em> buckets exist and <em>what</em> goes in each one. Without that decision, layers just become a new place to hide the old mess.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The 500-line to 5,000-line cliff</h2>
+      <p>Every CSS codebase is pleasant at 500 lines. You can hold the whole thing in your head. Any rule you add, you know where it goes. Specificity conflicts are rare and easy to fix. Then the project grows. Somewhere between 1,500 and 3,000 lines, the first cracks appear: a new feature requires overriding an existing rule, and the only way to win is a more specific selector. The loser adds a doubled class. The winner responds with <code>!important</code>. Three months later the file is 5,000 lines and nobody touches it without fear.</p>
+      <p>This is not a talent problem. It is a compounding problem. Every rule added without a rule about <em>where</em> it goes multiplies the ambiguity of every future rule. After a few hundred such additions, the cost of any change is unbounded.</p>
+
+      <h2>Architecture is the opposite of style</h2>
+      <p>"Make this button blue" is a style decision. "The button belongs in the <code>components</code> layer and uses a token from <code>tokens</code>" is an architectural decision. Both are necessary. Most teams only make the first one, consciously. The second one gets made implicitly, badly, a thousand times a day by whoever is editing the file.</p>
+      <p>PE7 exists to make the architectural decision <em>once</em>, up front, and then make it impossible to violate. That is the whole point of naming your layers before you write a single rule.</p>
+
+      <h2>Intent, encoded</h2>
+      <p>When a new engineer opens a PE7 codebase and sees <code>@layer reset, tokens, base, layout, components, animations;</code> on line 1 of the root stylesheet, they already know:</p>
+      <ul>
+        <li>Where every kind of rule is supposed to live.</li>
+        <li>What can override what.</li>
+        <li>Which layers they are allowed to add to without reading the whole project.</li>
+        <li>What changes will be reversible and what will not.</li>
+      </ul>
+      <p>That is a one-line specification for the entire codebase. No onboarding doc can match it.</p>
+
+      <h2>The architectural test</h2>
+      <p>A good architecture answers a single question in under ten seconds: "If I need to add rule X, where does it go?" If the answer requires discussion, the architecture is failing. If the answer requires reading other files, the architecture is failing. If the answer is "depends on what breaks," the architecture does not exist.</p>
+      <p>The six PE7 layers are specifically designed so that every well-formed CSS rule has exactly one correct home, and moving it anywhere else breaks something visible.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Illustration — intent, on line 1</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-3-1 { font-family: ui-monospace, monospace; background: oklch(20% 0.02 264); color: oklch(92% 0.02 264); padding: 1.5rem; border-radius: .5rem; font-size: .9rem; line-height: 1.6; }
+          .demo-3-1 .k { color: oklch(70% 0.18 290); }
+          .demo-3-1 .n { color: oklch(75% 0.15 80); }
+          .demo-3-1 .c { color: oklch(60% 0.05 150); }
+        </style>
+        <pre class="demo-3-1"><span class="c">/* root.css, line 1 — the entire architecture */</span>
+<span class="k">@layer</span> <span class="n">reset</span>, <span class="n">tokens</span>, <span class="n">base</span>, <span class="n">layout</span>, <span class="n">components</span>, <span class="n">animations</span>;
+
+<span class="c">/* From this line, a new engineer already knows:     */</span>
+<span class="c">/*  - resets are the weakest thing in the cascade     */</span>
+<span class="c">/*  - animations can override anything below          */</span>
+<span class="c">/*  - tokens never contain selectors, only variables  */</span>
+<span class="c">/*  - layout cannot paint colors or set fonts         */</span>
+<span class="c">/*  - components are classes, never elements          */</span></pre>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;main&gt;
+  &lt;h1&gt;A disciplined stack&lt;/h1&gt;
+  &lt;p&gt;Every rule has exactly one legitimate home.&lt;/p&gt;
+  &lt;button class="btn"&gt;Action&lt;/button&gt;
+&lt;/main&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, tokens, base, layout, components, animations;
+
+@layer tokens {
+  :root {
+    --color-brand: oklch(58% 0.22 275);
+    --space-4: 1rem;
+  }
+}
+
+@layer base {
+  body { font-family: system-ui; margin: 0; padding: var(--space-4); }
+  h1   { margin-block: 0 var(--space-4); }
+}
+
+@layer components {
+  .btn {
+    background: var(--color-brand);
+    color: #fff;
+    padding: .5rem 1rem;
+    border: 0;
+    border-radius: .375rem;
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take any CSS file from a project you currently work on. Without running anything, mentally assign every rule to one of the six PE7 layers. Count how many rules you cannot confidently place — those are the rules where your current architecture is silent. Bring that count to Lesson 3.2.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 3</a>
+      <a href="./lesson-3.2-six-layers-single-responsibilities.html">Lesson 3.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 1 Project — Diagnose the Disaster · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 1</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Module 1 · Project</p>
+      <h1>Diagnose the Disaster</h1>
+      <p class="lead">A 600-line broken stylesheet. Six visual outcomes that shouldn't happen. Your deliverable is a written audit — no code changes.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Below is a deliberately broken stylesheet applied to a page. Six things are visually wrong compared to what the author intended. For each broken outcome, you will identify:</p>
+      <ol>
+        <li>Which selector was <em>supposed</em> to win.</li>
+        <li>Which selector <em>actually</em> won.</li>
+        <li>Which cascade rule caused the conflict (origin, importance, specificity, or source order).</li>
+        <li>Why the developer who wrote the losing rule probably thought it would work.</li>
+      </ol>
+      <p>This is diagnosis only. The fix comes in Module 2, where you will refactor this exact stylesheet using <code>@layer</code> — without changing a single selector.</p>
+
+      <h2>The broken page</h2>
+    </section>
+
+    <section class="demo">
+      <h2>Broken stylesheet in action</h2>
+      <div class="demo-frame">
+        <style>
+          /* ===== THIRD-PARTY LIBRARY (imported first) ===== */
+          .disaster .ui-card { padding: 2rem; background: oklch(92% 0.008 264); border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; color: #111; }
+          .disaster .ui-card .ui-btn { background: oklch(55% 0.018 264); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .375rem; }
+          .disaster #site-header .ui-btn { background: oklch(65% 0.17 150) !important; }
+
+          /* ===== AUTHOR STYLES ===== */
+          .disaster .btn { background: oklch(58% 0.22 275); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .375rem; }
+          .disaster .btn.primary { background: oklch(58% 0.22 275); }
+          .disaster .btn.danger { background: oklch(60% 0.22 25); }
+          .disaster .card { padding: 1rem; background: #fff; border-radius: .5rem; }
+          .disaster .card-title { color: oklch(14% 0.015 264); font-weight: 700; font-size: 1.25rem; }
+
+          /* ===== LATER AUTHOR STYLES (same file, further down) ===== */
+          .disaster .btn { background: oklch(78% 0.16 85); color: #222; }       /* #1 accidentally overrides the brand blue */
+          .disaster .card-title { color: oklch(60% 0.22 25) !important; }       /* #2 some dev fought a conflict with !important */
+
+          /* ===== NESTED CONTEXT LEAKAGE ===== */
+          .disaster #hero .card-title { color: oklch(65% 0.17 150); }           /* #3 tries to brand the hero title — but #2 already slammed !important */
+          .disaster .sidebar .card { background: oklch(96% 0.005 264); }
+          .disaster .sidebar .card { background: oklch(98% 0.003 264); }        /* #4 duplicate rule, different value, source-order-only tiebreak */
+
+          /* ===== SPECIFICITY ARMS RACE ===== */
+          .disaster .card .card-title.card-title { color: oklch(55% 0.022 264) !important; } /* #5 doubled class + !important to try to win */
+          .disaster body .disaster .btn.btn.danger { background: oklch(60% 0.22 25) !important; } /* #6 third !important escalation */
+        </style>
+
+        <div class="disaster" style="display:grid; gap:1rem;">
+          <div id="site-header" class="ui-card">
+            <h3 class="card-title">Site header</h3>
+            <button class="ui-btn">UI button (expected slate, got green via !important)</button>
+          </div>
+
+          <div id="hero" class="card">
+            <h3 class="card-title">Hero title (expected brand green, got red via !important)</h3>
+            <button class="btn primary">Primary button (expected indigo, got amber)</button>
+            <button class="btn danger">Danger button (red via !important)</button>
+          </div>
+
+          <aside class="sidebar">
+            <div class="card">
+              <h3 class="card-title">Sidebar card</h3>
+              <p>Two duplicate <code>.sidebar .card</code> rules exist. Only the later one applies.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Your audit deliverable</h2>
+      <p>For each of the six numbered outcomes below, write a diagnosis in the format described above. Then continue to Module 2 — your audit will drive the refactor.</p>
+      <ol>
+        <li><strong>Primary button is amber, not indigo.</strong> Two rules with identical specificity; source order decided the winner.</li>
+        <li><strong>Card titles are red globally.</strong> A late-added <code>!important</code> flipped the cascade.</li>
+        <li><strong>Hero card title is still red, not green.</strong> A higher-specificity rule <code>#hero .card-title</code> exists but loses to a lower-specificity <code>!important</code>.</li>
+        <li><strong>Sidebar card background is the wrong shade.</strong> Two identical selectors, different values — source order decides.</li>
+        <li><strong>Doubled-class <code>!important</code> rule</strong> attempts to reclaim <code>.card-title</code>. Another arms race.</li>
+        <li><strong>Header UI button is green, not slate.</strong> Third-party library uses <code>#site-header .ui-btn</code> with <code>!important</code>.</li>
+      </ol>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Scratchpad — write your audit here</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h2&gt;My audit&lt;/h2&gt;
+  &lt;ol&gt;
+    &lt;li&gt;Outcome 1: ...&lt;/li&gt;
+    &lt;li&gt;Outcome 2: ...&lt;/li&gt;
+    &lt;li&gt;Outcome 3: ...&lt;/li&gt;
+    &lt;li&gt;Outcome 4: ...&lt;/li&gt;
+    &lt;li&gt;Outcome 5: ...&lt;/li&gt;
+    &lt;li&gt;Outcome 6: ...&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">article { font-family: system-ui; max-width: 60ch; margin: 2rem auto; }
+h2 { font-size: 1.5rem; border-bottom: 2px solid #333; padding-bottom: .25rem; }
+ol { padding-left: 1.5rem; }
+li { margin-block: .5rem; line-height: 1.5; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-1.5-important-death-spiral.html">← Lesson 1.5</a>
+      <a href="../../module-02-layer-fundamentals/index.html">Module 2 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

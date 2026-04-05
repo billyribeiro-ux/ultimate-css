@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1.1 — How the Cascade Actually Works · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 1</a>
+      <span>Lesson 1.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 1.1</p>
+      <h1>How the Cascade Actually Works</h1>
+      <p class="lead">Most developers think CSS is simple until it isn't. The cascade is a priority resolution system with four independent layers, and most developers only know one of them.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The four layers of the cascade</h2>
+      <p>When two CSS rules both match an element and set the same property, the browser resolves the conflict by asking four questions in order. The first question that produces a clear winner decides which rule wins. Only if all four are tied does a later rule get applied.</p>
+      <ol>
+        <li><strong>Origin &amp; importance.</strong> Is the rule in the user agent stylesheet, the author stylesheet, or a user override? Is it <code>!important</code>? The importance chain flips depending on origin.</li>
+        <li><strong>Layer priority.</strong> Is the rule in a <code>@layer</code>? Higher layers win over lower layers. Unlayered styles beat layered ones.</li>
+        <li><strong>Specificity.</strong> The A,B,C column score — discussed in detail in Lesson 1.2.</li>
+        <li><strong>Source order.</strong> The tiebreaker everyone thinks is the only rule.</li>
+      </ol>
+
+      <h2>The key insight</h2>
+      <p>Source order is the <em>last</em> resort, not the main event. Most developers write CSS assuming source order decides everything. It does not. That assumption is why things break in ways that seem inexplicable.</p>
+
+      <h2>UA styles are already running</h2>
+      <p>Before you write a single line of CSS, your HTML page is already styled — by the browser's user-agent stylesheet. Headings have margins. Lists have bullets. Buttons have chrome. Your author styles need to <em>cooperate</em> with those defaults, not override them blindly.</p>
+
+      <h2>Try it: UA defaults are real</h2>
+      <p>The demo below renders unstyled HTML. Every visual decision you see is the browser, not you. Add a rule in the CSS pane and watch how your author styles layer on top of the UA styles.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Live demo</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-1-1 h3 { font-family: serif; }
+          .demo-1-1 p  { color: #444; }
+          .demo-1-1 ul { padding-left: 1.25rem; }
+        </style>
+        <div class="demo-1-1">
+          <h3>Unstyled-ish heading</h3>
+          <p>The browser gave this paragraph its default margin, its default line-height, and its default color. You see the result of UA styles plus a tiny nudge from this demo.</p>
+          <ul><li>List item one</li><li>List item two</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Hello cascade&lt;/h1&gt;
+  &lt;p&gt;This paragraph already has a line-height from the UA stylesheet.&lt;/p&gt;
+  &lt;button&gt;And this button has chrome&lt;/button&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Open your DevTools on any page — look at the
+   "user agent stylesheet" entries. Every HTML element
+   starts styled. Your job is to cooperate with those
+   defaults, not fight them. Try overriding h1 below. */
+
+h1 {
+  color: indigo;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open any real webpage in DevTools. Find three properties that come from the user agent stylesheet. Write down what they are and what elements they target. Bring that list with you into Lesson 1.2 — you'll compare them against your own styles there.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 1</a>
+      <a href="./lesson-1.2-specificity-three-columns.html">Lesson 1.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

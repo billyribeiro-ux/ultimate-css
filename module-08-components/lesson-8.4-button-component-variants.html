@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.4 — Button Component: Variants via Tokens · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.4</p>
+      <h1>Button Component: Variants via Tokens</h1>
+      <p class="lead">The button is the smallest non-trivial component and the one most teams get wrong. Done properly, it is thirty lines of CSS. Done improperly, it is two hundred lines plus a Sass mixin plus a React wrapper. We are doing it properly.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The contract</h2>
+      <p>A button exposes four tokens and nothing else:</p>
+      <pre><code>.btn {
+  --btn-bg:       var(--color-primary);
+  --btn-bg-hover: var(--color-primary-hover);
+  --btn-color:    var(--color-text-on-primary);
+  --btn-border:   transparent;
+}</code></pre>
+      <p>Every declared rule in the component body references these four properties. Not <code>background: blue</code>. Not <code>color: white</code>. Only the tokens. This is what makes variants trivial.</p>
+
+      <h2>Variants override tokens only</h2>
+      <pre><code>.btn-ghost     { --btn-bg: transparent; --btn-color: var(--color-primary); --btn-border: var(--color-border-strong); }
+.btn-danger    { --btn-bg: var(--color-danger); --btn-bg-hover: oklch(52% 0.22 25); }
+.btn-secondary { --btn-bg: var(--color-surface-raised); --btn-color: var(--color-text-primary); --btn-border: var(--color-border-strong); }</code></pre>
+      <p>Notice what variants do <em>not</em> do: redeclare <code>padding</code>, redeclare <code>border-radius</code>, redeclare <code>font-size</code>. Those are structural — they belong to the component, not the variant. A variant that sets padding is a code smell indicating it should be a different component.</p>
+
+      <h2>States: :hover, :focus-visible, :disabled</h2>
+      <p>Three selectors, three lines:</p>
+      <pre><code>.btn:hover                 { background-color: var(--btn-bg-hover); }
+.btn:focus-visible         { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.btn:disabled,
+.btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }</code></pre>
+      <p>Use <code>:focus-visible</code>, not <code>:focus</code>. The former only shows the ring for keyboard users, which is what your designers actually wanted when they asked you to "remove the focus outline". Including <code>[aria-disabled="true"]</code> catches buttons that must remain focusable for screen readers while being logically disabled.</p>
+
+      <h2>Why the token indirection matters</h2>
+      <p>When a designer asks "can we make the danger button use the new critical-red?", you change <em>one</em> token value in the tokens layer. Every danger button on the site updates. No grep, no replace, no migration PR.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — button variants and states</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-4 .btn {
+            --btn-bg:       oklch(48% 0.22 275);
+            --btn-bg-hover: oklch(40% 0.19 275);
+            --btn-color:    #fff;
+            --btn-border:   transparent;
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .5rem 1rem;
+            background: var(--btn-bg); color: var(--btn-color);
+            border: 1px solid var(--btn-border);
+            border-radius: .5rem; font: 600 .875rem system-ui;
+            cursor: pointer;
+            transition: background-color 120ms;
+          }
+          .demo-8-4 .btn:hover { background: var(--btn-bg-hover); }
+          .demo-8-4 .btn:focus-visible { outline: 2px solid oklch(58% 0.22 275); outline-offset: 2px; }
+          .demo-8-4 .btn:disabled { opacity: .5; cursor: not-allowed; }
+          .demo-8-4 .btn-ghost  { --btn-bg: transparent; --btn-bg-hover: oklch(95% 0.04 275); --btn-color: oklch(40% 0.19 275); --btn-border: oklch(85% 0.012 264); }
+          .demo-8-4 .btn-danger { --btn-bg: oklch(60% 0.22 25); --btn-bg-hover: oklch(52% 0.22 25); }
+        </style>
+        <div class="demo-8-4" style="display:flex; gap:.5rem; flex-wrap:wrap;">
+          <button class="btn">Primary</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-danger">Danger</button>
+          <button class="btn" disabled>Disabled</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="row"&gt;
+  &lt;button class="btn"&gt;Save&lt;/button&gt;
+  &lt;button class="btn btn-ghost"&gt;Cancel&lt;/button&gt;
+  &lt;button class="btn btn-danger"&gt;Delete&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+.row { display: flex; gap: .5rem; }
+
+.btn {
+  --btn-bg:       oklch(48% 0.22 275);
+  --btn-bg-hover: oklch(40% 0.19 275);
+  --btn-color:    #fff;
+  --btn-border:   transparent;
+  padding: .5rem 1rem;
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  border: 1px solid var(--btn-border);
+  border-radius: .5rem;
+  font: 600 .875rem system-ui;
+  cursor: pointer;
+}
+.btn:hover { background: var(--btn-bg-hover); }
+.btn:focus-visible { outline: 2px solid oklch(58% 0.22 275); outline-offset: 2px; }
+
+/* Add a .btn-success variant below. Override ONLY tokens. */
+.btn-ghost  { --btn-bg: transparent; --btn-color: oklch(40% 0.19 275); --btn-border: #ccc; --btn-bg-hover: oklch(95% 0.04 275); }
+.btn-danger { --btn-bg: oklch(60% 0.22 25); --btn-bg-hover: oklch(52% 0.22 25); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a <code>.btn-success</code> variant to the editor above. Rule: you may only set custom property values. If you find yourself writing <code>padding</code> or <code>font-size</code>, stop and ask why.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.3-has-parent-selector.html">← Lesson 8.3</a>
+      <a href="./lesson-8.5-card-component-at-scope.html">Lesson 8.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

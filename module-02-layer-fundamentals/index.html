@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 2 — @layer Fundamentals · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../index.html#modules">Modules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container lesson">
+    <nav class="crumbs" aria-label="Breadcrumbs">
+      <a href="../index.html">Course</a>
+      <span>Module 2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 2 · Foundation</p>
+      <h1>@layer Fundamentals</h1>
+      <p class="lead">Module 1 left you frustrated with the cascade. This module hands you the one feature that fixes it: <code>@layer</code>. You will learn the syntax, the mental model, and the one rule that changes how you think about specificity forever.</p>
+    </header>
+
+    <section class="lesson-body">
+      <h2>Module goal</h2>
+      <p>Master every part of the <code>@layer</code> at-rule — declaration, population, ordering, sub-layers, the unlayered escape hatch, and <code>@import</code> integration — so you can refactor any legacy stylesheet without touching a single selector. By the end, the Module 1 disaster will be a solved problem.</p>
+
+      <h2>Browser support</h2>
+      <p><code>@layer</code> is production-ready in every modern browser: Chrome 99+, Firefox 97+, Safari 15.4+. Shipped in early 2022. You can use it today with no polyfill.</p>
+
+      <h2>Lessons</h2>
+      <ul class="lesson-list">
+        <li><a href="./lesson-2.1-what-is-at-layer.html"><span class="num">2.1</span> What @layer Actually Is</a></li>
+        <li><a href="./lesson-2.2-declaring-layer-order.html"><span class="num">2.2</span> Declaring Layer Order</a></li>
+        <li><a href="./lesson-2.3-populating-layers.html"><span class="num">2.3</span> Populating Layers</a></li>
+        <li><a href="./lesson-2.4-layer-priority-vs-specificity.html"><span class="num">2.4</span> Layer Priority vs Specificity: The Core Insight</a></li>
+        <li><a href="./lesson-2.5-unlayered-styles-escape-hatch.html"><span class="num">2.5</span> Unlayered Styles and the Escape Hatch</a></li>
+        <li><a href="./lesson-2.6-at-layer-with-at-import.html"><span class="num">2.6</span> @layer with @import</a></li>
+        <li><a href="./lesson-2.7-sub-layers.html"><span class="num">2.7</span> Sub-layers</a></li>
+      </ul>
+
+      <h2>Module project</h2>
+      <p><a href="./project/index.html">Refactor the Disaster</a> — take the Module 1 broken stylesheet and fix every outcome using <code>@layer</code> alone. No selector changes. No <code>!important</code>. Just architecture.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../module-01-the-problem/project/index.html">← Module 1 project</a>
+      <a href="./lesson-2.1-what-is-at-layer.html">Start Lesson 2.1 →</a>
+    </nav>
+  </main>
+</body>
+</html>

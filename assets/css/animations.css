@@ -1,0 +1,50 @@
+/* =============================================================
+   @layer animations — All motion. Highest priority layer.
+   ============================================================= */
+
+@layer animations {
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(var(--space-md)); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+  }
+
+  .fade-in {
+    animation: fade-in var(--dur-base) var(--ease-out) both;
+  }
+  .fade-up {
+    animation: fade-up var(--dur-moderate) var(--ease-out) both;
+  }
+
+  /* Editor "updated" flash — used by editor.js */
+  .editor-flash {
+    animation: pulse var(--dur-fast) var(--ease-in-out);
+  }
+
+  /* Scroll-driven reveal for module cards (progressive enhancement) */
+  @supports (animation-timeline: view()) {
+    .reveal-on-view {
+      animation: fade-up var(--dur-moderate) var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+
+  /* Global reduced-motion override — the one legitimate !important */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

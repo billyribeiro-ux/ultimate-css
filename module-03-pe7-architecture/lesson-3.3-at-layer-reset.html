@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.3 — @layer reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.3</p>
+      <h1>@layer reset</h1>
+      <p class="lead">The lowest layer, the weakest rules, the thinnest file. Its only job: delete browser defaults so the rest of your stack can start from a known baseline — and do it with zero specificity so nothing above has to fight to override it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single responsibility</h2>
+      <p>The reset layer exists to eliminate user-agent opinions. Default margins, default list bullets, default button chrome, default focus rings. It does not paint anything, does not size anything in the semantic sense, does not make decisions about how your product should look. It just clears the slate.</p>
+      <p>If your reset layer contains a single <code>font-family</code> declaration, you have violated the boundary. That is typography, which belongs in <code>base</code>.</p>
+
+      <h2>Why <code>:where()</code> matters</h2>
+      <p>The <code>:where()</code> pseudo-class has specificity <code>0,0,0</code> regardless of what it wraps. <code>:where(h1, h2, h3)</code> still scores zero. That is the entire reason the PE7 reset uses it everywhere.</p>
+      <p>A reset rule wrapped in <code>:where()</code> has zero specificity. The <em>layer</em> already gives it the lowest priority. The zero specificity means that even if somehow you needed to override a reset rule from <em>inside</em> the same layer (you should not), you would win trivially. And when you write <code>h1 { ... }</code> in your <code>base</code> layer, you do not need to think about whether the reset is fighting you — it cannot.</p>
+
+      <h2>The canonical reset</h2>
+      <pre><code>@layer reset {
+  /* Universal box model */
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Document defaults */
+  :where(html) {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Heading reset — no default size, no default weight */
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  /* Lists with role="list" drop their semantics in some screen readers
+     if we strip bullets, so we only strip when role is absent. */
+  :where(ul, ol) {
+    list-style: none;
+  }
+
+  /* Media should behave like blocks and never overflow */
+  :where(img, picture, video, canvas, svg) {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  /* Form controls inherit typography */
+  :where(input, button, textarea, select) {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Buttons lose their chrome but stay interactive */
+  :where(button) {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+}</code></pre>
+
+      <h2>What the reset must not do</h2>
+      <ul>
+        <li>Set colors. That is <code>base</code>.</li>
+        <li>Set fonts. That is <code>base</code>, using tokens.</li>
+        <li>Set spacing beyond zeroing. Spacing decisions belong in <code>base</code> and <code>layout</code>.</li>
+        <li>Touch classes. The reset only sees element selectors wrapped in <code>:where()</code>.</li>
+        <li>Use <code>!important</code>. Ever. A reset that needs importance is a reset that has been weaponised into a framework.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — reset before and after</h2>
+      <div class="demo-frame">
+        <style>
+          @layer reset33;
+          @layer reset33 {
+            .demo-3-3 :where(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
+            .demo-3-3 :where(h1, h2, h3, h4) { font-size: inherit; font-weight: inherit; }
+            .demo-3-3 :where(ul) { list-style: none; }
+            .demo-3-3 :where(button) { background: transparent; border: 0; padding: 0; cursor: pointer; font: inherit; }
+          }
+          .demo-3-3 { font-family: system-ui; padding: 1rem; color: oklch(20% 0.02 264); }
+        </style>
+        <div class="demo-3-3">
+          <h4>h4 with the reset applied — same size as body text, same weight</h4>
+          <ul><li>No bullet</li><li>No default padding</li></ul>
+          <button>A button with no chrome</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h1&gt;Reset demo&lt;/h1&gt;
+&lt;ul&gt;&lt;li&gt;one&lt;/li&gt;&lt;li&gt;two&lt;/li&gt;&lt;/ul&gt;
+&lt;button&gt;Bare button&lt;/button&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, base;
+
+@layer reset {
+  :where(*, *::before, *::after) {
+    box-sizing: border-box; margin: 0; padding: 0;
+  }
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit; font-weight: inherit;
+  }
+  :where(ul, ol) { list-style: none; }
+  :where(button) {
+    background: transparent; border: 0; padding: 0;
+    cursor: pointer; font: inherit;
+  }
+}
+
+@layer base {
+  body { font-family: system-ui; padding: 1rem; line-height: 1.5; }
+  h1 { font-size: 1.5rem; font-weight: 700; margin-block-end: 1rem; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove the <code>:where()</code> wrappers so every reset rule uses bare element selectors. The output looks identical. Now add, inside <code>@layer base</code>, a single rule <code>h1 { color: oklch(58% 0.22 275); }</code>. Does the h1 turn indigo? Yes. Now try it again — but first put <code>h1, h2 { color: red; }</code> (no <code>:where()</code>) back into the reset layer. Does base still win? Why does it matter when specificities inside different layers are still irrelevant?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.2-six-layers-single-responsibilities.html">← Lesson 3.2</a>
+      <a href="./lesson-3.4-at-layer-tokens.html">Lesson 3.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

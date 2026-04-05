@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.1 — Project Brief and Architecture Planning · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.1</p>
+      <h1>Project Brief and Architecture Planning</h1>
+      <p class="lead">Before writing a single line of CSS, the architecture is planned completely. A senior engineer plans in prose first — the code writes itself afterwards.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Your fictional product is <strong>Prism</strong> — a design-system hosting SaaS for engineering teams. The marketing page must have:</p>
+      <ul>
+        <li>Sticky navigation with an anchor-positioned dropdown</li>
+        <li>Hero section with a gradient accent, headline, subheadline, and CTA pair</li>
+        <li>Features grid (3 columns on desktop, auto-reflowing via <code>auto-fit</code>)</li>
+        <li>Testimonial section with carousel</li>
+        <li>Pricing table (three tiers)</li>
+        <li>FAQ accordion using <code>&lt;details&gt;</code></li>
+        <li>Cookie consent banner via the <code>popover</code> API</li>
+        <li>Footer with cluster layout</li>
+      </ul>
+
+      <h2>Mapping the brief to PE7 layers</h2>
+      <p>Before code, answer these questions in writing:</p>
+      <ol>
+        <li><strong>What token categories and names?</strong> Brand indigo + neutral scales, 9-stop spacing, 6-stop type, 5 motion durations, 4 easings, 3 radii.</li>
+        <li><strong>What layout primitives?</strong> Container, stack, cluster, grid, cover — all from Module 7.</li>
+        <li><strong>What components?</strong> nav, hero, feature-card, pricing-card, testimonial-slide, faq-item, cookie-banner, footer.</li>
+        <li><strong>What animations and which technique?</strong> Hero headline uses <code>@starting-style</code>, scroll reveals use <code>animation-timeline: view()</code>, sticky nav uses <code>scroll-state(stuck: top)</code>, card stagger uses <code>sibling-index()</code>.</li>
+        <li><strong>What modern features with fallbacks?</strong> Every scroll-driven / experimental feature wrapped in <code>@supports</code>.</li>
+        <li><strong>What requires JS?</strong> Zero JavaScript. The capstone is a no-JS deliverable (except for editor.js on the lesson pages themselves).</li>
+      </ol>
+
+      <h2>The file structure</h2>
+      <pre><code>module-12-capstone/capstone/
+├── index.html
+└── css/
+    ├── main.css           (@layer declaration + @import order)
+    ├── tokens.css
+    ├── reset.css
+    ├── base.css
+    ├── layout.css
+    ├── components.css
+    └── animations.css</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — the layer declaration</h2>
+      <div class="demo-frame">
+<pre><code>/* main.css — the capstone's root stylesheet */
+
+@layer reset, tokens, base, layout, components, animations;
+
+@import url("./reset.css");
+@import url("./tokens.css");
+@import url("./base.css");
+@import url("./layout.css");
+@import url("./components.css");
+@import url("./animations.css");</code></pre>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — plan your own</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;My architecture plan&lt;/h1&gt;
+  &lt;h2&gt;Tokens&lt;/h2&gt;
+  &lt;p&gt;Colors: ... Spacing: ... Type: ... Motion: ...&lt;/p&gt;
+  &lt;h2&gt;Components&lt;/h2&gt;
+  &lt;ul&gt;&lt;li&gt;nav&lt;/li&gt;&lt;li&gt;hero&lt;/li&gt;&lt;li&gt;feature-card&lt;/li&gt;&lt;/ul&gt;
+  &lt;h2&gt;Animations&lt;/h2&gt;
+  &lt;p&gt;Hero entrance, scroll reveal, sticky nav shadow, card stagger.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">article { font-family: system-ui; max-width: 60ch; margin: 2rem auto; padding: 1rem; }
+h1 { color: oklch(48% 0.22 275); }
+h2 { margin-block-start: 1.25rem; color: oklch(33% 0.020 264); }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Read the brief above, then write — in prose, in the editor — your own architecture plan for Prism. Answer all six planning questions before reading Lesson 12.2. If you cannot name a token, you are not ready to write it.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 12</a>
+      <a href="./lesson-12.2-token-system-build.html">Lesson 12.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3.5 — @layer base · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 3</a>
+      <span>Lesson 3.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 3.5</p>
+      <h1>@layer base</h1>
+      <p class="lead">Element selectors, token-powered, accessible by default. The base layer is the answer to "what does raw HTML look like in our design system, before a single component gets involved."</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single responsibility</h2>
+      <p>The base layer styles raw HTML elements. Every rule targets an element selector — <code>body</code>, <code>h1</code>, <code>p</code>, <code>a</code>, <code>button</code>, form controls. No classes. No IDs. No attribute selectors except accessibility-relevant ones like <code>:focus-visible</code>.</p>
+      <p>The goal: an author can write a plain HTML file with zero classes and get a typographically sensible, on-brand document. Markdown rendered to HTML should work. A blog post should work. A <code>&lt;dialog&gt;</code> element straight from the browser should look coherent.</p>
+
+      <h2>Only use tokens</h2>
+      <p>Every value in the base layer must reference a token. No magic numbers. No hex colours. No raw pixel values. If you cannot express something with an existing token, you either add the token (tokens layer) or the decision does not belong in base.</p>
+      <pre><code>@layer base {
+  body {
+    font-family: var(--font-body);
+    font-size:   var(--text-md);
+    line-height: var(--leading-normal);
+    color:       var(--color-text);
+    background:  var(--color-surface);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    line-height: var(--leading-tight);
+    text-wrap:   balance;
+  }
+
+  h1 { font-size: var(--text-3xl); }
+  h2 { font-size: var(--text-2xl); }
+  h3 { font-size: var(--text-xl);  }
+
+  p { max-inline-size: var(--measure-wide); text-wrap: pretty; }
+
+  a {
+    color: var(--color-link);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.15em;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}</code></pre>
+
+      <h2>Logical properties, always</h2>
+      <p>PE7 base rules use logical properties (<code>margin-block</code>, <code>padding-inline</code>, <code>inset</code>, <code>max-inline-size</code>) instead of physical ones (<code>margin-top</code>, <code>padding-left</code>, <code>width</code>). This is not dogma — it is the only way to ship a codebase that correctly supports right-to-left languages and vertical writing modes without retrofitting. Physical properties are a liability from day one.</p>
+
+      <h2>Accessible focus by default</h2>
+      <p>Every interactive element — <code>a</code>, <code>button</code>, <code>input</code>, <code>select</code>, <code>textarea</code>, <code>[tabindex]</code> — gets a visible focus ring in the base layer, keyed on <code>:focus-visible</code>. That way, accessibility is not a component-by-component opt-in; it is the default, and components have to actively opt <em>out</em> if they want custom focus behaviour.</p>
+
+      <h2>What base must not contain</h2>
+      <ul>
+        <li>No classes. Ever. Classes live in <code>components</code>.</li>
+        <li>No layout primitives. No <code>.stack</code>, no <code>.grid</code>.</li>
+        <li>No component-specific styling. A card is not an element.</li>
+        <li>No <code>!important</code>. The layer priority is your importance.</li>
+        <li>No hard-coded values. Everything resolves to a token.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — tokens + base, no classes</h2>
+      <div class="demo-frame">
+        <style>
+          @layer tokens35, base35;
+          @layer tokens35 {
+            .demo-3-5 { --color-text: oklch(14% 0.015 264); --color-link: oklch(55% 0.22 290); --space-3: .75rem; --space-4: 1rem; }
+          }
+          @layer base35 {
+            .demo-3-5 { font-family: system-ui; color: var(--color-text); line-height: 1.55; padding: var(--space-4); }
+            .demo-3-5 h3 { margin-block: 0 var(--space-3); font-size: 1.25rem; text-wrap: balance; }
+            .demo-3-5 p  { margin-block: 0 var(--space-3); max-inline-size: 60ch; text-wrap: pretty; }
+            .demo-3-5 a  { color: var(--color-link); text-decoration-thickness: 2px; text-underline-offset: 0.15em; }
+          }
+        </style>
+        <div class="demo-3-5">
+          <h3>Base styles, zero classes</h3>
+          <p>This entire demo uses only element selectors inside the base layer. Every value resolves to a token. No <code>.heading</code>, no <code>.prose</code>, no <code>.link</code>.</p>
+          <p>Logical properties (<code>margin-block</code>, <code>max-inline-size</code>) keep the rules RTL-safe.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Raw HTML, styled baseline&lt;/h1&gt;
+  &lt;p&gt;No classes. Just the base layer doing its job.&lt;/p&gt;
+  &lt;a href="#"&gt;A link&lt;/a&gt;
+  &lt;button&gt;A button&lt;/button&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, tokens, base;
+
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; margin: 0; padding: 0; }
+  :where(button) { background: transparent; border: 0; font: inherit; cursor: pointer; }
+}
+
+@layer tokens {
+  :root {
+    --color-text: oklch(14% 0.015 264);
+    --color-link: oklch(55% 0.22 290);
+    --color-focus: oklch(65% 0.22 275);
+    --space-3: .75rem;
+    --space-4: 1rem;
+    --text-2xl: 1.5rem;
+    --radius-sm: .25rem;
+  }
+}
+
+@layer base {
+  body { font-family: system-ui; color: var(--color-text);
+         line-height: 1.55; padding: var(--space-4); }
+  h1   { font-size: var(--text-2xl); margin-block-end: var(--space-3); text-wrap: balance; }
+  p    { margin-block-end: var(--space-3); max-inline-size: 60ch; text-wrap: pretty; }
+  a    { color: var(--color-link); }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Tab to the link and the button in the preview above. You should see the token-driven focus ring on both. Now delete the <code>:focus-visible</code> rule and tab again. The ring disappears everywhere — that is what "accessibility by default in the base layer" buys you. Put the rule back. Then try rewriting <code>margin-block-end: var(--space-3)</code> as <code>margin-bottom: var(--space-3)</code>. It works — now name the future language it breaks for.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-3.4-at-layer-tokens.html">← Lesson 3.4</a>
+      <a href="./lesson-3.6-at-layer-layout.html">Lesson 3.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.7 — Taming Third-Party CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.7</p>
+      <h1>Taming Third-Party CSS</h1>
+      <p class="lead">Every vendor stylesheet you pull in — date pickers, charts, rich text editors, analytics dashboards — was written without any knowledge of your cascade. The PE7 answer is to import them directly into the reset layer. Their styles are instantly neutralised by layer priority and you never touch their selectors.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem with third-party CSS</h2>
+      <p>A typical vendor stylesheet is 2000 lines of unlayered rules with <code>.vendor-button.vendor-button--primary</code> selectors and a liberal sprinkling of <code>!important</code>. Dropped into an ordinary project, it does exactly what its authors intended: it overrides your styles. In a layered project, that is upside down — you want <em>your</em> components to override the vendor's defaults, not the reverse.</p>
+
+      <h2>The pattern: import at reset level</h2>
+      <p>A single line is the entire technique.</p>
+      <pre><code>/* In your main.css, before any other layer */
+@import url("./vendor/normalize.css") layer(reset);
+@import url("./vendor/flatpickr.css") layer(reset);
+@import url("./vendor/chartjs.css") layer(reset);
+
+@layer reset, base, layout, components, utilities;
+
+@layer reset {
+  /* Your own reset rules go here — in the same layer */
+}</code></pre>
+      <p>The <code>layer(reset)</code> argument on <code>@import</code> places the imported file into the <code>reset</code> layer as if you had typed every rule inside an <code>@layer reset { ... }</code> block. Every vendor rule now lives at the bottom of the cascade. Your base layer, your components, your utilities — all of them win, even against the vendor's <code>!important</code>.</p>
+
+      <h2>Wait — !important?</h2>
+      <p>This is the part that surprises people. Inside <code>@layer</code>, the importance ordering flips. For <em>normal</em> declarations, higher layers beat lower layers. For <em>!important</em> declarations, lower layers beat higher layers. That sounds wrong until you think about what it is designed to solve: exactly this case. A third-party rule with <code>!important</code> in a low layer is quietly outranked by your higher-layer rules, <code>!important</code> or not.</p>
+
+      <h2>Why this is the right default</h2>
+      <p>You do not trust third-party CSS enough to let it override your design. But you also do not want to fork or patch it, because that creates a maintenance burden at every version bump. Importing into the reset layer is the compromise: you get the vendor's structural CSS for free, and the vendor's opinions are automatically silenced by your own.</p>
+
+      <h2>When to pick a higher layer instead</h2>
+      <p>If the vendor stylesheet is genuinely the visual language of the component — a rich-text editor whose toolbar is the product — import it into <code>components</code> instead of <code>reset</code>. The rule of thumb: import into the layer where you would have written the rules yourself if the vendor had handed you a plain list of selectors. Never import into <code>utilities</code> unless you are sure.</p>
+
+      <h2>One file, one layer</h2>
+      <p>Keep it to one layer per import. Do not attempt to scatter a vendor's rules across multiple layers using <code>@scope</code> or selector rewriting — that is exactly the kind of maintenance burden the pattern exists to avoid.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — vendor styles neutralised by layer</h2>
+      <div class="demo-frame">
+        <style>
+          @layer demo57-vendor, demo57-components;
+          .demo-5-7 { font-family: system-ui; }
+          @layer demo57-vendor {
+            .demo-5-7 .vendor-button { background: oklch(60% 0.22 25) !important; color: #fff !important; padding: .5rem 1rem; border: 0; border-radius: .25rem; }
+          }
+          @layer demo57-components {
+            .demo-5-7 .vendor-button { background: oklch(60% 0.18 275); }
+          }
+          .demo-5-7 p { font-size: .85rem; margin-block-start: .75rem; color: oklch(45% 0.02 264); }
+        </style>
+        <div class="demo-5-7">
+          <button class="vendor-button">Vendor button (indigo wins)</button>
+          <p>The vendor rule uses <code>!important</code> and is in a lower layer. The components layer wins anyway — that is the layer-<code>!important</code> flip.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="vendor-button"&gt;A button the vendor styled&lt;/button&gt;
+&lt;p&gt;Swap the layer of .vendor-button and watch the winner flip.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, base, components;
+
+/* Simulated vendor import: into reset layer */
+@layer reset {
+  .vendor-button {
+    background: crimson !important;
+    color: white !important;
+    padding: .5rem 1rem;
+    border: 0;
+    border-radius: .25rem;
+  }
+}
+
+/* Your components layer, no !important needed */
+@layer components {
+  .vendor-button {
+    background: steelblue;
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Move the vendor block out of <code>@layer reset</code> and into a plain unlayered rule. The button turns red — unlayered <code>!important</code> beats layered normal rules. That is the pre-PE7 world. Move it back. Indigo wins. The architecture did the work, not the developer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.6-motion-reset-prefers-reduced.html">← Lesson 5.6</a>
+      <a href="./lesson-5.8-writing-the-complete-pe7-reset.html">Lesson 5.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+/* Prism capstone — reset (PE7) */
+
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; }
+  :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) { margin: 0; }
+  :where(h1, h2, h3, h4, h5, h6) { font-size: inherit; font-weight: inherit; line-height: inherit; }
+  :where(ul[role="list"], ol[role="list"]) { list-style: none; padding: 0; margin: 0; }
+  :where(img, picture, video, canvas, svg) { display: block; max-inline-size: 100%; }
+  :where(img, video) { block-size: auto; }
+  :where(button, input, select, textarea) { font: inherit; color: inherit; }
+  :where(button) { cursor: pointer; background: none; border: none; padding: 0; }
+  :where(fieldset) { border: none; padding: 0; margin: 0; }
+  :where(body) { min-block-size: 100svh; text-rendering: optimizeLegibility; }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(*, *::before, *::after) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

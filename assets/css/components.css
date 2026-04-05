@@ -1,0 +1,429 @@
+/* =============================================================
+   @layer components — Course shell components (scoped)
+   Uses @scope and component-scoped custom properties.
+   ============================================================= */
+
+@layer components {
+
+  /* ---------- Site header ---------- */
+  .site-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-overlay);
+    background-color: color-mix(in oklch, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(10px);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .site-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-sm);
+    gap: var(--space-md);
+  }
+  .site-brand {
+    font-weight: var(--weight-bold);
+    font-size: var(--size-md);
+    color: var(--color-text-heading);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .site-brand span {
+    color: var(--color-primary);
+  }
+  .site-nav {
+    display: flex;
+    gap: var(--space-md);
+    font-size: var(--size-sm);
+  }
+  .site-nav a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+  .site-nav a:hover {
+    color: var(--color-primary);
+  }
+
+  /* ---------- Site footer ---------- */
+  .site-footer {
+    margin-block-start: var(--space-4xl);
+    padding-block: var(--space-2xl);
+    border-block-start: 1px solid var(--color-border);
+    color: var(--color-text-tertiary);
+    font-size: var(--size-sm);
+  }
+
+  /* ---------- Breadcrumbs ---------- */
+  .crumbs {
+    font-size: var(--size-sm);
+    color: var(--color-text-tertiary);
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+  }
+  .crumbs a {
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+  .crumbs > * + *::before {
+    content: "/";
+    margin-inline-end: var(--space-xs);
+    color: var(--color-border-strong);
+  }
+
+  /* ---------- Lesson page layout ---------- */
+  .lesson {
+    padding-block: var(--space-2xl);
+    --stack-gap: var(--space-xl);
+  }
+  .lesson > header h1 {
+    margin-block-end: var(--space-sm);
+  }
+  .lesson .lead {
+    font-size: var(--size-lg);
+    color: var(--color-text-secondary);
+    max-inline-size: var(--measure);
+    text-wrap: pretty;
+  }
+  .lesson-body {
+    --stack-gap: var(--space-md);
+  }
+  .lesson-body h2 {
+    margin-block-start: var(--space-lg);
+    font-size: var(--size-2xl);
+    border-block-end: 1px solid var(--color-border);
+    padding-block-end: var(--space-xs);
+  }
+  .lesson-body h3 {
+    margin-block-start: var(--space-md);
+    font-size: var(--size-xl);
+  }
+  .lesson-body p,
+  .lesson-body ul,
+  .lesson-body ol {
+    max-inline-size: var(--measure);
+  }
+
+  /* ---------- Callout ---------- */
+  .callout {
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-md) var(--space-lg);
+    background-color: var(--color-surface-raised);
+  }
+  .callout h2,
+  .callout h3 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--size-md);
+    color: var(--color-primary);
+    border: none;
+    padding: 0;
+  }
+  .callout.warning { border-inline-start-color: var(--color-warning); }
+  .callout.warning h2,
+  .callout.warning h3 { color: var(--color-warning); }
+  .callout.danger  { border-inline-start-color: var(--color-danger); }
+  .callout.danger h2,
+  .callout.danger h3 { color: var(--color-danger); }
+  .callout.success { border-inline-start-color: var(--color-success); }
+  .callout.success h2,
+  .callout.success h3 { color: var(--color-success); }
+
+  /* ---------- Demo frame ---------- */
+  .demo {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-raised);
+    overflow: hidden;
+  }
+  .demo > h2 {
+    font-size: var(--size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    padding: var(--space-sm) var(--space-md);
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-surface-sunken);
+    margin: 0;
+  }
+  .demo-frame {
+    padding: var(--space-lg);
+  }
+
+  /* ---------- Live editor ---------- */
+  .editor {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-raised);
+    overflow: hidden;
+  }
+  .editor > h2 {
+    font-size: var(--size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    padding: var(--space-sm) var(--space-md);
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-surface-sunken);
+    margin: 0;
+  }
+  .editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0;
+    min-block-size: 24rem;
+  }
+  @container (inline-size < 48rem) {
+    .editor-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+    }
+  }
+  .editor-pane {
+    display: flex;
+    flex-direction: column;
+    border-inline-end: 1px solid var(--color-border);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .editor-pane:nth-child(2) {
+    border-inline-end: none;
+  }
+  .editor-pane > span {
+    font-size: var(--size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    padding: var(--space-2xs) var(--space-sm);
+    background-color: var(--color-surface-sunken);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .editor textarea {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: var(--size-sm);
+    line-height: var(--leading-snug);
+    padding: var(--space-sm);
+    background-color: var(--color-surface-raised);
+    color: var(--color-text-primary);
+    border: none;
+    outline: none;
+    resize: none;
+    tab-size: 2;
+    min-block-size: 10rem;
+  }
+  .editor textarea:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
+  .editor iframe {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    inline-size: 100%;
+    block-size: 100%;
+    border: none;
+    background: #fff;
+    border-inline-start: 1px solid var(--color-border);
+  }
+  @container (inline-size < 48rem) {
+    .editor iframe {
+      grid-column: 1;
+      grid-row: auto;
+      min-block-size: 16rem;
+      border-inline-start: none;
+      border-block-start: 1px solid var(--color-border);
+    }
+  }
+  .editor-actions {
+    padding: var(--space-sm) var(--space-md);
+    border-block-start: 1px solid var(--color-border);
+    background-color: var(--color-surface-sunken);
+  }
+
+  /* ---------- Button ---------- */
+  .btn {
+    --btn-bg:        var(--color-primary);
+    --btn-bg-hover:  var(--color-primary-hover);
+    --btn-color:     var(--color-text-on-primary);
+    --btn-border:    transparent;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-md);
+    background-color: var(--btn-bg);
+    color: var(--btn-color);
+    border: 1px solid var(--btn-border);
+    border-radius: var(--radius-md);
+    font-size: var(--size-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-in-out),
+      color var(--dur-fast) var(--ease-in-out),
+      border-color var(--dur-fast) var(--ease-in-out);
+  }
+  .btn:hover { background-color: var(--btn-bg-hover); }
+  .btn-ghost {
+    --btn-bg: transparent;
+    --btn-bg-hover: var(--color-primary-subtle);
+    --btn-color: var(--color-primary);
+    --btn-border: var(--color-border-strong);
+  }
+  .btn-secondary {
+    --btn-bg: var(--color-surface-raised);
+    --btn-bg-hover: var(--color-surface-sunken);
+    --btn-color: var(--color-text-primary);
+    --btn-border: var(--color-border-strong);
+  }
+
+  /* ---------- Module card ---------- */
+  .module-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: transform var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+    position: relative;
+  }
+  .module-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+  .module-card .tag {
+    font-size: var(--size-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--color-primary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .module-card h3 {
+    margin: 0;
+    font-size: var(--size-lg);
+    color: var(--color-text-heading);
+  }
+  .module-card p {
+    margin: 0;
+    font-size: var(--size-sm);
+    color: var(--color-text-secondary);
+  }
+  .module-card .meta {
+    margin-block-start: auto;
+    font-size: var(--size-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  /* ---------- Lesson list ---------- */
+  .lesson-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .lesson-list li {
+    margin: 0;
+  }
+  .lesson-list a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    transition: border-color var(--dur-fast) var(--ease-out),
+                background-color var(--dur-fast) var(--ease-out);
+  }
+  .lesson-list a:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-subtle);
+  }
+  .lesson-list a .num {
+    font-family: var(--font-mono);
+    font-size: var(--size-xs);
+    color: var(--color-text-tertiary);
+    min-inline-size: 3rem;
+  }
+
+  /* ---------- Prev/next nav ---------- */
+  .lesson-nav {
+    margin-block-start: var(--space-2xl);
+    padding-block: var(--space-lg);
+    border-block-start: 1px solid var(--color-border);
+    justify-content: space-between;
+    font-size: var(--size-sm);
+  }
+  .lesson-nav a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .lesson-nav a:hover {
+    text-decoration: underline;
+  }
+
+  /* ---------- Badges ---------- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) var(--space-xs);
+    font-size: var(--size-xs);
+    font-weight: var(--weight-medium);
+    border-radius: var(--radius-full);
+    background-color: var(--color-primary-subtle);
+    color: var(--color-primary);
+  }
+  .badge.warning { background-color: color-mix(in oklch, var(--color-warning) 20%, transparent); color: var(--color-warning); }
+  .badge.success { background-color: color-mix(in oklch, var(--color-success) 20%, transparent); color: var(--color-success); }
+  .badge.danger  { background-color: color-mix(in oklch, var(--color-danger) 20%, transparent); color: var(--color-danger); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding-block: var(--space-4xl) var(--space-2xl);
+    text-align: start;
+  }
+  .hero h1 {
+    font-size: clamp(2.25rem, 5vw + 1rem, 4rem);
+    margin-block-end: var(--space-md);
+  }
+  .hero p.lead {
+    font-size: var(--size-lg);
+    max-inline-size: var(--measure);
+    color: var(--color-text-secondary);
+  }
+
+  /* Section heading */
+  .section-heading {
+    margin-block-start: var(--space-2xl);
+    margin-block-end: var(--space-md);
+  }
+
+  /* Browser support table spans full container width */
+  .support-table {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+  .support-table table {
+    min-inline-size: 40rem;
+  }
+}

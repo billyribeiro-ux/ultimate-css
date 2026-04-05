@@ -1,0 +1,70 @@
+/* =============================================================
+   @layer layout — Structural primitives only. No visual styling.
+   ============================================================= */
+
+@layer layout {
+  .container {
+    inline-size: min(var(--container-max, 72rem), 100%);
+    margin-inline: auto;
+    padding-inline: var(--container-gap, var(--space-lg));
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-gap, var(--space-md));
+  }
+  .stack-lg { --stack-gap: var(--space-xl); }
+  .stack-xl { --stack-gap: var(--space-2xl); }
+  .stack-sm { --stack-gap: var(--space-sm); }
+
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cluster-gap, var(--space-sm));
+    align-items: var(--cluster-align, center);
+    justify-content: var(--cluster-justify, flex-start);
+  }
+
+  .sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sidebar-gap, var(--space-xl));
+  }
+  .sidebar > :first-child {
+    flex-basis: var(--sidebar-width, 18rem);
+    flex-grow: 1;
+  }
+  .sidebar > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: var(--sidebar-min, 50%);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(var(--grid-min, 18rem), 1fr)
+    );
+    gap: var(--grid-gap, var(--space-md));
+  }
+
+  .cover {
+    display: grid;
+    place-items: center;
+    min-block-size: var(--cover-min-height, 70svh);
+    padding: var(--space-xl);
+  }
+
+  .center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Container-query contexts */
+  .cq-inline {
+    container-type: inline-size;
+  }
+}

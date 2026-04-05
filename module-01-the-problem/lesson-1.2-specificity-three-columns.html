@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1.2 — Specificity: The Three-Column System · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 1</a>
+      <span>Lesson 1.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 1.2</p>
+      <h1>Specificity: The Three-Column System</h1>
+      <p class="lead">Specificity is not a number. It is a three-column score — A, B, C — and the columns do not carry over. Understanding why that matters prevents a category of bugs that trips up experienced developers.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three columns</h2>
+      <ul>
+        <li><strong>A — IDs.</strong> Each <code>#id</code> in a selector adds 1 to the A column.</li>
+        <li><strong>B — classes, attributes, pseudo-classes.</strong> Each <code>.class</code>, <code>[attr]</code>, or <code>:hover</code> adds 1 to B.</li>
+        <li><strong>C — elements, pseudo-elements.</strong> Each <code>div</code>, <code>h1</code>, or <code>::before</code> adds 1 to C.</li>
+      </ul>
+      <p>The score is written as <code>A,B,C</code>. <code>#main .btn:hover</code> scores <code>1,2,0</code>. <code>button.primary[disabled]</code> scores <code>0,3,1</code>.</p>
+
+      <h2>The zero cases</h2>
+      <ul>
+        <li>The universal selector <code>*</code> scores <code>0,0,0</code>.</li>
+        <li><code>:where()</code> scores <code>0,0,0</code> regardless of what it wraps. This is why the PE7 reset uses it.</li>
+        <li>Inline styles score above the system — conceptually <code>1,0,0,0</code>.</li>
+      </ul>
+
+      <h2>The non-obvious rule: columns do not carry</h2>
+      <p><code>0,0,11</code> does <em>not</em> beat <code>0,1,0</code>. Eleven elements can never outweigh a single class. The columns are evaluated left to right — a higher A beats any B; a higher B beats any C — no matter how large the lower column is.</p>
+
+      <h2>Common misconception</h2>
+      <p>"More classes always wins." Walk through <code>.a.b.c.d.e</code> (<code>0,5,0</code>) losing to <code>#id</code> (<code>1,0,0</code>). Five classes lose to one ID.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — who wins?</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-1-2 #title { color: oklch(55% 0.22 275); }
+          .demo-1-2 .headline.headline.headline { color: oklch(65% 0.17 150); }
+        </style>
+        <div class="demo-1-2">
+          <h3 id="title" class="headline">.headline.headline.headline vs #title — who wins?</h3>
+          <p>The <code>#title</code> selector scores <code>1,0,0</code>. The triple <code>.headline</code> scores <code>0,3,0</code>. Three classes cannot beat one ID. You should see indigo, not green.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h1 id="title" class="headline big"&gt;Specificity&lt;/h1&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Predict the winner before running. Then run.
+   Score each rule: A,B,C. Remember: columns don't carry. */
+
+#title {
+  /* A,B,C = 1,0,0 */
+  color: tomato;
+}
+
+.headline.big {
+  /* A,B,C = 0,2,0 */
+  color: steelblue;
+}
+
+h1.headline.big[class] {
+  /* A,B,C = 0,3,1 */
+  color: seagreen;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Calculate the specificity of ten selectors below. For each pair, predict which wins before checking in the editor above.</p>
+      <ol>
+        <li><code>ul li a</code> vs <code>.nav a</code></li>
+        <li><code>#sidebar .item</code> vs <code>.sidebar .item.active</code></li>
+        <li><code>button:hover</code> vs <code>.btn.btn</code></li>
+        <li><code>[type="text"]:focus</code> vs <code>input:focus</code></li>
+        <li><code>main article h2</code> vs <code>.post h2</code></li>
+      </ol>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-1.1-how-the-cascade-works.html">← Lesson 1.1</a>
+      <a href="./lesson-1.3-specificity-war.html">Lesson 1.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

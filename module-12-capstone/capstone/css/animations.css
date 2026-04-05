@@ -1,0 +1,94 @@
+/* Prism capstone — animations layer.
+   All motion. Highest priority. Scroll-driven features wrapped in @supports. */
+
+@layer animations {
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(var(--space-md)); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Hero entrance — production-ready @starting-style */
+  .hero h1,
+  .hero p.lead,
+  .hero-cta {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--dur-slow) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
+  }
+  .hero h1      { transition-delay: 0ms; }
+  .hero p.lead  { transition-delay: 100ms; }
+  .hero-cta     { transition-delay: 200ms; }
+
+  @starting-style {
+    .hero h1,
+    .hero p.lead,
+    .hero-cta {
+      opacity: 0;
+      transform: translateY(var(--space-lg));
+    }
+  }
+
+  /* Scroll-driven section reveals — progressive enhancement */
+  @supports (animation-timeline: view()) {
+    .section-header,
+    .feature-card,
+    .pricing-card,
+    .testimonial {
+      animation: fade-up var(--dur-moderate) var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+
+  /* Staggered card entrance via sibling-index — progressive enhancement */
+  @supports (animation-delay: calc(sibling-index() * 100ms)) {
+    .features-grid > .feature-card {
+      animation-delay: calc((sibling-index() - 1) * 80ms);
+    }
+  }
+
+  /* Sticky nav shadow when stuck — progressive enhancement */
+  @supports (container-type: scroll-state) {
+    @container nav scroll-state(stuck: top) {
+      .nav {
+        box-shadow: var(--shadow-sm);
+      }
+    }
+  }
+
+  /* FAQ panel animation via @starting-style */
+  .faq details[open] > *:not(summary) {
+    animation: fade-up var(--dur-base) var(--ease-out);
+  }
+
+  /* Cookie banner enter */
+  .cookie-banner {
+    transition:
+      opacity var(--dur-moderate) var(--ease-out),
+      transform var(--dur-moderate) var(--ease-out),
+      display var(--dur-moderate) allow-discrete,
+      overlay var(--dur-moderate) allow-discrete;
+  }
+  .cookie-banner:not(:popover-open) {
+    opacity: 0;
+    transform: translateY(var(--space-lg));
+  }
+  @starting-style {
+    .cookie-banner:popover-open {
+      opacity: 0;
+      transform: translateY(var(--space-lg));
+    }
+  }
+
+  /* Global reduced-motion override — the ONE legitimate !important */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

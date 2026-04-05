@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.1 — Why Animations Own Their Layer · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.1</p>
+      <h1>Why Animations Own Their Layer</h1>
+      <p class="lead">Motion is the one concern every component has and the one every accessibility setting can strip away. Giving it the highest cascade layer is not a style preference — it is the only architecture that survives contact with <code>prefers-reduced-motion</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three reasons</h2>
+      <ol>
+        <li><strong>Single source of motion.</strong> Every transition and keyframe on the site is defined in one place. When a designer asks "can we slow everything down by 20%?", you change one duration token.</li>
+        <li><strong>Highest cascade priority.</strong> The animations layer comes last in <code>@layer reset, tokens, base, layout, components, animations</code>. That means animation properties win any cascade conflict. A component can declare a <code>transition</code> for its buttons; the animations layer can still override it globally without a specificity war.</li>
+        <li><strong>One-line accessibility override.</strong> Because all motion lives here, a single <code>@media (prefers-reduced-motion: reduce)</code> rule inside the layer can strip every animation and transition at once.</li>
+      </ol>
+
+      <h2>The reduced-motion override</h2>
+      <pre><code>@layer animations {
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration:   0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration:  0.01ms !important;
+      scroll-behavior:      auto   !important;
+    }
+  }
+}</code></pre>
+      <p>The <code>!important</code> here is intentional and correct. It is the one place in the entire PE7 architecture where <code>!important</code> is not a smell — because this rule must beat any future animation that gets added, and it must do so without the rule writer needing to remember.</p>
+
+      <h2>What goes in the layer</h2>
+      <ul>
+        <li><code>@keyframes</code> definitions.</li>
+        <li><code>transition</code> declarations on component states (<code>:hover</code>, <code>[aria-expanded]</code>).</li>
+        <li><code>animation</code> assignments.</li>
+        <li>Scroll-driven timelines and scroll-state container queries.</li>
+        <li>View transition pseudo-element rules.</li>
+      </ul>
+
+      <h2>What does <em>not</em> go here</h2>
+      <p>Duration, easing, and distance <em>values</em> belong in the tokens layer as <code>--dur-fast</code>, <code>--ease-out</code>, etc. The animations layer consumes those tokens; it does not invent new ones. This keeps the "design vocabulary" and the "motion mechanics" properly separated.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — reduced-motion override in action</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-9-1 .box {
+            inline-size: 4rem; block-size: 4rem; background: oklch(48% 0.22 275);
+            border-radius: .5rem;
+            animation: d91-pulse 1.5s ease-in-out infinite;
+          }
+          @keyframes d91-pulse { 50% { transform: scale(1.15); } }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-9-1 .box { animation-duration: .01ms !important; }
+          }
+        </style>
+        <div class="demo-9-1">
+          <div class="box" aria-label="Pulsing square"></div>
+          <p style="margin-top:1rem; font-size:.875rem; color: oklch(44% 0.020 264);">Turn on "Reduce motion" in your OS and reload. The pulse stops. One rule turned off every animation on the page.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="stack"&gt;
+  &lt;div class="box"&gt;&lt;/div&gt;
+  &lt;button class="btn"&gt;Hover me&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.stack { display: grid; gap: 1rem; }
+
+.box {
+  inline-size: 4rem; block-size: 4rem;
+  background: oklch(58% 0.22 275);
+  border-radius: .5rem;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin { to { transform: rotate(1turn); } }
+
+.btn {
+  padding: .5rem 1rem;
+  background: oklch(48% 0.22 275); color: #fff;
+  border: 0; border-radius: .5rem; cursor: pointer;
+  transition: transform 200ms ease-out;
+}
+.btn:hover { transform: translateY(-2px); }
+
+/* The global motion kill-switch. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Enable "Reduce motion" in your OS accessibility settings (System Settings on macOS; Ease of Access on Windows). Reload the editor above. Confirm the spinning box and the button hover both stop. Then turn it back off and watch them resume. This is the entire "respect user preferences" contract — one rule, one place.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 9</a>
+      <a href="./lesson-9.2-at-starting-style.html">Lesson 9.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

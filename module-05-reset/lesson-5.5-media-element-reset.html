@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.5 — Media Element Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.5</p>
+      <h1>Media Element Reset</h1>
+      <p class="lead">Images, videos, and SVGs are inline elements by default — a decision made when images were used as text decorations. On a modern page every image is a block, and every image must be allowed to shrink to its container. The reset fixes both with two rules.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The descender gap</h2>
+      <p>An <code>&lt;img&gt;</code> is inline by default, which means it sits on a text baseline. There is empty space below the baseline — the descender gap — reserved for letters like "g" and "y". In an image-only container you see that space as a mysterious four-pixel white stripe under every image. Setting <code>display: block</code> removes the baseline entirely.</p>
+      <pre><code>:where(img, picture, video, canvas, svg) {
+  display: block;
+  max-inline-size: 100%;
+}</code></pre>
+
+      <h2>Why max-inline-size, not max-width</h2>
+      <p>In a vertical writing mode, "width" is the block axis, not the inline axis. <code>max-inline-size</code> adapts automatically. This is a preview of the logical-properties rule from Lesson 6.5: in PE7 we never write physical properties when logical ones exist. The reset is the first layer to enforce that rule.</p>
+
+      <h2>Aspect ratio preservation</h2>
+      <p>Setting <code>max-inline-size: 100%</code> alone causes distortion when you also constrain <code>block-size</code>. The fix is to let the block axis flex with content:</p>
+      <pre><code>:where(img, video) { block-size: auto; }</code></pre>
+      <p>Combined with the browser's native aspect-ratio inference from the <code>width</code> and <code>height</code> HTML attributes, this gives correct layout-stable image sizing without cumulative layout shift.</p>
+
+      <h2>What we do not reset</h2>
+      <p>We do not force <code>object-fit: cover</code> or <code>cover</code>-like behaviour on media — that is a component decision. We do not set a default background or placeholder color — that is a component decision. The reset is subtraction, and everything else belongs to higher layers.</p>
+
+      <h2>SVG specifically</h2>
+      <p>Inline SVGs inherit <code>color</code> via <code>currentColor</code>, which is exactly what you want for icon systems. The reset should not touch SVG color or fill — doing so would break icons that rely on the currentColor pattern.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — descender gap and overflow</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-5 { font-family: system-ui; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-5-5 > figure { margin: 0; border: 2px solid oklch(60% 0.22 25); padding: 0; inline-size: 16rem; max-inline-size: 100%; }
+          .demo-5-5 figcaption { font-size: .75rem; padding: .25rem .5rem; background: oklch(95% 0.01 264); border-block-start: 1px solid oklch(85% 0.01 264); }
+          .demo-5-5 .broken svg { /* default inline */ }
+          .demo-5-5 .fixed svg { display: block; max-inline-size: 100%; }
+        </style>
+        <div class="demo-5-5">
+          <figure class="broken">
+            <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" width="240" height="144" aria-hidden="true"><rect width="200" height="120" fill="oklch(70% 0.15 220)"/></svg>
+            <figcaption>Default: inline + overflow + descender gap above this caption.</figcaption>
+          </figure>
+          <figure class="fixed">
+            <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" width="240" height="144" aria-hidden="true"><rect width="200" height="120" fill="oklch(70% 0.15 150)"/></svg>
+            <figcaption>Reset applied: block + constrained + gap closed.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;figure&gt;
+  &lt;svg viewBox="0 0 200 120" width="400" height="240" xmlns="http://www.w3.org/2000/svg"&gt;
+    &lt;rect width="200" height="120" fill="steelblue"/&gt;
+  &lt;/svg&gt;
+  &lt;figcaption&gt;Toggle the reset on and off. Watch the gap and the overflow.&lt;/figcaption&gt;
+&lt;/figure&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset {
+  :where(img, picture, video, canvas, svg) {
+    display: block;
+    max-inline-size: 100%;
+  }
+  :where(img, video) {
+    block-size: auto;
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+figure {
+  margin: 0;
+  inline-size: 12rem;
+  border: 2px solid crimson;
+}
+figcaption { padding: .25rem .5rem; font-size: .8rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Delete <code>max-inline-size: 100%</code> from the reset. The SVG overflows its parent figure and pushes the border out. Now delete <code>display: block</code> only. You will see a one-to-four pixel gap appear above the caption — the classic descender-gap bug. Two lines of reset CSS eliminate a whole category of image-related layout complaints.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.4-form-interactive-reset.html">← Lesson 5.4</a>
+      <a href="./lesson-5.6-motion-reset-prefers-reduced.html">Lesson 5.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.8 — PE7 Architecture Audit · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.8</p>
+      <h1>PE7 Architecture Audit</h1>
+      <p class="lead">A structured review of the complete capstone against every PE7 rule. Any violation is fixed before submission. No exceptions, no excuses.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The audit checklist</h2>
+      <ol>
+        <li>Layer order declared first in one line — <code>@layer reset, tokens, base, layout, components, animations;</code></li>
+        <li>All six layers present and populated.</li>
+        <li>No layer boundary violations — run through the seven boundary rules from Lesson 3.9.</li>
+        <li>No hard-coded values in base, layout, components, or animations — every property value is <code>var(--token)</code>.</li>
+        <li>Logical properties exclusively in reset and base — grep for <code>margin-left</code>, <code>padding-right</code>, etc. The only legitimate hit should be zero.</li>
+        <li><code>@scope</code> on every component's internal styling.</li>
+        <li>Zero <code>!important</code> except the <code>prefers-reduced-motion</code> override in the animations layer.</li>
+        <li>Every modern / progressive-enhancement CSS feature wrapped in <code>@supports</code> with a documented fallback.</li>
+        <li>Light and dark mode via <code>light-dark()</code> — no class toggling, no JavaScript.</li>
+        <li>Keyboard navigation complete — every interactive element reachable by Tab.</li>
+        <li>Screen reader accessibility — every control has an accessible name; headings form a correct outline.</li>
+        <li>Contrast ratios pass WCAG AA (4.5:1 for text, 3:1 for large text and non-text) in both light and dark mode.</li>
+      </ol>
+
+      <h2>The auditor's mindset</h2>
+      <p>When you find a violation, do not rationalize it. Fix it. The entire value of this architecture is that every rule has an unambiguous home. "I had to break the boundary because…" is the sentence that introduces technical debt into your codebase.</p>
+
+      <h2>Verify against the finished capstone</h2>
+      <p>Open the <a href="./capstone/index.html">finished capstone page</a> and run the checklist against its stylesheets in <code>capstone/css/</code>. Every item passes. If one does not, the capstone is not done.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — the final layer declaration</h2>
+      <div class="demo-frame">
+<pre><code>/* capstone/css/main.css */
+
+@layer reset, tokens, base, layout, components, animations;
+
+@import url("./reset.css");
+@import url("./tokens.css");
+@import url("./base.css");
+@import url("./layout.css");
+@import url("./components.css");
+@import url("./animations.css");</code></pre>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — run an audit</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Audit report: Prism capstone&lt;/h1&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Layer order declared — PASS&lt;/li&gt;
+    &lt;li&gt;All six layers populated — PASS&lt;/li&gt;
+    &lt;li&gt;No boundary violations — PASS&lt;/li&gt;
+    &lt;li&gt;No hard-coded values — PASS&lt;/li&gt;
+    &lt;li&gt;Logical properties only — PASS&lt;/li&gt;
+    &lt;li&gt;@scope on components — PASS&lt;/li&gt;
+    &lt;li&gt;!important only in reduced-motion — PASS&lt;/li&gt;
+    &lt;li&gt;@supports on progressive features — PASS&lt;/li&gt;
+    &lt;li&gt;light-dark() dark mode — PASS&lt;/li&gt;
+    &lt;li&gt;Keyboard navigation — PASS&lt;/li&gt;
+    &lt;li&gt;Screen reader compatible — PASS&lt;/li&gt;
+    &lt;li&gt;WCAG AA contrast both modes — PASS&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; max-width: 50ch; margin: 2rem auto; color: oklch(14% 0.015 264); }
+h1 { color: oklch(48% 0.22 275); }
+ul { padding: 0; list-style: none; }
+li {
+  padding: .5rem .75rem;
+  border-inline-start: 3px solid oklch(65% 0.17 150);
+  background: oklch(95% 0.04 275 / .3);
+  margin-block-end: .25rem;
+  border-radius: 0 .25rem .25rem 0;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout success">
+      <h2>Course complete</h2>
+      <p>If every item on the audit passes, you have shipped a PE7-compliant production page using only HTML and CSS. You now architect CSS the way a principal engineer does: intentionally, systematically, and without fear.</p>
+      <p><a href="./capstone/index.html">Open the finished capstone page</a> to see every pattern from the course applied in one deliverable.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.7-no-js-integration.html">← Lesson 12.7</a>
+      <a href="./capstone/index.html">Open capstone →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

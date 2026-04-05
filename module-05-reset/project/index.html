@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 5 Project — Ship a Production Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 5</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 5 · Project</p>
+      <h1>Ship a Production Reset</h1>
+      <p class="lead">Take the rules from every lesson in this module and assemble them into one <code>reset.css</code>. Prove the result by rendering the same HTML twice — once without the reset, once with — and explain every visible difference.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <ol>
+        <li>Write a single <code>reset.css</code> that contains every rule from lessons 5.2–5.6. Every selector wrapped in <code>:where()</code>. Every rule inside <code>@layer reset</code>.</li>
+        <li>Apply it to the HTML below and screenshot the before/after.</li>
+        <li>Write down, for each visible difference, which reset rule caused it.</li>
+      </ol>
+
+      <h2>The complete reset file</h2>
+      <pre><code>/* reset.css — PE7 production reset */
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; }
+
+  :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) { margin: 0; }
+  :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit; font-weight: inherit; line-height: inherit;
+  }
+  :where(ul[role="list"], ol[role="list"]) {
+    list-style: none; padding: 0; margin: 0;
+  }
+
+  :where(img, picture, video, canvas, svg) {
+    display: block; max-inline-size: 100%;
+  }
+  :where(img, video) { block-size: auto; }
+
+  :where(button, input, select, textarea) { font: inherit; color: inherit; }
+  :where(button) {
+    cursor: pointer; background: none; border: none; padding: 0;
+  }
+  :where(textarea) { resize: vertical; }
+  :where(fieldset) { border: none; padding: 0; margin: 0; }
+
+  :where(body) {
+    min-block-size: 100svh;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(*, *::before, *::after) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Live comparison — same HTML, reset off vs reset on</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-p { font-family: Georgia, serif; font-size: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-5-p > section { padding: 1rem; border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; background: #fff; }
+          .demo-5-p h4 { margin: 0 0 .5rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); font-family: system-ui; }
+          .demo-5-p figure { margin: 0; border: 1px solid oklch(80% 0.02 264); inline-size: 100%; }
+          .demo-5-p svg.block-off { /* UA inline */ }
+          .demo-5-p .after :where(h1, h2, p) { margin: 0; }
+          .demo-5-p .after :where(h1, h2) { font-size: inherit; font-weight: inherit; }
+          .demo-5-p .after :where(button, input) { font: inherit; color: inherit; }
+          .demo-5-p .after :where(button) { background: none; border: 1px solid currentColor; padding: .25rem .5rem; }
+          .demo-5-p .after :where(img, svg) { display: block; max-inline-size: 100%; }
+          .demo-5-p .after { display: flex; flex-direction: column; gap: .5rem; }
+        </style>
+        <div class="demo-5-p">
+          <section class="before">
+            <h4>Reset off (UA defaults)</h4>
+            <h1>Heading one</h1>
+            <h2>Heading two</h2>
+            <p>A paragraph with implicit margin and implicit oversized headings.</p>
+            <button>Default button</button>
+            <input value="Default input">
+            <figure><svg viewBox="0 0 200 60" width="200" height="60"><rect width="200" height="60" fill="oklch(65% 0.17 220)"/></svg></figure>
+          </section>
+          <section class="after">
+            <h4>Reset on</h4>
+            <h1>Heading one</h1>
+            <h2>Heading two</h2>
+            <p>Same HTML, zero opinions left. The base layer is now free to take over.</p>
+            <button>Chromeless button</button>
+            <input value="Font-inheriting input">
+            <figure><svg viewBox="0 0 200 60" width="200" height="60"><rect width="200" height="60" fill="oklch(65% 0.17 150)"/></svg></figure>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Your deliverable</h2>
+      <p>Ten numbered observations. For each one, state which rule in <code>reset.css</code> caused the change and which lesson introduced it.</p>
+      <ol>
+        <li>Heading sizes: h1 and h2 collapse to body size. Which rule? Which lesson?</li>
+        <li>Heading and paragraph margins: gone. Which rule?</li>
+        <li>Button font: inherits Georgia on the right, still uses system font on the left. Why?</li>
+        <li>Button chrome: removed on the right. Which rule?</li>
+        <li>Input font: inherits Georgia. Which rule?</li>
+        <li>SVG inside figure: now block-level on the right, no descender gap. Which rule?</li>
+        <li>SVG width: constrained to parent. Which rule?</li>
+        <li>Box-sizing: verify by inspecting computed styles. Which rule?</li>
+        <li>Motion: enable OS reduce-motion and re-check any animation. Which rule?</li>
+        <li>Third-party CSS: sketch how you would import a vendor stylesheet into this reset. Which lesson?</li>
+      </ol>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Scratchpad — paste your reset here and experiment</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Final reset test&lt;/h1&gt;
+  &lt;p&gt;Swap between reset on and off by commenting out the @layer block.&lt;/p&gt;
+  &lt;button&gt;Button&lt;/button&gt;
+  &lt;input value="Input"&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset, base;
+
+@layer reset {
+  :where(*, *::before, *::after) { box-sizing: border-box; }
+  :where(h1, h2, h3, p) { margin: 0; }
+  :where(h1, h2, h3) { font-size: inherit; font-weight: inherit; }
+  :where(button, input) { font: inherit; color: inherit; }
+  :where(button) { background: none; border: none; padding: 0; cursor: pointer; }
+}
+
+@layer base {
+  body { font-family: Georgia, serif; padding: 1rem; }
+  article { display: flex; flex-direction: column; gap: .5rem; max-inline-size: 40ch; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-5.8-writing-the-complete-pe7-reset.html">← Lesson 5.8</a>
+      <a href="../../module-06-base/index.html">Module 6 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+</body>
+</html>

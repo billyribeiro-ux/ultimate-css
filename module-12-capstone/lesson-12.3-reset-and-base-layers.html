@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.3 — Reset and Base Layers · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.3</p>
+      <h1>Reset and Base Layers</h1>
+      <p class="lead">Apply the production reset from Module 5 and build the base layer for Prism using only the tokens from 12.2. With just these two layers, the page should already be legible and accessible.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What you are building</h2>
+      <ul>
+        <li><code>capstone/css/reset.css</code> — the complete PE7 reset (from Module 5), <code>:where()</code>-wrapped, with the <code>prefers-reduced-motion</code> override.</li>
+        <li><code>capstone/css/base.css</code> — body defaults using tokens, heading hierarchy with <code>text-wrap: balance</code>, paragraph with <code>text-wrap: pretty</code> and <code>max-inline-size: 65ch</code>, <code>:focus-visible</code> styles, dark mode via <code>light-dark()</code>.</li>
+      </ul>
+
+      <h2>Verification checkpoint</h2>
+      <p>Load the capstone HTML with only <code>tokens.css</code>, <code>reset.css</code>, and <code>base.css</code> applied. The page should be: legible prose, navigable by keyboard with visible focus rings, correctly rendered in both light and dark mode via the OS preference. No layout yet, no components yet — just clean type on a clean background.</p>
+
+      <h2>The single rule, reinforced</h2>
+      <p>Every property value in <code>base.css</code> is <code>var(--token)</code>. If you catch yourself typing a hex code, stop and add a token to <code>tokens.css</code> first.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — base layer in action</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-12-3 { font-family: system-ui; color: oklch(14% 0.015 264); max-width: 40rem; line-height: 1.6; }
+          .demo-12-3 h2 { font-size: 1.75rem; text-wrap: balance; margin-block-end: .5rem; color: oklch(8% 0.012 264); }
+          .demo-12-3 p { text-wrap: pretty; max-inline-size: 65ch; color: oklch(33% 0.020 264); }
+          .demo-12-3 a { color: oklch(48% 0.22 275); text-underline-offset: 3px; }
+        </style>
+        <div class="demo-12-3">
+          <h2>Legible before a single component is written</h2>
+          <p>Only tokens, reset, and base. Typography, color, focus, and dark mode all work. The layout layer adds structure next; components add visual identity. But the page is already readable and accessible <a href="#">to a screen reader</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;A page with only tokens + reset + base&lt;/h1&gt;
+  &lt;p&gt;This paragraph reads correctly because the base layer applies tokenized typography and line-length limits. Resize the window and watch the measure stay at 65ch.&lt;/p&gt;
+  &lt;p&gt;&lt;a href="#"&gt;And this link&lt;/a&gt; uses the base-layer underline-offset and decoration-thickness.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  color-scheme: light dark;
+  --color-surface: light-dark(oklch(98% 0.003 264), oklch(8% 0.012 264));
+  --color-text:    light-dark(oklch(14% 0.015 264), oklch(96% 0.005 264));
+  --color-link:    light-dark(oklch(48% 0.22 275), oklch(68% 0.18 275));
+  --measure: 65ch;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  color: var(--color-text);
+  background: var(--color-surface);
+  line-height: 1.6;
+  padding: 2rem;
+}
+h1 { text-wrap: balance; }
+p  { text-wrap: pretty; max-inline-size: var(--measure); }
+a {
+  color: var(--color-link);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+a:hover { text-decoration-thickness: 2px; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Toggle your OS to dark mode. Watch the editor preview swap automatically via <code>light-dark()</code>. Confirm contrast stays comfortable in both. No JavaScript. No class toggle.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.2-token-system-build.html">← Lesson 12.2</a>
+      <a href="./lesson-12.4-layout-primitives-build.html">Lesson 12.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

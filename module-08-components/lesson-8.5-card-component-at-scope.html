@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.5 — Card Component with @scope · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.5</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>Card Component with @scope</h1>
+      <p class="lead">A card is the archetype of a container component — it wraps arbitrary content and must not leak. We build it with <code>@scope</code>, a scoped token API, and a container query that adapts horizontally or vertically based on the card's own width, not the viewport.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The architecture</h2>
+      <ol>
+        <li><code>.card</code> declares a container with its scoped token API.</li>
+        <li><code>@scope (.card)</code> styles internal elements (<code>img</code>, <code>h3</code>, <code>p</code>, <code>footer</code>) using element selectors — no BEM.</li>
+        <li>A <code>@container</code> query switches between stacked and horizontal layout based on the card's inline-size.</li>
+        <li>Variants override only tokens: <code>--card-bg</code>, <code>--card-border</code>, <code>--card-accent</code>.</li>
+      </ol>
+
+      <h2>Why not descendant selectors?</h2>
+      <p>If you wrote <code>.card img { ... }</code>, a nested card's image would inherit the outer card's image styles. <code>@scope</code> uses proximity matching — each image belongs to its nearest enclosing card, so nesting is safe.</p>
+
+      <h2>Container query adaptation</h2>
+      <p>The container query lets the card decide its own layout without knowing anything about the page:</p>
+      <pre><code>@container (inline-size &gt; 28rem) {
+  .card-body { display: grid; grid-template-columns: 10rem 1fr; gap: 1rem; }
+}</code></pre>
+      <p>Drop the same card into a wide hero, a narrow sidebar, or a three-column grid — it adapts. There is no "card-horizontal" variant class.</p>
+
+      <h2>Browser support</h2>
+      <p><code>@scope</code>: Chrome 118+, Safari 17.4+, Firefox 128+. Container queries: baseline in all modern browsers. Wrap the scope in <code>@supports (selector(@scope))</code> and fall back to element selectors inside <code>.card</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — adaptive card</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-5 .grid { display: grid; grid-template-columns: 20rem 1fr; gap: 1rem; }
+          .demo-8-5 .card {
+            --card-bg: #fff;
+            --card-border: oklch(85% 0.012 264);
+            --card-accent: oklch(48% 0.22 275);
+            container-type: inline-size;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-top: 3px solid var(--card-accent);
+            border-radius: .5rem;
+            overflow: hidden;
+          }
+          .demo-8-5 .card-featured { --card-accent: oklch(65% 0.17 150); }
+          @supports (selector(@scope)) {
+            @scope (.demo-8-5 .card) {
+              .body { padding: 1rem; display: grid; gap: .5rem; }
+              h3 { margin: 0; color: oklch(22% 0.018 264); font-size: 1.125rem; }
+              p  { margin: 0; color: oklch(44% 0.020 264); font-size: .875rem; }
+              .thumb { background: oklch(92% 0.008 264); aspect-ratio: 16/9; }
+              @container (inline-size &gt; 28rem) {
+                .body { grid-template-columns: 10rem 1fr; align-items: center; }
+                .thumb { aspect-ratio: 1; block-size: 100%; }
+              }
+            }
+          }
+        </style>
+        <div class="demo-8-5">
+          <div class="grid">
+            <div class="card">
+              <div class="body">
+                <div class="thumb"></div>
+                <h3>Narrow card</h3>
+                <p>Stacked because container width is small.</p>
+              </div>
+            </div>
+            <div class="card card-featured">
+              <div class="body">
+                <div class="thumb"></div>
+                <h3>Wide card</h3>
+                <p>Horizontal layout triggered by container query on its own width.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;div class="body"&gt;
+    &lt;div class="thumb"&gt;&lt;/div&gt;
+    &lt;h3&gt;Resize me&lt;/h3&gt;
+    &lt;p&gt;Drag the preview border to see the container query fire.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.card {
+  --card-bg: #fff;
+  --card-border: oklch(85% 0.012 264);
+  container-type: inline-size;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: .5rem;
+  overflow: hidden;
+}
+
+@supports (selector(@scope)) {
+  @scope (.card) {
+    .body { padding: 1rem; display: grid; gap: .5rem; }
+    h3 { margin: 0; }
+    p  { margin: 0; color: #555; }
+    .thumb { background: oklch(92% 0.008 264); aspect-ratio: 16/9; }
+    @container (inline-size &gt; 28rem) {
+      .body { grid-template-columns: 10rem 1fr; align-items: center; }
+      .thumb { aspect-ratio: 1; }
+    }
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third breakpoint to the container query: when <code>inline-size &gt; 50rem</code>, show a sidebar column with metadata. Notice how the <em>markup never changes</em> — only the scoped CSS.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.4-button-component-variants.html">← Lesson 8.4</a>
+      <a href="./lesson-8.6-anchor-positioning-tooltips.html">Lesson 8.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

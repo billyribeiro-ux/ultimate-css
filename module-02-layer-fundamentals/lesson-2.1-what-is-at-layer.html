@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.1 — What @layer Actually Is · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.1</p>
+      <h1>What @layer Actually Is</h1>
+      <p class="lead">Before syntax, the model. <code>@layer</code> is a new step in the cascade that sits above specificity. Once you grasp that single sentence, every confusing part of CSS architecture becomes obvious.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why it exists</h2>
+      <p>In Module 1 you saw rules fight each other. Third-party libraries clashed with author styles. Specificity arms races erupted. <code>!important</code> chains formed. None of that came from bad engineers — it came from the cascade offering exactly one lever (specificity) to express an intent that actually has two dimensions: <em>how specific is the selector</em> and <em>what kind of rule is this</em>.</p>
+      <p><code>@layer</code> gives you the second dimension. It lets you declare, explicitly, that one bucket of rules should always beat another bucket — regardless of how the selectors inside each bucket are written.</p>
+
+      <h2>The one-sentence definition</h2>
+      <p>A <strong>layer</strong> is a named priority bucket in the cascade. Every rule inside a higher-priority layer beats every rule inside a lower-priority layer, no matter the specificity of either one.</p>
+
+      <h2>Where it sits in the cascade</h2>
+      <p>Recall the four-step cascade from Lesson 1.1. Layer priority is step 2 — it runs <em>after</em> origin-and-importance, but <em>before</em> specificity. That ordering is the whole point. Specificity only ever decides things inside a single layer. Across layers, specificity is irrelevant.</p>
+      <ol>
+        <li>Origin &amp; importance</li>
+        <li><strong>Layer priority ← this is what <code>@layer</code> controls</strong></li>
+        <li>Specificity</li>
+        <li>Source order</li>
+      </ol>
+
+      <h2>The mental model: shelves, not piles</h2>
+      <p>Without layers, your stylesheet is a single pile of rules. The only way to sort them is specificity. With layers, you get labelled shelves stacked on top of each other. A feather on a high shelf is higher than a brick on a low shelf. A class in a high layer wins against an ID in a low layer.</p>
+      <p>This is the single most important sentence in the course. Re-read it. Everything from Module 3 onward is built on it.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Live demo — a layer beats an ID</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-2-1 { font-family: system-ui; }
+          @layer low, high;
+          @layer low {
+            .demo-2-1 #headline { color: oklch(60% 0.015 264); }
+          }
+          @layer high {
+            .demo-2-1 .headline { color: oklch(58% 0.22 275); }
+          }
+        </style>
+        <div class="demo-2-1">
+          <h3 id="headline" class="headline">A class in a high layer beats an ID in a low layer</h3>
+          <p>The ID rule scores <code>1,0,0</code>. The class rule scores <code>0,1,0</code>. Without layers, the ID wins. With layers — and with <code>high</code> declared after <code>low</code> — the class wins. You should see indigo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h1 id="title" class="headline"&gt;Layers beat specificity&lt;/h1&gt;
+&lt;p&gt;Delete the @layer declarations and watch the ID win again.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Two layers, declared in priority order: low then high.
+   The later-declared layer wins. */
+
+@layer low, high;
+
+@layer low {
+  #title { color: gray; }   /* specificity 1,0,0 */
+}
+
+@layer high {
+  .headline { color: oklch(58% 0.22 275); } /* specificity 0,1,0 */
+}
+
+body { font-family: system-ui; padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>In the editor above, remove the <code>@layer low, high;</code> declaration line entirely, then run. The two layers still exist — but their order is now determined by the order they were first seen. Does the class still win? Why or why not? Write down your prediction before running.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 2</a>
+      <a href="./lesson-2.2-declaring-layer-order.html">Lesson 2.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

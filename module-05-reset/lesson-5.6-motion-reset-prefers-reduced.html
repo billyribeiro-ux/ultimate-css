@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.6 — Motion Reset &amp; prefers-reduced-motion · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.6</p>
+      <h1>Motion Reset &amp; prefers-reduced-motion</h1>
+      <p class="lead">Users who request reduced motion are telling you — through an operating system preference — that fast transitions cause them nausea or vertigo. Respecting that request is not a nice-to-have. It is the single accessibility rule most deserving of an <code>!important</code> in the reset layer.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The one place !important belongs</h2>
+      <p>The rest of this course is about avoiding <code>!important</code>. Motion reduction is the exception. When a user sets the OS-level reduced-motion flag, they have told the browser that arbitrary component authors — including third-party libraries — must not animate. Any layer in the cascade could have added a transition; the reset has to shut them all down regardless of specificity.</p>
+      <pre><code>@media (prefers-reduced-motion: reduce) {
+  :where(*, *::before, *::after) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}</code></pre>
+
+      <h2>Why 0.01ms and not zero?</h2>
+      <p>Setting animation duration to exactly zero skips the animation entirely, including any <code>animationend</code> events. Component code that waits for those events — for example, a modal that dismounts after its exit animation finishes — would hang forever. <code>0.01ms</code> runs the animation for a single frame, fires the event, and looks instantaneous to the user.</p>
+
+      <h2>scroll-behavior</h2>
+      <p>Smooth scrolling is also motion. If a user asks for reduced motion, anchor links and <code>scrollIntoView</code> calls should jump instantly rather than animating. <code>scroll-behavior: auto</code> is the instant form; <code>smooth</code> is the animated form. The reset forces instant under reduced-motion.</p>
+
+      <h2>The :where() exception — still zero specificity</h2>
+      <p>The selector is <code>:where(*, *::before, *::after)</code>. <code>:where()</code> keeps the specificity at zero; the <code>!important</code> is what guarantees the rule wins regardless of layer order. This is the only time the two are combined in the PE7 architecture, and it is deliberately restricted to motion properties.</p>
+
+      <h2>What we do not disable</h2>
+      <p>We do not disable <em>all</em> animation — some animations encode state, like a spinner showing that a request is in flight. The reset shortens their duration to near-zero so the visual flash still communicates state, but never exceeds one frame. Components that need a truly motionless alternative should use a <code>@media (prefers-reduced-motion: reduce)</code> block of their own and swap the visual to a static indicator.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — animation under each preference</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-6 { font-family: system-ui; }
+          .demo-5-6 .box { inline-size: 3rem; block-size: 3rem; background: oklch(60% 0.18 275); border-radius: .5rem; animation: demo-slide 1.6s ease-in-out infinite alternate; }
+          @keyframes demo-slide { from { transform: translateX(0); } to { transform: translateX(60%); } }
+          .demo-5-6 .track { padding: .5rem; background: oklch(96% 0.005 264); border-radius: .5rem; }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-5-6 :where(*, *::before, *::after) {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+            }
+          }
+          .demo-5-6 p { font-size: .85rem; color: oklch(45% 0.02 264); margin-block-start: .5rem; }
+        </style>
+        <div class="demo-5-6">
+          <div class="track"><div class="box"></div></div>
+          <p>If your system is set to Reduce Motion, the box above is stationary. Otherwise it slides.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="track"&gt;&lt;div class="box"&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Toggle your OS reduce-motion setting and re-run.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset {
+  @media (prefers-reduced-motion: reduce) {
+    :where(*, *::before, *::after) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+body { font-family: system-ui; padding: 1rem; }
+.track { padding: .5rem; background: #f0f0f0; border-radius: .5rem; }
+.box {
+  inline-size: 3rem; block-size: 3rem;
+  background: steelblue; border-radius: .5rem;
+  animation: slide 1.5s ease-in-out infinite alternate;
+}
+@keyframes slide { to { transform: translateX(12rem); } }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>On macOS: System Settings &rarr; Accessibility &rarr; Display &rarr; Reduce motion. On Windows: Settings &rarr; Accessibility &rarr; Visual effects &rarr; Animation effects off. Toggle the setting, re-run the editor, and confirm the box stops sliding. Then write down one place in your last project where you used a transition that would have been disruptive under reduced motion. That is the rule you would have forgotten without a reset-level enforcement.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.5-media-element-reset.html">← Lesson 5.5</a>
+      <a href="./lesson-5.7-taming-third-party-css.html">Lesson 5.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

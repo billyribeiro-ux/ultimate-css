@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5.4 — Form &amp; Interactive Element Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 5</a>
+      <span>Lesson 5.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 5.4</p>
+      <h1>Form &amp; Interactive Element Reset</h1>
+      <p class="lead">Form elements are the only HTML elements the browser refuses to style like the rest of the page. They ignore font inheritance, render OS-specific chrome, and have a focus outline that fights every design system. The reset layer fixes all three problems at once.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The inheritance gap</h2>
+      <p>Every element on a page inherits <code>font-family</code>, <code>font-size</code>, <code>color</code>, and <code>line-height</code> from its parent — except <code>button</code>, <code>input</code>, <code>select</code>, and <code>textarea</code>. Those four break the chain on purpose so they can match the operating system's widgets. That was reasonable in 1998 and is a liability today.</p>
+      <pre><code>:where(button, input, select, textarea) {
+  font: inherit;
+  color: inherit;
+}</code></pre>
+      <p>The shorthand <code>font: inherit</code> pulls family, size, weight, style, variant, and line-height in a single declaration. After this rule, form elements are finally ordinary text.</p>
+
+      <h2>Removing button chrome</h2>
+      <p>A bare <code>&lt;button&gt;</code> ships with a background gradient, a border, padding, and a cursor that changes between operating systems. A reset strips every visual opinion and leaves only the semantic behaviour.</p>
+      <pre><code>:where(button) {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}</code></pre>
+      <p>The button still focuses, still submits, still fires click events. It just looks like nothing until the components layer decides what it should look like.</p>
+
+      <h2>Textareas are special</h2>
+      <p>Textareas default to <code>resize: both</code>, which lets users drag them sideways out of the layout. Horizontal resize is almost never wanted; vertical usually is. Lock it to vertical.</p>
+      <pre><code>:where(textarea) { resize: vertical; }</code></pre>
+
+      <h2>Fieldsets</h2>
+      <p>The UA gives <code>&lt;fieldset&gt;</code> a border, margin, and padding designed for Netscape-era forms. Strip them and use the element purely for semantic grouping.</p>
+      <pre><code>:where(fieldset) { border: none; padding: 0; margin: 0; }</code></pre>
+
+      <h2>Outline handling — do not remove, defer</h2>
+      <p>Never write <code>:where(button) { outline: none; }</code> in the reset. Removing the keyboard focus ring is the single most common accessibility mistake on the web. The reset keeps the outline alive; the base layer replaces it with an intentional <code>:focus-visible</code> style that meets WCAG contrast requirements. See Lesson 6.6.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — form reset, before and after</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-5-4 { font-family: Georgia, serif; font-size: 1.1rem; }
+          .demo-5-4 > div { padding: 1rem; border: 1px dashed oklch(85% 0.01 264); border-radius: .5rem; margin-block: .5rem; }
+          .demo-5-4 h4 { margin: 0 0 .5rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); font-family: system-ui; }
+          .demo-5-4 .after :where(button, input, textarea) { font: inherit; color: inherit; }
+          .demo-5-4 .after :where(button) { background: none; border: 1px solid currentColor; padding: .25rem .75rem; cursor: pointer; }
+        </style>
+        <div class="demo-5-4">
+          <div class="before">
+            <h4>Before (UA chrome)</h4>
+            <input type="text" value="Input breaks page font">
+            <button>Button breaks too</button>
+          </div>
+          <div class="after">
+            <h4>After (reset applied)</h4>
+            <input type="text" value="Input inherits Georgia">
+            <button>Button inherits Georgia</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;form&gt;
+  &lt;fieldset&gt;
+    &lt;legend&gt;Reset target&lt;/legend&gt;
+    &lt;input type="text" value="Form elements should inherit the page font"&gt;
+    &lt;textarea&gt;And textarea should only resize vertically.&lt;/textarea&gt;
+    &lt;button type="button"&gt;Reset removes button chrome&lt;/button&gt;
+  &lt;/fieldset&gt;
+&lt;/form&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer reset {
+  :where(button, input, select, textarea) {
+    font: inherit;
+    color: inherit;
+  }
+  :where(button) {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  :where(textarea) { resize: vertical; }
+  :where(fieldset) { border: none; padding: 0; margin: 0; }
+}
+
+body { font-family: Georgia, serif; font-size: 1.125rem; padding: 1rem; }
+form { display: flex; flex-direction: column; gap: .5rem; }
+input, textarea { border: 1px solid #888; padding: .25rem; }
+button { border: 1px solid currentColor; padding: .25rem .75rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Delete <code>font: inherit</code> from the reset and run. The input and button revert to the operating system's default widget font. Now add it back. Notice that you did not need to touch <code>font-family</code> on either element directly — one shorthand in the reset fixed every form control in the entire application.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-5.3-typography-reset.html">← Lesson 5.3</a>
+      <a href="./lesson-5.5-media-element-reset.html">Lesson 5.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

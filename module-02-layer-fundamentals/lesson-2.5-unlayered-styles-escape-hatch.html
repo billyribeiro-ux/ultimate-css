@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.5 — Unlayered Styles and the Escape Hatch · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.5</p>
+      <h1>Unlayered Styles and the Escape Hatch</h1>
+      <p class="lead">There is one kind of rule that beats every layer you will ever declare. It is not a bug. It is the feature that lets you adopt <code>@layer</code> on a legacy codebase without rewriting every file first.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <p>Any CSS rule that is <em>not</em> inside an <code>@layer</code> block is "unlayered." Unlayered rules win against every layered rule — no matter what layer, no matter how high the priority, no matter how specific.</p>
+      <p>Read that twice. It sounds backwards. Intuitively, unlayered feels like "no priority," and no priority should be weak. In the spec, it works the other way: unlayered means "I am explicitly not participating in the layer system, so treat me as the final word."</p>
+
+      <h2>Why that choice was made</h2>
+      <p>If the spec had said "unlayered is weakest," then adding a single <code>@layer components { ... }</code> block to an existing project would instantly break every rule outside it. Adoption would be catastrophic. By making unlayered strongest, a pre-layer codebase keeps working exactly as before, and you can wrap subsystems in layers one at a time without regressions.</p>
+
+      <h2>How to use it in practice</h2>
+      <p>Unlayered is for exactly two things: a legacy codebase you are migrating into layers gradually, and genuine last-resort overrides that must win regardless of architecture. In a greenfield PE7 project, you should have <em>zero</em> unlayered rules. Every rule lives in a named layer. That discipline is what makes the cascade predictable.</p>
+
+      <h2>The ordering, complete</h2>
+      <ol>
+        <li>Unlayered rules — win against everything layered.</li>
+        <li>Layered rules — ordered by layer declaration (last declared wins).</li>
+      </ol>
+      <p>Both of those still sit under specificity for ties inside the same group.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — unlayered beats the highest layer</h2>
+      <div class="demo-frame">
+        <style>
+          @layer low25, high25;
+          @layer high25 { .demo-2-5 .pill { background: oklch(58% 0.22 275); color: #fff; } }
+          .demo-2-5 .pill { background: oklch(60% 0.22 25); color: #fff; } /* unlayered — wins */
+          .demo-2-5 { font-family: system-ui; }
+          .demo-2-5 .pill { padding: .5rem 1rem; border-radius: 999px; display: inline-block; }
+        </style>
+        <div class="demo-2-5">
+          <span class="pill">Unlayered red beats high25 layer indigo.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;span class="pill"&gt;Who wins — layered or unlayered?&lt;/span&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer low, high;
+
+@layer high {
+  .pill { background: oklch(58% 0.22 275); color: #fff; }
+}
+
+/* Unlayered. This wins against every @layer block above. */
+.pill { background: oklch(60% 0.22 25); color: #fff; }
+
+.pill { padding: .5rem 1rem; border-radius: 999px; font-family: system-ui; }
+body { padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take the unlayered red rule and move it inside a new <code>@layer low { ... }</code> block — the lowest priority layer. Predict the result before running. Then, move it into <code>@layer high</code>. Which of the two ends up actually rendering red? Why?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-2.4-layer-priority-vs-specificity.html">← Lesson 2.4</a>
+      <a href="./lesson-2.6-at-layer-with-at-import.html">Lesson 2.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

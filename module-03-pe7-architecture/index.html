@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 3 — The PE7 Layer Architecture · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../index.html#modules">Modules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container lesson">
+    <nav class="crumbs" aria-label="Breadcrumbs">
+      <a href="../index.html">Course</a>
+      <span>Module 3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 3 · Architecture</p>
+      <h1>The PE7 Layer Architecture</h1>
+      <p class="lead">Module 2 taught you the syntax. This module teaches you what to <em>do</em> with it. Six layers, each with exactly one job, and seven non-negotiable boundary rules that keep those jobs from bleeding into each other.</p>
+    </header>
+
+    <section class="lesson-body">
+      <h2>Module goal</h2>
+      <p>Learn to reach for the right layer without thinking. By the end of this module, when you see a CSS problem you will immediately know which of the six layers it belongs in — and you will know which it does <em>not</em> belong in, which is often the more important skill.</p>
+
+      <h2>The stack, at a glance</h2>
+      <pre><code>@layer reset, tokens, base, layout, components, animations;</code></pre>
+      <p>That line is the spine of every PE7 project. Every rule in your codebase lives in exactly one of those six layers. No exceptions, no overflow, no unlayered leaks.</p>
+
+      <h2>Lessons</h2>
+      <ul class="lesson-list">
+        <li><a href="./lesson-3.1-why-architecture-matters.html"><span class="num">3.1</span> Why Architecture Matters</a></li>
+        <li><a href="./lesson-3.2-six-layers-single-responsibilities.html"><span class="num">3.2</span> Six Layers, Single Responsibilities</a></li>
+        <li><a href="./lesson-3.3-at-layer-reset.html"><span class="num">3.3</span> @layer reset</a></li>
+        <li><a href="./lesson-3.4-at-layer-tokens.html"><span class="num">3.4</span> @layer tokens</a></li>
+        <li><a href="./lesson-3.5-at-layer-base.html"><span class="num">3.5</span> @layer base</a></li>
+        <li><a href="./lesson-3.6-at-layer-layout.html"><span class="num">3.6</span> @layer layout</a></li>
+        <li><a href="./lesson-3.7-at-layer-components.html"><span class="num">3.7</span> @layer components</a></li>
+        <li><a href="./lesson-3.8-at-layer-animations.html"><span class="num">3.8</span> @layer animations</a></li>
+        <li><a href="./lesson-3.9-layer-boundaries-rules.html"><span class="num">3.9</span> Layer Boundaries: The 7 Non-Negotiables</a></li>
+      </ul>
+
+      <h2>Module project</h2>
+      <p><a href="./project/index.html">Scaffold a PE7 stack</a> — stand up the complete six-layer architecture for a fictional three-page docs site, with sample rules in each layer to prove the boundaries hold.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../module-02-layer-fundamentals/project/index.html">← Module 2 project</a>
+      <a href="./lesson-3.1-why-architecture-matters.html">Start Lesson 3.1 →</a>
+    </nav>
+  </main>
+</body>
+</html>

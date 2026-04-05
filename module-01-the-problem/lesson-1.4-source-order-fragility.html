@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1.4 — Source Order Fragility · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 1</a>
+      <span>Lesson 1.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 1.4</p>
+      <h1>Source Order Fragility</h1>
+      <p class="lead">Source order as a cascade tiebreaker sounds simple. In practice, it is a trap that detonates the moment you split CSS across files, use a build tool, or import third-party stylesheets.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule everyone knows</h2>
+      <p>When two rules have identical specificity, the one that appears later wins. This sounds predictable. It stops being predictable the moment you have more than one file.</p>
+
+      <h2>The trap</h2>
+      <p>A design system file imports before a component file. Both target <code>.btn</code> with identical specificity. The component wins because it is last. Six months later, the build configuration changes and imports are reordered. The design system now wins. Nothing in the code changed — only the import order. The bug is silent and invisible until a designer notices a button looks wrong.</p>
+
+      <h2>What affects source order</h2>
+      <ul>
+        <li><code>@import</code> ordering inside CSS files.</li>
+        <li><code>&lt;link&gt;</code> tag ordering in HTML.</li>
+        <li>Bundler behavior — which file gets concatenated first?</li>
+        <li>Deferred scripts that inject styles after parse.</li>
+      </ul>
+
+      <h2>Why this is a smell, not a bug</h2>
+      <p>A codebase where swapping the order of two imports changes the output is a codebase whose CSS architecture does not exist. <code>@layer</code> makes order explicit: you declare layer priority once, and physical file order no longer matters.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — identical specificity, last one wins</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-1-4 .tag { color: oklch(55% 0.22 275); }
+          .demo-1-4 .tag { color: oklch(65% 0.17 150); } /* this one wins */
+        </style>
+        <p class="tag demo-1-4" style="font-family:inherit;">Two <code>.tag</code> rules, identical specificity. The later rule is green — it wins purely because of source order.</p>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;p class="note"&gt;Swap the order of the two rules in the CSS pane.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Both rules have the same specificity (0,1,0).
+   Try moving the second rule above the first. Watch the color flip. */
+
+.note {
+  color: indigo;
+  font-size: 1.25rem;
+}
+
+.note {
+  color: crimson;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create two conflicting rules at identical specificity in the editor above. Swap their order repeatedly. Note that nothing about the selectors or the values has changed — only the position. Internalize how fragile this tiebreaker is when you can't see both files at once.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-1.3-specificity-war.html">← Lesson 1.3</a>
+      <a href="./lesson-1.5-important-death-spiral.html">Lesson 1.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

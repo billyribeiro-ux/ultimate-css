@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.7 — Form Fields with :has() Validation · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.7</p>
+      <h1>Form Fields with :has() Validation</h1>
+      <p class="lead">Every form validation library you have ever used exists to answer one question: "is this input valid right now?" — and then toggle a class on its wrapper. <code>:has()</code> plus native HTML constraint validation answers it in CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three-selector trick</h2>
+      <pre><code>.field                                                  { --field-accent: var(--color-border-strong); }
+.field:has(input:focus)                                 { --field-accent: var(--color-primary); }
+.field:has(input:invalid:not(:placeholder-shown))       { --field-accent: var(--color-danger); }
+.field:has(input:valid:not(:placeholder-shown))         { --field-accent: var(--color-success); }</code></pre>
+      <p>Four rules, four states. The field wrapper derives its border and label color from <code>--field-accent</code>. The individual rules only touch the custom property — never the actual <code>border-color</code> — so overriding is still a one-line change.</p>
+
+      <h2>Why <code>:not(:placeholder-shown)</code></h2>
+      <p>Without that qualifier, an empty required field is "invalid" the instant the page loads. The user sees red before typing anything, and learns to ignore validation. <code>:placeholder-shown</code> means "the field is empty and showing its placeholder" — so <code>:not(:placeholder-shown)</code> means "the user has actually entered something". That makes validation appear only after interaction, which is what users expect.</p>
+
+      <h2>Native constraints you can style</h2>
+      <ul>
+        <li><code>required</code> → participates in <code>:invalid</code> when empty.</li>
+        <li><code>type="email"</code>, <code>type="url"</code> → format validation for free.</li>
+        <li><code>pattern="..."</code> → regex validation without JavaScript.</li>
+        <li><code>minlength</code>, <code>maxlength</code>, <code>min</code>, <code>max</code>, <code>step</code>.</li>
+      </ul>
+
+      <h2>Accessibility</h2>
+      <p><code>:invalid</code> is purely visual. For screen readers, add <code>aria-invalid</code> via the platform's own form events, or use <code>aria-describedby</code> pointing at an error message element. CSS handles the paint; ARIA handles the announcement. The two layers are complementary, not competitive.</p>
+
+      <h2>Browser support</h2>
+      <p><code>:has()</code> is baseline. Native constraint validation is baseline. This lesson teaches a production-ready pattern — no <code>@supports</code> needed.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — self-validating form</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-8-7 form { display: grid; gap: 1rem; max-inline-size: 20rem; }
+          .demo-8-7 .field {
+            --field-accent: oklch(85% 0.012 264);
+            display: grid; gap: .25rem;
+            padding: .5rem .75rem;
+            border: 2px solid var(--field-accent);
+            border-radius: .5rem;
+            transition: border-color 120ms;
+          }
+          .demo-8-7 .field span { font-size: .75rem; font-weight: 600; color: var(--field-accent); text-transform: uppercase; letter-spacing: .05em; }
+          .demo-8-7 .field input { border: 0; outline: 0; background: transparent; font: inherit; }
+          .demo-8-7 .field:has(input:focus) { --field-accent: oklch(48% 0.22 275); }
+          .demo-8-7 .field:has(input:invalid:not(:placeholder-shown)) { --field-accent: oklch(60% 0.22 25); }
+          .demo-8-7 .field:has(input:valid:not(:placeholder-shown))   { --field-accent: oklch(55% 0.17 150); }
+        </style>
+        <div class="demo-8-7">
+          <form>
+            <label class="field"><span>Email</span><input type="email" placeholder="you@example.com" required></label>
+            <label class="field"><span>Username</span><input type="text" pattern="[a-z0-9]{4,}" placeholder="min 4 lowercase" required></label>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;form&gt;
+  &lt;label class="field"&gt;
+    &lt;span&gt;Password&lt;/span&gt;
+    &lt;input type="password" minlength="8" placeholder="8+ characters" required&gt;
+  &lt;/label&gt;
+  &lt;label class="field"&gt;
+    &lt;span&gt;Confirm URL&lt;/span&gt;
+    &lt;input type="url" placeholder="https://…" required&gt;
+  &lt;/label&gt;
+&lt;/form&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+form { display: grid; gap: 1rem; max-inline-size: 20rem; }
+
+.field {
+  --field-accent: oklch(70% 0.015 264);
+  display: grid; gap: .25rem;
+  padding: .5rem .75rem;
+  border: 2px solid var(--field-accent);
+  border-radius: .5rem;
+}
+.field span {
+  color: var(--field-accent);
+  font-size: .75rem; text-transform: uppercase; font-weight: 700;
+}
+.field input { border: 0; outline: 0; background: transparent; font: inherit; }
+
+.field:has(input:focus) { --field-accent: oklch(48% 0.22 275); }
+.field:has(input:invalid:not(:placeholder-shown)) { --field-accent: oklch(60% 0.22 25); }
+.field:has(input:valid:not(:placeholder-shown))   { --field-accent: oklch(55% 0.17 150); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a checkbox field with <code>required</code>. Style the label so it turns green with a checkmark via <code>::after</code> when the box is checked. No JavaScript — use <code>.field:has(input:checked)</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.6-anchor-positioning-tooltips.html">← Lesson 8.6</a>
+      <a href="./lesson-8.8-customizable-select-base-select.html">Lesson 8.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

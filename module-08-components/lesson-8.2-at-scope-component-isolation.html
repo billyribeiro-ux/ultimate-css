@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8.2 — @scope: Component Isolation · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 8</a>
+      <span>Lesson 8.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 8.2</p>
+      <p class="badge warning">Progressive enhancement</p>
+      <h1>@scope: Component Isolation</h1>
+      <p class="lead">Descendant selectors are the original leaky abstraction. Every <code>.card h3</code> you write is a promise to the rest of the codebase that no <code>h3</code> will ever appear inside a card without your permission. <code>@scope</code> is how you stop making that promise.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem @scope solves</h2>
+      <p>Write <code>.card h3 { font-size: 1.25rem }</code>. Six months later, a card contains a nested article that itself has an <code>h3</code>. Your rule now reaches into the nested article because descendant selectors descend forever. The fix has historically been BEM (<code>.card__title</code>), a discipline that works but bloats markup.</p>
+
+      <h2>@scope: proximity-based selection</h2>
+      <pre><code>@scope (.card) {
+  h3 { font-size: 1.25rem; color: var(--color-text-heading); }
+  p  { color: var(--color-text-secondary); }
+}</code></pre>
+      <p>Inside a <code>@scope</code>, the browser selects the <em>nearest</em> <code>.card</code> ancestor for any matched descendant. Nested cards do not bleed; the rules apply to each card's own <code>h3</code>.</p>
+
+      <h2>Donut scope: upper and lower bounds</h2>
+      <p>The second argument is a <em>scope end</em> — a "hole" that cuts the scope short:</p>
+      <pre><code>@scope (.post-list) to (.author-meta) {
+  a { color: var(--color-link); text-decoration: underline; }
+}</code></pre>
+      <p>This rule styles anchors inside a <code>.post-list</code>, but stops descending the moment it hits <code>.author-meta</code>. Donut scope is how you say "style the article body, but not the avatar widget embedded in it" without inventing new classes.</p>
+
+      <h2>Specificity: lower than you think</h2>
+      <p><code>@scope</code> does not add specificity. A selector written inside <code>@scope (.card)</code> has the same specificity as if you had written it outside the scope — the scope only affects matching, not weight. That means <code>@scope (.card) { h3 { ... } }</code> scores <code>0,0,1</code>, not <code>0,1,1</code>. Use this. It means consumers can still override your component's internals without a specificity war.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 118+, Edge 118+, Safari 17.4+, Firefox 128+. Production-ready in 2026 but still worth an <code>@supports</code> wrap for older evergreen installs.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — scoped card</h2>
+      <div class="demo-frame">
+        <style>
+          @supports (selector(@scope)) {
+            @scope (.demo-8-2 .card) {
+              h3 { margin: 0 0 .5rem; color: oklch(25% 0.05 275); font-size: 1.25rem; }
+              p  { margin: 0; color: oklch(45% 0.02 264); }
+            }
+          }
+          .demo-8-2 .card { padding: 1rem; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; background: #fff; }
+          .demo-8-2 .outside { margin-top: 1rem; color: oklch(14% 0.015 264); }
+        </style>
+        <div class="demo-8-2">
+          <div class="card">
+            <h3>Scoped title</h3>
+            <p>Only this paragraph is styled because it is inside the scope.</p>
+          </div>
+          <h3 class="outside">Outside heading — untouched by the card scope.</h3>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="post"&gt;
+  &lt;h2&gt;Article title&lt;/h2&gt;
+  &lt;p&gt;Body paragraph inside the post.&lt;/p&gt;
+  &lt;aside class="author-meta"&gt;
+    &lt;h2&gt;Author name&lt;/h2&gt;
+    &lt;p&gt;Author bio — should NOT be styled by the post scope.&lt;/p&gt;
+  &lt;/aside&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Donut scope: style the post body but stop
+   at .author-meta. */
+
+@supports (selector(@scope)) {
+  @scope (.post) to (.author-meta) {
+    h2 { color: oklch(40% 0.19 275); }
+    p  { color: oklch(35% 0.02 264); font-style: italic; }
+  }
+}
+
+.post, .author-meta { padding: 1rem; border: 1px solid #ccc; border-radius: .5rem; margin: .5rem 0; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take a BEM-heavy component in your own codebase — something with five or more <code>__</code> modifiers. Rewrite it using <code>@scope</code> and plain element selectors inside. Count how many class names disappeared from the markup.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-8.1-what-belongs-in-components.html">← Lesson 8.1</a>
+      <a href="./lesson-8.3-has-parent-selector.html">Lesson 8.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

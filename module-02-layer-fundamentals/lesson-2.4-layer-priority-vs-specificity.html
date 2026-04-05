@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.4 — Layer Priority vs Specificity · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.4</p>
+      <h1>Layer Priority vs Specificity: The Core Insight</h1>
+      <p class="lead">This is the lesson where <code>@layer</code> stops being syntax and becomes a worldview. One rule, correctly internalised, ends specificity wars forever.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The rule</h2>
+      <p>A rule in a higher-priority layer <strong>always</strong> beats a rule in a lower-priority layer. Always. Even if the higher-layer rule has lower specificity. Even if the lower-layer rule is an ID. Even if the lower-layer rule comes later in the file.</p>
+      <p>Specificity only matters inside the same layer. Across layers, it is noise.</p>
+
+      <h2>Why that fixes everything</h2>
+      <p>Remember the Module 1 disaster: a third-party library shipped <code>#site-header .ui-btn { ... !important }</code>, and author code could not override it without escalating to another <code>!important</code>. That was a specificity war.</p>
+      <p>With layers, you put the library in a low layer (<code>vendor</code>) and put your overrides in a higher layer (<code>components</code>). Your <code>.ui-btn</code> class — specificity <code>0,1,0</code> — now beats their <code>#site-header .ui-btn</code> — specificity <code>1,1,0</code>. The ID does not matter. The <code>!important</code> does not matter. The layer does.</p>
+
+      <h2>The mental shift</h2>
+      <p>Stop thinking "what is my specificity score?" Start thinking "what layer is this rule in, and should it be overriding the layer below?" That reframing is the whole product. Every rule below is a corollary.</p>
+
+      <h2>Inside the same layer, specificity is still king</h2>
+      <p>Do not misread the rule. Inside a single layer, the four cascade steps still apply exactly as in Module 1. Specificity, source order, the A/B/C columns — all of it. Layers only govern the <em>between-layer</em> decision. Once a layer wins, the within-layer fight resolves normally.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — class in high layer beats ID in low layer</h2>
+      <div class="demo-frame">
+        <style>
+          @layer low24, high24;
+          @layer low24 {
+            .demo-2-4 #main-heading { color: oklch(60% 0.015 264); font-weight: 400; }
+          }
+          @layer high24 {
+            .demo-2-4 .heading { color: oklch(58% 0.22 275); font-weight: 700; }
+          }
+          .demo-2-4 { font-family: system-ui; }
+        </style>
+        <div class="demo-2-4">
+          <h3 id="main-heading" class="heading">#main-heading (1,0,0) in low layer vs .heading (0,1,0) in high layer</h3>
+          <p>Under the old rules, the ID would win. With layers, the class wins. You see bold indigo, not regular gray.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h1 id="main-heading" class="heading"&gt;Who wins?&lt;/h1&gt;
+&lt;p&gt;Change the order of the layers on line 1 and re-run.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* high is declared AFTER low, so high wins. */
+@layer low, high;
+
+@layer low {
+  #main-heading { color: gray; }    /* A,B,C = 1,0,0 */
+}
+
+@layer high {
+  .heading { color: oklch(58% 0.22 275); } /* A,B,C = 0,1,0 */
+}
+
+body { font-family: system-ui; padding: 1rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third layer called <code>vendor</code> between <code>low</code> and <code>high</code>. Put <code>#main-heading.heading.heading { color: red; }</code> inside it — that is specificity <code>1,2,0</code>, the highest score in the whole stylesheet. Predict the rendered color before running. Then explain, in one sentence, why your prediction was right.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-2.3-populating-layers.html">← Lesson 2.3</a>
+      <a href="./lesson-2.5-unlayered-styles-escape-hatch.html">Lesson 2.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

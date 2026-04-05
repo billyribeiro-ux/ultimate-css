@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12.7 — No-JS UI Patterns Integration · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 12</a>
+      <span>Lesson 12.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 12.7</p>
+      <h1>No-JS UI Patterns Integration</h1>
+      <p class="lead">Wire every interactive UI pattern in Prism without writing a single line of JavaScript. The browser already ships everything we need.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What plugs in</h2>
+      <ul>
+        <li><strong>Nav dropdown</strong> — anchor positioning + <code>popover</code> attribute.</li>
+        <li><strong>FAQ accordion</strong> — <code>&lt;details&gt;/&lt;summary&gt;</code> with animated icon and content.</li>
+        <li><strong>Cookie consent banner</strong> — <code>popover</code> API; browser manages focus and ESC.</li>
+        <li><strong>Testimonial carousel</strong> — native scroll snap + <code>::scroll-marker</code> dots with <code>@supports</code> fallback.</li>
+        <li><strong>Pricing tab switcher (monthly/yearly)</strong> — <code>:has()</code> on a radio group swaps displayed prices via custom-property flip. No JS.</li>
+      </ul>
+
+      <h2>The acceptance check</h2>
+      <p>Tab through the entire capstone. Every interactive element is reachable. Every focus ring is visible. Every open/close pattern responds to Enter, Space, and Escape where appropriate. Disable JavaScript entirely in DevTools. Nothing about the page should change except the live editors on lesson pages.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — FAQ with animated disclosure</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-12-7 details {
+            border: 1px solid oklch(85% 0.012 264);
+            border-radius: .5rem;
+            padding: .75rem 1rem;
+            margin-block-end: .5rem;
+            background: white;
+            font-family: system-ui;
+            color: oklch(14% 0.015 264);
+          }
+          .demo-12-7 summary {
+            cursor: pointer;
+            font-weight: 600;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .demo-12-7 summary::after {
+            content: "+";
+            font-size: 1.25rem;
+            transition: transform 200ms ease;
+          }
+          .demo-12-7 details[open] summary::after {
+            transform: rotate(45deg);
+          }
+          .demo-12-7 details > *:not(summary) {
+            margin-block-start: .5rem;
+            color: oklch(33% 0.020 264);
+          }
+        </style>
+        <div class="demo-12-7">
+          <details>
+            <summary>Is this really zero JavaScript?</summary>
+            <p>Yes. The browser handles open and close state natively. Keyboard support is free.</p>
+          </details>
+          <details>
+            <summary>What about the animation?</summary>
+            <p>The icon rotates via a CSS transition on <code>details[open] summary::after</code>.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;details&gt;
+  &lt;summary&gt;How much does Prism cost?&lt;/summary&gt;
+  &lt;p&gt;Starts at $9/month for individual developers.&lt;/p&gt;
+&lt;/details&gt;
+&lt;details&gt;
+  &lt;summary&gt;Do I need to install anything?&lt;/summary&gt;
+  &lt;p&gt;No. Prism is web-based and requires no plugins.&lt;/p&gt;
+&lt;/details&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+details {
+  border: 1px solid oklch(85% 0.012 264);
+  border-radius: .5rem;
+  padding: 1rem;
+  margin-block-end: .75rem;
+  background: white;
+}
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+}
+summary::after {
+  content: "+";
+  transition: transform 200ms ease;
+}
+details[open] summary::after {
+  transform: rotate(45deg);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Tab into a <code>&lt;details&gt;</code>, press Space to open it, Space again to close. That is the entire API. Zero lines of JavaScript. Every framework accordion you have ever used is reimplementing this.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-12.6-motion-system-build.html">← Lesson 12.6</a>
+      <a href="./lesson-12.8-pe7-architecture-audit.html">Lesson 12.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

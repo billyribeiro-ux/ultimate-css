@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 5 — @layer reset: Production Reset · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../index.html#modules">Modules</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container lesson">
+    <nav class="crumbs" aria-label="Breadcrumbs">
+      <a href="../index.html">Course</a>
+      <span>Module 5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 5 · Layer</p>
+      <h1>@layer reset: The Production Reset</h1>
+      <p class="lead">Reset is subtraction. Its only job is to neutralise the user-agent stylesheet and any imported third-party CSS so that every layer above it can assume a known, boring baseline. In PE7 the reset layer is the lowest-priority layer in the cascade — by design.</p>
+    </header>
+
+    <section class="lesson-body">
+      <h2>Module goal</h2>
+      <p>Build a complete, production-grade reset inside <code>@layer reset</code> that is safe to drop into any project without surprising the layers above it. Every rule in this module is wrapped in <code>:where()</code> so it has zero specificity — your base, components, and utilities will override it without effort.</p>
+
+      <h2>Why reset is its own layer</h2>
+      <p>Because reset is subtraction, not decoration, it must live at the bottom of the cascade. Any rule in reset that accidentally wins over a component is a bug. By placing it in the lowest <code>@layer</code>, the language itself guarantees that cannot happen — no specificity gymnastics, no <code>!important</code>, no source-order tricks.</p>
+
+      <h2>Lessons</h2>
+      <ul class="lesson-list">
+        <li><a href="./lesson-5.1-what-a-reset-is.html"><span class="num">5.1</span> What a Reset Actually Is</a></li>
+        <li><a href="./lesson-5.2-box-model-reset.html"><span class="num">5.2</span> Box Model Reset</a></li>
+        <li><a href="./lesson-5.3-typography-reset.html"><span class="num">5.3</span> Typography Reset</a></li>
+        <li><a href="./lesson-5.4-form-interactive-reset.html"><span class="num">5.4</span> Form &amp; Interactive Element Reset</a></li>
+        <li><a href="./lesson-5.5-media-element-reset.html"><span class="num">5.5</span> Media Element Reset</a></li>
+        <li><a href="./lesson-5.6-motion-reset-prefers-reduced.html"><span class="num">5.6</span> Motion Reset &amp; prefers-reduced-motion</a></li>
+        <li><a href="./lesson-5.7-taming-third-party-css.html"><span class="num">5.7</span> Taming Third-Party CSS</a></li>
+        <li><a href="./lesson-5.8-writing-the-complete-pe7-reset.html"><span class="num">5.8</span> Writing the Complete PE7 Reset</a></li>
+      </ul>
+
+      <h2>Module project</h2>
+      <p><a href="./project/index.html">Ship a Production Reset</a> — assemble every rule from this module into a single reset file and prove it with a before/after demo on the same HTML.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../module-04-tokens/index.html">← Module 4</a>
+      <a href="./lesson-5.1-what-a-reset-is.html">Start Lesson 5.1 →</a>
+    </nav>
+  </main>
+</body>
+</html>

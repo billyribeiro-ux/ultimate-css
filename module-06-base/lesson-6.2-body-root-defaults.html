@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.2 — :root and body Defaults · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.2</p>
+      <h1>:root and body Defaults</h1>
+      <p class="lead">Four properties on <code>:root</code>, six on <code>body</code>, and the entire document inherits a sane typographic foundation. These ten lines of CSS are the most reused in the base layer — every project needs them, and every project writes them the same way.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>color-scheme on :root</h2>
+      <p>The <code>color-scheme</code> property tells the browser which of its native color schemes the document supports. The browser uses it for scrollbars, form controls, and the default UA palette — without it, a dark-mode page still has light scrollbars and light dropdowns.</p>
+      <pre><code>:root {
+  color-scheme: light dark;
+}</code></pre>
+      <p>Declaring <code>light dark</code> is an opt-in to both modes. The OS preference decides which one the UA controls adopt. Combined with <code>light-dark()</code> in Lesson 6.7, this single line drives the whole theming story.</p>
+
+      <h2>The rest of :root</h2>
+      <p>Keep <code>:root</code> minimal — it is where tokens live, not where rules live. The only rules that belong on <code>:root</code> itself are those that influence the whole document's rendering mode:</p>
+      <pre><code>:root {
+  color-scheme: light dark;
+  font-family: var(--font-sans);
+  font-size: 100%;
+  line-height: var(--leading-normal);
+  -webkit-text-size-adjust: 100%;
+}</code></pre>
+      <p><code>font-size: 100%</code> respects the user's browser default text size — critical for users who have changed it for legibility. <code>-webkit-text-size-adjust: 100%</code> prevents iOS Safari from inflating text in landscape orientation.</p>
+
+      <h2>body: the real baseline</h2>
+      <pre><code>body {
+  font-family: var(--font-sans);
+  font-size: var(--size-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}</code></pre>
+      <p>Every property is a token. The only non-token lines are the two font-smoothing hints — they have no token because they are not values, they are rendering switches. Opinions differ on whether antialiased smoothing is correct for every design; pick the one that matches your brand and leave it alone.</p>
+
+      <h2>Why background-color on body, not html</h2>
+      <p>Backgrounds on <code>html</code> propagate to the canvas (the viewport) under the CSS backgrounds specification, which is occasionally what you want and occasionally a surprise. Setting background on <code>body</code> gives the normal element-level behaviour and still fills the viewport as long as the body is at least viewport-tall — which the reset guarantees via <code>min-block-size: 100svh</code>.</p>
+
+      <h2>What we do not set here</h2>
+      <ul>
+        <li>No <code>margin</code> on body — the reset already cleared it.</li>
+        <li>No <code>padding</code> — that is layout's job.</li>
+        <li>No <code>max-inline-size</code> — the body is the canvas; constraint happens at <code>.container</code> in layout.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — light and dark UA controls</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-6-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-family: system-ui; }
+          .demo-6-2 > section { padding: 1rem; border-radius: .5rem; border: 1px solid oklch(85% 0.01 264); }
+          .demo-6-2 .light { color-scheme: light; background: oklch(98% 0.005 264); color: oklch(15% 0.02 264); }
+          .demo-6-2 .dark  { color-scheme: dark;  background: oklch(20% 0.02 264); color: oklch(92% 0.01 264); }
+          .demo-6-2 h4 { margin: 0 0 .5rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+          .demo-6-2 select, .demo-6-2 input { font: inherit; }
+        </style>
+        <div class="demo-6-2">
+          <section class="light">
+            <h4>color-scheme: light</h4>
+            <p>Native controls use light chrome.</p>
+            <select><option>Dropdown</option></select>
+            <input type="date">
+          </section>
+          <section class="dark">
+            <h4>color-scheme: dark</h4>
+            <p>Native controls use dark chrome automatically.</p>
+            <select><option>Dropdown</option></select>
+            <input type="date">
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;main&gt;
+  &lt;h1&gt;Base layer baseline&lt;/h1&gt;
+  &lt;p&gt;Scrollbar and form controls follow color-scheme.&lt;/p&gt;
+  &lt;input type="date"&gt;
+  &lt;select&gt;&lt;option&gt;Pick one&lt;/option&gt;&lt;/select&gt;
+&lt;/main&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer base {
+  :root {
+    --font-sans: system-ui, sans-serif;
+    --text: oklch(20% 0.02 264);
+    --bg:   oklch(98% 0.005 264);
+
+    color-scheme: light dark;
+    font-family: var(--font-sans);
+    font-size: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>color-scheme: light dark</code> to just <code>dark</code> and re-run. The form controls and scrollbar adopt dark chrome regardless of your OS preference. That is the forced-mode technique from Lesson 6.7 — useful for a permanent-dark marketing page or a code editor interface.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.1-job-of-base-layer.html">← Lesson 6.1</a>
+      <a href="./lesson-6.3-heading-hierarchy-tokens.html">Lesson 6.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>

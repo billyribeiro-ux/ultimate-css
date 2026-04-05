@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2.7 — Sub-layers · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 2</a>
+      <span>Lesson 2.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 2.7</p>
+      <h1>Sub-layers</h1>
+      <p class="lead">Six top-level layers is rarely enough for a large component layer. Sub-layers let you stack priorities within a single layer, using dot notation, without polluting your top-level declaration.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem</h2>
+      <p>Your <code>components</code> layer grows. You end up with base button styles, button variants (primary, secondary, danger), and button states (hover, disabled, loading). All three groups live in <code>components</code>, but they have a natural priority: states should override variants, variants should override base. How do you express that without adding <code>states</code>, <code>variants</code>, and <code>component-base</code> to your top-level layer list?</p>
+
+      <h2>The answer: dot notation</h2>
+      <p>You can declare layers with a parent name:</p>
+      <pre><code>@layer components.base, components.variants, components.states;</code></pre>
+      <p>This creates three sub-layers inside <code>components</code>. They behave like any other layer: last declared wins. But from outside, they are still part of <code>components</code> — nothing above or below <code>components</code> sees the sub-structure.</p>
+
+      <h2>Populating sub-layers</h2>
+      <pre><code>@layer components.base {
+  .btn { padding: .5rem 1rem; border-radius: .375rem; border: 0; }
+}
+
+@layer components.variants {
+  .btn.primary { background: oklch(58% 0.22 275); color: #fff; }
+  .btn.danger  { background: oklch(60% 0.22 25);  color: #fff; }
+}
+
+@layer components.states {
+  .btn:hover    { filter: brightness(1.1); }
+  .btn:disabled { opacity: .5; pointer-events: none; }
+}</code></pre>
+
+      <h2>Nested block form</h2>
+      <p>You can also nest <code>@layer</code> blocks to get the same effect:</p>
+      <pre><code>@layer components {
+  @layer base     { /* ... */ }
+  @layer variants { /* ... */ }
+  @layer states   { /* ... */ }
+}</code></pre>
+      <p>Both forms produce identical sub-layers. Pick whichever reads better in context.</p>
+
+      <h2>The encapsulation rule</h2>
+      <p>Sub-layers are isolated from the outside. A rule in <code>components.states</code> beats a rule in <code>components.variants</code>, but from <code>layout</code>'s perspective both are just "inside <code>components</code>." No other layer can reach in and reorder <code>components</code>'s internals. That encapsulation is what makes sub-layers safe for component library authors.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Live demo — base, variant, state</h2>
+      <div class="demo-frame">
+        <style>
+          @layer components27;
+          @layer components27.base {
+            .demo-2-7 .btn { padding: .5rem 1rem; border: 0; border-radius: .375rem; font-family: system-ui; background: oklch(85% 0.012 264); color: oklch(20% 0.02 264); }
+          }
+          @layer components27.variants {
+            .demo-2-7 .btn.primary { background: oklch(58% 0.22 275); color: #fff; }
+          }
+          @layer components27.states {
+            .demo-2-7 .btn.primary:disabled { background: oklch(80% 0.02 275); color: oklch(50% 0.02 275); }
+          }
+          .demo-2-7 { font-family: system-ui; display: flex; gap: .5rem; }
+        </style>
+        <div class="demo-2-7">
+          <button class="btn">base</button>
+          <button class="btn primary">primary variant</button>
+          <button class="btn primary" disabled>disabled state</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="btn"&gt;base&lt;/button&gt;
+&lt;button class="btn primary"&gt;primary&lt;/button&gt;
+&lt;button class="btn primary" disabled&gt;disabled&lt;/button&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer components.base, components.variants, components.states;
+
+@layer components.base {
+  .btn { padding: .5rem 1rem; border: 0; border-radius: .375rem;
+         background: oklch(85% 0.012 264); color: oklch(20% 0.02 264); }
+}
+
+@layer components.variants {
+  .btn.primary { background: oklch(58% 0.22 275); color: #fff; }
+}
+
+@layer components.states {
+  .btn:disabled { background: oklch(90% 0.01 264); color: oklch(60% 0.02 264); }
+}
+
+body { font-family: system-ui; padding: 1rem; display: flex; gap: .5rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Reorder the sub-layer declaration to <code>@layer components.states, components.variants, components.base;</code>. What happens to the disabled button? Why? Put it back the right way and explain, in one sentence, why <em>states</em> must be the last sub-layer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-2.6-at-layer-with-at-import.html">← Lesson 2.6</a>
+      <a href="./project/index.html">Module 2 project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+</body>
+</html>
