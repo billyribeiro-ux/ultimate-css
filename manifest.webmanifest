@@ -1,0 +1,58 @@
+{
+  "name": "ultimate·css — PE7 CSS Cascade Architecture",
+  "short_name": "ultimate·css",
+  "description": "A 12-module principal-engineer-level course on CSS cascade architecture, @layer, OKLCH design tokens, modern selectors, scroll-driven animation, and no-JS UI patterns. Pure web platform. No frameworks. No build step.",
+  "id": "/ultimate-css/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "theme_color": "#4e38d9",
+  "background_color": "#0a0a12",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "developer", "productivity"],
+  "icons": [
+    {
+      "src": "./assets/icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Module 1",
+      "short_name": "Module 1",
+      "description": "The Problem: Why CSS Breaks at Scale",
+      "url": "./module-01-the-problem/index.html",
+      "icons": [{ "src": "./assets/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Open the Prism capstone",
+      "short_name": "Capstone",
+      "description": "The finished production marketing page",
+      "url": "./module-12-capstone/capstone/index.html",
+      "icons": [{ "src": "./assets/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
