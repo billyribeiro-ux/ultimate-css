@@ -22,10 +22,13 @@ Module 12 — Capstone: Production Page from Scratch
 Module 13 — CSS in 2026: Functions, Colors, and What Just Shipped (May 2026 update)
 Module 14 — Industry Patterns: Apple, Netflix, Stripe, MD3, Fluent & Beyond (PE7 Deep Dive)
 Module 15 — Spectacular Effects: Pushing CSS to Its Limits (Showstopper)
+Module 16 — Real-World Page Layouts: Famous Sites Rebuilt
+Module 17 — Micro-Interactions: The Details That Ship Quality
+Module 18 — CSS Art & Creative Experiments: Total Platform Mastery
 ```
 
-- **Total modules:** 15
-- **Total lessons:** 137+
+- **Total modules:** 18
+- **Total lessons:** 169+
 - **Total projects:** 12 (one per module) + 80 mini-exercises
 - **Open** `index.html` in the repo root to start.
 
