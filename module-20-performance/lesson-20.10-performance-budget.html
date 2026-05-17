@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.10 — Setting a CSS Performance Budget · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.10 · Strategy</p>
+      <h1>Setting a CSS Performance Budget</h1>
+      <p class="lead">Performance without measurement is guesswork. A CSS performance budget sets hard limits on file size, render cost, and user-facing metrics — then enforces them in CI. Here are the metrics, the targets, and how PE7 architecture gives you a head start.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The metrics that matter</h2>
+      <p>CSS directly affects four Core Web Vitals and performance metrics:</p>
+
+      <h3>First Contentful Paint (FCP)</h3>
+      <p>Time until the user sees the first piece of content. CSS blocks rendering — every byte of CSS in <code>&lt;head&gt;</code> delays FCP. Critical CSS inlining (Lesson 20.4) directly reduces this metric.</p>
+
+      <h3>Largest Contentful Paint (LCP)</h3>
+      <p>Time until the largest visible element renders. Often a hero image or heading. CSS that blocks rendering or causes images to load late hurts LCP. Font loading strategy (Lesson 20.6) and image aspect-ratio (Lesson 20.7) directly improve this.</p>
+
+      <h3>Cumulative Layout Shift (CLS)</h3>
+      <p>Total visual instability during page load. CSS causes CLS through: font swaps without size-adjust, images without aspect-ratio, dynamically injected styles, and late-loading stylesheets that restyle content.</p>
+
+      <h3>Total Blocking Time (TBT)</h3>
+      <p>Time the main thread is blocked. CSS contributes through expensive style recalculation (complex selectors + large DOM), forced synchronous layouts (reading layout properties after writing them), and large stylesheet parsing.</p>
+
+      <h2>A realistic CSS performance budget</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+        <thead>
+          <tr style="border-bottom:2px solid oklch(80% 0.02 260)">
+            <th style="text-align:left;padding:0.5rem">Metric</th>
+            <th style="text-align:left;padding:0.5rem">Budget</th>
+            <th style="text-align:left;padding:0.5rem">Enforcement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid oklch(92% 0.01 260)">
+            <td style="padding:0.5rem">Critical CSS size</td>
+            <td style="padding:0.5rem">&lt; 14KB compressed</td>
+            <td style="padding:0.5rem">CI build check</td>
+          </tr>
+          <tr style="border-bottom:1px solid oklch(92% 0.01 260)">
+            <td style="padding:0.5rem">Total CSS size</td>
+            <td style="padding:0.5rem">&lt; 50KB compressed</td>
+            <td style="padding:0.5rem">CI build check</td>
+          </tr>
+          <tr style="border-bottom:1px solid oklch(92% 0.01 260)">
+            <td style="padding:0.5rem">Layout-triggering animations</td>
+            <td style="padding:0.5rem">0 (zero)</td>
+            <td style="padding:0.5rem">Stylelint rule</td>
+          </tr>
+          <tr style="border-bottom:1px solid oklch(92% 0.01 260)">
+            <td style="padding:0.5rem">CLS score</td>
+            <td style="padding:0.5rem">&lt; 0.1</td>
+            <td style="padding:0.5rem">Lighthouse CI</td>
+          </tr>
+          <tr style="border-bottom:1px solid oklch(92% 0.01 260)">
+            <td style="padding:0.5rem">FCP</td>
+            <td style="padding:0.5rem">&lt; 1.8s (mobile 4G)</td>
+            <td style="padding:0.5rem">Lighthouse CI</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem">Unused CSS per page</td>
+            <td style="padding:0.5rem">&lt; 40%</td>
+            <td style="padding:0.5rem">Coverage audit</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Monitoring with Lighthouse CI</h2>
+      <p>Lighthouse CI runs performance audits on every pull request. Configure assertions for CSS-specific metrics:</p>
+      <pre><code>{
+  "assertions": {
+    "first-contentful-paint": ["error", {"maxNumericValue": 1800}],
+    "cumulative-layout-shift": ["error", {"maxNumericValue": 0.1}],
+    "total-blocking-time": ["error", {"maxNumericValue": 300}],
+    "unused-css-rules": ["warn", {"maxLength": 0}]
+  }
+}</code></pre>
+
+      <h2>PE7 architecture's inherent advantages</h2>
+      <p>The PE7 layered architecture naturally supports performance budgets:</p>
+      <ul>
+        <li><strong>Layered loading:</strong> Tokens+reset+base can be inlined (critical), components+animations loaded async.</li>
+        <li><strong>Token deduplication:</strong> All values are defined once in the tokens layer. No repeated hardcoded values bloating file size.</li>
+        <li><strong>Compositor-only animations:</strong> The animations layer uses only transform, opacity, and filter. No layout-triggering animations by design.</li>
+        <li><strong>Modular removal:</strong> Unused layers can be removed without cascade side effects. Page-specific bundles are trivial to create.</li>
+        <li><strong>Container queries:</strong> Components using container-type get containment for free, reducing reflow scope.</li>
+      </ul>
+
+      <h2>Summary of this module</h2>
+      <p>You now have the complete CSS performance toolkit:</p>
+      <ol>
+        <li>Understand the rendering pipeline (20.1)</li>
+        <li>Use compositor-only animations (20.2)</li>
+        <li>Keep selectors flat (20.3)</li>
+        <li>Inline critical CSS (20.4)</li>
+        <li>Apply content-visibility (20.5)</li>
+        <li>Optimize font loading (20.6)</li>
+        <li>Prevent image layout shift (20.7)</li>
+        <li>Use CSS containment (20.8)</li>
+        <li>Reduce file size (20.9)</li>
+        <li>Enforce with budgets (20.10)</li>
+      </ol>
+    </section>
+
+    <section class="demo">
+      <h2>Reference — Performance budget dashboard</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-10 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-20-10 .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+            gap: 1rem;
+          }
+          .demo-20-10 .metric-card {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: oklch(97% 0.005 260);
+            border: 2px solid oklch(85% 0.02 260);
+            text-align: center;
+          }
+          .demo-20-10 .metric-card .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+          }
+          .demo-20-10 .metric-card .label {
+            font-size: 0.7rem;
+            color: oklch(50% 0 0);
+            margin: 0.25rem 0 0;
+          }
+          .demo-20-10 .metric-card .status {
+            display: inline-block;
+            margin-top: 0.4rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+          }
+          .demo-20-10 .pass { color: oklch(30% 0.15 150); background: oklch(92% 0.06 150); }
+          .demo-20-10 .warn { color: oklch(30% 0.12 80); background: oklch(92% 0.06 80); }
+          .demo-20-10 .fail { color: oklch(35% 0.15 25); background: oklch(92% 0.06 25); }
+          .demo-20-10 .value-pass { color: oklch(40% 0.18 150); }
+          .demo-20-10 .value-warn { color: oklch(50% 0.15 80); }
+          .demo-20-10 .value-fail { color: oklch(50% 0.2 25); }
+          .demo-20-10 .architecture {
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-10 .architecture h3 {
+            margin: 0 0 0.75rem;
+            font-size: 0.85rem;
+            color: oklch(40% 0.05 260);
+          }
+          .demo-20-10 .layer-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+          }
+          .demo-20-10 .layer-row {
+            display: grid;
+            grid-template-columns: 7rem 1fr 4rem;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+          }
+          .demo-20-10 .layer-name {
+            font-weight: 600;
+            color: oklch(35% 0.08 260);
+          }
+          .demo-20-10 .layer-bar {
+            height: 1.25rem;
+            border-radius: 0.5rem;
+            background: oklch(55% 0.15 260);
+            position: relative;
+          }
+          .demo-20-10 .layer-bar.inline { background: oklch(55% 0.18 150); }
+          .demo-20-10 .layer-bar.async  { background: oklch(60% 0.12 260); }
+          .demo-20-10 .layer-size {
+            font-size: 0.7rem;
+            color: oklch(50% 0 0);
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+          }
+        </style>
+        <div class="demo-20-10">
+          <div class="dashboard">
+            <div class="metric-card">
+              <p class="value value-pass">8KB</p>
+              <p class="label">Critical CSS</p>
+              <span class="status pass">PASS &lt; 14KB</span>
+            </div>
+            <div class="metric-card">
+              <p class="value value-pass">32KB</p>
+              <p class="label">Total CSS</p>
+              <span class="status pass">PASS &lt; 50KB</span>
+            </div>
+            <div class="metric-card">
+              <p class="value value-pass">0</p>
+              <p class="label">Layout Animations</p>
+              <span class="status pass">PASS = 0</span>
+            </div>
+            <div class="metric-card">
+              <p class="value value-pass">0.02</p>
+              <p class="label">CLS Score</p>
+              <span class="status pass">PASS &lt; 0.1</span>
+            </div>
+            <div class="metric-card">
+              <p class="value value-pass">1.2s</p>
+              <p class="label">FCP (4G)</p>
+              <span class="status pass">PASS &lt; 1.8s</span>
+            </div>
+            <div class="metric-card">
+              <p class="value value-warn">35%</p>
+              <p class="label">Unused CSS</p>
+              <span class="status warn">WARN &lt; 40%</span>
+            </div>
+          </div>
+          <div class="architecture">
+            <h3>PE7 Layer Budget Breakdown</h3>
+            <div class="layer-stack">
+              <div class="layer-row">
+                <span class="layer-name">tokens</span>
+                <div class="layer-bar inline" style="width:15%"></div>
+                <span class="layer-size">1.5KB</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-name">reset</span>
+                <div class="layer-bar inline" style="width:12%"></div>
+                <span class="layer-size">1.2KB</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-name">base</span>
+                <div class="layer-bar inline" style="width:25%"></div>
+                <span class="layer-size">2.5KB</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-name">layout</span>
+                <div class="layer-bar async" style="width:45%"></div>
+                <span class="layer-size">4.5KB</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-name">components</span>
+                <div class="layer-bar async" style="width:100%"></div>
+                <span class="layer-size">15KB</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-name">animations</span>
+                <div class="layer-bar async" style="width:30%"></div>
+                <span class="layer-size">3KB</span>
+              </div>
+              <div class="layer-row">
+                <span class="layer-name">overrides</span>
+                <div class="layer-bar async" style="width:10%"></div>
+                <span class="layer-size">1KB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Final exercise</h2>
+      <p>Take a real project and establish a CSS performance budget. (1) Measure current FCP, LCP, CLS, and total CSS size with Lighthouse. (2) Set targets based on the table above. (3) Apply the techniques from this module: inline critical CSS, use compositor-only animations, add content-visibility, set aspect-ratio on images, configure font-display. (4) Re-measure and verify you meet your budget. This is the workflow of a CSS performance engineer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.9-reducing-css-size.html">&larr; Lesson 20.9</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.10 — Complete Layouts with Zero Breakpoints · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.10 · Fluid Systems</p>
+      <h1>Complete Layouts with Zero Breakpoints</h1>
+      <p class="lead">The capstone of responsive thinking: a full page layout that adapts from 320px to 2560px without a single media query. Design for a continuum, not discrete sizes.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The philosophy</h2>
+      <p>Breakpoint-based design treats responsive as "desktop layout + mobile layout + maybe tablet." Zero-breakpoint design treats every pixel width as equally valid. The layout flows continuously like water, never snapping between states.</p>
+
+      <h2>The toolkit</h2>
+      <p>Every zero-breakpoint layout combines these techniques:</p>
+      <pre><code>/* 1. Fluid type and spacing */
+--text-h1: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+--space-section: clamp(2rem, 1rem + 4vw, 6rem);
+
+/* 2. Intrinsic container sizing */
+.page { inline-size: min(75rem, 100% - 2rem); margin-inline: auto; }
+
+/* 3. Auto-fit grids for card areas */
+.cards { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+
+/* 4. Flex-wrap for nav/tags/buttons */
+.nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+/* 5. Container queries for component-level adaptation */
+.card-container { container-type: inline-size; }
+
+/* 6. Logical properties for writing-mode agnosticism */
+.card { padding-inline: var(--space-m); padding-block: var(--space-s); }</code></pre>
+
+      <h2>The sidebar pattern without breakpoints</h2>
+      <p>A sidebar that collapses to full-width when space is insufficient, using only flex-wrap:</p>
+      <pre><code>.with-sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-l);
+}
+.sidebar {
+  flex-basis: 20rem;
+  flex-grow: 1;
+}
+.content {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: 60%;
+}
+/* When there isn't room for both, content's min-inline-size
+   forces the sidebar to wrap below. No breakpoint needed. */</code></pre>
+
+      <h2>The header pattern</h2>
+      <p>Logo + nav that wraps naturally:</p>
+      <pre><code>.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.logo { margin-inline-end: auto; }
+/* Nav items wrap when they run out of space. Done. */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full blog layout, zero breakpoints</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-10 {
+            --space-unit: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+            --space-s: var(--space-unit);
+            --space-m: calc(var(--space-unit) * 1.5);
+            --space-l: calc(var(--space-unit) * 2.5);
+            --space-xl: calc(var(--space-unit) * 4);
+
+            font-family: system-ui, sans-serif;
+            background: oklch(10% 0.01 250);
+            color: oklch(85% 0.01 250);
+            border-radius: 0.5rem;
+            overflow: hidden;
+          }
+          .demo-21-10 .page {
+            inline-size: min(70rem, 100%);
+            margin-inline: auto;
+            padding-inline: var(--space-s);
+          }
+          /* Header */
+          .demo-21-10 .site-hdr {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-s);
+            padding-block: var(--space-s);
+            border-block-end: 1px solid oklch(20% 0.02 250);
+          }
+          .demo-21-10 .site-hdr .logo {
+            font-weight: 800;
+            font-size: clamp(1rem, 0.8rem + 0.8vw, 1.3rem);
+            margin-inline-end: auto;
+          }
+          .demo-21-10 .site-hdr .hdr-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-s);
+          }
+          .demo-21-10 .site-hdr .hdr-nav a {
+            font-size: clamp(0.75rem, 0.7rem + 0.3vw, 0.9rem);
+            color: oklch(65% 0.03 250);
+            text-decoration: none;
+          }
+          /* Main layout */
+          .demo-21-10 .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-l);
+            padding-block: var(--space-l);
+          }
+          .demo-21-10 .content-col {
+            flex-basis: 0;
+            flex-grow: 999;
+            min-inline-size: 60%;
+          }
+          .demo-21-10 .sidebar-col {
+            flex-basis: 15rem;
+            flex-grow: 1;
+          }
+          /* Article */
+          .demo-21-10 .article-title {
+            font-size: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-block-end: var(--space-s);
+          }
+          .demo-21-10 .article-meta {
+            font-size: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+            color: oklch(55% 0.03 250);
+            margin-block-end: var(--space-m);
+          }
+          .demo-21-10 .article-body {
+            font-size: clamp(0.85rem, 0.8rem + 0.2vw, 1rem);
+            line-height: 1.7;
+            color: oklch(72% 0.01 250);
+          }
+          .demo-21-10 .article-body p + p { margin-block-start: var(--space-s); }
+          /* Cards grid */
+          .demo-21-10 .cards-section {
+            margin-block-start: var(--space-l);
+          }
+          .demo-21-10 .cards-section h3 {
+            font-size: clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
+            margin-block-end: var(--space-s);
+          }
+          .demo-21-10 .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: var(--space-s);
+          }
+          .demo-21-10 .mini-card {
+            padding: var(--space-s);
+            background: oklch(16% 0.02 250);
+            border-radius: calc(var(--space-unit) * 0.5);
+            border: 1px solid oklch(22% 0.02 250);
+          }
+          .demo-21-10 .mini-card h4 {
+            font-size: clamp(0.8rem, 0.75rem + 0.2vw, 0.95rem);
+            margin-block-end: 0.3rem;
+          }
+          .demo-21-10 .mini-card p {
+            font-size: clamp(0.7rem, 0.65rem + 0.15vw, 0.8rem);
+            color: oklch(55% 0.02 250);
+          }
+          /* Sidebar */
+          .demo-21-10 .sidebar-box {
+            padding: var(--space-s);
+            background: oklch(15% 0.02 250);
+            border-radius: calc(var(--space-unit) * 0.5);
+            border: 1px solid oklch(22% 0.02 250);
+            margin-block-end: var(--space-s);
+          }
+          .demo-21-10 .sidebar-box h4 {
+            font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.85rem);
+            color: oklch(70% 0.05 270);
+            margin-block-end: 0.5rem;
+          }
+          .demo-21-10 .sidebar-box p,
+          .demo-21-10 .sidebar-box li {
+            font-size: clamp(0.7rem, 0.65rem + 0.15vw, 0.8rem);
+            color: oklch(60% 0.02 250);
+            line-height: 1.5;
+          }
+          .demo-21-10 .sidebar-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+          }
+          .demo-21-10 .sidebar-box li + li { margin-block-start: 0.3rem; }
+          /* Footer */
+          .demo-21-10 .site-ftr {
+            padding-block: var(--space-m);
+            border-block-start: 1px solid oklch(20% 0.02 250);
+            font-size: clamp(0.7rem, 0.65rem + 0.15vw, 0.8rem);
+            color: oklch(50% 0.02 250);
+            text-align: center;
+          }
+        </style>
+        <div class="demo-21-10">
+          <div class="page">
+            <header class="site-hdr">
+              <span class="logo">ZeroBP</span>
+              <nav class="hdr-nav">
+                <a href="#">Home</a>
+                <a href="#">Articles</a>
+                <a href="#">Projects</a>
+                <a href="#">About</a>
+              </nav>
+            </header>
+            <div class="main-layout">
+              <div class="content-col">
+                <h1 class="article-title">Building Layouts Without Breakpoints</h1>
+                <p class="article-meta">May 2026 — 5 min read</p>
+                <div class="article-body">
+                  <p>This entire layout uses zero media queries. The header wraps naturally with flex-wrap. The sidebar collapses when the main content needs its 60% minimum width. The card grid uses auto-fit to reflow at any width.</p>
+                  <p>Every font size uses clamp() with rem+vw. Every spacing token derives from one fluid unit. The container maxes out with min(70rem, 100%). Resize from 320px to 2560px and nothing breaks.</p>
+                </div>
+                <div class="cards-section">
+                  <h3>Related Articles</h3>
+                  <div class="card-grid">
+                    <div class="mini-card"><h4>Fluid Typography</h4><p>The clamp() formula for smooth scaling.</p></div>
+                    <div class="mini-card"><h4>Intrinsic Sizing</h4><p>min(), max(), and fit-content patterns.</p></div>
+                    <div class="mini-card"><h4>Container Queries</h4><p>Component-level responsiveness.</p></div>
+                  </div>
+                </div>
+              </div>
+              <aside class="sidebar-col">
+                <div class="sidebar-box">
+                  <h4>About</h4>
+                  <p>A blog about modern CSS techniques that eliminate breakpoint-based thinking.</p>
+                </div>
+                <div class="sidebar-box">
+                  <h4>Categories</h4>
+                  <ul>
+                    <li>Fluid Design</li>
+                    <li>Container Queries</li>
+                    <li>Intrinsic Layouts</li>
+                    <li>Modern CSS</li>
+                  </ul>
+                </div>
+              </aside>
+            </div>
+            <footer class="site-ftr">Zero breakpoints, infinite adaptability.</footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;header class="hdr"&gt;
+    &lt;span class="logo"&gt;Site&lt;/span&gt;
+    &lt;nav&gt;&lt;a href="#"&gt;Home&lt;/a&gt; &lt;a href="#"&gt;Blog&lt;/a&gt; &lt;a href="#"&gt;About&lt;/a&gt;&lt;/nav&gt;
+  &lt;/header&gt;
+  &lt;div class="layout"&gt;
+    &lt;main&gt;
+      &lt;h1&gt;Hello World&lt;/h1&gt;
+      &lt;p&gt;Content here...&lt;/p&gt;
+      &lt;div class="cards"&gt;
+        &lt;div class="card"&gt;A&lt;/div&gt;
+        &lt;div class="card"&gt;B&lt;/div&gt;
+        &lt;div class="card"&gt;C&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+    &lt;aside&gt;Sidebar&lt;/aside&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root { --sp: clamp(0.75rem, 0.5rem + 1vw, 1.25rem); }
+body { font-family: system-ui; margin: 0; background: #111; color: #eee; }
+
+.page { inline-size: min(70rem, 100% - 2rem); margin-inline: auto; }
+
+.hdr { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp); padding-block: var(--sp); border-bottom: 1px solid #222; }
+.logo { font-weight: 800; margin-inline-end: auto; }
+nav a { color: #888; text-decoration: none; margin-inline-start: 1rem; }
+
+.layout { display: flex; flex-wrap: wrap; gap: calc(var(--sp) * 2); padding-block: calc(var(--sp) * 2); }
+main { flex: 999 0 0; min-inline-size: 60%; }
+aside { flex: 1 0 15rem; padding: var(--sp); background: #1a1a2e; border-radius: 0.5rem; }
+
+h1 { font-size: clamp(1.5rem, 1rem + 2vw, 3rem); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px,100%), 1fr)); gap: var(--sp); margin-top: var(--sp); }
+.card { padding: var(--sp); background: #1a1a2e; border-radius: 0.4rem; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a complete portfolio page with zero media queries: a wrapping header, a hero with fluid type, a project grid (auto-fit), a flex-wrap sidebar layout for an about section, and a footer. Test it at 320px, 768px, 1024px, 1440px, and 2560px — it should look intentional at every width without a single <code>@media</code> rule.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.9-viewport-units.html">&larr; Lesson 21.9</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

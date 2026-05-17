@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.1 — Print Stylesheets: The Fundamentals · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.1 · Print Stylesheets</p>
+      <h1>Print Stylesheets: The Fundamentals</h1>
+      <p class="lead">When a user hits Ctrl+P, your carefully crafted web page becomes a document on paper. Without a print stylesheet, they get navigation bars, sticky headers, and illegible dark backgrounds. With one, they get a clean, readable document. Here's how.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The @media print rule</h2>
+      <p>Everything starts with the <code>@media print</code> block. Styles inside it only apply when the page is being printed or previewed for print:</p>
+      <pre><code>@media print {
+  /* These rules only apply on paper */
+}</code></pre>
+      <p>You can also use a separate stylesheet with a media attribute: <code>&lt;link rel="stylesheet" href="print.css" media="print"&gt;</code>. The browser won't block rendering for print stylesheets, so there's no performance cost.</p>
+
+      <h2>What to hide</h2>
+      <p>The first job of any print stylesheet is removing elements that make no sense on paper:</p>
+      <pre><code>@media print {
+  nav,
+  footer,
+  .site-header,
+  .sidebar,
+  .cookie-banner,
+  button,
+  .no-print {
+    display: none !important;
+  }
+}</code></pre>
+      <p>Navigation, interactive controls, video embeds, chat widgets — none of these serve the reader on paper.</p>
+
+      <h2>What to show: URLs after links</h2>
+      <p>On screen, a link's destination is discoverable via hover. On paper, it's invisible. The classic technique uses generated content:</p>
+      <pre><code>@media print {
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    font-weight: normal;
+    word-break: break-all;
+  }
+}</code></pre>
+      <p>This appends the full URL after every external link, so readers know where to go.</p>
+
+      <h2>Background colors don't print</h2>
+      <p>By default, browsers strip background colors and images when printing (to save ink). If you need them — for branding, charts, or diagrams — you must explicitly opt in:</p>
+      <pre><code>@media print {
+  .brand-header {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}</code></pre>
+
+      <h2>Page margins with @page</h2>
+      <p>The <code>@page</code> rule controls the physical page itself — margins, size, and orientation:</p>
+      <pre><code>@page {
+  margin: 2cm;
+}
+
+@page :first {
+  margin-top: 4cm; /* Extra space on the first page */
+}</code></pre>
+
+      <h2>Font sizing for print</h2>
+      <p>Screen fonts are sized in <code>px</code>, <code>rem</code>, or <code>em</code>. Print fonts historically use <code>pt</code> (points) — 1pt = 1/72 inch. A good body text size for print is 11–12pt:</p>
+      <pre><code>@media print {
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+  }
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Web page with print stylesheet</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-1 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(97% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-1 .page-sim {
+            background: #fff;
+            border: 1px solid oklch(85% 0.02 270);
+            border-radius: 0.25rem;
+            padding: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px oklch(0% 0 0 / 0.08);
+          }
+          .demo-23-1 .sim-nav {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: oklch(25% 0.05 270);
+            color: white;
+            border-radius: 0.25rem;
+            margin-block-end: 1rem;
+            font-size: 0.85rem;
+          }
+          .demo-23-1 .sim-nav a { color: oklch(80% 0.1 270); text-decoration: none; }
+          .demo-23-1 h3 { margin: 0 0 0.5rem; font-size: 1.2rem; }
+          .demo-23-1 p { margin: 0 0 0.75rem; font-size: 0.9rem; line-height: 1.6; color: oklch(35% 0.02 270); }
+          .demo-23-1 .sim-link { color: oklch(45% 0.2 270); }
+          .demo-23-1 .sim-link::after {
+            content: " (https://example.com/article)";
+            font-size: 0.8em;
+            color: oklch(50% 0.05 270);
+          }
+          .demo-23-1 .sim-footer {
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid oklch(90% 0.01 270);
+            font-size: 0.8rem;
+            color: oklch(60% 0.02 270);
+          }
+          .demo-23-1 .print-badge {
+            display: inline-block;
+            background: oklch(90% 0.08 145);
+            color: oklch(30% 0.1 145);
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+          }
+          .demo-23-1 .hidden-in-print {
+            opacity: 0.4;
+            text-decoration: line-through;
+            position: relative;
+          }
+        </style>
+        <div class="demo-23-1">
+          <span class="print-badge">Print Preview Simulation</span>
+          <div class="page-sim">
+            <div class="sim-nav hidden-in-print">
+              <a href="#">Home</a>
+              <a href="#">About</a>
+              <a href="#">Contact</a>
+            </div>
+            <h3>Article Title</h3>
+            <p>This is a sample article body. When printed, the navigation above is hidden (shown struck-through here), and links get their URLs appended:</p>
+            <p>Read the <a href="#" class="sim-link">full documentation</a> for details.</p>
+            <p class="sim-footer">Page rendered with 2cm margins, 12pt body text, and no background colors.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="main-nav"&gt;
+  &lt;a href="/"&gt;Home&lt;/a&gt;
+  &lt;a href="/about"&gt;About&lt;/a&gt;
+&lt;/nav&gt;
+&lt;article&gt;
+  &lt;h1&gt;My Article&lt;/h1&gt;
+  &lt;p&gt;Visit &lt;a href="https://example.com"&gt;Example&lt;/a&gt; for more.&lt;/p&gt;
+  &lt;p&gt;This content should look great on paper.&lt;/p&gt;
+&lt;/article&gt;
+&lt;footer&gt;
+  &lt;p&gt;&amp;copy; 2026 My Site&lt;/p&gt;
+&lt;/footer&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: Georgia, serif;
+  max-width: 65ch;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.main-nav {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: #1a1a2e;
+  border-radius: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+.main-nav a { color: #a8b4ff; text-decoration: none; }
+
+h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+p { line-height: 1.7; margin-bottom: 1rem; }
+a { color: #4a3fbf; }
+footer { margin-top: 2rem; color: #666; font-size: 0.85rem; }
+
+/* Print stylesheet */
+@media print {
+  .main-nav, footer {
+    display: none !important;
+  }
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+    max-width: none;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    font-weight: normal;
+  }
+}
+
+@page {
+  margin: 2cm;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open your browser's print preview (Ctrl+P / Cmd+P) on any page you've built. Notice what looks broken — sticky headers overlapping content, dark backgrounds wasting ink, invisible links. Add a <code>@media print</code> block that fixes at least three of these issues. Bonus: add <code>abbr[title]::after { content: " (" attr(title) ")"; }</code> to expand abbreviations on paper.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 23</a>
+      <a href="./lesson-23.2-page-breaks.html">Lesson 23.2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

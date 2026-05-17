@@ -28,10 +28,13 @@ Module 18 — CSS Art & Creative Experiments: Total Platform Mastery
 Module 19 — CSS Accessibility: Building for Everyone
 Module 20 — CSS Performance: Making It Fast
 Module 21 — Advanced Responsive Design: Beyond Breakpoints
+Module 22 — CSS at Scale: Architecture for Teams
+Module 23 — CSS Beyond the Browser: Print & Email
+Module 24 — CSS Challenges: Test Your Mastery (12 challenges)
 ```
 
-- **Total modules:** 21
-- **Total lessons:** 200+
+- **Total modules:** 24
+- **Total lessons:** 230+
 - **Total projects:** 12 (one per module) + 80 mini-exercises
 - **Open** `index.html` in the repo root to start.
 
