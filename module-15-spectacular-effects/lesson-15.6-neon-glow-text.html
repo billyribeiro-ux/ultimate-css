@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.6 — Neon Glow Text · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.6 · Spectacular Effects</p>
+      <h1>Neon Glow Text</h1>
+      <p class="lead">Realistic neon sign text with animated flicker. Multiple <code>text-shadow</code> layers at increasing blur radii create the glow, while irregularly-timed keyframes simulate the characteristic flicker of gas-discharge tubes.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Building the neon glow</h2>
+      <p>Real neon tubes have a bright core (the gas discharge itself) surrounded by a soft, wide glow (scattered light). We simulate this with multiple <code>text-shadow</code> layers at increasing blur radii — typically 5 layers from tight (7px) to wide (82px) in the same hue.</p>
+
+      <h3>The text-shadow stack</h3>
+      <pre><code>text-shadow:
+  0 0 7px   oklch(80% 0.18 190),
+  0 0 10px  oklch(80% 0.18 190),
+  0 0 21px  oklch(75% 0.20 190),
+  0 0 42px  oklch(70% 0.22 190),
+  0 0 82px  oklch(65% 0.25 190);</code></pre>
+
+      <h3>Irregular flicker</h3>
+      <p>Real neon flickers irregularly — not evenly. The keyframes use unevenly spaced percentages (<code>0%, 2%, 4%, 8%, 70%, 72%, 100%</code>) with brief dips in opacity and shadow intensity. This asymmetry is what makes the flicker look genuine rather than like a simple pulse.</p>
+
+      <h3>The power-on entrance</h3>
+      <p>Using <code>@starting-style</code>, the neon sign "powers on" when first rendered — starting dim and building to full intensity. This entrance effect sells the illusion that these are real electrical tubes warming up.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Neon signs</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-15-6 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            padding: 3rem 2rem;
+            background: oklch(8% 0.01 270);
+            border-radius: 0.5rem;
+            font-family: system-ui, sans-serif;
+            position: relative;
+            overflow: hidden;
+          }
+
+          /* Faint brick texture via gradients */
+          .demo-15-6::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+              repeating-linear-gradient(
+                0deg,
+                oklch(15% 0.01 30 / 0.15) 0px,
+                oklch(15% 0.01 30 / 0.15) 1px,
+                transparent 1px,
+                transparent 30px
+              ),
+              repeating-linear-gradient(
+                90deg,
+                oklch(15% 0.01 30 / 0.1) 0px,
+                oklch(15% 0.01 30 / 0.1) 1px,
+                transparent 1px,
+                transparent 60px
+              );
+            pointer-events: none;
+          }
+
+          .demo-15-6 .neon-teal {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: oklch(85% 0.15 190);
+            text-shadow:
+              0 0 7px oklch(80% 0.18 190),
+              0 0 10px oklch(80% 0.18 190),
+              0 0 21px oklch(75% 0.20 190),
+              0 0 42px oklch(70% 0.22 190),
+              0 0 82px oklch(65% 0.25 190);
+            animation: flicker-teal 4s infinite;
+            position: relative;
+          }
+
+          .demo-15-6 .neon-pink {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: oklch(80% 0.18 340);
+            text-shadow:
+              0 0 7px oklch(75% 0.20 340),
+              0 0 10px oklch(75% 0.20 340),
+              0 0 21px oklch(70% 0.22 340),
+              0 0 42px oklch(65% 0.25 340),
+              0 0 82px oklch(60% 0.28 340);
+            animation: flicker-pink 5s infinite;
+            position: relative;
+          }
+
+          @keyframes flicker-teal {
+            0%, 100% { opacity: 1; }
+            3%       { opacity: 0.4; }
+            6%       { opacity: 1; }
+            7%       { opacity: 0.8; }
+            9%       { opacity: 1; }
+            68%      { opacity: 1; }
+            70%      { opacity: 0.6; }
+            72%      { opacity: 1; }
+          }
+
+          @keyframes flicker-pink {
+            0%, 100% { opacity: 1; }
+            41%      { opacity: 1; }
+            42%      { opacity: 0.5; }
+            43%      { opacity: 0.9; }
+            44%      { opacity: 0.4; }
+            46%      { opacity: 1; }
+            85%      { opacity: 1; }
+            86%      { opacity: 0.7; }
+            88%      { opacity: 1; }
+          }
+
+          .demo-15-6 .subtitle {
+            font-size: 0.85rem;
+            color: oklch(50% 0 0);
+            position: relative;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-6 .neon-teal,
+            .demo-15-6 .neon-pink {
+              animation: none;
+            }
+          }
+        </style>
+        <div class="demo-15-6">
+          <div class="neon-teal">OPEN LATE</div>
+          <div class="neon-pink">Cocktails</div>
+          <div class="subtitle">Pure CSS neon -- no images, no JS</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="wall"&gt;
+  &lt;div class="neon neon--teal"&gt;OPEN LATE&lt;/div&gt;
+  &lt;div class="neon neon--pink"&gt;Cocktails&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { margin: 0; font-family: system-ui; }
+
+.wall {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  background: oklch(8% 0.01 270);
+}
+
+.neon {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Teal neon */
+.neon--teal {
+  font-size: 3rem;
+  color: oklch(85% 0.15 190);
+  text-shadow:
+    0 0 7px  oklch(80% 0.18 190),
+    0 0 10px oklch(80% 0.18 190),
+    0 0 21px oklch(75% 0.20 190),
+    0 0 42px oklch(70% 0.22 190),
+    0 0 82px oklch(65% 0.25 190);
+  animation: flick1 4s infinite;
+}
+
+/* Pink neon */
+.neon--pink {
+  font-size: 2.5rem;
+  color: oklch(80% 0.18 340);
+  text-shadow:
+    0 0 7px  oklch(75% 0.20 340),
+    0 0 10px oklch(75% 0.20 340),
+    0 0 21px oklch(70% 0.22 340),
+    0 0 42px oklch(65% 0.25 340),
+    0 0 82px oklch(60% 0.28 340);
+  animation: flick2 5s infinite;
+}
+
+/* Irregular flicker timing */
+@keyframes flick1 {
+  0%,100% { opacity: 1; }
+  3%  { opacity: 0.4; }
+  6%  { opacity: 1; }
+  7%  { opacity: 0.8; }
+  9%  { opacity: 1; }
+  68% { opacity: 1; }
+  70% { opacity: 0.6; }
+  72% { opacity: 1; }
+}
+@keyframes flick2 {
+  0%,100% { opacity: 1; }
+  41% { opacity: 1; }
+  42% { opacity: 0.5; }
+  43% { opacity: 0.9; }
+  44% { opacity: 0.4; }
+  46% { opacity: 1; }
+  86% { opacity: 0.7; }
+  88% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third neon sign in amber/gold (<code>oklch(80% 0.18 85)</code>) with its own unique flicker timing. Then try adding <code>@starting-style { .neon { opacity: 0; text-shadow: none; } }</code> with a <code>transition: opacity 1.5s, text-shadow 1.5s</code> on <code>.neon</code> for a power-on entrance effect. The sign should warm up from dark to full glow when the page loads.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.5-clip-path-morphing.html">&larr; Lesson 15.5</a>
+      <a href="./lesson-15.7-infinite-scroll-marquee.html">Lesson 15.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

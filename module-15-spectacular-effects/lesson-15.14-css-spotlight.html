@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.14 — CSS-Only Spotlight / Searchlight · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.14</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.14 · Spectacular Effects</p>
+      <h1>CSS-Only Spotlight / Searchlight</h1>
+      <p class="lead">A spotlight cone sweeping across a dark page, revealing content underneath. Uses an animated <code>radial-gradient</code> mask with <code>@property</code> for smooth position interpolation. The effect is dramatic and theatrical — content appears only where the light falls.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The mask-image technique</h2>
+      <p>The content sits normally in the document, but a <code>mask-image</code> with a <code>radial-gradient</code> controls what is visible. The gradient goes from white (fully visible) at its center to transparent (hidden) at its edges, creating a circular "window" — the spotlight.</p>
+
+      <h3>Animating the spotlight position</h3>
+      <p>Register <code>--spot-x</code> and <code>--spot-y</code> as <code>&lt;percentage&gt;</code> types with <code>@property</code>. This lets the keyframes smoothly interpolate between positions. The spotlight sweeps from <code>10% 30%</code> to <code>90% 70%</code> and back, tracing an arc across the page.</p>
+
+      <pre><code>@property --spot-x {
+  syntax: "&lt;percentage&gt;";
+  inherits: false;
+  initial-value: 10%;
+}
+.spotlight-layer {
+  mask-image: radial-gradient(
+    circle 180px at var(--spot-x) var(--spot-y),
+    white, transparent);
+  animation: sweep 6s ease-in-out infinite alternate;
+}
+@keyframes sweep {
+  0%   { --spot-x: 10%; --spot-y: 30%; }
+  100% { --spot-x: 90%; --spot-y: 70%; }
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Spotlight reveal</h2>
+      <div class="demo-frame">
+        <style>
+          @property --spot-x-15-14 {
+            syntax: "<percentage>";
+            inherits: false;
+            initial-value: 10%;
+          }
+          @property --spot-y-15-14 {
+            syntax: "<percentage>";
+            inherits: false;
+            initial-value: 30%;
+          }
+
+          .demo-15-14 {
+            font-family: system-ui, sans-serif;
+          }
+          .demo-15-14 .spotlight-scene {
+            position: relative;
+            inline-size: 100%;
+            block-size: 350px;
+            background: oklch(5% 0.01 270);
+            border-radius: 0.75rem;
+            overflow: hidden;
+          }
+          .demo-15-14 .hidden-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            mask-image: radial-gradient(
+              circle 140px at var(--spot-x-15-14) var(--spot-y-15-14),
+              white 0%,
+              white 40%,
+              transparent 70%
+            );
+            -webkit-mask-image: radial-gradient(
+              circle 140px at var(--spot-x-15-14) var(--spot-y-15-14),
+              white 0%,
+              white 40%,
+              transparent 70%
+            );
+            animation: spotlight-sweep-15-14 6s ease-in-out infinite alternate;
+          }
+          .demo-15-14 .hidden-content h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            text-align: center;
+          }
+          .demo-15-14 .hidden-content p {
+            font-size: 1rem;
+            color: oklch(80% 0.05 270);
+            margin: 0;
+            max-inline-size: 40ch;
+            text-align: center;
+            line-height: 1.5;
+          }
+          .demo-15-14 .hidden-shapes {
+            position: absolute;
+            inset: 0;
+            mask-image: radial-gradient(
+              circle 140px at var(--spot-x-15-14) var(--spot-y-15-14),
+              white 0%,
+              white 40%,
+              transparent 70%
+            );
+            -webkit-mask-image: radial-gradient(
+              circle 140px at var(--spot-x-15-14) var(--spot-y-15-14),
+              white 0%,
+              white 40%,
+              transparent 70%
+            );
+            animation: spotlight-sweep-15-14 6s ease-in-out infinite alternate;
+          }
+          .demo-15-14 .shape {
+            position: absolute;
+            border-radius: 1rem;
+          }
+          .demo-15-14 .shape:nth-child(1) {
+            inline-size: 80px;
+            block-size: 80px;
+            background: oklch(60% 0.22 275);
+            top: 15%;
+            left: 10%;
+            border-radius: 50%;
+          }
+          .demo-15-14 .shape:nth-child(2) {
+            inline-size: 100px;
+            block-size: 60px;
+            background: oklch(65% 0.20 190);
+            top: 60%;
+            left: 25%;
+          }
+          .demo-15-14 .shape:nth-child(3) {
+            inline-size: 70px;
+            block-size: 70px;
+            background: oklch(60% 0.22 340);
+            top: 25%;
+            right: 15%;
+            transform: rotate(45deg);
+          }
+          .demo-15-14 .shape:nth-child(4) {
+            inline-size: 90px;
+            block-size: 50px;
+            background: oklch(70% 0.18 85);
+            bottom: 20%;
+            right: 25%;
+            border-radius: 2rem;
+          }
+
+          .demo-15-14 .glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+              circle 180px at var(--spot-x-15-14) var(--spot-y-15-14),
+              oklch(70% 0.08 200 / 0.15),
+              transparent 70%
+            );
+            animation: spotlight-sweep-15-14 6s ease-in-out infinite alternate;
+            pointer-events: none;
+          }
+
+          @keyframes spotlight-sweep-15-14 {
+            0%   { --spot-x-15-14: 10%; --spot-y-15-14: 30%; }
+            25%  { --spot-x-15-14: 50%; --spot-y-15-14: 20%; }
+            50%  { --spot-x-15-14: 85%; --spot-y-15-14: 45%; }
+            75%  { --spot-x-15-14: 60%; --spot-y-15-14: 75%; }
+            100% { --spot-x-15-14: 15%; --spot-y-15-14: 65%; }
+          }
+
+          .demo-15-14 .hint {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--color-text-tertiary);
+            margin-block-start: 0.75rem;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-14 .hidden-content,
+            .demo-15-14 .hidden-shapes,
+            .demo-15-14 .glow {
+              animation: none;
+              --spot-x-15-14: 50%;
+              --spot-y-15-14: 50%;
+            }
+          }
+        </style>
+        <div class="demo-15-14">
+          <div class="spotlight-scene">
+            <div class="hidden-shapes">
+              <div class="shape"></div>
+              <div class="shape"></div>
+              <div class="shape"></div>
+              <div class="shape"></div>
+            </div>
+            <div class="hidden-content">
+              <h3>Hidden in Plain Sight</h3>
+              <p>This content is only visible where the spotlight falls. The mask reveals what the darkness conceals.</p>
+            </div>
+            <div class="glow"></div>
+          </div>
+          <p class="hint">The spotlight sweeps automatically, revealing hidden content and shapes</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;div class="content"&gt;
+    &lt;h3&gt;Hidden in Plain Sight&lt;/h3&gt;
+    &lt;p&gt;Only visible where the spotlight falls.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="glow"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@property --sx {
+  syntax: "&lt;percentage&gt;";
+  inherits: false;
+  initial-value: 10%;
+}
+@property --sy {
+  syntax: "&lt;percentage&gt;";
+  inherits: false;
+  initial-value: 30%;
+}
+
+body {
+  margin: 0; font-family: system-ui;
+  background: oklch(5% .01 270);
+}
+
+.scene {
+  position: relative;
+  width: 100%; height: 100vh;
+  overflow: hidden;
+}
+
+.content {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  text-align: center; color: white;
+  /* The spotlight mask */
+  mask-image: radial-gradient(
+    circle 150px at var(--sx) var(--sy),
+    white 0%, white 40%, transparent 70%);
+  -webkit-mask-image: radial-gradient(
+    circle 150px at var(--sx) var(--sy),
+    white 0%, white 40%, transparent 70%);
+  animation: sweep 6s ease-in-out
+    infinite alternate;
+}
+
+.glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(
+    circle 180px at var(--sx) var(--sy),
+    oklch(70% .08 200 / .15), transparent 70%);
+  animation: sweep 6s ease-in-out
+    infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes sweep {
+  0%   { --sx: 10%; --sy: 30%; }
+  50%  { --sx: 85%; --sy: 45%; }
+  100% { --sx: 15%; --sy: 65%; }
+}
+
+h3 { font-size: 2rem; margin: 0 0 .5rem; }
+p { margin: 0; opacity: .8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .content, .glow {
+    animation: none;
+    --sx: 50%; --sy: 50%;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the spotlight radius from <code>150px</code> to <code>80px</code> for a tighter beam, or <code>300px</code> for a flood light. Try replacing the circular gradient with an ellipse: <code>ellipse 200px 100px</code> for an oval searchlight. Add a second spotlight by layering two gradients in the <code>mask-image</code> — use <code>mask-composite: add</code> to combine them.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.13-staggered-grid-reveal.html">&larr; Lesson 15.13</a>
+      <a href="./lesson-15.15-mega-scroll-experience.html">Lesson 15.15 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

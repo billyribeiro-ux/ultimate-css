@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.15 — The Mega Scroll Experience · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.15</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.15 · Spectacular Effects</p>
+      <h1>The Mega Scroll Experience</h1>
+      <p class="lead">A single long-scroll page combining multiple spectacular effects in sequence. This lesson is about composition — how to layer aurora, typewriter, 3D tilt, staggered grids, glassmorphism, neon glow, and marquee effects without them clashing. Every effect wrapped in <code>@supports</code>, every animation silenced by <code>prefers-reduced-motion</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Composition principles</h2>
+      <p>Individual effects are impressive; a page that combines six of them without chaos is <em>engineering</em>. The key principles:</p>
+
+      <h3>1. One hero effect per section</h3>
+      <p>Each scroll section should have exactly one primary effect. The aurora is the hero backdrop, not the typewriter. The neon glow is the feature heading, not the content. When two effects compete for attention in the same viewport, both lose impact.</p>
+
+      <h3>2. Transition tone between sections</h3>
+      <p>Moving from a dark aurora hero to a bright grid reveal needs a gradient transition — a section that eases from dark to light. Abrupt tone shifts feel like separate pages stitched together. Gradual tone shifts feel like one continuous experience.</p>
+
+      <h3>3. Performance budget</h3>
+      <p>Running six simultaneous CSS animations burns GPU memory. The solution: use <code>animation-timeline: view()</code> where possible so effects only animate when visible. The aurora hero should pause or simplify when scrolled out of view. The marquee can run indefinitely because it is lightweight (only <code>translate</code>).</p>
+
+      <h3>4. Reduced motion kills all decorative animation</h3>
+      <p>One <code>@media (prefers-reduced-motion: reduce)</code> block at the bottom disables every animation, transition, and scroll-driven effect. The page should still look good — just static. This is not optional; it is a requirement.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Mega scroll composition</h2>
+      <div class="demo-frame">
+        <style>
+          @property --mega-aurora-hue {
+            syntax: "<number>";
+            inherits: false;
+            initial-value: 150;
+          }
+          @property --mega-bg-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+          }
+
+          .demo-15-15 {
+            font-family: system-ui, sans-serif;
+            max-block-size: 600px;
+            overflow-y: auto;
+            border-radius: 0.5rem;
+            scroll-snap-type: y proximity;
+          }
+
+          /* === Section 1: Aurora Hero + Typewriter === */
+          .demo-15-15 .hero-aurora {
+            position: relative;
+            block-size: 400px;
+            background: oklch(8% 0.03 270);
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            scroll-snap-align: start;
+          }
+          .demo-15-15 .aurora-bg {
+            position: absolute;
+            inset: 0;
+            background:
+              radial-gradient(ellipse 80% 50% at 30% 30%,
+                oklch(45% 0.10 var(--mega-aurora-hue)) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 70% 60%,
+                oklch(35% 0.08 260) 0%, transparent 60%);
+            opacity: 0.7;
+            animation: mega-aurora-drift 18s ease-in-out infinite;
+          }
+          @keyframes mega-aurora-drift {
+            0%, 100% { transform: translateX(0); --mega-aurora-hue: 150; }
+            50%      { transform: translateX(5%); --mega-aurora-hue: 170; }
+          }
+          .demo-15-15 .hero-glass {
+            position: relative;
+            backdrop-filter: blur(30px);
+            background: oklch(100% 0 0 / 0.08);
+            border: 1px solid oklch(100% 0 0 / 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+          }
+          .demo-15-15 .hero-glass h2 {
+            margin: 0 0 0.5rem;
+            font-size: 1.5rem;
+          }
+          .demo-15-15 .type-line {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            font-family: ui-monospace, monospace;
+            font-size: 0.85rem;
+            width: 0;
+            color: oklch(80% 0.12 190);
+            border-inline-end: 2px solid oklch(80% 0.12 190);
+            animation: mega-type 2s steps(28) 1s forwards,
+                       mega-blink 0.7s step-end 1s infinite;
+          }
+          @keyframes mega-type { to { width: 28ch; } }
+          @keyframes mega-blink { 50% { border-color: transparent; } }
+
+          /* === Section 2: 3D Tilt Gallery === */
+          .demo-15-15 .tilt-section {
+            padding: 2rem 1rem;
+            background: oklch(97% 0.01 270);
+            scroll-snap-align: start;
+          }
+          .demo-15-15 .tilt-section h2 {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 0 0 1.5rem;
+            color: oklch(25% 0.02 270);
+          }
+          .demo-15-15 .tilt-row {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+          }
+          .demo-15-15 .tilt-card {
+            flex-shrink: 0;
+            inline-size: 200px;
+            block-size: 130px;
+            border-radius: 0.75rem;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 16px oklch(0% 0 0 / 0.15);
+          }
+          .demo-15-15 .tilt-card:nth-child(1) { background: linear-gradient(135deg, oklch(55% 0.25 275), oklch(45% 0.22 310)); }
+          .demo-15-15 .tilt-card:nth-child(2) { background: linear-gradient(135deg, oklch(50% 0.22 190), oklch(45% 0.20 160)); }
+          .demo-15-15 .tilt-card:nth-child(3) { background: linear-gradient(135deg, oklch(55% 0.22 340), oklch(50% 0.25 10)); }
+          .demo-15-15 .tilt-card:nth-child(4) { background: linear-gradient(135deg, oklch(60% 0.20 85), oklch(50% 0.22 60)); }
+
+          @supports (animation-timeline: view()) {
+            .demo-15-15 .tilt-card {
+              animation: mega-tilt linear both;
+              animation-timeline: view(inline);
+            }
+            @keyframes mega-tilt {
+              0%   { transform: perspective(600px) rotateY(-12deg) scale(0.92); opacity: 0.5; }
+              50%  { transform: perspective(600px) rotateY(0) scale(1); opacity: 1; }
+              100% { transform: perspective(600px) rotateY(12deg) scale(0.92); opacity: 0.5; }
+            }
+          }
+
+          /* === Section 3: Staggered Grid === */
+          .demo-15-15 .grid-section {
+            padding: 2rem 1rem;
+            background: oklch(95% 0.01 270);
+            scroll-snap-align: start;
+          }
+          .demo-15-15 .grid-section h2 {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 0 0 1.5rem;
+            color: oklch(25% 0.02 270);
+          }
+          .demo-15-15 .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            max-inline-size: 500px;
+            margin: 0 auto;
+          }
+          .demo-15-15 .mini-card {
+            block-size: 70px;
+            border-radius: 0.5rem;
+            background: oklch(65% 0.18 calc(30 * var(--i)));
+            opacity: 0;
+            transform: translateY(1.5rem) scale(0.95);
+            animation: mega-reveal 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: calc(var(--i) * 60ms);
+          }
+          @keyframes mega-reveal {
+            to { opacity: 1; transform: none; }
+          }
+
+          /* === Section 4: Glassmorphism === */
+          .demo-15-15 .glass-section {
+            padding: 2rem;
+            background: conic-gradient(from var(--mega-bg-angle), oklch(50% 0.18 275), oklch(50% 0.15 190), oklch(50% 0.15 340), oklch(50% 0.18 275));
+            animation: mega-glass-spin 20s linear infinite;
+            display: grid;
+            place-items: center;
+            block-size: 300px;
+            scroll-snap-align: start;
+          }
+          @keyframes mega-glass-spin { to { --mega-bg-angle: 360deg; } }
+          .demo-15-15 .glass-panel {
+            backdrop-filter: blur(20px) saturate(180%);
+            background: oklch(100% 0 0 / 0.12);
+            border: 1px solid oklch(100% 0 0 / 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            color: white;
+            max-inline-size: 360px;
+          }
+          .demo-15-15 .glass-panel h2 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+          .demo-15-15 .glass-panel p { margin: 0; font-size: 0.85rem; opacity: 0.85; line-height: 1.5; }
+
+          /* === Section 5: Neon Heading === */
+          .demo-15-15 .neon-section {
+            padding: 3rem 2rem;
+            background: oklch(6% 0.01 270);
+            display: grid;
+            place-items: center;
+            scroll-snap-align: start;
+          }
+          .demo-15-15 .neon-heading {
+            font-size: 2rem;
+            font-weight: 700;
+            color: oklch(85% 0.15 190);
+            text-shadow:
+              0 0 7px oklch(80% 0.18 190),
+              0 0 10px oklch(80% 0.18 190),
+              0 0 21px oklch(75% 0.20 190),
+              0 0 42px oklch(70% 0.22 190),
+              0 0 82px oklch(65% 0.25 190);
+            animation: mega-flicker 4s infinite;
+            text-align: center;
+          }
+          @keyframes mega-flicker {
+            0%, 100% { opacity: 1; }
+            3%  { opacity: 0.4; }
+            6%  { opacity: 1; }
+            70% { opacity: 1; }
+            72% { opacity: 0.6; }
+            74% { opacity: 1; }
+          }
+
+          /* === Section 6: Marquee === */
+          .demo-15-15 .marquee-section {
+            padding: 1.5rem 0;
+            background: oklch(12% 0.02 270);
+            overflow: hidden;
+            scroll-snap-align: start;
+          }
+          .demo-15-15 .marquee-track {
+            display: flex;
+            gap: 2rem;
+            width: max-content;
+            animation: mega-scroll 20s linear infinite;
+          }
+          .demo-15-15 .marquee-section:hover .marquee-track {
+            animation-play-state: paused;
+          }
+          .demo-15-15 .marquee-item {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            color: oklch(60% 0.02 270);
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+          }
+          @keyframes mega-scroll { to { translate: -50% 0; } }
+
+          /* === Reduced motion === */
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-15 .aurora-bg,
+            .demo-15-15 .glass-section,
+            .demo-15-15 .marquee-track { animation: none; }
+            .demo-15-15 .type-line {
+              animation: none;
+              width: auto;
+              border-inline-end: none;
+            }
+            .demo-15-15 .neon-heading { animation: none; }
+            .demo-15-15 .mini-card {
+              animation: none;
+              opacity: 1;
+              transform: none;
+            }
+            .demo-15-15 .tilt-card { animation: none; }
+          }
+        </style>
+        <div class="demo-15-15">
+          <!-- Section 1: Aurora + Typewriter -->
+          <section class="hero-aurora">
+            <div class="aurora-bg"></div>
+            <div class="hero-glass">
+              <h2>The Mega Scroll Experience</h2>
+              <span class="type-line">Six effects, one scroll, all CSS</span>
+            </div>
+          </section>
+
+          <!-- Section 2: 3D Tilt Gallery -->
+          <section class="tilt-section">
+            <h2>Scroll-Driven 3D Tilt</h2>
+            <div class="tilt-row">
+              <div class="tilt-card">Mountain</div>
+              <div class="tilt-card">Ocean</div>
+              <div class="tilt-card">Sunset</div>
+              <div class="tilt-card">Forest</div>
+            </div>
+          </section>
+
+          <!-- Section 3: Staggered Grid -->
+          <section class="grid-section">
+            <h2>Rainbow Wave Grid</h2>
+            <div class="mini-grid">
+              <div class="mini-card" style="--i:0"></div>
+              <div class="mini-card" style="--i:1"></div>
+              <div class="mini-card" style="--i:2"></div>
+              <div class="mini-card" style="--i:3"></div>
+              <div class="mini-card" style="--i:4"></div>
+              <div class="mini-card" style="--i:5"></div>
+              <div class="mini-card" style="--i:6"></div>
+              <div class="mini-card" style="--i:7"></div>
+              <div class="mini-card" style="--i:8"></div>
+              <div class="mini-card" style="--i:9"></div>
+              <div class="mini-card" style="--i:10"></div>
+              <div class="mini-card" style="--i:11"></div>
+            </div>
+          </section>
+
+          <!-- Section 4: Glassmorphism -->
+          <section class="glass-section">
+            <div class="glass-panel">
+              <h2>Glass on Gradient</h2>
+              <p>Frosted glass over a rotating conic gradient. The backdrop-filter picks up color fragments from the animated background, creating a living, breathing surface.</p>
+            </div>
+          </section>
+
+          <!-- Section 5: Neon -->
+          <section class="neon-section">
+            <div class="neon-heading">The Future is CSS</div>
+          </section>
+
+          <!-- Section 6: Marquee -->
+          <section class="marquee-section">
+            <div class="marquee-track">
+              <span class="marquee-item">perspective</span>
+              <span class="marquee-item">clip-path</span>
+              <span class="marquee-item">@property</span>
+              <span class="marquee-item">animation-timeline</span>
+              <span class="marquee-item">backdrop-filter</span>
+              <span class="marquee-item">mask-image</span>
+              <span class="marquee-item">mix-blend-mode</span>
+              <span class="marquee-item">conic-gradient</span>
+              <span class="marquee-item">perspective</span>
+              <span class="marquee-item">clip-path</span>
+              <span class="marquee-item">@property</span>
+              <span class="marquee-item">animation-timeline</span>
+              <span class="marquee-item">backdrop-filter</span>
+              <span class="marquee-item">mask-image</span>
+              <span class="marquee-item">mix-blend-mode</span>
+              <span class="marquee-item">conic-gradient</span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Composition checklist</h2>
+      <p>Before shipping a multi-effect page, verify: (1) No two effects compete for attention in the same viewport. (2) Tone transitions between sections are gradual. (3) Every effect is in <code>@supports</code> where needed. (4) <code>prefers-reduced-motion</code> disables all decorative animation. (5) Scroll performance is smooth at 60fps. (6) The page tells a story — each section has a purpose, not just a technique.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.14-css-spotlight.html">&larr; Lesson 15.14</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

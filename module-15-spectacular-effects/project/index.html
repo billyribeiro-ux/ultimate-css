@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Spectacular Showcase — Module 15 Project · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+  <style>
+    /* =====================================================
+       THE SPECTACULAR SHOWCASE
+       All CSS. All performant. All accessible.
+       ===================================================== */
+
+    /* --- @property registrations --- */
+    @property --showcase-aurora-hue-1 {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 150;
+    }
+    @property --showcase-aurora-hue-2 {
+      syntax: "<number>";
+      inherits: false;
+      initial-value: 260;
+    }
+    @property --showcase-holo-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @property --showcase-glass-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @property --showcase-spot-x {
+      syntax: "<percentage>";
+      inherits: false;
+      initial-value: 20%;
+    }
+    @property --showcase-spot-y {
+      syntax: "<percentage>";
+      inherits: false;
+      initial-value: 40%;
+    }
+
+    /* --- Base --- */
+    .showcase {
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+    .showcase *,
+    .showcase *::before,
+    .showcase *::after {
+      box-sizing: border-box;
+    }
+    .showcase section {
+      position: relative;
+    }
+    .showcase h2 {
+      border: none;
+      padding: 0;
+    }
+
+    /* =========================
+       SECTION 1: AURORA HERO
+       ========================= */
+    .sc-hero {
+      position: relative;
+      min-block-size: 100vh;
+      min-block-size: 600px;
+      display: grid;
+      place-items: center;
+      background: oklch(6% 0.02 270);
+      overflow: hidden;
+    }
+    .sc-hero__aurora-1 {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 25% 20%,
+          oklch(45% 0.12 var(--showcase-aurora-hue-1)) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 75% 65%,
+          oklch(35% 0.10 var(--showcase-aurora-hue-2)) 0%, transparent 60%);
+      opacity: 0.7;
+      animation: sc-aurora-drift-1 18s ease-in-out infinite,
+                 sc-aurora-hue 20s linear infinite;
+    }
+    .sc-hero__aurora-2 {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 45% at 60% 30%,
+          oklch(40% 0.08 180) 0%, transparent 65%);
+      opacity: 0.4;
+      mix-blend-mode: screen;
+      animation: sc-aurora-drift-2 15s ease-in-out infinite;
+    }
+    .sc-hero__aurora-3 {
+      position: absolute;
+      inset: 0;
+      background:
+        conic-gradient(from 200deg at 50% 0%,
+          transparent 25%,
+          oklch(45% 0.07 160 / 0.3) 38%,
+          oklch(40% 0.09 200 / 0.2) 50%,
+          transparent 62%);
+      opacity: 0.5;
+      animation: sc-aurora-drift-3 22s ease-in-out infinite;
+    }
+    .sc-hero__stars {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(1px 1px at 8% 12%, oklch(95% 0 0 / 0.8), transparent),
+        radial-gradient(1.5px 1.5px at 22% 38%, oklch(90% 0 0 / 0.6), transparent),
+        radial-gradient(1px 1px at 42% 8%, oklch(95% 0 0 / 0.9), transparent),
+        radial-gradient(1px 1px at 58% 52%, oklch(90% 0 0 / 0.5), transparent),
+        radial-gradient(1.5px 1.5px at 73% 22%, oklch(95% 0 0 / 0.7), transparent),
+        radial-gradient(1px 1px at 88% 42%, oklch(90% 0 0 / 0.6), transparent),
+        radial-gradient(1px 1px at 92% 78%, oklch(95% 0 0 / 0.8), transparent),
+        radial-gradient(1px 1px at 33% 68%, oklch(90% 0 0 / 0.5), transparent),
+        radial-gradient(1px 1px at 52% 88%, oklch(95% 0 0 / 0.6), transparent),
+        radial-gradient(1px 1px at 15% 85%, oklch(90% 0 0 / 0.4), transparent);
+    }
+    .sc-hero__content {
+      position: relative;
+      text-align: center;
+      padding: 2rem;
+      max-inline-size: 600px;
+    }
+    .sc-hero__glass {
+      backdrop-filter: blur(40px) saturate(150%);
+      background: oklch(100% 0 0 / 0.06);
+      border: 1px solid oklch(100% 0 0 / 0.1);
+      border-radius: 1.5rem;
+      padding: 3rem;
+    }
+    .sc-hero__title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: white;
+      margin: 0 0 1rem;
+      line-height: 1.1;
+    }
+    .sc-hero__subtitle {
+      font-size: 1.1rem;
+      color: oklch(80% 0.05 270);
+      margin: 0 0 1.5rem;
+      line-height: 1.5;
+    }
+    .sc-hero__type {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: ui-monospace, 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: oklch(80% 0.15 190);
+      width: 0;
+      border-inline-end: 2px solid oklch(80% 0.15 190);
+      animation: sc-type 2.5s steps(32) 1.5s forwards,
+                 sc-blink 0.7s step-end 1.5s infinite;
+    }
+
+    @keyframes sc-aurora-drift-1 {
+      0%, 100% { transform: translateX(0) scaleX(1); }
+      33%      { transform: translateX(4%) scaleX(1.08); }
+      66%      { transform: translateX(-4%) scaleX(0.96); }
+    }
+    @keyframes sc-aurora-hue {
+      0%   { --showcase-aurora-hue-1: 150; --showcase-aurora-hue-2: 260; }
+      33%  { --showcase-aurora-hue-1: 170; --showcase-aurora-hue-2: 280; }
+      66%  { --showcase-aurora-hue-1: 140; --showcase-aurora-hue-2: 245; }
+      100% { --showcase-aurora-hue-1: 150; --showcase-aurora-hue-2: 260; }
+    }
+    @keyframes sc-aurora-drift-2 {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      50%      { transform: translateX(-6%) translateY(-3%); }
+    }
+    @keyframes sc-aurora-drift-3 {
+      0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.5; }
+      50%      { transform: translateX(3%) scaleY(1.15); opacity: 0.35; }
+    }
+    @keyframes sc-type { to { width: 32ch; } }
+    @keyframes sc-blink { 50% { border-color: transparent; } }
+
+    /* =========================
+       SECTION 2: HOLOGRAPHIC CARDS
+       ========================= */
+    .sc-holo {
+      padding: 5rem 2rem;
+      background: oklch(8% 0.02 270);
+    }
+    .sc-holo__heading {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: oklch(90% 0.05 270);
+      margin: 0 0 0.75rem;
+    }
+    .sc-holo__lead {
+      text-align: center;
+      font-size: 1rem;
+      color: oklch(60% 0.03 270);
+      margin: 0 auto 3rem;
+      max-inline-size: 50ch;
+    }
+    .sc-holo__grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      max-inline-size: 900px;
+      margin: 0 auto;
+    }
+    .sc-holo__card {
+      position: relative;
+      inline-size: 260px;
+      block-size: 340px;
+      border-radius: 1rem;
+      background: linear-gradient(145deg, oklch(22% 0.06 280), oklch(14% 0.04 260));
+      color: white;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px oklch(0% 0 0 / 0.5);
+      cursor: default;
+    }
+    .sc-holo__card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: conic-gradient(
+        from var(--showcase-holo-angle) at 50% 50%,
+        oklch(70% 0.30 0), oklch(70% 0.30 60), oklch(70% 0.30 120),
+        oklch(70% 0.30 180), oklch(70% 0.30 240), oklch(70% 0.30 300), oklch(70% 0.30 360)
+      );
+      mix-blend-mode: color-dodge;
+      opacity: 0.2;
+      animation: sc-holo-spin 10s linear infinite;
+      pointer-events: none;
+      transition: opacity 300ms ease;
+    }
+    .sc-holo__card:hover::before {
+      opacity: 0.4;
+    }
+    @keyframes sc-holo-spin { to { --showcase-holo-angle: 360deg; } }
+    .sc-holo__icon {
+      font-size: 3rem;
+      line-height: 1;
+      margin-block-end: auto;
+      text-shadow: 0 0 20px oklch(70% 0.2 275 / 0.4);
+    }
+    .sc-holo__card h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      position: relative;
+    }
+    .sc-holo__card p {
+      margin: 0;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       SECTION 3: LIQUID BLOB DIVIDER
+       ========================= */
+    .sc-blob-divider {
+      block-size: 180px;
+      background: oklch(0% 0 0);
+      filter: contrast(20);
+      overflow: hidden;
+      position: relative;
+    }
+    .sc-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(20px);
+    }
+    .sc-blob--1 {
+      inline-size: 160px; block-size: 160px;
+      background: oklch(50% 0.22 275);
+      top: 20%; left: 10%;
+      animation: sc-blob-1 10s ease-in-out infinite;
+    }
+    .sc-blob--2 {
+      inline-size: 120px; block-size: 120px;
+      background: oklch(55% 0.20 190);
+      top: 10%; left: 35%;
+      animation: sc-blob-2 13s ease-in-out infinite;
+    }
+    .sc-blob--3 {
+      inline-size: 140px; block-size: 140px;
+      background: oklch(50% 0.22 340);
+      top: 25%; left: 60%;
+      animation: sc-blob-3 11s ease-in-out infinite;
+    }
+    .sc-blob--4 {
+      inline-size: 100px; block-size: 100px;
+      background: oklch(60% 0.18 85);
+      top: 15%; left: 82%;
+      animation: sc-blob-4 14s ease-in-out infinite;
+    }
+    @keyframes sc-blob-1 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(80px, -20px); }
+      66% { transform: translate(-30px, 30px); }
+    }
+    @keyframes sc-blob-2 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-60px, 25px); }
+      66% { transform: translate(50px, -15px); }
+    }
+    @keyframes sc-blob-3 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(40px, -30px); }
+      66% { transform: translate(-70px, 10px); }
+    }
+    @keyframes sc-blob-4 {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(-50px, 20px); }
+      66% { transform: translate(30px, -25px); }
+    }
+
+    /* =========================
+       SECTION 4: 3D CARD FLIP SHOWCASE
+       ========================= */
+    .sc-flip {
+      padding: 5rem 2rem;
+      background: linear-gradient(180deg, oklch(0% 0 0) 0%, oklch(12% 0.02 270) 15%, oklch(96% 0.01 270) 40%);
+    }
+    .sc-flip__heading {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: oklch(20% 0.02 270);
+      margin: 0 0 0.75rem;
+    }
+    .sc-flip__lead {
+      text-align: center;
+      font-size: 1rem;
+      color: oklch(50% 0.02 270);
+      margin: 0 auto 3rem;
+      max-inline-size: 45ch;
+    }
+    .sc-flip__row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    .sc-flip__scene {
+      perspective: 800px;
+      inline-size: 240px;
+      block-size: 300px;
+    }
+    .sc-flip__card {
+      position: relative;
+      inline-size: 100%;
+      block-size: 100%;
+      transform-style: preserve-3d;
+      transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .sc-flip__scene:hover .sc-flip__card {
+      transform: rotateY(180deg);
+    }
+    .sc-flip__face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+      color: white;
+    }
+    .sc-flip__front--1 { background: linear-gradient(135deg, oklch(48% 0.25 275), oklch(55% 0.20 310)); }
+    .sc-flip__front--2 { background: linear-gradient(135deg, oklch(50% 0.20 190), oklch(45% 0.22 160)); }
+    .sc-flip__front--3 { background: linear-gradient(135deg, oklch(55% 0.22 340), oklch(50% 0.25 10)); }
+    .sc-flip__back {
+      background: linear-gradient(135deg, oklch(30% 0.12 270), oklch(20% 0.08 250));
+      transform: rotateY(180deg);
+    }
+    .sc-flip__avatar {
+      inline-size: 64px;
+      block-size: 64px;
+      border-radius: 50%;
+      background: oklch(80% 0.10 85);
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: oklch(35% 0.12 85);
+      margin-block-end: 0.75rem;
+      border: 2px solid oklch(100% 0 0 / 0.2);
+    }
+    .sc-flip__face h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1.1rem;
+    }
+    .sc-flip__face p {
+      margin: 0.15rem 0;
+      font-size: 0.8rem;
+      opacity: 0.75;
+    }
+    .sc-flip__hint {
+      margin-block-start: 1rem;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.5;
+    }
+
+    /* =========================
+       SECTION 5: SCROLL-DRIVEN TILT GALLERY
+       ========================= */
+    .sc-tilt {
+      padding: 4rem 2rem;
+      background: oklch(97% 0.01 270);
+    }
+    .sc-tilt__heading {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: oklch(20% 0.02 270);
+      margin: 0 0 2rem;
+    }
+    .sc-tilt__gallery {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      padding: 1rem;
+      scroll-snap-type: x mandatory;
+    }
+    .sc-tilt__item {
+      flex-shrink: 0;
+      inline-size: 260px;
+      block-size: 170px;
+      border-radius: 1rem;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 6px 24px oklch(0% 0 0 / 0.15);
+      scroll-snap-align: center;
+    }
+    .sc-tilt__item:nth-child(1) { background: linear-gradient(135deg, oklch(55% 0.25 275), oklch(45% 0.22 310)); }
+    .sc-tilt__item:nth-child(2) { background: linear-gradient(135deg, oklch(50% 0.22 190), oklch(45% 0.20 160)); }
+    .sc-tilt__item:nth-child(3) { background: linear-gradient(135deg, oklch(55% 0.22 340), oklch(50% 0.25 10)); }
+    .sc-tilt__item:nth-child(4) { background: linear-gradient(135deg, oklch(60% 0.20 85), oklch(50% 0.22 60)); }
+    .sc-tilt__item:nth-child(5) { background: linear-gradient(135deg, oklch(50% 0.20 150), oklch(45% 0.18 130)); }
+    .sc-tilt__item:nth-child(6) { background: linear-gradient(135deg, oklch(45% 0.25 275), oklch(55% 0.22 230)); }
+
+    @supports (animation-timeline: view()) {
+      .sc-tilt__item {
+        animation: sc-tilt-through linear both;
+        animation-timeline: view(inline);
+      }
+      @keyframes sc-tilt-through {
+        0%   { transform: perspective(800px) rotateY(-15deg) scale(0.9); opacity: 0.4; }
+        45%  { transform: perspective(800px) rotateY(0) scale(1); opacity: 1; }
+        55%  { transform: perspective(800px) rotateY(0) scale(1); opacity: 1; }
+        100% { transform: perspective(800px) rotateY(15deg) scale(0.9); opacity: 0.4; }
+      }
+    }
+
+    /* =========================
+       SECTION 6: NEON GLOW CALLOUT
+       ========================= */
+    .sc-neon {
+      padding: 5rem 2rem;
+      background: oklch(6% 0.01 270);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .sc-neon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg,
+          oklch(12% 0.01 30 / 0.1) 0px, oklch(12% 0.01 30 / 0.1) 1px,
+          transparent 1px, transparent 30px),
+        repeating-linear-gradient(90deg,
+          oklch(12% 0.01 30 / 0.08) 0px, oklch(12% 0.01 30 / 0.08) 1px,
+          transparent 1px, transparent 60px);
+      pointer-events: none;
+    }
+    .sc-neon__teal {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: oklch(85% 0.15 190);
+      text-shadow:
+        0 0 7px oklch(80% 0.18 190),
+        0 0 10px oklch(80% 0.18 190),
+        0 0 21px oklch(75% 0.20 190),
+        0 0 42px oklch(70% 0.22 190),
+        0 0 82px oklch(65% 0.25 190);
+      animation: sc-flicker-teal 4s infinite;
+      position: relative;
+      text-align: center;
+    }
+    .sc-neon__pink {
+      font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      color: oklch(80% 0.18 340);
+      text-shadow:
+        0 0 7px oklch(75% 0.20 340),
+        0 0 10px oklch(75% 0.20 340),
+        0 0 21px oklch(70% 0.22 340),
+        0 0 42px oklch(65% 0.25 340),
+        0 0 82px oklch(60% 0.28 340);
+      animation: sc-flicker-pink 5s infinite;
+      position: relative;
+      text-align: center;
+    }
+    @keyframes sc-flicker-teal {
+      0%, 100% { opacity: 1; }
+      3% { opacity: 0.4; } 6% { opacity: 1; }
+      7% { opacity: 0.8; } 9% { opacity: 1; }
+      68% { opacity: 1; } 70% { opacity: 0.6; } 72% { opacity: 1; }
+    }
+    @keyframes sc-flicker-pink {
+      0%, 100% { opacity: 1; }
+      41% { opacity: 1; } 42% { opacity: 0.5; }
+      43% { opacity: 0.9; } 44% { opacity: 0.4; } 46% { opacity: 1; }
+      85% { opacity: 1; } 86% { opacity: 0.7; } 88% { opacity: 1; }
+    }
+
+    /* =========================
+       SECTION 7: GLASSMORPHISM FEATURES
+       ========================= */
+    .sc-glass {
+      padding: 5rem 2rem;
+      background: conic-gradient(
+        from var(--showcase-glass-angle),
+        oklch(45% 0.18 275),
+        oklch(50% 0.16 190),
+        oklch(45% 0.15 340),
+        oklch(45% 0.18 275)
+      );
+      animation: sc-glass-spin 25s linear infinite;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      align-items: center;
+    }
+    @keyframes sc-glass-spin { to { --showcase-glass-angle: 360deg; } }
+    .sc-glass__card {
+      backdrop-filter: blur(24px) saturate(180%);
+      background: oklch(100% 0 0 / 0.12);
+      border: 1px solid oklch(100% 0 0 / 0.18);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      inline-size: 300px;
+      color: white;
+      box-shadow: 0 8px 32px oklch(0% 0 0 / 0.15);
+      transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1),
+                  box-shadow 300ms ease,
+                  border-color 300ms ease;
+    }
+    .sc-glass__card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 16px 48px oklch(0% 0 0 / 0.25);
+      border-color: oklch(100% 0 0 / 0.3);
+    }
+    .sc-glass__card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .sc-glass__card p {
+      margin: 0;
+      font-size: 0.85rem;
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+    .sc-glass__icon {
+      font-size: 2rem;
+      margin-block-end: 0.75rem;
+      display: block;
+    }
+
+    /* =========================
+       SECTION 8: STAGGERED RAINBOW GRID
+       ========================= */
+    .sc-grid {
+      padding: 5rem 2rem;
+      background: oklch(97% 0.005 270);
+    }
+    .sc-grid__heading {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: oklch(20% 0.02 270);
+      margin: 0 0 2rem;
+    }
+    .sc-grid__container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      max-inline-size: 720px;
+      margin: 0 auto;
+    }
+    .sc-grid__card {
+      block-size: 100px;
+      border-radius: 0.75rem;
+      background: oklch(65% 0.18 calc(30 * var(--i)));
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
+      opacity: 0;
+      transform: translateY(2rem) scale(0.95);
+      animation: sc-grid-reveal 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation-delay: calc(var(--i) * 70ms);
+    }
+    @keyframes sc-grid-reveal {
+      to { opacity: 1; transform: none; }
+    }
+
+    /* =========================
+       SECTION 9: INFINITE MARQUEE FOOTER
+       ========================= */
+    .sc-marquee {
+      padding: 1.5rem 0;
+      background: oklch(10% 0.02 270);
+      overflow: hidden;
+    }
+    .sc-marquee__track {
+      display: flex;
+      gap: 2rem;
+      width: max-content;
+      animation: sc-marquee-scroll 30s linear infinite;
+    }
+    .sc-marquee:hover .sc-marquee__track {
+      animation-play-state: paused;
+    }
+    .sc-marquee__item {
+      flex-shrink: 0;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: oklch(55% 0.03 270);
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    @keyframes sc-marquee-scroll { to { translate: -50% 0; } }
+
+    .sc-marquee--reverse .sc-marquee__track {
+      animation-direction: reverse;
+    }
+
+    /* =========================
+       FOOTER
+       ========================= */
+    .sc-footer {
+      padding: 2rem;
+      background: oklch(6% 0.02 270);
+      text-align: center;
+      color: oklch(45% 0.02 270);
+      font-size: 0.85rem;
+    }
+    .sc-footer a {
+      color: oklch(65% 0.15 190);
+      text-decoration: none;
+    }
+    .sc-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================
+       REDUCED MOTION — EVERYTHING OFF
+       ========================= */
+    @media (prefers-reduced-motion: reduce) {
+      .sc-hero__aurora-1,
+      .sc-hero__aurora-2,
+      .sc-hero__aurora-3,
+      .sc-holo__card::before,
+      .sc-blob,
+      .sc-glass,
+      .sc-marquee__track {
+        animation: none !important;
+      }
+      .sc-hero__type {
+        animation: none;
+        width: auto;
+        border-inline-end: none;
+      }
+      .sc-neon__teal,
+      .sc-neon__pink {
+        animation: none;
+      }
+      .sc-grid__card {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+      .sc-flip__card {
+        transition-duration: 0.01ms;
+      }
+      .sc-glass__card {
+        transition-duration: 0.01ms;
+      }
+      .sc-tilt__item {
+        animation: none;
+      }
+    }
+
+    /* =========================
+       DARK MODE ADJUSTMENTS
+       ========================= */
+    @media (prefers-color-scheme: dark) {
+      .sc-flip {
+        background: linear-gradient(180deg, oklch(0% 0 0) 0%, oklch(10% 0.02 270) 15%, oklch(15% 0.02 270) 50%);
+      }
+      .sc-flip__heading,
+      .sc-flip__lead {
+        color: oklch(85% 0.03 270);
+      }
+      .sc-tilt {
+        background: oklch(12% 0.02 270);
+      }
+      .sc-tilt__heading {
+        color: oklch(85% 0.03 270);
+      }
+      .sc-grid {
+        background: oklch(12% 0.02 270);
+      }
+      .sc-grid__heading {
+        color: oklch(85% 0.03 270);
+      }
+      .sc-glass__card {
+        background: oklch(0% 0 0 / 0.15);
+        border-color: oklch(100% 0 0 / 0.08);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <div class="showcase">
+
+    <!-- ===== SECTION 1: AURORA HERO ===== -->
+    <section class="sc-hero">
+      <div class="sc-hero__aurora-1"></div>
+      <div class="sc-hero__aurora-2"></div>
+      <div class="sc-hero__aurora-3"></div>
+      <div class="sc-hero__stars"></div>
+      <div class="sc-hero__content">
+        <div class="sc-hero__glass">
+          <h1 class="sc-hero__title">The Spectacular Showcase</h1>
+          <p class="sc-hero__subtitle">Eight CSS effects. One scrolling experience. Zero JavaScript. This is what CSS can do in 2026.</p>
+          <span class="sc-hero__type">All CSS. All performant. All real.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: HOLOGRAPHIC FEATURE CARDS ===== -->
+    <section class="sc-holo">
+      <h2 class="sc-holo__heading">Holographic Feature Cards</h2>
+      <p class="sc-holo__lead">Conic-gradient rainbow overlays with mix-blend-mode create an iridescent shimmer that rotates continuously.</p>
+      <div class="sc-holo__grid">
+        <div class="sc-holo__card">
+          <span class="sc-holo__icon">&#9670;</span>
+          <h3>Perspective</h3>
+          <p>3D transforms with configurable vanishing points for cinematic depth.</p>
+        </div>
+        <div class="sc-holo__card">
+          <span class="sc-holo__icon">&#9733;</span>
+          <h3>@property</h3>
+          <p>Registered custom properties enabling smooth hue rotation and gradient animation.</p>
+        </div>
+        <div class="sc-holo__card">
+          <span class="sc-holo__icon">&#9830;</span>
+          <h3>Clip-Path</h3>
+          <p>Polygon morphing between complex shapes with equal point counts for smooth interpolation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 3: LIQUID BLOB DIVIDER ===== -->
+    <section class="sc-blob-divider">
+      <div class="sc-blob sc-blob--1"></div>
+      <div class="sc-blob sc-blob--2"></div>
+      <div class="sc-blob sc-blob--3"></div>
+      <div class="sc-blob sc-blob--4"></div>
+    </section>
+
+    <!-- ===== SECTION 4: 3D CARD FLIP ===== -->
+    <section class="sc-flip">
+      <h2 class="sc-flip__heading">3D Card Flip</h2>
+      <p class="sc-flip__lead">Hover to reveal the back face. Perspective, preserve-3d, and backface-visibility working in concert.</p>
+      <div class="sc-flip__row">
+        <div class="sc-flip__scene">
+          <div class="sc-flip__card">
+            <div class="sc-flip__face sc-flip__front--1">
+              <div class="sc-flip__avatar">AK</div>
+              <h3>Ada Kowalski</h3>
+              <p>Principal Engineer</p>
+              <span class="sc-flip__hint">Hover to flip</span>
+            </div>
+            <div class="sc-flip__face sc-flip__back">
+              <h3>Contact</h3>
+              <p>ada@acme.dev</p>
+              <p>+1 (555) 042-1337</p>
+              <p>San Francisco</p>
+            </div>
+          </div>
+        </div>
+        <div class="sc-flip__scene">
+          <div class="sc-flip__card">
+            <div class="sc-flip__face sc-flip__front--2">
+              <div class="sc-flip__avatar">MR</div>
+              <h3>Mira Rodriguez</h3>
+              <p>Design Lead</p>
+              <span class="sc-flip__hint">Hover to flip</span>
+            </div>
+            <div class="sc-flip__face sc-flip__back">
+              <h3>Contact</h3>
+              <p>mira@acme.dev</p>
+              <p>+1 (555) 098-7654</p>
+              <p>Portland</p>
+            </div>
+          </div>
+        </div>
+        <div class="sc-flip__scene">
+          <div class="sc-flip__card">
+            <div class="sc-flip__face sc-flip__front--3">
+              <div class="sc-flip__avatar">JL</div>
+              <h3>Jun Li</h3>
+              <p>Staff Engineer</p>
+              <span class="sc-flip__hint">Hover to flip</span>
+            </div>
+            <div class="sc-flip__face sc-flip__back">
+              <h3>Contact</h3>
+              <p>jun@acme.dev</p>
+              <p>+1 (555) 321-0987</p>
+              <p>New York</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 5: SCROLL-DRIVEN TILT GALLERY ===== -->
+    <section class="sc-tilt">
+      <h2 class="sc-tilt__heading">Scroll-Driven 3D Tilt</h2>
+      <div class="sc-tilt__gallery">
+        <div class="sc-tilt__item">Mountain Vista</div>
+        <div class="sc-tilt__item">Ocean Depths</div>
+        <div class="sc-tilt__item">Sunset Bloom</div>
+        <div class="sc-tilt__item">Desert Gold</div>
+        <div class="sc-tilt__item">Forest Canopy</div>
+        <div class="sc-tilt__item">Arctic Aurora</div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 6: NEON GLOW CALLOUT ===== -->
+    <section class="sc-neon">
+      <div class="sc-neon__teal">This is ALL CSS</div>
+      <div class="sc-neon__pink">No JavaScript. No images.</div>
+    </section>
+
+    <!-- ===== SECTION 7: GLASSMORPHISM FEATURES ===== -->
+    <section class="sc-glass">
+      <div class="sc-glass__card">
+        <span class="sc-glass__icon">&#9632;</span>
+        <h3>Backdrop Filter</h3>
+        <p>Frosted glass that picks up color fragments from the animated gradient behind it. Blur and saturate combine for depth.</p>
+      </div>
+      <div class="sc-glass__card">
+        <span class="sc-glass__icon">&#9650;</span>
+        <h3>@supports</h3>
+        <p>Every progressive feature wrapped in feature queries. The page works everywhere; it just gets more spectacular with support.</p>
+      </div>
+      <div class="sc-glass__card">
+        <span class="sc-glass__icon">&#9679;</span>
+        <h3>Reduced Motion</h3>
+        <p>One media query disables all decorative animation. The page is still beautiful static. Accessibility is not optional.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 8: STAGGERED RAINBOW GRID ===== -->
+    <section class="sc-grid">
+      <h2 class="sc-grid__heading">Rainbow Wave</h2>
+      <div class="sc-grid__container">
+        <div class="sc-grid__card" style="--i: 0">01</div>
+        <div class="sc-grid__card" style="--i: 1">02</div>
+        <div class="sc-grid__card" style="--i: 2">03</div>
+        <div class="sc-grid__card" style="--i: 3">04</div>
+        <div class="sc-grid__card" style="--i: 4">05</div>
+        <div class="sc-grid__card" style="--i: 5">06</div>
+        <div class="sc-grid__card" style="--i: 6">07</div>
+        <div class="sc-grid__card" style="--i: 7">08</div>
+        <div class="sc-grid__card" style="--i: 8">09</div>
+        <div class="sc-grid__card" style="--i: 9">10</div>
+        <div class="sc-grid__card" style="--i: 10">11</div>
+        <div class="sc-grid__card" style="--i: 11">12</div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 9: INFINITE MARQUEE ===== -->
+    <section class="sc-marquee">
+      <div class="sc-marquee__track">
+        <span class="sc-marquee__item">perspective</span>
+        <span class="sc-marquee__item">@property</span>
+        <span class="sc-marquee__item">clip-path</span>
+        <span class="sc-marquee__item">animation-timeline</span>
+        <span class="sc-marquee__item">backdrop-filter</span>
+        <span class="sc-marquee__item">mask-image</span>
+        <span class="sc-marquee__item">mix-blend-mode</span>
+        <span class="sc-marquee__item">conic-gradient</span>
+        <span class="sc-marquee__item">backface-visibility</span>
+        <span class="sc-marquee__item">transform-style</span>
+        <span class="sc-marquee__item">perspective</span>
+        <span class="sc-marquee__item">@property</span>
+        <span class="sc-marquee__item">clip-path</span>
+        <span class="sc-marquee__item">animation-timeline</span>
+        <span class="sc-marquee__item">backdrop-filter</span>
+        <span class="sc-marquee__item">mask-image</span>
+        <span class="sc-marquee__item">mix-blend-mode</span>
+        <span class="sc-marquee__item">conic-gradient</span>
+        <span class="sc-marquee__item">backface-visibility</span>
+        <span class="sc-marquee__item">transform-style</span>
+      </div>
+    </section>
+
+    <section class="sc-marquee sc-marquee--reverse">
+      <div class="sc-marquee__track">
+        <span class="sc-marquee__item">oklch</span>
+        <span class="sc-marquee__item">text-shadow</span>
+        <span class="sc-marquee__item">filter: contrast</span>
+        <span class="sc-marquee__item">filter: blur</span>
+        <span class="sc-marquee__item">radial-gradient</span>
+        <span class="sc-marquee__item">cubic-bezier</span>
+        <span class="sc-marquee__item">steps()</span>
+        <span class="sc-marquee__item">preserve-3d</span>
+        <span class="sc-marquee__item">scroll-snap</span>
+        <span class="sc-marquee__item">light-dark()</span>
+        <span class="sc-marquee__item">oklch</span>
+        <span class="sc-marquee__item">text-shadow</span>
+        <span class="sc-marquee__item">filter: contrast</span>
+        <span class="sc-marquee__item">filter: blur</span>
+        <span class="sc-marquee__item">radial-gradient</span>
+        <span class="sc-marquee__item">cubic-bezier</span>
+        <span class="sc-marquee__item">steps()</span>
+        <span class="sc-marquee__item">preserve-3d</span>
+        <span class="sc-marquee__item">scroll-snap</span>
+        <span class="sc-marquee__item">light-dark()</span>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="sc-footer">
+      <p>Module 15 Project — The Spectacular Showcase</p>
+      <p><a href="../index.html">Back to Module 15</a></p>
+    </footer>
+  </div>
+
+  <nav class="container lesson-nav cluster">
+    <a href="../lesson-15.15-mega-scroll-experience.html">&larr; Lesson 15.15</a>
+    <a href="../../index.html">Course Home &rarr;</a>
+  </nav>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

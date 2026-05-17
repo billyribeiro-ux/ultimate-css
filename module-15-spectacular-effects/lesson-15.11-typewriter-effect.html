@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.11 — Typewriter Effect with Blinking Cursor · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.11 · Spectacular Effects</p>
+      <h1>Typewriter Effect with Blinking Cursor</h1>
+      <p class="lead">Text that types itself out character by character with a blinking cursor. Uses <code>width</code> animation with <code>steps()</code> timing, <code>overflow: hidden</code>, and <code>white-space: nowrap</code>. Multiple lines sequenced with <code>animation-delay</code> create a terminal-style output.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>How the typewriter works</h2>
+      <p>The text exists in full in the HTML — we are not generating characters. Instead, the element starts at <code>width: 0</code> with <code>overflow: hidden</code> and <code>white-space: nowrap</code>, then animates to <code>width: Nch</code> where N is the character count. The <code>ch</code> unit equals the width of the "0" character — perfect for monospace fonts.</p>
+
+      <h3>The steps() timing function</h3>
+      <p>The key is <code>steps(N)</code> where N matches the character count. Instead of a smooth width transition, the animation jumps in exactly N discrete steps — revealing one character at a time. Without <code>steps()</code>, the text would smoothly slide in, destroying the typewriter illusion.</p>
+
+      <h3>The blinking cursor</h3>
+      <p>A <code>border-inline-end: 3px solid</code> on the text element creates the cursor line. A separate <code>@keyframes blink</code> toggles <code>border-color</code> to <code>transparent</code> at 50% for the classic terminal blink. The cursor blink runs independently of the typing animation.</p>
+
+      <h3>Sequencing multiple lines</h3>
+      <p>The second line's <code>animation-delay</code> equals the first line's total animation duration. The cursor on line 1 only blinks during its typing phase, then the cursor "moves" to line 2 by hiding line 1's border and showing line 2's.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Terminal typewriter</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-15-11 {
+            font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+            background: oklch(10% 0.02 150);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+          }
+          .demo-15-11 .terminal-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-block-end: 1.5rem;
+            padding-block-end: 1rem;
+            border-block-end: 1px solid oklch(25% 0.02 150);
+          }
+          .demo-15-11 .terminal-dot {
+            inline-size: 12px;
+            block-size: 12px;
+            border-radius: 50%;
+          }
+          .demo-15-11 .terminal-dot:nth-child(1) { background: oklch(60% 0.20 25); }
+          .demo-15-11 .terminal-dot:nth-child(2) { background: oklch(75% 0.16 85); }
+          .demo-15-11 .terminal-dot:nth-child(3) { background: oklch(65% 0.17 150); }
+
+          .demo-15-11 .line {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            width: 0;
+            border-inline-end: 3px solid transparent;
+          }
+
+          .demo-15-11 .prompt {
+            color: oklch(65% 0.17 150);
+          }
+          .demo-15-11 .cmd {
+            color: oklch(85% 0.05 150);
+          }
+          .demo-15-11 .output {
+            color: oklch(70% 0.12 190);
+          }
+
+          /* Line 1: "$ npm run build" (16 chars) */
+          .demo-15-11 .line-1 {
+            width: 0;
+            animation:
+              type-15-11 1.2s steps(16) 0.5s forwards,
+              cursor-15-11 0.7s step-end 0.5s 3;
+            border-inline-end-color: oklch(65% 0.17 150);
+          }
+
+          /* Line 2: "Build successful." (17 chars) */
+          .demo-15-11 .line-2 {
+            width: 0;
+            animation:
+              type-15-11-b 1.3s steps(17) 2.5s forwards,
+              cursor-15-11 0.7s step-end 2.5s 3;
+            border-inline-end-color: oklch(70% 0.12 190);
+          }
+
+          /* Line 3: "$ Ready on port 3000" (20 chars) */
+          .demo-15-11 .line-3 {
+            width: 0;
+            animation:
+              type-15-11-c 1.5s steps(20) 4.5s forwards,
+              cursor-15-11 0.7s step-end 4.5s infinite;
+            border-inline-end-color: oklch(65% 0.17 150);
+          }
+
+          @keyframes type-15-11 {
+            from { width: 0; }
+            to   { width: 16ch; }
+          }
+          @keyframes type-15-11-b {
+            from { width: 0; }
+            to   { width: 17ch; }
+          }
+          @keyframes type-15-11-c {
+            from { width: 0; }
+            to   { width: 20ch; }
+          }
+          @keyframes cursor-15-11 {
+            0%, 100% { border-inline-end-color: currentColor; }
+            50%      { border-inline-end-color: transparent; }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-11 .line {
+              animation: none;
+              width: auto;
+              border-inline-end: none;
+            }
+          }
+        </style>
+        <div class="demo-15-11">
+          <div class="terminal-bar">
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+            <div class="terminal-dot"></div>
+          </div>
+          <div>
+            <span class="line line-1 prompt">$ npm run build&nbsp;</span>
+          </div>
+          <div>
+            <span class="line line-2 output">Build successful.&nbsp;</span>
+          </div>
+          <div>
+            <span class="line line-3 prompt">$ Ready on port 3000</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="terminal"&gt;
+  &lt;div class="bar"&gt;
+    &lt;span class="dot"&gt;&lt;/span&gt;
+    &lt;span class="dot"&gt;&lt;/span&gt;
+    &lt;span class="dot"&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div&gt;&lt;span class="line l1"&gt;$ npm run build &lt;/span&gt;&lt;/div&gt;
+  &lt;div&gt;&lt;span class="line l2"&gt;Build successful. &lt;/span&gt;&lt;/div&gt;
+  &lt;div&gt;&lt;span class="line l3"&gt;$ Ready on port 3000&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  background: oklch(8% 0.01 270);
+  font-family: ui-monospace, monospace;
+}
+.terminal {
+  background: oklch(10% 0.02 150);
+  padding: 2rem;
+  border-radius: .75rem;
+  min-width: 380px;
+}
+.bar {
+  display: flex; gap: .5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid oklch(25% .02 150);
+}
+.dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+}
+.dot:nth-child(1) { background: oklch(60% .2 25); }
+.dot:nth-child(2) { background: oklch(75% .16 85); }
+.dot:nth-child(3) { background: oklch(65% .17 150); }
+
+.line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  font-size: .95rem;
+  line-height: 1.8;
+  border-right: 3px solid transparent;
+}
+
+/* Line 1: 16 chars, starts at 0.5s */
+.l1 {
+  color: oklch(65% .17 150);
+  animation:
+    t1 1.2s steps(16) .5s forwards,
+    blink .7s step-end .5s 3;
+  border-color: oklch(65% .17 150);
+}
+/* Line 2: 17 chars, starts at 2.5s */
+.l2 {
+  color: oklch(70% .12 190);
+  animation:
+    t2 1.3s steps(17) 2.5s forwards,
+    blink .7s step-end 2.5s 3;
+  border-color: oklch(70% .12 190);
+}
+/* Line 3: 20 chars, starts at 4.5s */
+.l3 {
+  color: oklch(65% .17 150);
+  animation:
+    t3 1.5s steps(20) 4.5s forwards,
+    blink .7s step-end 4.5s infinite;
+  border-color: oklch(65% .17 150);
+}
+
+@keyframes t1 { to { width: 16ch; } }
+@keyframes t2 { to { width: 17ch; } }
+@keyframes t3 { to { width: 20ch; } }
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line {
+    animation: none;
+    width: auto;
+    border-right: none;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a fourth line with your own custom message. Count the characters carefully — the <code>steps()</code> value and the <code>ch</code> width must match exactly. Then try changing the cursor blink speed from <code>0.7s</code> to <code>1s</code> — which feels more realistic? Add a slight <code>animation-delay</code> gap between lines (2 seconds instead of immediate) to simulate "thinking time."</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.10-glassmorphism-animated.html">&larr; Lesson 15.10</a>
+      <a href="./lesson-15.12-hamburger-to-x.html">Lesson 15.12 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

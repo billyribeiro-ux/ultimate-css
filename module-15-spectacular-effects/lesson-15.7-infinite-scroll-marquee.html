@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.7 — Infinite Scroll Marquee · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.7 · Spectacular Effects</p>
+      <h1>Infinite Scroll Marquee</h1>
+      <p class="lead">A smooth, infinite horizontal scrolling strip — the "trusted by" logo ticker used on every SaaS landing page. The trick: duplicate the content, animate exactly 50%, and the loop is seamless. Pause on hover for accessibility.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The seamless loop math</h2>
+      <p>The container holds two identical copies of the content side by side in a flex row. The total width is exactly 2x the content width. The animation translates by <code>-50%</code> (one full content width). When the second copy reaches where the first copy started, the animation loops — and since the copies are identical, the jump is invisible.</p>
+
+      <h3>The pattern</h3>
+      <pre><code>.marquee { overflow: hidden; }
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee 20s linear infinite;
+}
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to { translate: -50% 0; }
+}</code></pre>
+
+      <h3>Vertical variant</h3>
+      <p>The same principle works vertically: stack the duplicated content in a column and animate <code>translate: 0 -50%</code>. Perfect for testimonial tickers or notification feeds.</p>
+
+      <h2>Accessibility</h2>
+      <p>Pause on <code>:hover</code> lets mouse users stop the motion. For keyboard and reduced-motion users, <code>prefers-reduced-motion: reduce</code> stops the animation entirely, showing all items in a static row.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Logo marquee</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-15-7 {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+          }
+          .demo-15-7 .marquee {
+            overflow: hidden;
+            padding-block: 1rem;
+            background: oklch(96% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-15-7 .marquee--dark {
+            background: oklch(12% 0.02 270);
+          }
+          .demo-15-7 .marquee__track {
+            display: flex;
+            gap: 2rem;
+            width: max-content;
+            animation: demo-marquee 25s linear infinite;
+          }
+          .demo-15-7 .marquee:hover .marquee__track {
+            animation-play-state: paused;
+          }
+          .demo-15-7 .marquee__item {
+            flex-shrink: 0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+          }
+          .demo-15-7 .marquee:not(.marquee--dark) .marquee__item {
+            background: white;
+            color: oklch(30% 0.02 270);
+            border: 1px solid oklch(90% 0.01 270);
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.06);
+          }
+          .demo-15-7 .marquee--dark .marquee__item {
+            background: oklch(20% 0.03 270);
+            color: oklch(80% 0.02 270);
+            border: 1px solid oklch(25% 0.02 270);
+          }
+          .demo-15-7 .marquee--reverse .marquee__track {
+            animation-direction: reverse;
+          }
+
+          /* Vertical marquee */
+          .demo-15-7 .marquee-v {
+            overflow: hidden;
+            block-size: 200px;
+            padding-inline: 1rem;
+            background: oklch(96% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-15-7 .marquee-v__track {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            animation: demo-marquee-v 15s linear infinite;
+          }
+          .demo-15-7 .marquee-v:hover .marquee-v__track {
+            animation-play-state: paused;
+          }
+          .demo-15-7 .marquee-v__item {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: oklch(35% 0.02 270);
+          }
+
+          @keyframes demo-marquee {
+            to { translate: -50% 0; }
+          }
+          @keyframes demo-marquee-v {
+            to { translate: 0 -50%; }
+          }
+
+          .demo-15-7 .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--color-text-tertiary);
+            margin: 0;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-7 .marquee__track,
+            .demo-15-7 .marquee-v__track {
+              animation: none;
+            }
+          }
+        </style>
+        <div class="demo-15-7">
+          <p class="section-label">Horizontal (hover to pause)</p>
+          <div class="marquee">
+            <div class="marquee__track">
+              <div class="marquee__item">Acme Corp</div>
+              <div class="marquee__item">Globex Inc</div>
+              <div class="marquee__item">Initech</div>
+              <div class="marquee__item">Umbrella Co</div>
+              <div class="marquee__item">Stark Industries</div>
+              <div class="marquee__item">Wayne Enterprises</div>
+              <div class="marquee__item">Cyberdyne</div>
+              <div class="marquee__item">Soylent Corp</div>
+              <!-- Duplicate for seamless loop -->
+              <div class="marquee__item">Acme Corp</div>
+              <div class="marquee__item">Globex Inc</div>
+              <div class="marquee__item">Initech</div>
+              <div class="marquee__item">Umbrella Co</div>
+              <div class="marquee__item">Stark Industries</div>
+              <div class="marquee__item">Wayne Enterprises</div>
+              <div class="marquee__item">Cyberdyne</div>
+              <div class="marquee__item">Soylent Corp</div>
+            </div>
+          </div>
+
+          <p class="section-label">Reverse direction, dark</p>
+          <div class="marquee marquee--dark marquee--reverse">
+            <div class="marquee__track">
+              <div class="marquee__item">React</div>
+              <div class="marquee__item">Svelte</div>
+              <div class="marquee__item">Vue</div>
+              <div class="marquee__item">Angular</div>
+              <div class="marquee__item">Solid</div>
+              <div class="marquee__item">Astro</div>
+              <div class="marquee__item">Next.js</div>
+              <div class="marquee__item">Nuxt</div>
+              <div class="marquee__item">React</div>
+              <div class="marquee__item">Svelte</div>
+              <div class="marquee__item">Vue</div>
+              <div class="marquee__item">Angular</div>
+              <div class="marquee__item">Solid</div>
+              <div class="marquee__item">Astro</div>
+              <div class="marquee__item">Next.js</div>
+              <div class="marquee__item">Nuxt</div>
+            </div>
+          </div>
+
+          <p class="section-label">Vertical variant</p>
+          <div class="marquee-v">
+            <div class="marquee-v__track">
+              <div class="marquee-v__item">New deployment successful</div>
+              <div class="marquee-v__item">Performance score: 99/100</div>
+              <div class="marquee-v__item">0 critical vulnerabilities</div>
+              <div class="marquee-v__item">Build time: 1.2s</div>
+              <div class="marquee-v__item">12 tests passing</div>
+              <div class="marquee-v__item">Bundle size: 42kb</div>
+              <div class="marquee-v__item">New deployment successful</div>
+              <div class="marquee-v__item">Performance score: 99/100</div>
+              <div class="marquee-v__item">0 critical vulnerabilities</div>
+              <div class="marquee-v__item">Build time: 1.2s</div>
+              <div class="marquee-v__item">12 tests passing</div>
+              <div class="marquee-v__item">Bundle size: 42kb</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="marquee"&gt;
+  &lt;div class="track"&gt;
+    &lt;span class="item"&gt;Acme Corp&lt;/span&gt;
+    &lt;span class="item"&gt;Globex Inc&lt;/span&gt;
+    &lt;span class="item"&gt;Initech&lt;/span&gt;
+    &lt;span class="item"&gt;Umbrella Co&lt;/span&gt;
+    &lt;span class="item"&gt;Stark Ind&lt;/span&gt;
+    &lt;span class="item"&gt;Wayne Ent&lt;/span&gt;
+    &lt;!-- Duplicate set for seamless loop --&gt;
+    &lt;span class="item"&gt;Acme Corp&lt;/span&gt;
+    &lt;span class="item"&gt;Globex Inc&lt;/span&gt;
+    &lt;span class="item"&gt;Initech&lt;/span&gt;
+    &lt;span class="item"&gt;Umbrella Co&lt;/span&gt;
+    &lt;span class="item"&gt;Stark Ind&lt;/span&gt;
+    &lt;span class="item"&gt;Wayne Ent&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  font-family: system-ui;
+  background: oklch(97% 0.01 270);
+}
+
+.marquee {
+  overflow: hidden;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: scroll 20s linear infinite;
+}
+
+/* Pause on hover */
+.marquee:hover .track {
+  animation-play-state: paused;
+}
+
+.item {
+  flex-shrink: 0;
+  padding: .75rem 1.5rem;
+  background: white;
+  border: 1px solid oklch(90% .01 270);
+  border-radius: .5rem;
+  font-weight: 600;
+  font-size: .9rem;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px oklch(0% 0 0 / .06);
+}
+
+/* Translate exactly -50% for seamless loop */
+@keyframes scroll {
+  to { translate: -50% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add <code>animation-direction: reverse</code> to scroll the other way. Then add a second marquee row below going in the opposite direction — this "opposing lanes" pattern is extremely common on marketing sites. Try speeding up to <code>10s</code> and slowing down to <code>40s</code> to find the sweet spot for readability versus energy.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.6-neon-glow-text.html">&larr; Lesson 15.6</a>
+      <a href="./lesson-15.8-magnetic-hover-button.html">Lesson 15.8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

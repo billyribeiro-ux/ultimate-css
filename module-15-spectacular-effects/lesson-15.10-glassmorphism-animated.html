@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.10 — Glassmorphism with Animated Gradient · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.10 · Spectacular Effects</p>
+      <h1>Glassmorphism with Animated Gradient</h1>
+      <p class="lead">A layered glass card floating over an animated gradient background. The combination of moving color, frosted glass, and hover elevation creates a premium, modern aesthetic. Dark mode flips the overlay. The effect should feel like a luxury product page.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three-layer composition</h2>
+      <p>The glassmorphism effect requires three visual layers working together. The <strong>background</strong> provides the color and motion — an animated gradient that rotates via <code>@property --bg-angle</code>. The <strong>glass card</strong> sits on top with <code>backdrop-filter: blur(20px) saturate(180%)</code>, picking up blurred fragments of the background color. The <strong>border</strong> uses a semi-transparent white to catch the light.</p>
+
+      <h3>The glass recipe</h3>
+      <pre><code>.glass {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: oklch(100% 0 0 / 0.15);
+  border: 1px solid oklch(100% 0 0 / 0.2);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px oklch(0% 0 0 / 0.1);
+}</code></pre>
+
+      <h3>The animated background</h3>
+      <p>Register <code>--bg-angle</code> as <code>&lt;angle&gt;</code> to enable smooth rotation. The gradient uses three OKLCH colors and rotates slowly — 20 seconds per revolution — creating that living, breathing background that makes the glass card pop.</p>
+
+      <h3>Dark mode adaptation</h3>
+      <p>In dark mode, the glass overlay switches from <code>oklch(100% 0 0 / 0.15)</code> (white tint) to <code>oklch(0% 0 0 / 0.2)</code> (dark tint). The border becomes <code>oklch(100% 0 0 / 0.08)</code> — subtler but still catching light. This two-line change is all that is needed.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Glass card on animated gradient</h2>
+      <div class="demo-frame">
+        <style>
+          @property --glass-bg-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+          }
+
+          .demo-15-10 {
+            font-family: system-ui, sans-serif;
+          }
+          .demo-15-10 .glass-scene {
+            position: relative;
+            inline-size: 100%;
+            block-size: 420px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(
+              from var(--glass-bg-angle),
+              oklch(50% 0.22 275),
+              oklch(55% 0.20 190),
+              oklch(50% 0.18 340),
+              oklch(50% 0.22 275)
+            );
+            animation: glass-bg-rotate 20s linear infinite;
+          }
+          @keyframes glass-bg-rotate {
+            to { --glass-bg-angle: 360deg; }
+          }
+
+          .demo-15-10 .glass-card {
+            backdrop-filter: blur(20px) saturate(180%);
+            background: oklch(100% 0 0 / 0.15);
+            border: 1px solid oklch(100% 0 0 / 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            inline-size: 320px;
+            color: white;
+            box-shadow: 0 8px 32px oklch(0% 0 0 / 0.15);
+            transition: transform 300ms cubic-bezier(0.33, 1, 0.68, 1),
+                        box-shadow 300ms ease,
+                        border-color 300ms ease;
+          }
+          .demo-15-10 .glass-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 48px oklch(0% 0 0 / 0.25);
+            border-color: oklch(100% 0 0 / 0.35);
+          }
+
+          .demo-15-10 .glass-card .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.7;
+          }
+          .demo-15-10 .glass-card h3 {
+            margin: 0.75rem 0 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+          }
+          .demo-15-10 .glass-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0.85;
+          }
+          .demo-15-10 .glass-card .price {
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
+            margin-block-start: 1.5rem;
+            padding-block-start: 1rem;
+            border-block-start: 1px solid oklch(100% 0 0 / 0.15);
+          }
+          .demo-15-10 .glass-card .price-value {
+            font-size: 2rem;
+            font-weight: 700;
+          }
+          .demo-15-10 .glass-card .price-period {
+            font-size: 0.85rem;
+            opacity: 0.6;
+          }
+
+          @media (prefers-color-scheme: dark) {
+            .demo-15-10 .glass-card {
+              background: oklch(0% 0 0 / 0.2);
+              border-color: oklch(100% 0 0 / 0.08);
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-10 .glass-scene {
+              animation: none;
+            }
+            .demo-15-10 .glass-card {
+              transition-duration: 0.01ms;
+            }
+          }
+        </style>
+        <div class="demo-15-10">
+          <div class="glass-scene">
+            <div class="glass-card">
+              <span class="tag">Premium Plan</span>
+              <h3>Unlimited Access</h3>
+              <p>Everything in Pro, plus priority support, custom integrations, and advanced analytics for your entire team.</p>
+              <div class="price">
+                <span class="price-value">$99</span>
+                <span class="price-period">/month</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;div class="glass"&gt;
+    &lt;span class="tag"&gt;Premium&lt;/span&gt;
+    &lt;h3&gt;Unlimited Access&lt;/h3&gt;
+    &lt;p&gt;Everything you need for your team.&lt;/p&gt;
+    &lt;div class="price"&gt;
+      &lt;span class="big"&gt;$99&lt;/span&gt;
+      &lt;span class="sm"&gt;/month&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@property --angle {
+  syntax: "&lt;angle&gt;";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+body { margin: 0; font-family: system-ui; }
+
+.scene {
+  height: 100vh;
+  display: grid; place-items: center;
+  background: conic-gradient(
+    from var(--angle),
+    oklch(50% 0.22 275),
+    oklch(55% 0.20 190),
+    oklch(50% 0.18 340),
+    oklch(50% 0.22 275));
+  animation: spin 20s linear infinite;
+}
+@keyframes spin {
+  to { --angle: 360deg; }
+}
+
+.glass {
+  backdrop-filter: blur(20px) saturate(180%);
+  background: oklch(100% 0 0 / 0.15);
+  border: 1px solid oklch(100% 0 0 / 0.2);
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 300px;
+  color: white;
+  box-shadow: 0 8px 32px oklch(0% 0 0 / .15);
+  transition: transform 300ms cubic-bezier(.33,1,.68,1),
+              box-shadow 300ms ease;
+}
+.glass:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 48px oklch(0% 0 0 / .25);
+  border-color: oklch(100% 0 0 / .35);
+}
+
+.tag {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .1em; opacity: .7;
+}
+h3 { margin: .75rem 0 .5rem; font-size: 1.5rem; }
+p { margin: 0; font-size: .9rem; opacity: .85; line-height: 1.5; }
+.price {
+  display: flex; align-items: baseline; gap: .25rem;
+  margin-top: 1.5rem; padding-top: 1rem;
+  border-top: 1px solid oklch(100% 0 0 / .15);
+}
+.big { font-size: 2rem; font-weight: 700; }
+.sm { font-size: .85rem; opacity: .6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene { animation: none; }
+  .glass { transition-duration: .01ms; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the glass <code>background</code> to <code>oklch(0% 0 0 / 0.25)</code> for a dark-glass variant. Then add a second glass card beside the first with different blur values — <code>blur(10px)</code> versus <code>blur(40px)</code> — to see how blur radius affects the glass quality. Try adding <code>border-image: linear-gradient(135deg, oklch(100% 0 0 / 0.3), oklch(100% 0 0 / 0.05)) 1</code> for a gradient border effect.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.9-scroll-driven-tilt-gallery.html">&larr; Lesson 15.9</a>
+      <a href="./lesson-15.11-typewriter-effect.html">Lesson 15.11 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

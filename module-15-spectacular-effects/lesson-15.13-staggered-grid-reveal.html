@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.13 — Staggered Grid Reveal · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.13</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.13 · Spectacular Effects</p>
+      <h1>Staggered Grid Reveal</h1>
+      <p class="lead">A grid of cards that reveal one by one in a wave pattern. Each card's delay is offset by its index, creating a cascading "rainbow wave" effect. Combined with scroll-driven animation for a reveal that triggers on scroll, not on page load.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The stagger pattern</h2>
+      <p>Staggered animation means each element starts its animation slightly after the previous one. The delay is calculated per-element. The emerging CSS approach uses <code>sibling-index()</code> — but since browser support is still limited, we use inline <code>style</code> attributes with <code>--i</code> custom properties as the reliable fallback.</p>
+
+      <h3>The delay calculation</h3>
+      <pre><code>/* Future: automatic stagger */
+animation-delay: calc((sibling-index() - 1) * 60ms);
+
+/* Current: manual index via custom property */
+.card { animation-delay: calc(var(--i, 0) * 60ms); }
+&lt;div class="card" style="--i: 0"&gt;
+&lt;div class="card" style="--i: 1"&gt;
+...</code></pre>
+
+      <h3>The reveal animation</h3>
+      <p>Each card fades up from <code>opacity: 0; transform: translateY(2rem) scale(0.95)</code> to its natural position. The combination of vertical translation, slight scale, and opacity creates a "rising into existence" effect that feels organic.</p>
+
+      <h3>Rainbow hue cycling</h3>
+      <p>Each card's background hue is derived from its index: <code>background: oklch(70% 0.15 calc(30 * var(--i)))</code>. With 12 cards at 30-degree hue increments, the grid cycles through the entire color wheel — creating a rainbow wave when the stagger plays.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Rainbow wave grid</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-15-13 {
+            padding: 1.5rem;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-15-13 .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+          }
+          .demo-15-13 .grid-card {
+            block-size: 100px;
+            border-radius: 0.75rem;
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+            background: oklch(65% 0.18 calc(30 * var(--i)));
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.1);
+            opacity: 0;
+            transform: translateY(2rem) scale(0.95);
+            animation: reveal-15-13 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: calc(var(--i) * 80ms);
+          }
+
+          @keyframes reveal-15-13 {
+            to {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+
+          .demo-15-13 .replay-btn {
+            display: block;
+            margin: 1.5rem auto 0;
+            padding: 0.5rem 1.5rem;
+            background: oklch(50% 0.22 275);
+            color: white;
+            border: none;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+          }
+          .demo-15-13 .replay-btn:hover {
+            background: oklch(45% 0.22 275);
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-13 .grid-card {
+              animation: none;
+              opacity: 1;
+              transform: none;
+            }
+          }
+        </style>
+        <div class="demo-15-13">
+          <div class="grid" id="stagger-grid">
+            <div class="grid-card" style="--i: 0">01</div>
+            <div class="grid-card" style="--i: 1">02</div>
+            <div class="grid-card" style="--i: 2">03</div>
+            <div class="grid-card" style="--i: 3">04</div>
+            <div class="grid-card" style="--i: 4">05</div>
+            <div class="grid-card" style="--i: 5">06</div>
+            <div class="grid-card" style="--i: 6">07</div>
+            <div class="grid-card" style="--i: 7">08</div>
+            <div class="grid-card" style="--i: 8">09</div>
+            <div class="grid-card" style="--i: 9">10</div>
+            <div class="grid-card" style="--i: 10">11</div>
+            <div class="grid-card" style="--i: 11">12</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
+  &lt;div class="card" style="--i:0"&gt;01&lt;/div&gt;
+  &lt;div class="card" style="--i:1"&gt;02&lt;/div&gt;
+  &lt;div class="card" style="--i:2"&gt;03&lt;/div&gt;
+  &lt;div class="card" style="--i:3"&gt;04&lt;/div&gt;
+  &lt;div class="card" style="--i:4"&gt;05&lt;/div&gt;
+  &lt;div class="card" style="--i:5"&gt;06&lt;/div&gt;
+  &lt;div class="card" style="--i:6"&gt;07&lt;/div&gt;
+  &lt;div class="card" style="--i:7"&gt;08&lt;/div&gt;
+  &lt;div class="card" style="--i:8"&gt;09&lt;/div&gt;
+  &lt;div class="card" style="--i:9"&gt;10&lt;/div&gt;
+  &lt;div class="card" style="--i:10"&gt;11&lt;/div&gt;
+  &lt;div class="card" style="--i:11"&gt;12&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  font-family: system-ui;
+  background: oklch(97% 0.01 270);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 2rem;
+  max-width: 500px;
+}
+
+.card {
+  height: 100px;
+  border-radius: .75rem;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: .85rem;
+  color: white;
+  /* Rainbow hue from index */
+  background: oklch(65% 0.18
+    calc(30 * var(--i)));
+  box-shadow: 0 4px 12px oklch(0% 0 0 / .1);
+
+  /* Start hidden */
+  opacity: 0;
+  transform: translateY(2rem) scale(.95);
+
+  /* Staggered reveal */
+  animation: reveal 500ms
+    cubic-bezier(.4,0,.2,1) forwards;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Try changing the stagger delay from <code>80ms</code> to <code>150ms</code> — it becomes more dramatic but slower. Then try <code>30ms</code> — the wave becomes almost imperceptible. Find the sweet spot for your taste. Change the hue multiplier from <code>30</code> to <code>15</code> for a subtler color range, or <code>60</code> for a more compressed rainbow. For extra credit, wrap the animation in <code>@supports (animation-timeline: view())</code> and add <code>animation-timeline: view()</code> to trigger on scroll.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.12-hamburger-to-x.html">&larr; Lesson 15.12</a>
+      <a href="./lesson-15.14-css-spotlight.html">Lesson 15.14 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

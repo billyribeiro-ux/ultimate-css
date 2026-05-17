@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.8 — Magnetic Hover Button · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.8 · Spectacular Effects</p>
+      <h1>Magnetic Hover Button</h1>
+      <p class="lead">A button that "attracts" toward the cursor with a springy, elastic return. The CSS architecture uses custom properties for the transform, with an overshooting cubic-bezier that creates a physical, magnetic feel. Production uses 6 lines of JS for the coordinate; the CSS is where the magic lives.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The CSS-first approach</h2>
+      <p>The magnetic effect is built on CSS custom properties and elastic easing. The <code>transform</code> reads from <code>--tx</code> and <code>--ty</code> which default to <code>0</code>. In production, a <code>mousemove</code> listener calculates the offset between cursor and button center, scales it down (e.g., <code>* 0.3</code>), and sets those properties. The CSS handles all the animation physics.</p>
+
+      <h3>The elastic easing</h3>
+      <p>The key to the magnetic feel is <code>cubic-bezier(0.33, 1, 0.68, 1)</code> — this easing overshoots slightly past the target, then settles back. When the cursor leaves and the properties reset to <code>0</code>, the button "bounces" back to center like a spring releasing. This single line of CSS is what makes it feel physical rather than robotic.</p>
+
+      <h3>The production JS (6 lines)</h3>
+      <pre><code>btn.addEventListener('mousemove', e => {
+  const rect = btn.getBoundingClientRect();
+  const x = e.clientX - rect.left - rect.width / 2;
+  const y = e.clientY - rect.top - rect.height / 2;
+  btn.style.setProperty('--tx', `${x * 0.3}px`);
+  btn.style.setProperty('--ty', `${y * 0.3}px`);
+});
+btn.addEventListener('mouseleave', () => {
+  btn.style.setProperty('--tx', '0px');
+  btn.style.setProperty('--ty', '0px');
+});</code></pre>
+
+      <h3>CSS-only simplified version</h3>
+      <p>Without JS, we use <code>:hover</code> for a simpler effect: <code>transform: scale(1.05) translateY(-2px)</code> with the elastic easing. It does not follow the cursor, but the elastic return still feels magnetic. This is the progressive enhancement baseline.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Magnetic buttons</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-15-8 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            padding: 3rem 2rem;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-15-8 .mag-btn {
+            --tx: 0px;
+            --ty: 0px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            border: none;
+            border-radius: 3rem;
+            cursor: pointer;
+            transform: translate(var(--tx), var(--ty));
+            transition: transform 400ms cubic-bezier(0.33, 1, 0.68, 1),
+                        box-shadow 300ms ease;
+          }
+          .demo-15-8 .mag-btn:hover {
+            transform: translate(var(--tx), var(--ty)) scale(1.05) translateY(-2px);
+          }
+          .demo-15-8 .mag-btn:active {
+            transform: translate(var(--tx), var(--ty)) scale(0.98);
+            transition-duration: 100ms;
+          }
+
+          .demo-15-8 .mag-btn--primary {
+            background: linear-gradient(135deg, oklch(55% 0.25 275), oklch(50% 0.22 310));
+            color: white;
+            box-shadow: 0 4px 15px oklch(50% 0.20 275 / 0.3);
+          }
+          .demo-15-8 .mag-btn--primary:hover {
+            box-shadow: 0 8px 25px oklch(50% 0.20 275 / 0.4);
+          }
+
+          .demo-15-8 .mag-btn--teal {
+            background: linear-gradient(135deg, oklch(55% 0.18 190), oklch(50% 0.20 170));
+            color: white;
+            box-shadow: 0 4px 15px oklch(50% 0.15 190 / 0.3);
+          }
+          .demo-15-8 .mag-btn--teal:hover {
+            box-shadow: 0 8px 25px oklch(50% 0.15 190 / 0.4);
+          }
+
+          .demo-15-8 .mag-btn--outline {
+            background: transparent;
+            color: oklch(55% 0.22 275);
+            border: 2px solid oklch(55% 0.22 275);
+            box-shadow: 0 4px 15px oklch(50% 0.20 275 / 0.1);
+          }
+          .demo-15-8 .mag-btn--outline:hover {
+            background: oklch(55% 0.22 275 / 0.05);
+            box-shadow: 0 8px 25px oklch(50% 0.20 275 / 0.15);
+          }
+
+          .demo-15-8 .mag-btn--glow {
+            background: oklch(15% 0.02 270);
+            color: oklch(85% 0.15 190);
+            border: 1px solid oklch(60% 0.15 190 / 0.3);
+            box-shadow:
+              0 0 15px oklch(65% 0.15 190 / 0.15),
+              inset 0 0 15px oklch(65% 0.15 190 / 0.05);
+          }
+          .demo-15-8 .mag-btn--glow:hover {
+            box-shadow:
+              0 0 25px oklch(65% 0.15 190 / 0.3),
+              inset 0 0 25px oklch(65% 0.15 190 / 0.1);
+          }
+
+          .demo-15-8 .hint {
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--color-text-tertiary);
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-8 .mag-btn {
+              transition-duration: 0.01ms;
+            }
+          }
+        </style>
+        <div class="demo-15-8">
+          <button class="mag-btn mag-btn--primary">Get Started</button>
+          <button class="mag-btn mag-btn--teal">Learn More</button>
+          <button class="mag-btn mag-btn--outline">View Plans</button>
+          <button class="mag-btn mag-btn--glow">Enter Portal</button>
+          <p class="hint">Hover over buttons -- note the elastic easing on enter and leave</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="buttons"&gt;
+  &lt;button class="mag primary"&gt;Get Started&lt;/button&gt;
+  &lt;button class="mag teal"&gt;Learn More&lt;/button&gt;
+  &lt;button class="mag outline"&gt;View Plans&lt;/button&gt;
+  &lt;button class="mag glow"&gt;Enter Portal&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  font-family: system-ui;
+  background: oklch(97% 0.01 270);
+}
+.buttons {
+  display: flex; flex-wrap: wrap;
+  gap: 1.5rem; justify-content: center;
+}
+
+.mag {
+  --tx: 0px; --ty: 0px;
+  padding: 1rem 2.5rem;
+  font-size: 1rem; font-weight: 600;
+  border: none; border-radius: 3rem;
+  cursor: pointer;
+  transform: translate(var(--tx), var(--ty));
+  /* The elastic easing is the magic */
+  transition:
+    transform 400ms cubic-bezier(.33,1,.68,1),
+    box-shadow 300ms ease;
+}
+.mag:hover {
+  transform: translate(var(--tx), var(--ty))
+    scale(1.05) translateY(-2px);
+}
+.mag:active {
+  transform: scale(0.98);
+  transition-duration: 100ms;
+}
+
+.primary {
+  background: linear-gradient(135deg,
+    oklch(55% .25 275), oklch(50% .22 310));
+  color: white;
+  box-shadow: 0 4px 15px oklch(50% .2 275 / .3);
+}
+.primary:hover {
+  box-shadow: 0 8px 25px oklch(50% .2 275 / .4);
+}
+
+.teal {
+  background: linear-gradient(135deg,
+    oklch(55% .18 190), oklch(50% .2 170));
+  color: white;
+  box-shadow: 0 4px 15px oklch(50% .15 190 / .3);
+}
+
+.outline {
+  background: transparent;
+  color: oklch(55% .22 275);
+  border: 2px solid oklch(55% .22 275);
+}
+
+.glow {
+  background: oklch(15% .02 270);
+  color: oklch(85% .15 190);
+  border: 1px solid oklch(60% .15 190 / .3);
+  box-shadow: 0 0 15px oklch(65% .15 190 / .15);
+}
+.glow:hover {
+  box-shadow: 0 0 25px oklch(65% .15 190 / .3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mag { transition-duration: 0.01ms; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Try changing the cubic-bezier from <code>(0.33, 1, 0.68, 1)</code> to <code>(0.34, 1.56, 0.64, 1)</code> — this is the bounce easing from the tokens file. The overshoot is more dramatic. Then try a longer <code>600ms</code> duration — the button feels heavier, like it has more mass. Which combination feels most magnetic to you?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.7-infinite-scroll-marquee.html">&larr; Lesson 15.7</a>
+      <a href="./lesson-15.9-scroll-driven-tilt-gallery.html">Lesson 15.9 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
