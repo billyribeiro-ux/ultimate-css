@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.1 — CSS Nesting: Native, No Preprocessor · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.1</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · all modern browsers</p>
+      <p class="badge">Lesson 13.1</p>
+      <h1>CSS Nesting: Native, No Preprocessor</h1>
+      <p class="lead">Chrome 120+, Firefox 117+, Safari 17.2+. Every modern browser ships native CSS nesting today. The preprocessor tax is over — write nested rules directly in your stylesheets with zero build step.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The &amp; nesting selector</h2>
+      <p>The <code>&amp;</code> selector represents the parent rule's selector list. It works exactly like Sass's <code>&amp;</code>, but it runs in the browser — no compilation required.</p>
+      <p>Any rule written inside another rule is a nested rule. The browser expands it by prepending the parent selector. <code>.card { &amp; h2 { ... } }</code> becomes <code>.card h2 { ... }</code> in the resolved stylesheet.</p>
+
+      <h2>Nested rules, nested media, nested @layer</h2>
+      <p>You can nest media queries inside selectors — the browser scopes them automatically. You can also nest <code>@layer</code> blocks inside selectors, though this is rarely useful in practice.</p>
+      <p>Nested <code>@media</code> is the real win: instead of repeating a selector inside a media query block, you write the query inside the selector. The component stays together in one place.</p>
+
+      <h2>When nesting helps vs when it hurts</h2>
+      <p>Nesting is a readability tool, not a specificity tool. The output CSS has the same specificity whether you nest or not. The rule: never nest more than 2-3 levels deep. Beyond that, you are creating the same unreadable selectors that Sass enabled for a decade.</p>
+      <p>Good nesting groups a component's internal styles. Bad nesting recreates the DOM tree in CSS.</p>
+
+      <h2>Real-world example: flat vs nested</h2>
+      <p>A card component written flat requires repeating <code>.card</code> on every rule. The nested version groups everything under one <code>.card</code> block — same output, less repetition, easier to move or delete the entire component.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — flat vs nested (same output)</h2>
+      <div class="demo-frame">
+        <style>
+          /* Nested version — this is what ships to the browser */
+          .demo-13-1 .card {
+            padding: 1.5rem;
+            background: oklch(98% 0.005 264);
+            border: 1px solid oklch(90% 0.01 264);
+            border-radius: 0.5rem;
+
+            & h3 {
+              margin: 0 0 0.5rem;
+              font-size: 1.25rem;
+              color: oklch(25% 0.02 264);
+            }
+
+            & p {
+              margin: 0;
+              color: oklch(40% 0.015 264);
+              line-height: 1.5;
+            }
+
+            & .actions {
+              margin-block-start: 1rem;
+              display: flex;
+              gap: 0.5rem;
+            }
+
+            @media (width < 40rem) {
+              padding: 1rem;
+            }
+          }
+          .demo-13-1 .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+            border: 1px solid oklch(85% 0.01 264);
+            border-radius: 0.375rem;
+            background: oklch(58% 0.22 275);
+            color: #fff;
+            cursor: pointer;
+          }
+        </style>
+        <div class="demo-13-1">
+          <div class="card">
+            <h3>Native nesting in action</h3>
+            <p>This card's styles are written with native CSS nesting. The browser resolves them identically to flat selectors — no build step involved.</p>
+            <div class="actions">
+              <button class="btn-sm">Primary</button>
+              <button class="btn-sm" style="background: transparent; color: oklch(58% 0.22 275); border-color: oklch(58% 0.22 275);">Ghost</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="toolbar"&gt;
+  &lt;a href="#" class="toolbar-brand"&gt;Acme&lt;/a&gt;
+  &lt;ul class="toolbar-links"&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Docs&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Pricing&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="#"&gt;Blog&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;button class="toolbar-cta"&gt;Sign up&lt;/button&gt;
+&lt;/nav&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Refactor this flat CSS into nested syntax.
+   The output should look identical. */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: oklch(98% 0.005 264);
+  border-bottom: 1px solid oklch(90% 0.01 264);
+  font-family: system-ui, sans-serif;
+}
+
+.toolbar-brand {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: oklch(25% 0.02 264);
+  text-decoration: none;
+}
+
+.toolbar-links {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-inline-start: auto;
+}
+
+.toolbar-links a {
+  color: oklch(40% 0.015 264);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.toolbar-links a:hover {
+  color: oklch(48% 0.22 275);
+}
+
+.toolbar-cta {
+  padding: 0.5rem 1rem;
+  background: oklch(58% 0.22 275);
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.toolbar-cta:hover {
+  background: oklch(48% 0.22 275);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Rewrite the flat toolbar CSS above using native nesting. Group <code>.toolbar-brand</code>, <code>.toolbar-links</code>, and <code>.toolbar-cta</code> inside a single <code>.toolbar { ... }</code> block. Use <code>&amp;</code> where needed. Nest the <code>:hover</code> states inside their elements. Confirm the output looks identical.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 13</a>
+      <a href="./lesson-13.2-relative-color-syntax.html">Lesson 13.2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

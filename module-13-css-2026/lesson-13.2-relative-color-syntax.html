@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.2 — Relative Color Syntax · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.2</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · all modern browsers</p>
+      <p class="badge">Lesson 13.2</p>
+      <h1>Relative Color Syntax: oklch(from ...)</h1>
+      <p class="lead">Chrome 125+, Firefox 128+, Safari 18+. Derive any color from any other color — lighten, darken, desaturate, shift hue — all in pure CSS. One brand token generates an entire palette.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The syntax: oklch(from origin l c h)</h2>
+      <p>Relative color syntax takes an origin color and exposes its channels as variables you can manipulate with <code>calc()</code>. In OKLCH, those channels are <code>l</code> (lightness 0-1), <code>c</code> (chroma 0-0.4), and <code>h</code> (hue 0-360).</p>
+      <p><code>oklch(from var(--brand) l c h)</code> returns the brand color unchanged. The power comes from modifying the channels.</p>
+
+      <h2>Lighten and darken</h2>
+      <p><code>oklch(from var(--brand) calc(l + 0.2) c h)</code> adds 20% lightness — a lighter tint. <code>calc(l - 0.15)</code> darkens. Because OKLCH lightness is perceptually uniform, +0.2 looks like the same amount of change regardless of the base color.</p>
+
+      <h2>Desaturate and saturate</h2>
+      <p><code>oklch(from var(--brand) l calc(c * 0.5) h)</code> halves the chroma — a muted version. <code>calc(c * 1.5)</code> intensifies. Clamping happens automatically; you cannot exceed the gamut.</p>
+
+      <h2>Hue rotation</h2>
+      <p><code>oklch(from var(--brand) l c calc(h + 180))</code> produces the complementary color. <code>calc(h + 30)</code> gives an analogous neighbor. Hue wraps at 360 automatically.</p>
+
+      <h2>Real-world: one token, full palette</h2>
+      <p>Instead of hand-picking 8 color variants for hover, active, subtle, on-brand-text, and complementary states, you derive them all from a single <code>--brand</code> token. Change the brand token and every variant updates instantly — zero manual recalculation.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — palette from one base color</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-2 {
+            --brand: oklch(55% 0.22 275);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+            gap: 0.5rem;
+            font-family: system-ui, sans-serif;
+            font-size: 0.75rem;
+          }
+          .demo-13-2 .swatch {
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 600;
+            text-shadow: 0 1px 2px oklch(0% 0 0 / 0.3);
+          }
+          .demo-13-2 .s-base   { background: var(--brand); }
+          .demo-13-2 .s-light  { background: oklch(from var(--brand) calc(l + 0.2) c h); }
+          .demo-13-2 .s-lighter{ background: oklch(from var(--brand) calc(l + 0.35) c h); color: oklch(25% 0.02 264); text-shadow: none; }
+          .demo-13-2 .s-dark   { background: oklch(from var(--brand) calc(l - 0.15) c h); }
+          .demo-13-2 .s-muted  { background: oklch(from var(--brand) l calc(c * 0.4) h); }
+          .demo-13-2 .s-comp   { background: oklch(from var(--brand) l c calc(h + 180)); }
+          .demo-13-2 .s-analog { background: oklch(from var(--brand) l c calc(h + 30)); }
+          .demo-13-2 .s-warm   { background: oklch(from var(--brand) l c calc(h - 60)); }
+        </style>
+        <div class="demo-13-2">
+          <div class="swatch s-base">Base</div>
+          <div class="swatch s-light">+20% L</div>
+          <div class="swatch s-lighter">+35% L</div>
+          <div class="swatch s-dark">-15% L</div>
+          <div class="swatch s-muted">40% C</div>
+          <div class="swatch s-comp">+180 H</div>
+          <div class="swatch s-analog">+30 H</div>
+          <div class="swatch s-warm">-60 H</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="palette"&gt;
+  &lt;div class="swatch base"&gt;Brand&lt;/div&gt;
+  &lt;div class="swatch hover"&gt;Hover&lt;/div&gt;
+  &lt;div class="swatch active"&gt;Active&lt;/div&gt;
+  &lt;div class="swatch subtle"&gt;Subtle&lt;/div&gt;
+  &lt;div class="swatch on-brand"&gt;On-brand text&lt;/div&gt;
+  &lt;div class="swatch complement"&gt;Complement&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Start with one brand token.
+   Derive hover, active, subtle, on-brand-text, and
+   complementary using relative color syntax. */
+
+:root {
+  --brand: oklch(55% 0.22 275);
+}
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  font-family: system-ui, sans-serif;
+  padding: 1rem;
+}
+
+.swatch {
+  padding: 1.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.base {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Derive hover: lighten by 10% */
+.hover {
+  background: oklch(from var(--brand) calc(l + 0.1) c h);
+  color: #fff;
+}
+
+/* Derive active: darken by 10% */
+.active {
+  background: /* your turn: darken the brand */;
+  color: #fff;
+}
+
+/* Derive subtle: very light, low chroma */
+.subtle {
+  background: /* your turn: l + 0.4, c * 0.3 */;
+  color: oklch(25% 0.02 264);
+}
+
+/* On-brand text: dark version for use on light bg */
+.on-brand {
+  background: oklch(95% 0.01 275);
+  color: /* your turn: darken brand for text use */;
+}
+
+/* Complementary: rotate hue 180 degrees */
+.complement {
+  background: /* your turn */;
+  color: #fff;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Fill in the four missing <code>oklch(from ...)</code> values in the CSS above. Then change <code>--brand</code> to <code>oklch(60% 0.18 150)</code> (a teal) and confirm every derived swatch updates automatically. That is the power of relative color syntax — one token change, zero manual work.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.1-css-nesting.html">&larr; Lesson 13.1</a>
+      <a href="./lesson-13.3-color-mix.html">Lesson 13.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

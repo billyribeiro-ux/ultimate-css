@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CSS Cascade Architecture — PE7 Complete Course</title>
-  <meta name="description" content="A 12-module principal-engineer-level course on CSS cascade architecture, @layer, OKLCH tokens, modern selectors, and no-JS UI.">
+  <meta name="description" content="A 13-module principal-engineer-level course on CSS cascade architecture, @layer, OKLCH tokens, modern selectors, and no-JS UI. Updated May 2026.">
   <link rel="stylesheet" href="./assets/css/main.css">
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
@@ -36,10 +36,10 @@
     <section class="container hero">
       <p class="badge">PE7 · Principal Engineer Level 7+</p>
       <h1>CSS Cascade Architecture</h1>
-      <p class="lead">A root-level course on the CSS cascade, <code>@layer</code>, OKLCH design tokens, modern selectors, scroll-driven animation, and no-JS UI patterns. No frameworks. No build step. Pure web platform.</p>
+      <p class="lead">A root-level course on the CSS cascade, <code>@layer</code>, OKLCH design tokens, modern selectors, scroll-driven animation, no-JS UI patterns, and every CSS function shipped through May 2026. No frameworks. No build step. Pure web platform.</p>
       <div class="cluster" style="margin-block-start: var(--space-lg);">
         <a class="btn" href="./module-01-the-problem/index.html">Start Module 1</a>
-        <a class="btn btn-ghost" href="#modules">See all 12 modules</a>
+        <a class="btn btn-ghost" href="#modules">See all 13 modules</a>
         <button class="btn btn-secondary" type="button" data-install-app hidden>Install app</button>
       </div>
       <p class="badge" style="margin-block-start: var(--space-md);">Installable · works offline · macOS, iOS, Android, Chrome, Edge, Safari</p>
@@ -52,7 +52,7 @@
     </section>
 
     <section class="container" id="modules">
-      <h2 class="section-heading">The 12 modules</h2>
+      <h2 class="section-heading">The 13 modules</h2>
       <div class="grid" style="--grid-min: 20rem;">
 
         <a class="module-card reveal-on-view" href="./module-01-the-problem/index.html">
@@ -139,11 +139,18 @@
           <span class="meta">8 lessons · 1 capstone</span>
         </a>
 
+        <a class="module-card reveal-on-view" href="./module-13-css-2026/index.html" style="border-color: var(--color-primary);">
+          <span class="tag">Module 13 · May 2026</span>
+          <h3>CSS in 2026 — Functions, Colors & What Just Shipped</h3>
+          <p>Native nesting, relative color syntax, <code>color-mix()</code>, <code>contrast-color()</code>, <code>interpolate-size</code>, <code>field-sizing</code>, Interop 2026 dialog/popover, and the complete updated browser matrix.</p>
+          <span class="meta">12 lessons · 1 project</span>
+        </a>
+
       </div>
     </section>
 
     <section class="container" id="support">
-      <h2 class="section-heading">Browser support at a glance</h2>
+      <h2 class="section-heading">Browser support — updated May 17, 2026</h2>
       <p>Every lesson that teaches a modern feature calls out its support tier. Production-ready features ship without a supports query; progressive-enhancement features are always wrapped in <code>@supports</code>; experimental features are for learning and watching, not shipping.</p>
       <div class="support-table">
         <table>
@@ -151,21 +158,56 @@
             <tr><th>Feature</th><th>Chrome</th><th>Firefox</th><th>Safari</th><th>Tier</th></tr>
           </thead>
           <tbody>
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">Core architecture</td></tr>
             <tr><td><code>@layer</code></td><td>99+</td><td>97+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
-            <tr><td><code>@scope</code></td><td>118+</td><td>128+</td><td>17.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>@scope</code></td><td>118+</td><td>146+</td><td>17.4+</td><td><span class="badge success">Production</span></td></tr>
             <tr><td><code>:has()</code></td><td>105+</td><td>121+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>CSS Nesting</td><td>120+</td><td>117+</td><td>17.2+</td><td><span class="badge success">Production</span></td></tr>
             <tr><td><code>@starting-style</code></td><td>117+</td><td>129+</td><td>17.5+</td><td><span class="badge success">Production</span></td></tr>
-            <tr><td>Anchor positioning</td><td>125+</td><td>132+</td><td>18.0+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>Anchor positioning</td><td>125+</td><td>147+</td><td>26+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>@property</code></td><td>85+</td><td>128+</td><td>16.4+</td><td><span class="badge success">Production</span></td></tr>
+
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">Color &amp; tokens</td></tr>
             <tr><td>OKLCH color</td><td>111+</td><td>113+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>Relative color syntax</td><td>125+</td><td>128+</td><td>18+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>color-mix()</code></td><td>111+</td><td>113+</td><td>16.2+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>contrast-color()</code></td><td>147+</td><td>all</td><td>all</td><td><span class="badge success">Production</span></td></tr>
             <tr><td><code>light-dark()</code></td><td>123+</td><td>120+</td><td>17.5+</td><td><span class="badge success">Production</span></td></tr>
+
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">Layout</td></tr>
             <tr><td>Container queries (size)</td><td>105+</td><td>110+</td><td>16.0+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td>Subgrid</td><td>117+</td><td>71+</td><td>16.0+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>content-visibility</code></td><td>85+</td><td>125+</td><td>18+</td><td><span class="badge success">Production</span></td></tr>
+
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">Typography &amp; text</td></tr>
             <tr><td><code>text-wrap: balance</code></td><td>114+</td><td>121+</td><td>17.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>text-wrap: pretty</code></td><td>117+</td><td>planned</td><td>26+</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>text-box-trim</code></td><td>133+</td><td>planned</td><td>18.2+</td><td><span class="badge warning">Progressive</span></td></tr>
+
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">Animation &amp; transitions</td></tr>
             <tr><td>View transitions (same-doc)</td><td>111+</td><td>135+</td><td>18.0+</td><td><span class="badge success">Production</span></td></tr>
-            <tr><td>Scroll-driven animations</td><td>115+</td><td>in progress</td><td>26+</td><td><span class="badge warning">Progressive</span></td></tr>
-            <tr><td><code>sibling-index()</code></td><td>130+</td><td>planned</td><td>18.2+</td><td><span class="badge warning">Progressive</span></td></tr>
-            <tr><td><code>::scroll-marker</code></td><td>135+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td>View transitions (cross-doc)</td><td>126+</td><td>135+</td><td>18.2+</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td>Scroll-driven animations</td><td>115+</td><td>planned</td><td>26+</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>interpolate-size</code></td><td>129+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">CSS functions</td></tr>
+            <tr><td><code>round()</code>, <code>mod()</code>, <code>rem()</code></td><td>125+</td><td>118+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>sign()</code>, <code>abs()</code></td><td>125+</td><td>118+</td><td>15.4+</td><td><span class="badge success">Production</span></td></tr>
             <tr><td><code>if()</code> function</td><td>137+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td>Advanced <code>attr()</code></td><td>133+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>sibling-index()</code></td><td>137+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
             <tr><td>Custom <code>@function</code></td><td>early</td><td>planned</td><td>planned</td><td><span class="badge danger">Experimental</span></td></tr>
+
+            <tr><td colspan="5" style="font-weight: var(--weight-semibold); background: var(--color-surface-sunken); color: var(--color-text-tertiary); text-transform: uppercase; font-size: var(--size-xs); letter-spacing: 0.08em;">Components &amp; interactivity</td></tr>
+            <tr><td><code>::scroll-marker</code></td><td>135+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td>Scroll-state queries</td><td>133+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>field-sizing: content</code></td><td>123+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>::details-content</code></td><td>131+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>:open</code> pseudo-class</td><td>114+</td><td>133+</td><td>17.2+</td><td><span class="badge success">Production</span></td></tr>
+            <tr><td><code>popover="hint"</code></td><td>133+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>reading-flow</code></td><td>137+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td><code>appearance: base-select</code></td><td>135+</td><td>planned</td><td>planned</td><td><span class="badge warning">Progressive</span></td></tr>
+            <tr><td>Masonry (<code>grid-lanes</code>)</td><td>flagged</td><td>flagged</td><td>26+</td><td><span class="badge danger">Experimental</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -174,7 +216,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>ultimate·css — PE7 CSS Cascade Architecture course. Pure web platform. No frameworks. No build step.</p>
+      <p>ultimate·css — PE7 CSS Cascade Architecture course. Pure web platform. No frameworks. No build step. Updated May 17, 2026.</p>
     </div>
   </footer>
   <script src="./assets/js/pwa.js" defer></script>
