@@ -51,6 +51,18 @@
 
       <h2>Dark and light themes</h2>
       <p>Using <code>prefers-color-scheme</code>, the clock face switches between a light dial with dark hands and a dark dial with light hands, demonstrating how custom properties make theming trivial.</p>
+
+      <h2>Calculating animation-delay</h2>
+      <p>The formula for syncing to current time: take the current hours (0-11), minutes, and seconds. For the second hand: <code>animation-delay: -(seconds)s</code>. For the minute hand: <code>animation-delay: -(minutes * 60 + seconds)s</code>. For the hour hand: <code>animation-delay: -(hours * 3600 + minutes * 60 + seconds)s</code>. A one-line inline style attribute sets these at page load.</p>
+
+      <h2>The center pivot</h2>
+      <p>Each hand uses <code>transform-origin: bottom center</code> so rotation happens around the base. The hand is positioned with its bottom edge at the clock center using <code>position: absolute; bottom: 50%</code>. The center dot covers the pivot point for a polished look.</p>
+
+      <h2>Adding minute tick marks</h2>
+      <p>A second conic-gradient layer with 60 thinner slices (1deg each) can represent minute markers. Use <code>mask: radial-gradient()</code> to limit the ticks to just the outer ring, keeping the face interior clean.</p>
+
+      <h2>Responsive sizing</h2>
+      <p>Defining the clock size as a custom property (<code>--clock-size</code>) and deriving all hand lengths as percentages of that value makes the entire clock scalable. Container queries can then resize the clock within card layouts.</p>
     </section>
 
     <section class="demo">

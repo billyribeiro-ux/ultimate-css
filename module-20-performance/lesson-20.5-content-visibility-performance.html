@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.5 — content-visibility: The 7x Speedup · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.5 · Rendering</p>
+      <h1>content-visibility: The 7x Speedup</h1>
+      <p class="lead">One CSS property can reduce initial render time from 200ms to 30ms on content-heavy pages. <code>content-visibility: auto</code> tells the browser to skip layout and paint for off-screen elements entirely — rendering them only when they scroll into view.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>How content-visibility works</h2>
+      <p><code>content-visibility: auto</code> applies three containment types to off-screen elements: layout containment, style containment, and paint containment. The browser skips the layout and paint stages entirely for these elements until they approach the viewport. This is not lazy loading — the DOM is still there, the content is still accessible to search — it's just not rendered until needed.</p>
+
+      <h2>The contain-intrinsic-size requirement</h2>
+      <p>When an element's rendering is skipped, it has zero height. This causes the scrollbar to jump wildly as elements render on scroll. The fix is <code>contain-intrinsic-size</code>:</p>
+      <pre><code>.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}</code></pre>
+      <p>The <code>auto</code> keyword tells the browser: "Use 500px as the initial estimate, but once this element has been rendered, remember its actual size." This means the first visit uses the estimate, and subsequent scrolls use the real measured height. Much better than a fixed value.</p>
+
+      <h2>Real-world impact</h2>
+      <p>Consider a documentation page with 50 sections. Without <code>content-visibility</code>, the browser must layout and paint all 50 sections on initial load — even though only 2-3 are visible. With <code>content-visibility: auto</code>, it only renders the visible sections initially. The other 47 are rendered on-demand as the user scrolls.</p>
+      <p>Measured results on a real documentation site: rendering time dropped from 232ms to 30ms — a <strong>7.7x improvement</strong>.</p>
+
+      <h2>Measuring with Performance panel</h2>
+      <ol>
+        <li>Open DevTools Performance panel</li>
+        <li>Record a page load without <code>content-visibility</code></li>
+        <li>Note the total "Rendering" time in the summary</li>
+        <li>Add <code>content-visibility: auto</code> to off-screen sections</li>
+        <li>Record again and compare</li>
+      </ol>
+
+      <h2>When NOT to use it</h2>
+      <ul>
+        <li><strong>Accessibility:</strong> Some screen readers may not announce content with <code>content-visibility: hidden</code>. The <code>auto</code> value is generally safe because the browser renders content when it enters the viewport, but test with screen readers.</li>
+        <li><strong>Find-in-page:</strong> Content with <code>content-visibility: auto</code> IS searchable with Ctrl+F (the browser handles this). But <code>content-visibility: hidden</code> is not.</li>
+        <li><strong>Anchor links:</strong> Jumping to an anchor within a skipped section works — the browser renders it on demand. But the scroll position may be imprecise if <code>contain-intrinsic-size</code> estimates are wrong.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Scrollable container with content-visibility</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-5 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+          }
+          .demo-20-5 .scroll-container {
+            height: 20rem;
+            overflow-y: auto;
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            scroll-behavior: smooth;
+          }
+          .demo-20-5 .scroll-container h3 {
+            position: sticky;
+            top: 0;
+            background: oklch(97% 0.005 260);
+            padding: 0.5rem;
+            margin: 0 -0.75rem;
+            font-size: 0.8rem;
+            color: oklch(40% 0.1 260);
+            border-bottom: 1px solid oklch(90% 0.01 260);
+            z-index: 1;
+          }
+          .demo-20-5 .doc-section {
+            padding: 1rem 0;
+            border-bottom: 1px solid oklch(92% 0.01 260);
+          }
+          .demo-20-5 .doc-section h4 {
+            margin: 0 0 0.5rem;
+            font-size: 0.85rem;
+            color: oklch(30% 0.05 260);
+          }
+          .demo-20-5 .doc-section p {
+            font-size: 0.75rem;
+            color: oklch(45% 0 0);
+            line-height: 1.5;
+            margin: 0;
+          }
+          .demo-20-5 .with-cv .doc-section {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 6rem;
+          }
+          .demo-20-5 .metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .demo-20-5 .metric-card {
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-5 .metric-card h4 {
+            margin: 0 0 0.5rem;
+            font-size: 0.8rem;
+            color: oklch(40% 0 0);
+          }
+          .demo-20-5 .metric-bar {
+            height: 2rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            padding-left: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+          }
+          .demo-20-5 .bar-slow { background: oklch(55% 0.2 25); width: 100%; }
+          .demo-20-5 .bar-fast { background: oklch(55% 0.18 150); width: 15%; }
+          .demo-20-5 .code-snippet {
+            background: oklch(15% 0.02 260);
+            color: oklch(80% 0.05 150);
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+            white-space: pre;
+          }
+          .demo-20-5 .warning {
+            padding: 0.75rem;
+            background: oklch(92% 0.06 80);
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            color: oklch(30% 0.1 80);
+            border-left: 3px solid oklch(65% 0.18 80);
+          }
+        </style>
+        <div class="demo-20-5">
+          <div class="scroll-container with-cv">
+            <h3>With content-visibility: auto</h3>
+            <div class="doc-section"><h4>Section 1: Introduction</h4><p>This section is visible and fully rendered. The browser lays out and paints it normally because it is within the viewport.</p></div>
+            <div class="doc-section"><h4>Section 2: Getting Started</h4><p>This section may or may not be visible depending on scroll position. The browser renders it as it approaches the viewport edge.</p></div>
+            <div class="doc-section"><h4>Section 3: Configuration</h4><p>Off-screen sections are skipped entirely. No layout, no paint. Only the contain-intrinsic-size placeholder height is used.</p></div>
+            <div class="doc-section"><h4>Section 4: API Reference</h4><p>When you scroll to this section, the browser renders it just-in-time. The transition is seamless to the user.</p></div>
+            <div class="doc-section"><h4>Section 5: Advanced Usage</h4><p>Each skipped section saves layout and paint time. With 50 sections, that is 47 sections of work avoided on initial load.</p></div>
+            <div class="doc-section"><h4>Section 6: Troubleshooting</h4><p>The auto keyword for contain-intrinsic-size remembers the real height after first render, preventing scroll jumps on repeat visits.</p></div>
+            <div class="doc-section"><h4>Section 7: Migration Guide</h4><p>Content-visibility: auto is safe for accessibility — screen readers can still access the DOM, and find-in-page works normally.</p></div>
+            <div class="doc-section"><h4>Section 8: Performance Tips</h4><p>Combine content-visibility with lazy-loaded images for maximum savings. Images in skipped sections are not decoded until needed.</p></div>
+            <div class="doc-section"><h4>Section 9: Changelog</h4><p>Track rendering improvements in DevTools Performance panel. Look for reduced Layout and Paint events during initial page load.</p></div>
+            <div class="doc-section"><h4>Section 10: FAQ</h4><p>The most common question: does it break SEO? No — content is still in the DOM, fully crawlable. Only rendering is deferred.</p></div>
+          </div>
+          <div class="metrics">
+            <div class="metric-card">
+              <h4>Rendering time comparison</h4>
+              <div class="metric-bar bar-slow">232ms (without)</div>
+              <div class="metric-bar bar-fast">30ms</div>
+              <p style="font-size:0.75rem;color:oklch(50% 0 0);margin:0">7.7x faster initial render</p>
+            </div>
+            <div class="metric-card">
+              <h4>The CSS</h4>
+              <div class="code-snippet">.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}</div>
+            </div>
+            <div class="warning">
+              <strong>Note:</strong> Always provide contain-intrinsic-size. Without it, off-screen elements collapse to 0px height, causing scrollbar instability.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;section class="doc-section"&gt;
+    &lt;h2&gt;Section 1&lt;/h2&gt;
+    &lt;p&gt;Visible content rendered immediately.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section class="doc-section"&gt;
+    &lt;h2&gt;Section 2&lt;/h2&gt;
+    &lt;p&gt;More content that may be off-screen.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section class="doc-section"&gt;
+    &lt;h2&gt;Section 3&lt;/h2&gt;
+    &lt;p&gt;Deferred rendering saves time.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section class="doc-section"&gt;
+    &lt;h2&gt;Section 4&lt;/h2&gt;
+    &lt;p&gt;Only rendered when scrolled into view.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section class="doc-section"&gt;
+    &lt;h2&gt;Section 5&lt;/h2&gt;
+    &lt;p&gt;Huge performance savings at scale.&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 0;
+  margin: 0;
+}
+.page {
+  max-width: 40rem;
+  margin: 0 auto;
+  height: 12rem;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.doc-section {
+  padding: 2rem;
+  margin-bottom: 1rem;
+  background: oklch(96% 0.01 260);
+  border-radius: 0.75rem;
+  border: 1px solid oklch(90% 0.02 260);
+
+  /* The magic property: */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 8rem;
+}
+.doc-section h2 {
+  margin: 0 0 0.5rem;
+  color: oklch(35% 0.12 260);
+}
+.doc-section p {
+  margin: 0;
+  color: oklch(40% 0 0);
+}
+
+/* Try removing content-visibility and
+   contain-intrinsic-size, then scroll.
+   The visual result is the same but
+   rendering cost increases with more
+   sections. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add 20 more sections to the HTML (duplicate the pattern). Open DevTools Performance panel, record a page load with <code>content-visibility: auto</code> applied. Note the rendering time. Then remove the property and record again. Compare the "Rendering" summary. On a page with 25 sections, you should see a measurable difference — multiply that by real-world pages with hundreds of elements.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.4-critical-css.html">&larr; Lesson 20.4</a>
+      <a href="./lesson-20.6-font-loading.html">Lesson 20.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

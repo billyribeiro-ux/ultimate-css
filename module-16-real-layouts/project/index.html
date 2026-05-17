@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 16 Project — Layout Patterns Reference · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 16</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 16 · Project</p>
+      <h1>Layout Patterns Reference</h1>
+      <p class="lead">A single-page reference linking to all ten real-world layouts rebuilt in this module. Each card previews the layout pattern with a CSS gradient thumbnail and brief description. Use this as your go-to reference when starting a new project.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>About this project</h2>
+      <p>This reference page collects every layout from Module 16 into one navigable grid. Each thumbnail is rendered entirely with CSS gradients to suggest the layout structure. The grid uses <code>auto-fit</code> with <code>minmax()</code> for automatic responsiveness. Click any card to jump directly to the full lesson with the complete implementation.</p>
+
+      <div class="demo-frame" style="padding: 2rem; background: light-dark(oklch(97% 0.005 264), oklch(8% 0.02 264));">
+        <style>
+          .project-16 { font-family: system-ui, -apple-system, sans-serif; color: light-dark(oklch(20% 0.01 264), oklch(90% 0.01 264)); }
+          .project-16 *, .project-16 *::before, .project-16 *::after { box-sizing: border-box; margin: 0; }
+          .project-16 .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.5rem; }
+          .project-16 .ref-card { border-radius: 0.75rem; overflow: hidden; border: 1px solid light-dark(oklch(90% 0.01 264), oklch(18% 0.01 264)); background: light-dark(oklch(99% 0.005 264), oklch(11% 0.015 264)); transition: transform 200ms, box-shadow 200ms; text-decoration: none; color: inherit; display: block; }
+          .project-16 .ref-card:hover { transform: translateY(-0.25rem); box-shadow: 0 8px 24px oklch(0% 0 0 / 0.15); }
+          .project-16 .ref-thumb { aspect-ratio: 16/10; position: relative; overflow: hidden; }
+          .project-16 .ref-body { padding: 1rem; }
+          .project-16 .ref-body h3 { font-size: 0.9375rem; font-weight: 700; margin-block-end: 0.375rem; }
+          .project-16 .ref-body p { font-size: 0.75rem; color: light-dark(oklch(45% 0.01 264), oklch(58% 0.01 264)); line-height: 1.5; }
+          .project-16 .ref-num { position: absolute; inset-block-start: 0.5rem; inset-inline-start: 0.5rem; font-size: 0.625rem; font-weight: 700; background: oklch(0% 0 0 / 0.5); color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem; }
+
+          /* Thumbnail layouts as CSS gradients */
+          .project-16 .ref-card:nth-child(1) .ref-thumb { background: linear-gradient(180deg, oklch(25% 0.08 275) 30%, oklch(15% 0.04 264) 30% 50%, oklch(18% 0.03 264) 50% 75%, oklch(12% 0.05 275 / 0.3) 75%); }
+          .project-16 .ref-card:nth-child(2) .ref-thumb { background: linear-gradient(90deg, oklch(14% 0.02 264) 15%, oklch(18% 0.03 264) 15%), linear-gradient(180deg, oklch(12% 0.02 264) 8%, transparent 8%); }
+          .project-16 .ref-card:nth-child(3) .ref-thumb { background: linear-gradient(180deg, oklch(20% 0.01 264) 5%, oklch(14% 0.015 264) 5%), linear-gradient(90deg, transparent 20%, oklch(16% 0.02 264) 20% 80%, transparent 80%); }
+          .project-16 .ref-card:nth-child(4) .ref-thumb { background: linear-gradient(90deg, oklch(30% 0.1 264) 55%, oklch(14% 0.02 264) 55%); }
+          .project-16 .ref-card:nth-child(5) .ref-thumb { background: repeating-linear-gradient(90deg, oklch(40% 0.12 275) 0 32%, oklch(14% 0.015 264) 32% 33.33%), repeating-linear-gradient(180deg, oklch(35% 0.1 200) 0 48%, oklch(14% 0.015 264) 48% 50%); }
+          .project-16 .ref-card:nth-child(6) .ref-thumb { background: linear-gradient(90deg, oklch(12% 0.02 264) 25%, oklch(16% 0.025 264) 25%), linear-gradient(180deg, oklch(14% 0.02 264) 90%, oklch(18% 0.03 264) 90%); }
+          .project-16 .ref-card:nth-child(7) .ref-thumb { background: linear-gradient(90deg, oklch(10% 0.02 264) 18%, oklch(14% 0.02 264) 18%), linear-gradient(180deg, transparent 85%, oklch(12% 0.03 275) 85%); }
+          .project-16 .ref-card:nth-child(8) .ref-thumb { background: linear-gradient(90deg, oklch(12% 0.02 264) 14%, oklch(16% 0.02 264) 14% 40%, oklch(14% 0.015 264) 40%); }
+          .project-16 .ref-card:nth-child(9) .ref-thumb { background: linear-gradient(90deg, transparent 15%, oklch(16% 0.02 264) 15% 65%, transparent 65%), linear-gradient(180deg, oklch(20% 0.03 275) 10%, oklch(14% 0.015 264) 10%); }
+          .project-16 .ref-card:nth-child(10) .ref-thumb { background: linear-gradient(180deg, oklch(15% 0.05 275) 35%, oklch(12% 0.02 264) 35%), linear-gradient(90deg, transparent 0% 75%, oklch(14% 0.02 264) 75%); }
+        </style>
+        <div class="project-16">
+          <div class="ref-grid">
+            <a href="../lesson-16.1-saas-landing-page.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.1</span></div>
+              <div class="ref-body"><h3>SaaS Landing Page</h3><p>Hero gradient, feature grid, pricing toggle with :has(), FAQ accordion, and scroll-driven reveals.</p></div>
+            </a>
+            <a href="../lesson-16.2-dashboard-layout.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.2</span></div>
+              <div class="ref-body"><h3>Dashboard Layout</h3><p>Collapsible sidebar, stat cards, chart placeholders, data table, and container query responsive panels.</p></div>
+            </a>
+            <a href="../lesson-16.3-blog-article.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.3</span></div>
+              <div class="ref-body"><h3>Long-Form Article</h3><p>Optimal reading width, drop caps, scroll progress bar, sticky TOC sidebar, and typographic rhythm.</p></div>
+            </a>
+            <a href="../lesson-16.4-ecommerce-product.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.4</span></div>
+              <div class="ref-body"><h3>Product Page</h3><p>Image gallery with scroll-snap, color swatches via custom properties, star ratings, sticky cart bar.</p></div>
+            </a>
+            <a href="../lesson-16.5-portfolio-gallery.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.5</span></div>
+              <div class="ref-body"><h3>Portfolio Gallery</h3><p>Masonry columns, hover overlays, category filtering with :has(), popover lightbox, stagger animations.</p></div>
+            </a>
+            <a href="../lesson-16.6-messaging-app.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.6</span></div>
+              <div class="ref-body"><h3>Chat Interface</h3><p>Contact sidebar, bubble tails, typing indicator, field-sizing input, sticky date headers.</p></div>
+            </a>
+            <a href="../lesson-16.7-music-player.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.7</span></div>
+              <div class="ref-body"><h3>Music Player</h3><p>Playlist sidebar, album grid, now-playing bar, vinyl spin, color-adaptive hue theming.</p></div>
+            </a>
+            <a href="../lesson-16.8-email-client.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.8</span></div>
+              <div class="ref-body"><h3>Email Client</h3><p>Three-column layout, star toggle, read/unread states, compose popover, responsive collapse.</p></div>
+            </a>
+            <a href="../lesson-16.9-social-feed.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.9</span></div>
+              <div class="ref-body"><h3>Social Feed</h3><p>Stories bar, post cards, like heart animation, skeleton loading, suggested follows sidebar.</p></div>
+            </a>
+            <a href="../lesson-16.10-video-platform.html" class="ref-card">
+              <div class="ref-thumb"><span class="ref-num">16.10</span></div>
+              <div class="ref-body"><h3>Video Platform</h3><p>Featured hero, category tabs, Netflix hover scale, up-next sidebar, auto-fit grid.</p></div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>What you have learned</h2>
+      <p>Module 16 proves that modern CSS is a complete UI toolkit. Every famous interface on the web -- from SaaS landing pages to video platforms -- can be rebuilt with pure CSS using <code>:has()</code>, container queries, scroll-driven animations, the popover API, OKLCH color, <code>light-dark()</code>, and responsive grid primitives. No frameworks, no JavaScript for layout, no compromises.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-16.10-video-platform.html">&larr; Lesson 16.10</a>
+      <a href="../../index.html">Back to Course &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

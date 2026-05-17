@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.7 — Dark Mode as an Accessibility Feature · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.7 · Inclusive Design</p>
+      <h1>Dark Mode as an Accessibility Feature</h1>
+      <p class="lead">Dark mode is not just aesthetic — it reduces eye strain for photosensitive users, helps people with migraines, and saves battery on OLED screens. It is an accessibility feature that happens to also be popular. Here is how to implement it correctly.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why dark mode is accessibility</h2>
+      <p>Bright screens in dark environments cause eye fatigue. For users with photophobia (light sensitivity, common in migraine sufferers), a white background is physically painful. Dark mode inverts the luminance relationship, reducing total light emission by 60-80% on OLED displays.</p>
+
+      <h2>The light-dark() function</h2>
+      <pre><code>:root {
+  color-scheme: light dark;
+}
+body {
+  background: light-dark(oklch(98% 0.01 275), oklch(15% 0.02 275));
+  color: light-dark(oklch(20% 0.03 275), oklch(90% 0.02 275));
+}</code></pre>
+      <p>The <code>light-dark()</code> function picks the first value in light mode and the second in dark mode. Combined with <code>color-scheme: light dark</code>, it respects the user's system preference automatically.</p>
+
+      <h2>Common dark-mode contrast failures</h2>
+      <ul>
+        <li><strong>Text too dim:</strong> Using oklch(60%) text on oklch(15%) background gives only ~3:1 ratio. Push text to at least oklch(80%) for body copy.</li>
+        <li><strong>Borders invisible:</strong> oklch(30%) borders on oklch(15%) background vanish. Use at least oklch(40%) for subtle borders.</li>
+        <li><strong>Links indistinguishable:</strong> Standard link blue fails on dark backgrounds. Use oklch(75% 0.15 250) or similar high-lightness variant.</li>
+      </ul>
+
+      <h2>Image adaptation</h2>
+      <p>Full-brightness images on a dark background create painful contrast. A subtle filter reduces this:</p>
+      <pre><code>@media (prefers-color-scheme: dark) {
+  img:not([src*=".svg"]) {
+    filter: brightness(0.9) contrast(0.95);
+  }
+}</code></pre>
+
+      <h2>Testing both modes</h2>
+      <p>Chrome DevTools: Rendering panel, emulate prefers-color-scheme. Always verify contrast ratios in BOTH modes — a color pair that passes in light mode may fail in dark mode and vice versa.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full page in both modes</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-7 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+          .demo-19-7 .mode-panel {
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+          .demo-19-7 .light-panel {
+            background: oklch(98% 0.01 275);
+            color: oklch(20% 0.03 275);
+            border: 1px solid oklch(88% 0.03 275);
+          }
+          .demo-19-7 .dark-panel {
+            background: oklch(15% 0.02 275);
+            color: oklch(90% 0.02 275);
+            border: 1px solid oklch(30% 0.04 275);
+          }
+          .demo-19-7 .mode-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+          }
+          .demo-19-7 h3 {
+            font-size: 1rem;
+            margin: 0;
+          }
+          .demo-19-7 .dark-panel h3 { color: oklch(95% 0.01 275); }
+          .demo-19-7 p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 0;
+          }
+          .demo-19-7 .dark-panel p { color: oklch(82% 0.02 275); }
+          .demo-19-7 .link-light { color: oklch(45% 0.2 265); }
+          .demo-19-7 .link-dark { color: oklch(75% 0.15 250); }
+          .demo-19-7 .chip {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+          .demo-19-7 .light-panel .chip {
+            background: oklch(90% 0.06 275);
+            color: oklch(35% 0.15 275);
+          }
+          .demo-19-7 .dark-panel .chip {
+            background: oklch(30% 0.08 275);
+            color: oklch(80% 0.1 275);
+          }
+          .demo-19-7 .btn-demo {
+            align-self: flex-start;
+            padding: 0.4rem 0.9rem;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+          }
+          .demo-19-7 .light-panel .btn-demo {
+            background: oklch(48% 0.22 275);
+            color: oklch(98% 0 0);
+          }
+          .demo-19-7 .dark-panel .btn-demo {
+            background: oklch(65% 0.2 275);
+            color: oklch(10% 0.05 275);
+          }
+          .demo-19-7 .contrast-note {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            font-style: italic;
+          }
+        </style>
+        <div class="demo-19-7">
+          <div class="mode-panel light-panel">
+            <span class="mode-label">Light mode</span>
+            <h3>Dashboard</h3>
+            <p>Your projects are on track. <a href="#" class="link-light">View details</a></p>
+            <span class="chip">3 active</span>
+            <button class="btn-demo">Create project</button>
+            <span class="contrast-note">Text: 14.5:1 | Link: 7.2:1 | Button: 8.1:1</span>
+          </div>
+          <div class="mode-panel dark-panel">
+            <span class="mode-label">Dark mode</span>
+            <h3>Dashboard</h3>
+            <p>Your projects are on track. <a href="#" class="link-dark">View details</a></p>
+            <span class="chip">3 active</span>
+            <button class="btn-demo">Create project</button>
+            <span class="contrast-note">Text: 11.2:1 | Link: 6.8:1 | Button: 7.5:1</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;h1&gt;Settings&lt;/h1&gt;
+  &lt;div class="card"&gt;
+    &lt;h2&gt;Notifications&lt;/h2&gt;
+    &lt;p&gt;Control how you receive alerts and updates.&lt;/p&gt;
+    &lt;a href="#"&gt;Manage preferences&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;h2&gt;Privacy&lt;/h2&gt;
+    &lt;p&gt;Review your data sharing settings.&lt;/p&gt;
+    &lt;button&gt;Review&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root { color-scheme: light dark; }
+
+body {
+  font-family: system-ui;
+  margin: 0;
+}
+
+.page {
+  padding: 2rem;
+  background: light-dark(oklch(98% 0.01 275), oklch(12% 0.02 275));
+  color: light-dark(oklch(20% 0.03 275), oklch(90% 0.02 275));
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  color: light-dark(oklch(15% 0.1 275), oklch(95% 0.02 275));
+}
+
+.card {
+  padding: 1.25rem;
+  background: light-dark(oklch(100% 0 0), oklch(20% 0.02 275));
+  border: 1px solid light-dark(oklch(88% 0.03 275), oklch(32% 0.04 275));
+  border-radius: 0.5rem;
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-block-end: 0.3rem;
+}
+
+.card p {
+  font-size: 0.85rem;
+  color: light-dark(oklch(40% 0.03 275), oklch(75% 0.02 275));
+  margin-block-end: 0.75rem;
+}
+
+a {
+  color: light-dark(oklch(45% 0.2 265), oklch(75% 0.15 250));
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: light-dark(oklch(48% 0.22 275), oklch(65% 0.2 275));
+  color: light-dark(oklch(98% 0 0), oklch(10% 0.05 275));
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Toggle your system between light and dark mode (or use DevTools emulation). Verify that every text element passes at least 4.5:1 contrast in both modes. Intentionally break it by setting the dark-mode card text to <code>oklch(55% 0.02 275)</code> — watch the contrast drop below AA. Fix it by pushing the lightness to 80%+.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.6-forced-colors-high-contrast.html">&larr; Lesson 19.6</a>
+      <a href="./lesson-19.8-touch-targets.html">Lesson 19.8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

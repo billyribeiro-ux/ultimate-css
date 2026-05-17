@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.10 — The Video Platform · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.10 · Real-World Layout</p>
+      <h1>The Video Platform (YouTube/Netflix Style)</h1>
+      <p class="lead">A video platform with a featured hero, category tabs via <code>:target</code>, a responsive video grid with Netflix-style hover preview (scale + info overlay), a sidebar "up next" column, and skeleton loading states. The complete streaming interface in pure CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Anatomy of the layout</h2>
+      <p>The video platform opens with a large featured hero (the currently highlighted video). Below it, category tabs let users switch views using <code>:target</code> pseudo-class. The main area is a responsive grid of video thumbnails using <code>auto-fit</code> with <code>minmax()</code>. A sidebar column shows "up next" suggestions. On smaller viewports, the sidebar collapses below the grid.</p>
+
+      <h2>Netflix-style hover preview</h2>
+      <p>On hover, video cards scale up slightly (<code>scale: 1.05</code>) and reveal an info overlay that slides up from below. The card uses <code>z-index</code> elevation on hover to prevent clipping by siblings. The transition uses a slight delay on mouse-enter and immediate on mouse-leave for a polished feel.</p>
+
+      <h2>Category tabs with :target</h2>
+      <p>Each category section has an <code>id</code>. Navigation links point to these anchors. The <code>:target</code> pseudo-class shows the targeted section while hiding others. This provides JavaScript-free tab switching with deep-linkable URLs.</p>
+
+      <h2>Responsive auto-fit grid</h2>
+      <p>The video grid uses <code>grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr))</code> to automatically adapt from 4 columns on wide screens to 1 column on mobile. No media queries needed for the column count.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full video platform</h2>
+      <div class="demo-frame" style="padding:0; background:oklch(8% 0.02 264); overflow-y:auto; max-block-size:80vh;">
+        <style>
+          .demo-16-10 { font-family: system-ui, -apple-system, sans-serif; color: light-dark(oklch(20% 0.01 264), oklch(92% 0.01 264)); background: light-dark(oklch(97% 0.005 264), oklch(7% 0.02 264)); line-height: 1.5; }
+          .demo-16-10 *, .demo-16-10 *::before, .demo-16-10 *::after { box-sizing: border-box; margin: 0; }
+
+          /* Hero */
+          .demo-16-10 .vid-hero { position: relative; aspect-ratio: 21/9; background: linear-gradient(135deg, oklch(15% 0.05 275), oklch(20% 0.03 200), oklch(10% 0.04 310)); display: flex; align-items: flex-end; padding: 2rem; overflow: hidden; }
+          .demo-16-10 .vid-hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, oklch(7% 0.02 264 / 0.9) 0%, transparent 60%); }
+          .demo-16-10 .hero-content { position: relative; z-index: 2; max-inline-size: 30rem; }
+          .demo-16-10 .hero-content h1 { font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 800; margin-block-end: 0.5rem; color: white; }
+          .demo-16-10 .hero-content p { font-size: 0.8125rem; color: oklch(75% 0.01 264); margin-block-end: 1rem; }
+          .demo-16-10 .hero-btns { display: flex; gap: 0.5rem; }
+          .demo-16-10 .hero-btns button { padding: 0.5rem 1.25rem; border-radius: 0.375rem; font-weight: 600; font-size: 0.8125rem; cursor: pointer; border: none; }
+          .demo-16-10 .btn-play { background: white; color: oklch(15% 0.01 264); }
+          .demo-16-10 .btn-info { background: oklch(40% 0.01 264 / 0.7); color: white; }
+
+          /* Category tabs */
+          .demo-16-10 .cat-nav { display: flex; gap: 0.5rem; padding: 1rem 1.5rem; overflow-x: auto; scrollbar-width: none; }
+          .demo-16-10 .cat-nav::-webkit-scrollbar { display: none; }
+          .demo-16-10 .cat-nav a { padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.8125rem; font-weight: 500; white-space: nowrap; text-decoration: none; color: light-dark(oklch(40% 0.01 264), oklch(70% 0.01 264)); background: light-dark(oklch(93% 0.005 264), oklch(15% 0.015 264)); transition: background 200ms, color 200ms; }
+          .demo-16-10 .cat-nav a:hover { background: light-dark(oklch(88% 0.01 264), oklch(20% 0.02 264)); }
+          .demo-16-10 .cat-nav a.active { background: oklch(48% 0.2 275); color: white; }
+
+          /* Main layout */
+          .demo-16-10 .vid-layout { display: grid; grid-template-columns: 1fr 16rem; gap: 1.5rem; padding: 0 1.5rem 2rem; }
+          @media (max-width: 48rem) { .demo-16-10 .vid-layout { grid-template-columns: 1fr; } }
+
+          /* Video grid */
+          .demo-16-10 .vid-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1rem; }
+          .demo-16-10 .vid-card { cursor: pointer; border-radius: 0.5rem; overflow: hidden; transition: transform 200ms 100ms, z-index 0ms 100ms; position: relative; }
+          .demo-16-10 .vid-card:hover { transform: scale(1.05); z-index: 10; transition: transform 200ms 0ms, z-index 0ms 0ms; }
+          .demo-16-10 .vid-thumb { aspect-ratio: 16/9; position: relative; }
+          .demo-16-10 .vid-card:nth-child(1) .vid-thumb { background: linear-gradient(135deg, oklch(40% 0.18 275), oklch(50% 0.12 300)); }
+          .demo-16-10 .vid-card:nth-child(2) .vid-thumb { background: linear-gradient(135deg, oklch(45% 0.15 160), oklch(55% 0.12 130)); }
+          .demo-16-10 .vid-card:nth-child(3) .vid-thumb { background: linear-gradient(135deg, oklch(45% 0.2 25), oklch(55% 0.15 50)); }
+          .demo-16-10 .vid-card:nth-child(4) .vid-thumb { background: linear-gradient(135deg, oklch(40% 0.18 200), oklch(50% 0.15 230)); }
+          .demo-16-10 .vid-card:nth-child(5) .vid-thumb { background: linear-gradient(135deg, oklch(45% 0.15 60), oklch(50% 0.18 80)); }
+          .demo-16-10 .vid-card:nth-child(6) .vid-thumb { background: linear-gradient(135deg, oklch(40% 0.2 310), oklch(50% 0.15 340)); }
+          .demo-16-10 .vid-card:nth-child(7) .vid-thumb { background: linear-gradient(135deg, oklch(45% 0.15 100), oklch(50% 0.12 120)); }
+          .demo-16-10 .vid-card:nth-child(8) .vid-thumb { background: linear-gradient(135deg, oklch(40% 0.18 0), oklch(50% 0.15 20)); }
+          .demo-16-10 .vid-thumb .duration { position: absolute; inset-block-end: 0.375rem; inset-inline-end: 0.375rem; background: oklch(10% 0 0 / 0.8); color: white; font-size: 0.625rem; font-weight: 600; padding: 0.125rem 0.375rem; border-radius: 0.25rem; }
+
+          /* Hover overlay */
+          .demo-16-10 .vid-overlay { position: absolute; inset: 0; background: linear-gradient(to top, oklch(5% 0.02 264 / 0.9) 0%, transparent 50%); display: flex; align-items: flex-end; padding: 0.5rem; opacity: 0; transition: opacity 200ms; }
+          .demo-16-10 .vid-card:hover .vid-overlay { opacity: 1; }
+          .demo-16-10 .vid-overlay span { font-size: 0.625rem; color: white; font-weight: 500; }
+
+          .demo-16-10 .vid-meta { padding: 0.5rem 0.25rem; }
+          .demo-16-10 .vid-title { font-size: 0.75rem; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-block-end: 0.25rem; }
+          .demo-16-10 .vid-channel { font-size: 0.6875rem; color: light-dark(oklch(50% 0.01 264), oklch(55% 0.01 264)); }
+          .demo-16-10 .vid-stats { font-size: 0.625rem; color: light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264)); }
+
+          /* Sidebar */
+          .demo-16-10 .vid-sidebar { }
+          .demo-16-10 .vid-sidebar h3 { font-size: 0.875rem; font-weight: 700; margin-block-end: 0.75rem; }
+          .demo-16-10 .up-next-list { display: flex; flex-direction: column; gap: 0.75rem; }
+          .demo-16-10 .up-next-item { display: grid; grid-template-columns: 5rem 1fr; gap: 0.5rem; cursor: pointer; }
+          .demo-16-10 .up-next-item:hover { opacity: 0.85; }
+          .demo-16-10 .un-thumb { aspect-ratio: 16/9; border-radius: 0.375rem; }
+          .demo-16-10 .up-next-item:nth-child(1) .un-thumb { background: linear-gradient(135deg, oklch(45% 0.15 160), oklch(55% 0.12 130)); }
+          .demo-16-10 .up-next-item:nth-child(2) .un-thumb { background: linear-gradient(135deg, oklch(40% 0.18 275), oklch(50% 0.12 300)); }
+          .demo-16-10 .up-next-item:nth-child(3) .un-thumb { background: linear-gradient(135deg, oklch(45% 0.2 25), oklch(55% 0.15 50)); }
+          .demo-16-10 .up-next-item:nth-child(4) .un-thumb { background: linear-gradient(135deg, oklch(40% 0.15 200), oklch(50% 0.12 230)); }
+          .demo-16-10 .up-next-item:nth-child(5) .un-thumb { background: linear-gradient(135deg, oklch(45% 0.18 310), oklch(50% 0.15 340)); }
+          .demo-16-10 .un-info .un-title { font-size: 0.6875rem; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+          .demo-16-10 .un-info .un-channel { font-size: 0.625rem; color: light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264)); }
+          .demo-16-10 .un-info .un-views { font-size: 0.5625rem; color: light-dark(oklch(60% 0.01 264), oklch(45% 0.01 264)); }
+
+          /* Skeleton */
+          .demo-16-10 .vid-skel { border-radius: 0.5rem; overflow: hidden; }
+          .demo-16-10 .skel-thumb { aspect-ratio: 16/9; background: linear-gradient(90deg, light-dark(oklch(92% 0.005 264), oklch(14% 0.01 264)) 25%, light-dark(oklch(96% 0.005 264), oklch(18% 0.01 264)) 50%, light-dark(oklch(92% 0.005 264), oklch(14% 0.01 264)) 75%); background-size: 200% 100%; animation: vid-shimmer 1.5s infinite linear; }
+          .demo-16-10 .skel-text { block-size: 0.6rem; border-radius: 0.25rem; margin-block-start: 0.5rem; background: linear-gradient(90deg, light-dark(oklch(92% 0.005 264), oklch(14% 0.01 264)) 25%, light-dark(oklch(96% 0.005 264), oklch(18% 0.01 264)) 50%, light-dark(oklch(92% 0.005 264), oklch(14% 0.01 264)) 75%); background-size: 200% 100%; animation: vid-shimmer 1.5s infinite linear; }
+          .demo-16-10 .skel-text:last-child { inline-size: 60%; }
+          @keyframes vid-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+        </style>
+        <div class="demo-16-10">
+          <div class="vid-hero">
+            <div class="hero-content">
+              <h1>Building Interfaces Without JavaScript</h1>
+              <p>A deep dive into pure CSS layout patterns that power the world's most polished products. From dashboards to chat apps.</p>
+              <div class="hero-btns"><button class="btn-play">Play</button><button class="btn-info">More Info</button></div>
+            </div>
+          </div>
+
+          <nav class="cat-nav">
+            <a href="#" class="active">All</a>
+            <a href="#">CSS Layouts</a>
+            <a href="#">Animations</a>
+            <a href="#">Design Systems</a>
+            <a href="#">Typography</a>
+            <a href="#">Color Theory</a>
+          </nav>
+
+          <div class="vid-layout">
+            <div class="vid-grid">
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">12:34</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">Complete Guide to CSS Grid in 2026</div><div class="vid-channel">Layout Masters</div><div class="vid-stats">245K views - 3 days ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">8:17</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">Scroll-Driven Animations Deep Dive</div><div class="vid-channel">CSS Wizardry</div><div class="vid-stats">180K views - 1 week ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">15:42</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">Building a Design System from Scratch</div><div class="vid-channel">System Design</div><div class="vid-stats">92K views - 2 weeks ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">6:55</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">OKLCH Color: The Complete Guide</div><div class="vid-channel">Color Theory</div><div class="vid-stats">156K views - 4 days ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">22:10</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">Container Queries Change Everything</div><div class="vid-channel">Responsive Design</div><div class="vid-stats">310K views - 5 days ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">9:38</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">The Popover API Explained</div><div class="vid-channel">Web Standards</div><div class="vid-stats">78K views - 1 week ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">11:22</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">Masonry Layout Without JavaScript</div><div class="vid-channel">CSS Tricks</div><div class="vid-stats">125K views - 2 weeks ago</div></div>
+              </div>
+              <div class="vid-card">
+                <div class="vid-thumb"><span class="duration">18:05</span><div class="vid-overlay"><span>Preview on hover</span></div></div>
+                <div class="vid-meta"><div class="vid-title">Dark Mode with light-dark()</div><div class="vid-channel">Theme Lab</div><div class="vid-stats">201K views - 6 days ago</div></div>
+              </div>
+              <div class="vid-skel"><div class="skel-thumb"></div><div class="skel-text"></div><div class="skel-text"></div></div>
+              <div class="vid-skel"><div class="skel-thumb"></div><div class="skel-text"></div><div class="skel-text"></div></div>
+            </div>
+
+            <aside class="vid-sidebar">
+              <h3>Up Next</h3>
+              <div class="up-next-list">
+                <div class="up-next-item"><div class="un-thumb"></div><div class="un-info"><div class="un-title">CSS :has() - 10 Real Use Cases</div><div class="un-channel">Modern CSS</div><div class="un-views">89K views</div></div></div>
+                <div class="up-next-item"><div class="un-thumb"></div><div class="un-info"><div class="un-title">Relative Color Syntax Explained</div><div class="un-channel">Color Theory</div><div class="un-views">45K views</div></div></div>
+                <div class="up-next-item"><div class="un-thumb"></div><div class="un-info"><div class="un-title">View Transitions API Tutorial</div><div class="un-channel">Web Transitions</div><div class="un-views">67K views</div></div></div>
+                <div class="up-next-item"><div class="un-thumb"></div><div class="un-info"><div class="un-title">@property Deep Dive</div><div class="un-channel">CSS Houdini</div><div class="un-views">34K views</div></div></div>
+                <div class="up-next-item"><div class="un-thumb"></div><div class="un-info"><div class="un-title">Anchor Positioning Guide</div><div class="un-channel">Layout Masters</div><div class="un-views">112K views</div></div></div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — Netflix hover preview</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid-demo"&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="thumb"&gt;
+      &lt;div class="overlay"&gt;Play&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="title"&gt;CSS Mastery&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="thumb t2"&gt;
+      &lt;div class="overlay"&gt;Play&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="title"&gt;Grid Layout&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="thumb t3"&gt;
+      &lt;div class="overlay"&gt;Play&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="title"&gt;Animations&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="thumb t4"&gt;
+      &lt;div class="overlay"&gt;Play&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="title"&gt;Color Theory&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; background: oklch(12% 0.02 264); color: white; }
+.grid-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1rem; }
+
+.card {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 200ms 100ms, z-index 0ms;
+  position: relative;
+}
+.card:hover {
+  transform: scale(1.08);
+  z-index: 10;
+  transition: transform 200ms 0ms;
+}
+
+.thumb {
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, oklch(40% 0.2 275), oklch(50% 0.15 300));
+  position: relative;
+}
+.thumb.t2 { background: linear-gradient(135deg, oklch(45% 0.18 160), oklch(55% 0.12 130)); }
+.thumb.t3 { background: linear-gradient(135deg, oklch(45% 0.2 25), oklch(55% 0.15 50)); }
+.thumb.t4 { background: linear-gradient(135deg, oklch(40% 0.15 200), oklch(50% 0.12 230)); }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: oklch(5% 0 0 / 0.7);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  opacity: 0;
+  transition: opacity 200ms;
+}
+.card:hover .overlay { opacity: 1; }
+
+.title { padding: 0.5rem 0.25rem; font-size: 0.75rem; font-weight: 600; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>The Netflix hover effect is deceptively simple: <code>transform: scale(1.05)</code> with a <code>z-index</code> bump on hover. The delayed transition (100ms delay on enter, 0ms on leave) prevents the jittery feel of instant scaling. Combined with <code>auto-fit</code> grids and skeleton shimmer animations, you get a production-grade video platform layout with zero JavaScript.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.9-social-feed.html">&larr; Lesson 16.9</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

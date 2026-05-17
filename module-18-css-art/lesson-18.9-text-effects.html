@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.9 — Text Animation Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.9 · Text Effects</p>
+      <h1>Text Animation Showcase</h1>
+      <p class="lead">Eight distinct text animation techniques: gradient text, glitch, wave, typing loop, 3D extrude, reveal wipe, outline-to-fill, and scramble. Each demonstrates a different CSS capability — from <code>background-clip</code> to <code>text-shadow</code> stacking to <code>clip-path</code> transitions.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>1. Gradient text</h2>
+      <p>Apply a gradient <code>background</code> to the text element, then use <code>-webkit-background-clip: text</code> and <code>color: transparent</code> to reveal the gradient through the letterforms. Animate <code>background-position</code> for a flowing effect.</p>
+
+      <h2>2. Glitch effect</h2>
+      <p>Layer <code>::before</code> and <code>::after</code> with the same text content but offset <code>clip-path</code> slices and contrasting colors. Animate the clip-path rapidly for a digital distortion look.</p>
+
+      <h2>3. Wave</h2>
+      <p>Wrap each character in a <code>&lt;span&gt;</code> and stagger <code>animation-delay</code> on a <code>translateY</code> keyframe. The wave propagates through the word letter by letter.</p>
+
+      <h2>4. Typing and deleting</h2>
+      <p>A fixed-width container with <code>overflow: hidden</code> and <code>border-right</code> (cursor). The width animates from 0 to full via <code>steps(n)</code> matching character count, then reverses.</p>
+
+      <h2>5. 3D extrude</h2>
+      <p>Stack multiple <code>text-shadow</code> values, each offset by 1px more in X and Y, with progressively darker colors. The result resembles extruded 3D lettering.</p>
+
+      <h2>6. Reveal wipe</h2>
+      <p>A <code>clip-path: inset()</code> animation that reveals text from left to right (or any direction) by animating the clip edge from 100% to 0%.</p>
+
+      <h2>7. Outline to fill</h2>
+      <p><code>-webkit-text-stroke</code> provides the outline. On hover, transition <code>color</code> from transparent to solid, filling the letters while the stroke remains.</p>
+
+      <h2>8. Scramble</h2>
+      <p>Using <code>::before</code> with <code>content</code> that swaps rapidly through characters via keyframes, settling on the final text. Pure CSS version uses a multi-step animation with discrete content values.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Eight Text Effects</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-18-9 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+            font-family: system-ui, sans-serif;
+          }
+
+          .demo-18-9 .effect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
+            border-radius: 12px;
+            background: oklch(97% 0.01 270);
+            padding: 1rem;
+            gap: 0.5rem;
+          }
+
+          .demo-18-9 .effect-name {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: oklch(55% 0.03 270);
+            font-weight: 600;
+          }
+
+          /* 1. Gradient Text */
+          .demo-18-9 .gradient-text {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(90deg,
+              oklch(65% 0.25 0),
+              oklch(65% 0.25 60),
+              oklch(65% 0.25 120),
+              oklch(65% 0.25 180),
+              oklch(65% 0.25 240),
+              oklch(65% 0.25 300),
+              oklch(65% 0.25 360)
+            );
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift-18-9 3s linear infinite;
+          }
+          @keyframes gradient-shift-18-9 {
+            from { background-position: 0% 50%; }
+            to { background-position: 200% 50%; }
+          }
+
+          /* 2. Glitch */
+          .demo-18-9 .glitch-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: oklch(30% 0.02 270);
+            position: relative;
+          }
+          .demo-18-9 .glitch-text::before,
+          .demo-18-9 .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+          }
+          .demo-18-9 .glitch-text::before {
+            color: oklch(60% 0.25 180);
+            animation: glitch-1-18-9 2s infinite linear alternate;
+          }
+          .demo-18-9 .glitch-text::after {
+            color: oklch(60% 0.25 0);
+            animation: glitch-2-18-9 2s infinite linear alternate;
+          }
+          @keyframes glitch-1-18-9 {
+            0%, 80% { clip-path: inset(0 100% 0 0); }
+            82% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 0); }
+            84% { clip-path: inset(50% 0 20% 0); transform: translate(2px, 0); }
+            86% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 0); }
+            88%, 100% { clip-path: inset(0 100% 0 0); }
+          }
+          @keyframes glitch-2-18-9 {
+            0%, 85% { clip-path: inset(0 100% 0 0); }
+            87% { clip-path: inset(60% 0 10% 0); transform: translate(3px, 0); }
+            89% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, 0); }
+            91% { clip-path: inset(70% 0 5% 0); transform: translate(1px, 0); }
+            93%, 100% { clip-path: inset(0 100% 0 0); }
+          }
+
+          /* 3. Wave */
+          .demo-18-9 .wave-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: oklch(45% 0.15 270);
+            display: flex;
+          }
+          .demo-18-9 .wave-text span {
+            display: inline-block;
+            animation: wave-18-9 1.5s ease-in-out infinite;
+          }
+          .demo-18-9 .wave-text span:nth-child(1) { animation-delay: 0s; }
+          .demo-18-9 .wave-text span:nth-child(2) { animation-delay: 0.1s; }
+          .demo-18-9 .wave-text span:nth-child(3) { animation-delay: 0.2s; }
+          .demo-18-9 .wave-text span:nth-child(4) { animation-delay: 0.3s; }
+          .demo-18-9 .wave-text span:nth-child(5) { animation-delay: 0.4s; }
+          @keyframes wave-18-9 {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-12px); }
+          }
+
+          /* 4. Typing */
+          .demo-18-9 .typing-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: monospace;
+            color: oklch(35% 0.1 150);
+            border-right: 2px solid oklch(35% 0.1 150);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation:
+              type-18-9 3s steps(12) infinite alternate,
+              blink-18-9 0.6s step-end infinite;
+          }
+          @keyframes type-18-9 {
+            0% { width: 0; }
+            50%, 100% { width: 12ch; }
+          }
+          @keyframes blink-18-9 {
+            50% { border-color: transparent; }
+          }
+
+          /* 5. 3D Extrude */
+          .demo-18-9 .extrude-text {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: oklch(55% 0.2 30);
+            text-shadow:
+              1px 1px 0 oklch(45% 0.18 30),
+              2px 2px 0 oklch(40% 0.16 30),
+              3px 3px 0 oklch(35% 0.14 30),
+              4px 4px 0 oklch(30% 0.12 30),
+              5px 5px 0 oklch(25% 0.1 30),
+              6px 6px 0 oklch(20% 0.08 30);
+            animation: extrude-18-9 2s ease-in-out infinite alternate;
+          }
+          @keyframes extrude-18-9 {
+            to {
+              text-shadow:
+                1px 1px 0 oklch(45% 0.18 30),
+                1px 1px 0 oklch(40% 0.16 30),
+                1px 1px 0 oklch(35% 0.14 30),
+                2px 2px 0 oklch(30% 0.12 30),
+                2px 2px 0 oklch(25% 0.1 30),
+                2px 2px 0 oklch(20% 0.08 30);
+            }
+          }
+
+          /* 6. Reveal Wipe */
+          .demo-18-9 .reveal-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: oklch(40% 0.15 200);
+            clip-path: inset(0 100% 0 0);
+            animation: reveal-18-9 2s ease-out infinite alternate;
+          }
+          @keyframes reveal-18-9 {
+            to { clip-path: inset(0 0 0 0); }
+          }
+
+          /* 7. Outline to Fill */
+          .demo-18-9 .outline-text {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px oklch(50% 0.2 270);
+            transition: color 0.6s;
+          }
+          .demo-18-9 .outline-text:hover {
+            color: oklch(50% 0.2 270);
+          }
+
+          /* 8. Scramble */
+          .demo-18-9 .scramble-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            color: oklch(40% 0.1 160);
+            position: relative;
+          }
+          .demo-18-9 .scramble-text::before {
+            content: "DECODE";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: oklch(97% 0.01 270);
+            animation: scramble-18-9 4s step-end infinite;
+          }
+          @keyframes scramble-18-9 {
+            0% { content: "X#9&K!"; }
+            10% { content: "D#9&K!"; }
+            20% { content: "DE9&K!"; }
+            30% { content: "DEC&K!"; }
+            40% { content: "DECK!"; }
+            50% { content: "DECOK!"; }
+            60% { content: "DECODE"; }
+            60.1%, 100% { content: "DECODE"; }
+          }
+        </style>
+        <div class="demo-18-9">
+          <div class="effect">
+            <span class="gradient-text">Gradient</span>
+            <span class="effect-name">Background Clip</span>
+          </div>
+          <div class="effect">
+            <span class="glitch-text" data-text="GLITCH">GLITCH</span>
+            <span class="effect-name">Glitch</span>
+          </div>
+          <div class="effect">
+            <span class="wave-text"><span>W</span><span>a</span><span>v</span><span>e</span><span>s</span></span>
+            <span class="effect-name">Wave</span>
+          </div>
+          <div class="effect">
+            <span class="typing-text">Hello World!</span>
+            <span class="effect-name">Typing</span>
+          </div>
+          <div class="effect">
+            <span class="extrude-text">DEPTH</span>
+            <span class="effect-name">3D Extrude</span>
+          </div>
+          <div class="effect">
+            <span class="reveal-text">Revealed</span>
+            <span class="effect-name">Reveal Wipe</span>
+          </div>
+          <div class="effect">
+            <span class="outline-text">HOVER</span>
+            <span class="effect-name">Outline to Fill (hover)</span>
+          </div>
+          <div class="effect">
+            <span class="scramble-text">DECODE</span>
+            <span class="effect-name">Scramble</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h1 class="gradient"&gt;Rainbow&lt;/h1&gt;
+&lt;h1 class="glitch" data-text="GLITCH"&gt;GLITCH&lt;/h1&gt;
+&lt;h1 class="outline"&gt;FILL ME&lt;/h1&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">h1 { font-size: 2.5rem; font-weight: 900; }
+
+.gradient {
+  background: linear-gradient(90deg,
+    oklch(65% 0.25 0), oklch(65% 0.25 120),
+    oklch(65% 0.25 240), oklch(65% 0.25 360)
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: flow 3s linear infinite;
+}
+@keyframes flow {
+  to { background-position: 200% 50%; }
+}
+
+.glitch {
+  position: relative;
+  color: oklch(30% 0.02 270);
+}
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+}
+.glitch::before { color: oklch(60% 0.25 180); }
+.glitch::after { color: oklch(60% 0.25 0); }
+
+.outline {
+  color: transparent;
+  -webkit-text-stroke: 2px oklch(50% 0.2 270);
+  transition: color 0.5s;
+}
+.outline:hover { color: oklch(50% 0.2 270); }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Create a ninth effect: "neon glow." Use <code>text-shadow</code> with multiple layers of increasing blur (4px, 8px, 16px, 32px) in a vibrant color. Animate the shadow opacity on/off rapidly to simulate a flickering neon sign. Add a <code>::after</code> pseudo-element as a subtle reflection below the text using <code>scaleY(-1)</code> with reduced opacity.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.8-particle-effects.html">&larr; Lesson 18.8</a>
+      <a href="./lesson-18.10-css-only-carousel-advanced.html">Lesson 18.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

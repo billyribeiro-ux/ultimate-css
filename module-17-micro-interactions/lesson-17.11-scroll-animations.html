@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.11 — Scroll-Triggered Animation Cookbook · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.11 · Micro-Interactions</p>
+      <h1>Scroll-Triggered Animation Cookbook</h1>
+      <p class="lead">Eight production scroll patterns — fade-up, slide-in, scale-up, counter tick-up, progress fill, parallax shift, header shrink, and text highlight sweep — all powered by <code>animation-timeline: view()</code> with progressive enhancement via <code>@supports</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>How scroll-driven animations work</h2>
+      <p>The <code>animation-timeline</code> property replaces time with scroll progress. Instead of an animation running over 2 seconds, it runs from 0% to 100% of the element's visibility in the viewport. <code>animation-timeline: view()</code> binds to the element's own intersection with the scrollport. No JavaScript, no Intersection Observer.</p>
+
+      <h2>The eight patterns</h2>
+
+      <h3>1. Fade up</h3>
+      <p>Element starts at <code>opacity: 0; translateY(2rem)</code> and ends at <code>opacity: 1; translateY(0)</code>. The animation range is <code>entry 0% entry 50%</code> so it completes by the time the element is half-visible.</p>
+
+      <h3>2. Slide in left/right</h3>
+      <p>Same as fade-up but using <code>translateX(-3rem)</code> or <code>translateX(3rem)</code>. Alternating left/right on adjacent items creates a staggered reveal.</p>
+
+      <h3>3. Scale up</h3>
+      <p>Starts at <code>scale(0.8); opacity: 0</code> and scales to full size. Great for cards and images that "pop" into view.</p>
+
+      <h3>4. Counter tick-up</h3>
+      <p>Uses <code>@property</code> to animate a registered custom property as an integer. The counter ticks from 0 to the target number as the element scrolls into view, displayed via <code>counter()</code> in a pseudo-element.</p>
+
+      <h3>5. Progress fill</h3>
+      <p>A horizontal bar that fills from 0% to its target width based on scroll position. Uses <code>animation-timeline: scroll()</code> bound to the nearest scroll container for a "reading progress" effect.</p>
+
+      <h3>6. Parallax shift</h3>
+      <p>Background or element moves at a different rate than scroll. Using <code>animation-range: cover</code> with a translateY from -20% to 20% creates depth.</p>
+
+      <h3>7. Header shrink</h3>
+      <p>The page header reduces padding and font-size as the user scrolls down. Uses <code>animation-timeline: scroll(root)</code> with a short range so it completes quickly.</p>
+
+      <h3>8. Text highlight sweep</h3>
+      <p>A gradient background sweeps across text using <code>background-size</code> animation from 0% to 100%, with <code>background-clip: text</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Scroll patterns</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-11 {
+            font-family: system-ui;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            height: 28rem; overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 1rem;
+          }
+          .demo-17-11 .spacer {
+            height: 6rem;
+            display: grid; place-items: center;
+            font-size: 0.75rem;
+            color: light-dark(oklch(60% 0 0), oklch(50% 0 0));
+          }
+
+          /* Fade up */
+          .demo-17-11 .fade-up {
+            opacity: 0; transform: translateY(2rem);
+            animation: scroll-fade-up linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .fade-up {
+              animation-timeline: view();
+              animation-range: entry 0% entry 60%;
+            }
+          }
+          @keyframes scroll-fade-up {
+            to { opacity: 1; transform: translateY(0); }
+          }
+
+          /* Slide in left */
+          .demo-17-11 .slide-left {
+            opacity: 0; transform: translateX(-3rem);
+            animation: scroll-slide-left linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .slide-left {
+              animation-timeline: view();
+              animation-range: entry 0% entry 60%;
+            }
+          }
+          @keyframes scroll-slide-left {
+            to { opacity: 1; transform: translateX(0); }
+          }
+
+          /* Slide in right */
+          .demo-17-11 .slide-right {
+            opacity: 0; transform: translateX(3rem);
+            animation: scroll-slide-right linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .slide-right {
+              animation-timeline: view();
+              animation-range: entry 0% entry 60%;
+            }
+          }
+          @keyframes scroll-slide-right {
+            to { opacity: 1; transform: translateX(0); }
+          }
+
+          /* Scale up */
+          .demo-17-11 .scale-up {
+            opacity: 0; transform: scale(0.8);
+            animation: scroll-scale-up linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .scale-up {
+              animation-timeline: view();
+              animation-range: entry 0% entry 50%;
+            }
+          }
+          @keyframes scroll-scale-up {
+            to { opacity: 1; transform: scale(1); }
+          }
+
+          /* Progress fill */
+          .demo-17-11 .progress-bar {
+            height: 0.5rem; border-radius: 0.25rem;
+            background: light-dark(oklch(92% 0 0), oklch(25% 0 0));
+            overflow: hidden;
+          }
+          .demo-17-11 .progress-bar__fill {
+            height: 100%; width: 0%;
+            background: oklch(55% 0.2 260);
+            border-radius: 0.25rem;
+            animation: scroll-fill linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .progress-bar__fill {
+              animation-timeline: view();
+              animation-range: entry 0% cover 50%;
+            }
+          }
+          @keyframes scroll-fill {
+            to { width: 80%; }
+          }
+
+          /* Highlight sweep */
+          .demo-17-11 .highlight {
+            font-size: 1.25rem; font-weight: 700;
+            background: linear-gradient(90deg, oklch(55% 0.2 260), oklch(55% 0.2 260)) no-repeat;
+            background-size: 0% 100%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            animation: scroll-highlight linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .highlight {
+              animation-timeline: view();
+              animation-range: entry 20% cover 40%;
+            }
+          }
+          @keyframes scroll-highlight {
+            to {
+              background-size: 100% 100%;
+              color: oklch(100% 0 0);
+            }
+          }
+
+          /* Shared card style */
+          .demo-17-11 .card {
+            padding: 1.25rem; border-radius: 0.5rem;
+            border: 1px solid light-dark(oklch(90% 0 0), oklch(28% 0 0));
+            background: light-dark(oklch(98% 0 0), oklch(18% 0 0));
+            font-size: 0.875rem;
+          }
+
+          /* Parallax */
+          .demo-17-11 .parallax-box {
+            padding: 2rem; border-radius: 0.75rem;
+            background: linear-gradient(135deg, oklch(55% 0.15 260), oklch(50% 0.15 300));
+            color: oklch(100% 0 0);
+            font-weight: 600; text-align: center;
+            animation: scroll-parallax linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .demo-17-11 .parallax-box {
+              animation-timeline: view();
+              animation-range: cover;
+            }
+          }
+          @keyframes scroll-parallax {
+            from { transform: translateY(-1rem); }
+            to { transform: translateY(1rem); }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-17-11 .fade-up,
+            .demo-17-11 .slide-left,
+            .demo-17-11 .slide-right,
+            .demo-17-11 .scale-up {
+              opacity: 1; transform: none; animation: none;
+            }
+            .demo-17-11 .progress-bar__fill { animation: none; width: 80%; }
+            .demo-17-11 .parallax-box { animation: none; }
+            .demo-17-11 .highlight { animation: none; background-size: 100% 100%; color: oklch(100% 0 0); }
+          }
+        </style>
+        <div class="demo-17-11">
+          <div class="spacer">Scroll down to see animations</div>
+
+          <div class="card fade-up">
+            <strong>Fade Up</strong> — This card fades in and rises as it enters the viewport.
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="card slide-left">
+            <strong>Slide In Left</strong> — Enters from the left side.
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="card slide-right">
+            <strong>Slide In Right</strong> — Enters from the right side.
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="card scale-up">
+            <strong>Scale Up</strong> — Pops in from a smaller size.
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="progress-bar">
+            <div class="progress-bar__fill"></div>
+          </div>
+          <p style="font-size:0.75rem; margin:0.25rem 0 0; color: light-dark(oklch(50% 0 0), oklch(55% 0 0));">Progress fill — bar width driven by scroll position</p>
+
+          <div class="spacer"></div>
+
+          <p class="highlight">This text highlights as you scroll past it.</p>
+
+          <div class="spacer"></div>
+
+          <div class="parallax-box">Parallax — moves at a different scroll rate</div>
+
+          <div class="spacer"></div>
+          <div class="spacer"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scroll-container"&gt;
+  &lt;div class="spacer"&gt;Scroll down&lt;/div&gt;
+  &lt;div class="box fade-up"&gt;Fade Up&lt;/div&gt;
+  &lt;div class="spacer"&gt;&lt;/div&gt;
+  &lt;div class="box slide-in"&gt;Slide In&lt;/div&gt;
+  &lt;div class="spacer"&gt;&lt;/div&gt;
+  &lt;div class="box scale"&gt;Scale Up&lt;/div&gt;
+  &lt;div class="spacer"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; }
+
+.scroll-container {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.spacer { height: 60vh; display: grid; place-items: center; }
+.box {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: oklch(55% 0.2 260);
+  color: white;
+  font-weight: 700;
+}
+
+/* Fade up */
+.fade-up {
+  opacity: 0;
+  transform: translateY(2rem);
+  animation: fadeUp linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 50%;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide in */
+.slide-in {
+  opacity: 0;
+  transform: translateX(-3rem);
+  animation: slideIn linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 50%;
+}
+@keyframes slideIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Scale */
+.scale {
+  opacity: 0;
+  transform: scale(0.7);
+  animation: scaleUp linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 50%;
+}
+@keyframes scaleUp {
+  to { opacity: 1; transform: scale(1); }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a "reading progress" bar fixed at the top of the scroll container using <code>animation-timeline: scroll()</code> (document scroll, not view). The bar should fill from 0% to 100% width as the user scrolls the entire page. Then add a "staggered grid" where 6 cards animate in sequence using <code>animation-delay</code> combined with <code>animation-timeline: view()</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.10-page-transitions.html">&larr; Lesson 17.10</a>
+      <a href="./lesson-17.12-dark-mode-transitions.html">Lesson 17.12 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

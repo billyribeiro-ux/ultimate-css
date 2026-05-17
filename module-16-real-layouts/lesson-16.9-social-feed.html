@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.9 — The Social Feed · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.9 · Real-World Layout</p>
+      <h1>The Social Feed (Twitter/Instagram Style)</h1>
+      <p class="lead">A vertical social feed with post cards containing avatar, name, timestamp, content, image, and action bar. A like toggle via checkbox and <code>:has()</code> with a heart scale animation, a stories bar with horizontal <code>scroll-snap</code>, and skeleton loading placeholders. The essential social media layout.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Anatomy of the layout</h2>
+      <p>The social feed is a single-column centered layout. A stories bar scrolls horizontally at the top. Below it, post cards stack vertically. Each card has a header (avatar + name + timestamp), content area, optional image, and an action bar with like/comment/share. A sidebar shows suggested follows on wider viewports.</p>
+
+      <h2>Like toggle with heart animation</h2>
+      <p>The heart icon is a checkbox label using <code>clip-path</code> or the <code>::before/::after</code> technique to draw the heart shape. When checked, <code>:has(input:checked)</code> triggers a <code>scale</code> keyframe animation (scale up to 1.3, bounce back to 1). The color transitions from neutral gray to red via OKLCH.</p>
+
+      <h2>Stories bar with scroll-snap</h2>
+      <p>The stories bar is a horizontally scrolling flex container with <code>scroll-snap-type: x mandatory</code>. Each story circle uses a gradient border ring (via <code>border-image</code> or a background gradient behind the avatar) to indicate unseen stories.</p>
+
+      <h2>Skeleton loading states</h2>
+      <p>Skeleton placeholders use a <code>linear-gradient</code> background animation that sweeps left-to-right, creating the shimmer effect. The skeleton cards match the exact dimensions of real cards so there is zero layout shift when content loads.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full social feed</h2>
+      <div class="demo-frame" style="padding:0; background:oklch(8% 0.02 264); overflow-y:auto; max-block-size:80vh;">
+        <style>
+          .demo-16-9 { font-family: system-ui, -apple-system, sans-serif; color: light-dark(oklch(20% 0.01 264), oklch(90% 0.01 264)); background: light-dark(oklch(96% 0.005 264), oklch(8% 0.02 264)); line-height: 1.5; padding: 1rem; }
+          .demo-16-9 *, .demo-16-9 *::before, .demo-16-9 *::after { box-sizing: border-box; margin: 0; }
+
+          .demo-16-9 .feed-layout { display: grid; grid-template-columns: 1fr 16rem; gap: 1.5rem; max-inline-size: 48rem; margin-inline: auto; }
+          @media (max-width: 48rem) { .demo-16-9 .feed-layout { grid-template-columns: 1fr; } }
+
+          /* Stories bar */
+          .demo-16-9 .stories { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding: 1rem; background: light-dark(oklch(99% 0.005 264), oklch(11% 0.015 264)); border-radius: 0.75rem; border: 1px solid light-dark(oklch(92% 0.01 264), oklch(16% 0.01 264)); margin-block-end: 1rem; scrollbar-width: none; }
+          .demo-16-9 .stories::-webkit-scrollbar { display: none; }
+          .demo-16-9 .story { scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; gap: 0.375rem; flex-shrink: 0; }
+          .demo-16-9 .story-ring { inline-size: 3.5rem; block-size: 3.5rem; border-radius: 50%; padding: 0.2rem; background: linear-gradient(135deg, oklch(65% 0.25 25), oklch(55% 0.25 310), oklch(50% 0.2 275)); }
+          .demo-16-9 .story-ring.seen { background: light-dark(oklch(80% 0.01 264), oklch(30% 0.01 264)); }
+          .demo-16-9 .story-avatar { inline-size: 100%; block-size: 100%; border-radius: 50%; border: 2px solid light-dark(oklch(99% 0 0), oklch(11% 0 0)); }
+          .demo-16-9 .story:nth-child(1) .story-avatar { background: linear-gradient(135deg, oklch(60% 0.15 275), oklch(50% 0.12 250)); }
+          .demo-16-9 .story:nth-child(2) .story-avatar { background: linear-gradient(135deg, oklch(60% 0.18 160), oklch(50% 0.15 130)); }
+          .demo-16-9 .story:nth-child(3) .story-avatar { background: linear-gradient(135deg, oklch(55% 0.2 25), oklch(50% 0.15 50)); }
+          .demo-16-9 .story:nth-child(4) .story-avatar { background: linear-gradient(135deg, oklch(55% 0.18 200), oklch(50% 0.15 230)); }
+          .demo-16-9 .story:nth-child(5) .story-avatar { background: linear-gradient(135deg, oklch(60% 0.15 60), oklch(50% 0.18 80)); }
+          .demo-16-9 .story:nth-child(6) .story-avatar { background: linear-gradient(135deg, oklch(55% 0.2 310), oklch(50% 0.15 340)); }
+          .demo-16-9 .story-name { font-size: 0.625rem; max-inline-size: 4rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+          /* Feed */
+          .demo-16-9 .feed { display: flex; flex-direction: column; gap: 1rem; }
+
+          /* Post card */
+          .demo-16-9 .post-card { background: light-dark(oklch(99% 0.005 264), oklch(11% 0.015 264)); border: 1px solid light-dark(oklch(92% 0.01 264), oklch(16% 0.01 264)); border-radius: 0.75rem; overflow: hidden; }
+          .demo-16-9 .post-header { display: flex; align-items: center; gap: 0.625rem; padding: 0.75rem 1rem; }
+          .demo-16-9 .post-avatar { inline-size: 2.25rem; block-size: 2.25rem; border-radius: 50%; flex-shrink: 0; }
+          .demo-16-9 .post-card:nth-child(1) .post-avatar { background: linear-gradient(135deg, oklch(55% 0.18 275), oklch(50% 0.15 300)); }
+          .demo-16-9 .post-card:nth-child(2) .post-avatar { background: linear-gradient(135deg, oklch(55% 0.2 25), oklch(50% 0.18 50)); }
+          .demo-16-9 .post-card:nth-child(3) .post-avatar { background: linear-gradient(135deg, oklch(60% 0.15 160), oklch(50% 0.18 130)); }
+          .demo-16-9 .post-card:nth-child(4) .post-avatar { background: linear-gradient(135deg, oklch(55% 0.18 200), oklch(50% 0.15 230)); }
+          .demo-16-9 .post-user .name { font-size: 0.8125rem; font-weight: 600; }
+          .demo-16-9 .post-user .time { font-size: 0.6875rem; color: light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264)); }
+          .demo-16-9 .post-content { padding: 0 1rem; font-size: 0.8125rem; margin-block-end: 0.75rem; }
+          .demo-16-9 .post-image { inline-size: 100%; aspect-ratio: 4/3; }
+          .demo-16-9 .post-card:nth-child(1) .post-image { background: linear-gradient(135deg, oklch(50% 0.18 275), oklch(65% 0.12 230)); }
+          .demo-16-9 .post-card:nth-child(2) .post-image { background: linear-gradient(135deg, oklch(55% 0.2 25), oklch(70% 0.12 60)); }
+          .demo-16-9 .post-card:nth-child(4) .post-image { background: linear-gradient(135deg, oklch(50% 0.15 200), oklch(65% 0.1 160)); }
+
+          /* Action bar */
+          .demo-16-9 .post-actions { display: flex; align-items: center; gap: 1.25rem; padding: 0.75rem 1rem; }
+          .demo-16-9 .action-btn { display: flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: light-dark(oklch(45% 0.01 264), oklch(58% 0.01 264)); cursor: pointer; border: none; background: none; font-family: inherit; }
+
+          /* Like toggle */
+          .demo-16-9 .like-toggle { display: flex; align-items: center; gap: 0.375rem; }
+          .demo-16-9 .like-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+          .demo-16-9 .like-toggle label { display: inline-block; inline-size: 1.125rem; block-size: 1rem; cursor: pointer; position: relative; }
+          .demo-16-9 .like-toggle label::before, .demo-16-9 .like-toggle label::after { content: ""; position: absolute; inset-block-start: 0; inline-size: 0.6rem; block-size: 1rem; border-radius: 0.6rem 0.6rem 0 0; background: light-dark(oklch(70% 0.01 264), oklch(40% 0.01 264)); transition: background 200ms; }
+          .demo-16-9 .like-toggle label::before { inset-inline-start: 0.15rem; rotate: -45deg; transform-origin: bottom right; }
+          .demo-16-9 .like-toggle label::after { inset-inline-start: 0.35rem; rotate: 45deg; transform-origin: bottom left; }
+          .demo-16-9 .like-toggle input:checked + label::before, .demo-16-9 .like-toggle input:checked + label::after { background: oklch(60% 0.25 25); }
+          .demo-16-9 .like-toggle input:checked + label { animation: heart-pop 300ms ease; }
+          @keyframes heart-pop { 0% { scale: 1; } 50% { scale: 1.3; } 100% { scale: 1; } }
+          .demo-16-9 .like-toggle .count { font-size: 0.75rem; color: light-dark(oklch(45% 0.01 264), oklch(58% 0.01 264)); }
+
+          /* Sidebar */
+          .demo-16-9 .feed-sidebar { position: sticky; inset-block-start: 1rem; align-self: start; }
+          .demo-16-9 .suggested { background: light-dark(oklch(99% 0.005 264), oklch(11% 0.015 264)); border: 1px solid light-dark(oklch(92% 0.01 264), oklch(16% 0.01 264)); border-radius: 0.75rem; padding: 1rem; }
+          .demo-16-9 .suggested h3 { font-size: 0.8125rem; font-weight: 600; margin-block-end: 0.75rem; }
+          .demo-16-9 .suggest-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+          .demo-16-9 .suggest-item .sug-avatar { inline-size: 2rem; block-size: 2rem; border-radius: 50%; background: linear-gradient(135deg, oklch(55% 0.15 200), oklch(50% 0.12 230)); flex-shrink: 0; }
+          .demo-16-9 .suggest-item:nth-child(3) .sug-avatar { background: linear-gradient(135deg, oklch(55% 0.18 25), oklch(50% 0.15 50)); }
+          .demo-16-9 .suggest-item:nth-child(4) .sug-avatar { background: linear-gradient(135deg, oklch(55% 0.15 310), oklch(50% 0.12 340)); }
+          .demo-16-9 .suggest-item .sug-name { font-size: 0.75rem; font-weight: 600; }
+          .demo-16-9 .suggest-item .sug-handle { font-size: 0.6875rem; color: light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264)); }
+          .demo-16-9 .follow-btn { margin-inline-start: auto; padding: 0.3rem 0.75rem; border-radius: 2rem; background: oklch(48% 0.2 275); color: white; border: none; font-size: 0.6875rem; font-weight: 600; cursor: pointer; }
+
+          /* Skeleton */
+          .demo-16-9 .skeleton-card { background: light-dark(oklch(99% 0.005 264), oklch(11% 0.015 264)); border: 1px solid light-dark(oklch(92% 0.01 264), oklch(16% 0.01 264)); border-radius: 0.75rem; padding: 1rem; }
+          .demo-16-9 .skel-line { block-size: 0.75rem; border-radius: 0.375rem; margin-block-end: 0.5rem; background: linear-gradient(90deg, light-dark(oklch(92% 0.005 264), oklch(16% 0.01 264)) 25%, light-dark(oklch(96% 0.005 264), oklch(20% 0.01 264)) 50%, light-dark(oklch(92% 0.005 264), oklch(16% 0.01 264)) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+          .demo-16-9 .skel-avatar { inline-size: 2.25rem; block-size: 2.25rem; border-radius: 50%; margin-block-end: 0.75rem; background: linear-gradient(90deg, light-dark(oklch(92% 0.005 264), oklch(16% 0.01 264)) 25%, light-dark(oklch(96% 0.005 264), oklch(20% 0.01 264)) 50%, light-dark(oklch(92% 0.005 264), oklch(16% 0.01 264)) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+          .demo-16-9 .skel-image { inline-size: 100%; aspect-ratio: 4/3; border-radius: 0.5rem; margin-block: 0.75rem; background: linear-gradient(90deg, light-dark(oklch(92% 0.005 264), oklch(16% 0.01 264)) 25%, light-dark(oklch(96% 0.005 264), oklch(20% 0.01 264)) 50%, light-dark(oklch(92% 0.005 264), oklch(16% 0.01 264)) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite linear; }
+          .demo-16-9 .skel-line:nth-child(2) { inline-size: 60%; }
+          .demo-16-9 .skel-line:nth-child(4) { inline-size: 80%; }
+          @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+        </style>
+        <div class="demo-16-9">
+          <div class="feed-layout">
+            <div class="feed-main">
+              <div class="stories">
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-name">Alex</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-name">Sarah</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-name">Marcus</span></div>
+                <div class="story"><div class="story-ring seen"><div class="story-avatar"></div></div><span class="story-name">Emma</span></div>
+                <div class="story"><div class="story-ring seen"><div class="story-avatar"></div></div><span class="story-name">James</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-name">Olivia</span></div>
+              </div>
+
+              <div class="feed">
+                <article class="post-card">
+                  <div class="post-header"><div class="post-avatar"></div><div class="post-user"><div class="name">Alex Rivera</div><div class="time">2 hours ago</div></div></div>
+                  <p class="post-content">Just shipped the new design system. 200+ components, full dark mode support, and OKLCH color tokens throughout. Incredibly proud of the team.</p>
+                  <div class="post-image"></div>
+                  <div class="post-actions">
+                    <div class="like-toggle"><input type="checkbox" id="like1-16-9" checked><label for="like1-16-9"></label><span class="count">247</span></div>
+                    <button class="action-btn">42 comments</button>
+                    <button class="action-btn">Share</button>
+                  </div>
+                </article>
+
+                <article class="post-card">
+                  <div class="post-header"><div class="post-avatar"></div><div class="post-user"><div class="name">Sarah Chen</div><div class="time">4 hours ago</div></div></div>
+                  <p class="post-content">Hot take: CSS has become so powerful that 80% of what we use JavaScript for in UI could be handled by the browser natively. :has(), popover, scroll-driven animations, container queries...</p>
+                  <div class="post-image"></div>
+                  <div class="post-actions">
+                    <div class="like-toggle"><input type="checkbox" id="like2-16-9"><label for="like2-16-9"></label><span class="count">1,203</span></div>
+                    <button class="action-btn">187 comments</button>
+                    <button class="action-btn">Share</button>
+                  </div>
+                </article>
+
+                <article class="post-card">
+                  <div class="post-header"><div class="post-avatar"></div><div class="post-user"><div class="name">Design Weekly</div><div class="time">6 hours ago</div></div></div>
+                  <p class="post-content">This week: new Baseline features, scroll-driven animations ship in Firefox, and the masonry layout proposal gets updated. The platform keeps accelerating.</p>
+                  <div class="post-actions">
+                    <div class="like-toggle"><input type="checkbox" id="like3-16-9"><label for="like3-16-9"></label><span class="count">89</span></div>
+                    <button class="action-btn">12 comments</button>
+                    <button class="action-btn">Share</button>
+                  </div>
+                </article>
+
+                <article class="post-card">
+                  <div class="post-header"><div class="post-avatar"></div><div class="post-user"><div class="name">Marcus Webb</div><div class="time">8 hours ago</div></div></div>
+                  <p class="post-content">Built an entire e-commerce product page with zero JavaScript. Color swatches, gallery, sticky cart bar, star ratings. All CSS. The future is here.</p>
+                  <div class="post-image"></div>
+                  <div class="post-actions">
+                    <div class="like-toggle"><input type="checkbox" id="like4-16-9" checked><label for="like4-16-9"></label><span class="count">534</span></div>
+                    <button class="action-btn">67 comments</button>
+                    <button class="action-btn">Share</button>
+                  </div>
+                </article>
+
+                <div class="skeleton-card">
+                  <div class="skel-avatar"></div>
+                  <div class="skel-line"></div>
+                  <div class="skel-line"></div>
+                  <div class="skel-image"></div>
+                  <div class="skel-line"></div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="feed-sidebar">
+              <div class="suggested">
+                <h3>Suggested for you</h3>
+                <div class="suggest-item"><div class="sug-avatar"></div><div><div class="sug-name">CSS Tricks</div><div class="sug-handle">@css_tricks</div></div><button class="follow-btn">Follow</button></div>
+                <div class="suggest-item"><div class="sug-avatar"></div><div><div class="sug-name">Jen Simmons</div><div class="sug-handle">@jensimmons</div></div><button class="follow-btn">Follow</button></div>
+                <div class="suggest-item"><div class="sug-avatar"></div><div><div class="sug-name">Adam Argyle</div><div class="sug-handle">@argyleink</div></div><button class="follow-btn">Follow</button></div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — like toggle with heart animation</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="like-demo"&gt;
+  &lt;div class="like-row"&gt;
+    &lt;input type="checkbox" id="h1"&gt;
+    &lt;label for="h1" class="heart"&gt;&lt;/label&gt;
+    &lt;span&gt;Like this post&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="like-row"&gt;
+    &lt;input type="checkbox" id="h2" checked&gt;
+    &lt;label for="h2" class="heart"&gt;&lt;/label&gt;
+    &lt;span&gt;Already liked&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: grid; place-items: center; }
+.like-demo { display: flex; flex-direction: column; gap: 1.5rem; }
+.like-row { display: flex; align-items: center; gap: 0.75rem; }
+.like-row input { position: absolute; opacity: 0; }
+
+.heart {
+  display: inline-block;
+  inline-size: 1.5rem;
+  block-size: 1.35rem;
+  position: relative;
+  cursor: pointer;
+}
+.heart::before, .heart::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inline-size: 0.8rem;
+  block-size: 1.35rem;
+  border-radius: 0.8rem 0.8rem 0 0;
+  background: oklch(75% 0.01 264);
+  transition: background 200ms;
+}
+.heart::before { inset-inline-start: 0.15rem; rotate: -45deg; transform-origin: bottom right; }
+.heart::after  { inset-inline-start: 0.55rem; rotate: 45deg; transform-origin: bottom left; }
+
+input:checked + .heart::before,
+input:checked + .heart::after {
+  background: oklch(60% 0.25 25);
+}
+input:checked + .heart {
+  animation: pop 300ms ease;
+}
+@keyframes pop {
+  0%   { scale: 1; }
+  50%  { scale: 1.3; }
+  100% { scale: 1; }
+}
+
+.like-row span { font-size: 0.875rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>Social feeds combine every CSS fundamental: flex for card layout, scroll-snap for stories, checkboxes for interactive state (likes, follows), gradient animations for skeleton loading, and <code>:has()</code> for propagating state changes visually. The heart animation is a single <code>scale</code> keyframe triggered by <code>:checked</code>. Simple, tactile, zero JavaScript.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.8-email-client.html">&larr; Lesson 16.8</a>
+      <a href="./lesson-16.10-video-platform.html">Lesson 16.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

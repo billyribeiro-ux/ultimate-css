@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.1 — Fluid Typography with clamp() · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.1 · Fluid Systems</p>
+      <h1>Fluid Typography with clamp()</h1>
+      <p class="lead">The clamp(min, preferred, max) pattern for type that scales smoothly between viewport sizes. No media queries, no breakpoints — just text that flows from mobile to desktop in one continuous motion.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem with fixed font sizes</h2>
+      <p>Traditional responsive typography uses media queries to jump between sizes: 1rem on mobile, 1.25rem on tablet, 1.5rem on desktop. These discrete jumps create awkward in-between states and require constant maintenance as new breakpoints emerge.</p>
+
+      <h2>The clamp() formula</h2>
+      <p>The <code>clamp()</code> function takes three arguments: a minimum, a preferred (fluid) value, and a maximum. The browser uses the preferred value unless it falls below the minimum or exceeds the maximum.</p>
+      <pre><code>/* The formula */
+font-size: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+
+/* Breakdown:
+   min: 1rem (16px) — never smaller than this
+   preferred: 0.5rem + 1.5vw — scales with viewport
+   max: 2rem (32px) — never larger than this
+*/</code></pre>
+
+      <h2>Why vw alone is dangerous</h2>
+      <p>Using <code>font-size: 3vw</code> alone creates two problems: (1) on a 320px viewport that's only 9.6px — unreadable, and (2) it completely ignores the user's font-size preference set in browser settings. A user who sets their default to 20px for accessibility gets overridden.</p>
+
+      <h3>The rem + vw hybrid</h3>
+      <p>By combining <code>rem</code> (respects user preference) with <code>vw</code> (responds to viewport), we get the best of both worlds. The rem portion acts as an accessible baseline that the vw portion adds to:</p>
+      <pre><code>/* Accessible fluid type */
+font-size: clamp(1rem, 0.75rem + 1vw, 1.5rem);
+
+/* If user sets base to 20px:
+   min becomes 20px (not 16px)
+   preferred becomes 15px + 1vw
+   max becomes 30px
+   User preference is respected throughout */</code></pre>
+
+      <h2>Building a complete fluid type scale</h2>
+      <p>A production type scale defines every size token with clamp(). The key insight: larger sizes need more dramatic scaling, smaller sizes need less.</p>
+      <pre><code>:root {
+  --text-xs:  clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm:  clamp(0.875rem, 0.8rem + 0.4vw, 1rem);
+  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --text-lg:  clamp(1.125rem, 0.95rem + 0.9vw, 1.5rem);
+  --text-xl:  clamp(1.25rem, 0.9rem + 1.5vw, 2rem);
+  --text-2xl: clamp(1.5rem, 0.8rem + 2.5vw, 2.75rem);
+  --text-3xl: clamp(2rem, 1rem + 3.5vw, 4rem);
+}</code></pre>
+
+      <h2>The math behind the preferred value</h2>
+      <p>To calculate the preferred value for a given min/max range across viewport sizes:</p>
+      <pre><code>/* Target: 1rem at 320px, 2rem at 1200px
+
+   slope = (max - min) / (vw-max - vw-min)
+   slope = (32 - 16) / (1200 - 320) = 16/880 = 0.01818
+   In vw: 1.818vw
+
+   intercept = min - slope * vw-min
+   intercept = 16 - 0.01818 * 320 = 10.18px = 0.636rem
+
+   Result: clamp(1rem, 0.636rem + 1.818vw, 2rem)
+*/</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fluid type scale</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-1 {
+            padding: clamp(1rem, 0.5rem + 2vw, 3rem);
+            font-family: system-ui, sans-serif;
+            background: oklch(15% 0.02 270);
+            color: oklch(90% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-21-1 .scale-display {
+            display: grid;
+            gap: 1rem;
+          }
+          .demo-21-1 .scale-item {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            padding-block: 0.5rem;
+            border-block-end: 1px solid oklch(30% 0.02 270);
+          }
+          .demo-21-1 .scale-label {
+            font-size: 0.75rem;
+            color: oklch(60% 0.1 270);
+            min-inline-size: 6ch;
+            font-family: monospace;
+          }
+          .demo-21-1 .xs  { font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem); }
+          .demo-21-1 .sm  { font-size: clamp(0.875rem, 0.8rem + 0.4vw, 1rem); }
+          .demo-21-1 .base { font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem); }
+          .demo-21-1 .lg  { font-size: clamp(1.125rem, 0.95rem + 0.9vw, 1.5rem); }
+          .demo-21-1 .xl  { font-size: clamp(1.25rem, 0.9rem + 1.5vw, 2rem); }
+          .demo-21-1 .xxl { font-size: clamp(1.5rem, 0.8rem + 2.5vw, 2.75rem); }
+          .demo-21-1 .xxxl {
+            font-size: clamp(2rem, 1rem + 3.5vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+          }
+          .demo-21-1 .hero-demo {
+            margin-block-start: 2rem;
+            padding: clamp(1.5rem, 1rem + 2vw, 4rem);
+            background: oklch(20% 0.04 270);
+            border-radius: 0.75rem;
+            text-align: center;
+          }
+          .demo-21-1 .hero-demo h3 {
+            font-size: clamp(1.5rem, 0.5rem + 4vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            background: linear-gradient(135deg, oklch(75% 0.2 300), oklch(70% 0.2 200));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+          .demo-21-1 .hero-demo p {
+            font-size: clamp(0.9rem, 0.8rem + 0.5vw, 1.25rem);
+            color: oklch(65% 0.02 270);
+            margin-block-start: 0.75rem;
+          }
+        </style>
+        <div class="demo-21-1">
+          <div class="scale-display">
+            <div class="scale-item"><span class="scale-label">xs</span><span class="xs">Extra small fluid text</span></div>
+            <div class="scale-item"><span class="scale-label">sm</span><span class="sm">Small fluid text</span></div>
+            <div class="scale-item"><span class="scale-label">base</span><span class="base">Base fluid text</span></div>
+            <div class="scale-item"><span class="scale-label">lg</span><span class="lg">Large fluid text</span></div>
+            <div class="scale-item"><span class="scale-label">xl</span><span class="xl">Extra large fluid text</span></div>
+            <div class="scale-item"><span class="scale-label">2xl</span><span class="xxl">Display fluid text</span></div>
+            <div class="scale-item"><span class="scale-label">3xl</span><span class="xxxl">Hero fluid text</span></div>
+          </div>
+          <div class="hero-demo">
+            <h3>Zero Breakpoints</h3>
+            <p>Resize the browser — this heading scales smoothly from mobile to ultrawide</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="fluid-type"&gt;
+  &lt;h1&gt;Fluid Heading&lt;/h1&gt;
+  &lt;h2&gt;Subheading scales too&lt;/h2&gt;
+  &lt;p&gt;Body text adapts between 1rem and 1.125rem.&lt;/p&gt;
+  &lt;small&gt;Caption text stays readable at every size.&lt;/small&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --text-lg: clamp(1.25rem, 0.9rem + 1.5vw, 2rem);
+  --text-xl: clamp(1.5rem, 0.8rem + 2.5vw, 3rem);
+  --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
+}
+
+body {
+  font-family: system-ui;
+  padding: 2rem;
+}
+
+.fluid-type { max-width: 60ch; }
+
+h1 {
+  font-size: var(--text-xl);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: var(--text-lg);
+  line-height: 1.2;
+}
+
+p { font-size: var(--text-base); }
+small { font-size: var(--text-sm); }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a fluid type scale where the heading ranges from 2rem to 5rem, body from 1rem to 1.25rem, and caption from 0.75rem to 0.875rem. Use the rem+vw hybrid formula for each. Test by resizing — the heading should scale dramatically while body text barely changes.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 21</a>
+      <a href="./lesson-21.2-fluid-spacing.html">Lesson 21.2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.3 — Intrinsic Sizing · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.3 · Fluid Systems</p>
+      <h1>Intrinsic Sizing: min(), max(), clamp(), fit-content</h1>
+      <p class="lead">Five layout problems solved without media queries. Let elements size themselves intelligently using CSS math functions and intrinsic keywords.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>min() — "be this OR smaller"</h2>
+      <p>The <code>min()</code> function picks the smallest of its arguments. The classic use: a container that maxes out at a fixed width but shrinks to fit small viewports:</p>
+      <pre><code>/* Container: 40rem max, or 100% of available space */
+.container {
+  inline-size: min(40rem, 100%);
+  margin-inline: auto;
+}
+/* No media query needed — it just works */</code></pre>
+
+      <h2>max() — "be this OR bigger"</h2>
+      <p>The inverse: pick the largest value. Useful for minimum sizing constraints:</p>
+      <pre><code>/* Sidebar: at least 300px, or 30% of parent */
+.sidebar {
+  inline-size: max(300px, 30%);
+}
+
+/* Image: never smaller than 200px */
+.thumbnail {
+  inline-size: max(200px, 25%);
+}</code></pre>
+
+      <h2>fit-content — content-driven sizing with a cap</h2>
+      <p><code>fit-content(max)</code> makes an element shrink to its content but never exceed the specified maximum. Unlike max-width, it also affects how the element participates in grid/flex layouts:</p>
+      <pre><code>/* Tag: shrinks to text but caps at 200px */
+.tag {
+  inline-size: fit-content(200px);
+}
+
+/* Grid column that fits content up to 300px */
+grid-template-columns: fit-content(300px) 1fr;</code></pre>
+
+      <h2>min-content and max-content</h2>
+      <p>These keywords size elements to their content's intrinsic dimensions:</p>
+      <pre><code>/* Shrink to the longest word */
+.narrow { inline-size: min-content; }
+
+/* Expand to fit all content on one line */
+.wide { inline-size: max-content; }
+
+/* Practical: a heading that wraps tightly */
+h1 {
+  inline-size: min-content;
+  /* Wraps at each word boundary */
+}</code></pre>
+
+      <h2>The auto-fit + minmax() pattern</h2>
+      <p>The most powerful intrinsic grid pattern — columns that automatically wrap and fill available space:</p>
+      <pre><code>.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 1rem;
+}
+/* Why min(300px, 100%)?
+   Prevents overflow when container is less than 300px */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Five intrinsic sizing patterns</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-3 {
+            padding: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+            font-family: system-ui, sans-serif;
+            background: oklch(13% 0.02 220);
+            color: oklch(88% 0.01 220);
+            border-radius: 0.5rem;
+            display: grid;
+            gap: 2rem;
+          }
+          .demo-21-3 .pattern {
+            padding: 1rem;
+            background: oklch(18% 0.02 220);
+            border-radius: 0.5rem;
+            border: 1px solid oklch(25% 0.03 220);
+          }
+          .demo-21-3 .pattern-label {
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: oklch(65% 0.12 180);
+            margin-block-end: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+          /* Pattern 1: min() container */
+          .demo-21-3 .min-container {
+            inline-size: min(35rem, 100%);
+            margin-inline: auto;
+            padding: 1rem;
+            background: oklch(25% 0.04 270);
+            border-radius: 0.25rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: oklch(75% 0.05 270);
+          }
+          /* Pattern 2: max() minimum sizing */
+          .demo-21-3 .max-boxes {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+          }
+          .demo-21-3 .max-box {
+            inline-size: max(120px, 20%);
+            padding: 0.75rem;
+            background: oklch(40% 0.12 150);
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            text-align: center;
+          }
+          /* Pattern 3: fit-content tags */
+          .demo-21-3 .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+          }
+          .demo-21-3 .tag {
+            inline-size: fit-content(200px);
+            padding: 0.4rem 0.8rem;
+            background: oklch(30% 0.08 300);
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            color: oklch(80% 0.08 300);
+          }
+          /* Pattern 4: min-content heading */
+          .demo-21-3 .min-content-demo {
+            display: flex;
+            gap: 1rem;
+            align-items: start;
+          }
+          .demo-21-3 .min-content-heading {
+            inline-size: min-content;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: oklch(85% 0.1 50);
+            border-inline-end: 3px solid oklch(60% 0.15 50);
+            padding-inline-end: 1rem;
+          }
+          .demo-21-3 .min-content-body {
+            font-size: 0.85rem;
+            color: oklch(65% 0.02 220);
+            line-height: 1.6;
+          }
+          /* Pattern 5: auto-fit grid */
+          .demo-21-3 .auto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+            gap: 0.75rem;
+          }
+          .demo-21-3 .grid-item {
+            padding: 1rem;
+            background: oklch(22% 0.05 200);
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            text-align: center;
+            border: 1px solid oklch(30% 0.05 200);
+          }
+        </style>
+        <div class="demo-21-3">
+          <div class="pattern">
+            <div class="pattern-label">1. min(35rem, 100%) container</div>
+            <div class="min-container">I max out at 35rem but shrink to 100% on narrow screens</div>
+          </div>
+          <div class="pattern">
+            <div class="pattern-label">2. max(120px, 20%) minimum sizing</div>
+            <div class="max-boxes">
+              <div class="max-box">A</div>
+              <div class="max-box">B</div>
+              <div class="max-box">C</div>
+              <div class="max-box">D</div>
+            </div>
+          </div>
+          <div class="pattern">
+            <div class="pattern-label">3. fit-content(200px) tags</div>
+            <div class="tags">
+              <span class="tag">CSS</span>
+              <span class="tag">Responsive</span>
+              <span class="tag">Intrinsic Sizing</span>
+              <span class="tag">No Media Queries</span>
+            </div>
+          </div>
+          <div class="pattern">
+            <div class="pattern-label">4. min-content heading</div>
+            <div class="min-content-demo">
+              <div class="min-content-heading">Intrinsic Web Design</div>
+              <div class="min-content-body">The heading wraps at each word boundary, taking up minimal horizontal space while the body fills the remaining area.</div>
+            </div>
+          </div>
+          <div class="pattern">
+            <div class="pattern-label">5. repeat(auto-fit, minmax(min(180px, 100%), 1fr))</div>
+            <div class="auto-grid">
+              <div class="grid-item">Card 1</div>
+              <div class="grid-item">Card 2</div>
+              <div class="grid-item">Card 3</div>
+              <div class="grid-item">Card 4</div>
+              <div class="grid-item">Card 5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="layout"&gt;
+  &lt;aside class="sidebar"&gt;Sidebar&lt;/aside&gt;
+  &lt;main class="content"&gt;
+    &lt;div class="grid"&gt;
+      &lt;div class="card"&gt;Card 1&lt;/div&gt;
+      &lt;div class="card"&gt;Card 2&lt;/div&gt;
+      &lt;div class="card"&gt;Card 3&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.layout {
+  display: grid;
+  grid-template-columns: fit-content(250px) 1fr;
+  gap: 1rem;
+  inline-size: min(80rem, 100%);
+  margin-inline: auto;
+}
+
+.sidebar {
+  padding: 1rem;
+  background: oklch(90% 0.05 200);
+  border-radius: 0.5rem;
+  inline-size: max(150px, 100%);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 1rem;
+}
+
+.card {
+  padding: 1.5rem;
+  background: oklch(92% 0.04 270);
+  border-radius: 0.5rem;
+  text-align: center;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a three-column layout where: the first column uses <code>fit-content(200px)</code> for a nav, the middle uses <code>1fr</code> for content, and the third uses <code>min(300px, 30%)</code> for an aside. Add an auto-fit grid inside the content column. The entire layout should work from 320px to 2560px with zero media queries.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.2-fluid-spacing.html">&larr; Lesson 21.2</a>
+      <a href="./lesson-21.4-container-queries-at-scale.html">Lesson 21.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

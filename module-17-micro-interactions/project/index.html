@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project — Micro-Interaction Playground · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 17</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 17 · Project</p>
+      <h1>Micro-Interaction Playground</h1>
+      <p class="lead">A scrolling showcase demonstrating every micro-interaction pattern from this module in one cohesive experience. Toggle switches, spinners, badges, skeletons, progress indicators, tooltips, validation, buttons, cards, page transitions, scroll animations, and dark mode switching.</p>
+    </header>
+
+    <section class="demo">
+      <div class="demo-frame">
+        <style>
+          .playground {
+            font-family: system-ui;
+            padding: 0;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            background: light-dark(oklch(98% 0 0), oklch(10% 0 0));
+            transition: background-color 400ms ease, color 400ms ease;
+          }
+          .playground:has(#pg-dark:checked) { color-scheme: dark; }
+          .playground:has(#pg-dark:not(:checked)) { color-scheme: light; }
+
+          .playground .pg-section {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid light-dark(oklch(92% 0 0), oklch(20% 0 0));
+          }
+          .playground .pg-section:last-child { border-bottom: none; }
+          .playground .pg-title {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.05em; margin: 0 0 1rem;
+            color: light-dark(oklch(50% 0 0), oklch(55% 0 0));
+          }
+
+          /* --- Dark mode toggle (top bar) --- */
+          .playground .pg-topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+            background: light-dark(oklch(100% 0 0), oklch(14% 0 0));
+            border-bottom: 1px solid light-dark(oklch(92% 0 0), oklch(22% 0 0));
+            transition: background-color 400ms ease, border-color 400ms ease;
+            position: sticky; top: 0; z-index: 100;
+          }
+          .playground .pg-topbar__brand {
+            font-weight: 700; font-size: 0.9rem;
+          }
+          .playground #pg-dark { display: none; }
+          .playground .pg-theme-toggle {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; font-size: 0.75rem; font-weight: 600;
+          }
+          .playground .pg-theme-track {
+            width: 2.25rem; height: 1.125rem;
+            background: light-dark(oklch(85% 0 0), oklch(30% 0 0));
+            border-radius: 0.5625rem;
+            position: relative;
+            transition: background 300ms ease;
+          }
+          .playground .pg-theme-track::after {
+            content: ""; position: absolute;
+            top: 2px; left: 2px;
+            width: calc(1.125rem - 4px); height: calc(1.125rem - 4px);
+            background: oklch(100% 0 0); border-radius: 50%;
+            transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+          .playground #pg-dark:checked ~ .pg-topbar .pg-theme-track::after {
+            transform: translateX(1.125rem);
+          }
+
+          /* --- Section 1: Toggles --- */
+          .playground .pg-toggles { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+          .playground .pg-toggle {
+            --size: 1.25rem;
+            position: relative; display: inline-flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; font-size: 0.8rem;
+          }
+          .playground .pg-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+          .playground .pg-toggle__track {
+            width: calc(var(--size) * 1.75); height: var(--size);
+            background: light-dark(oklch(85% 0 0), oklch(30% 0 0));
+            border-radius: calc(var(--size) / 2);
+            transition: background 200ms ease;
+          }
+          .playground .pg-toggle__track::after {
+            content: ""; position: absolute;
+            top: 2px; left: 2px;
+            width: calc(var(--size) - 4px); height: calc(var(--size) - 4px);
+            background: oklch(100% 0 0); border-radius: 50%;
+            box-shadow: 0 1px 2px oklch(0% 0 0 / 0.15);
+            transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+          .playground .pg-toggle input:checked + .pg-toggle__track {
+            background: oklch(55% 0.2 260);
+          }
+          .playground .pg-toggle input:checked + .pg-toggle__track::after {
+            transform: translateX(calc(var(--size) * 0.75));
+          }
+
+          /* --- Section 2: Spinners --- */
+          .playground .pg-spinners { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+          .playground .pg-spinner {
+            width: 1.5rem; height: 1.5rem;
+            border: 2.5px solid light-dark(oklch(88% 0 0), oklch(25% 0 0));
+            border-top-color: oklch(55% 0.2 260);
+            border-radius: 50%;
+            animation: pg-spin 700ms linear infinite;
+          }
+          .playground .pg-spinner--dots {
+            border: none; display: flex; gap: 0.25rem; align-items: center;
+            width: auto; height: auto;
+          }
+          .playground .pg-spinner--dots span {
+            width: 0.4rem; height: 0.4rem; border-radius: 50%;
+            background: oklch(55% 0.2 260);
+            animation: pg-bounce 1s ease-in-out infinite;
+          }
+          .playground .pg-spinner--dots span:nth-child(2) { animation-delay: 0.15s; }
+          .playground .pg-spinner--dots span:nth-child(3) { animation-delay: 0.3s; }
+          .playground .pg-spinner--pulse {
+            border: none;
+            background: oklch(55% 0.2 260 / 0.3);
+            animation: pg-pulse 1.2s ease-in-out infinite;
+          }
+          @keyframes pg-spin { to { rotate: 360deg; } }
+          @keyframes pg-bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+          }
+          @keyframes pg-pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 1; }
+          }
+
+          /* --- Section 3: Badges --- */
+          .playground .pg-badges { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+          .playground .pg-badge-wrap {
+            position: relative; width: 2rem; height: 2rem;
+            background: light-dark(oklch(93% 0 0), oklch(25% 0 0));
+            border-radius: 0.375rem;
+          }
+          .playground .pg-dot {
+            position: absolute; top: -3px; right: -3px;
+            width: 0.5rem; height: 0.5rem;
+            background: oklch(55% 0.2 25);
+            border-radius: 50%;
+            border: 2px solid light-dark(oklch(98% 0 0), oklch(10% 0 0));
+          }
+          .playground .pg-count {
+            position: absolute; top: -6px; right: -8px;
+            min-width: 1.1rem; height: 1.1rem;
+            padding: 0 0.3rem;
+            background: oklch(55% 0.2 25);
+            color: oklch(100% 0 0);
+            border-radius: 0.55rem;
+            font-size: 0.6rem; font-weight: 700;
+            display: grid; place-items: center;
+            border: 2px solid light-dark(oklch(98% 0 0), oklch(10% 0 0));
+          }
+
+          /* --- Section 4: Skeleton --- */
+          .playground .pg-skeleton { display: grid; gap: 0.5rem; max-width: 14rem; }
+          .playground .pg-skel {
+            background: light-dark(oklch(92% 0 0), oklch(22% 0 0));
+            background-image: linear-gradient(110deg, transparent 25%, light-dark(oklch(100% 0 0 / 0.4), oklch(100% 0 0 / 0.06)) 50%, transparent 75%);
+            background-size: 200% 100%;
+            animation: pg-shimmer 1.5s ease-in-out infinite;
+            border-radius: 0.25rem;
+          }
+          .playground .pg-skel--img { height: 5rem; border-radius: 0.375rem; }
+          .playground .pg-skel--title { height: 0.875rem; width: 60%; }
+          .playground .pg-skel--line { height: 0.625rem; }
+          .playground .pg-skel--line:last-child { width: 45%; }
+          @keyframes pg-shimmer { from { background-position: -100% 0; } to { background-position: 100% 0; } }
+
+          /* --- Section 5: Progress --- */
+          .playground .pg-progress { display: grid; gap: 1rem; }
+          .playground .pg-bar-track {
+            height: 0.375rem; border-radius: 0.1875rem;
+            background: light-dark(oklch(92% 0 0), oklch(25% 0 0));
+            overflow: hidden;
+          }
+          .playground .pg-bar-fill {
+            height: 100%; width: 72%; border-radius: 0.1875rem;
+            background: oklch(55% 0.2 260);
+            transition: width 300ms ease;
+          }
+          .playground .pg-ring {
+            width: 3.5rem; height: 3.5rem; border-radius: 50%;
+            background: conic-gradient(oklch(55% 0.2 260) 72%, light-dark(oklch(92% 0 0), oklch(25% 0 0)) 0);
+            mask: radial-gradient(circle, transparent 55%, black 56%);
+            -webkit-mask: radial-gradient(circle, transparent 55%, black 56%);
+          }
+          .playground .pg-row { display: flex; align-items: center; gap: 1.5rem; }
+
+          /* --- Section 6: Tooltips --- */
+          .playground .pg-tooltips { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+          .playground .pg-tip-trigger {
+            position: relative; display: inline-flex;
+            padding: 0.4rem 0.75rem; border-radius: 0.25rem;
+            background: light-dark(oklch(95% 0 0), oklch(22% 0 0));
+            border: 1px solid light-dark(oklch(88% 0 0), oklch(30% 0 0));
+            font-size: 0.75rem; font-weight: 500; cursor: default;
+          }
+          .playground .pg-tooltip {
+            position: absolute; bottom: calc(100% + 0.4rem);
+            left: 50%; transform: translateX(-50%);
+            padding: 0.25rem 0.5rem; border-radius: 0.2rem;
+            background: light-dark(oklch(20% 0 0), oklch(80% 0 0));
+            color: light-dark(oklch(95% 0 0), oklch(10% 0 0));
+            font-size: 0.65rem; white-space: nowrap;
+            opacity: 0; scale: 0.9;
+            pointer-events: none;
+            transition: opacity 150ms ease, scale 150ms ease;
+          }
+          .playground .pg-tip-trigger:hover .pg-tooltip {
+            opacity: 1; scale: 1; transition-delay: 150ms;
+          }
+
+          /* --- Section 7: Validation --- */
+          .playground .pg-validation { display: grid; gap: 0.75rem; max-width: 16rem; }
+          .playground .pg-input-wrap { position: relative; }
+          .playground .pg-input {
+            width: 100%; padding: 0.5rem 2rem 0.5rem 0.6rem;
+            border: 1.5px solid light-dark(oklch(82% 0 0), oklch(35% 0 0));
+            border-radius: 0.3rem; font-size: 0.8rem;
+            background: light-dark(oklch(100% 0 0), oklch(15% 0 0));
+            color: inherit; outline: none;
+            transition: border-color 200ms ease, box-shadow 200ms ease;
+          }
+          .playground .pg-input:focus {
+            border-color: oklch(55% 0.2 260);
+            box-shadow: 0 0 0 2px oklch(55% 0.2 260 / 0.12);
+          }
+          .playground .pg-input:not(:placeholder-shown):valid {
+            border-color: oklch(55% 0.18 145);
+          }
+          .playground .pg-input:not(:placeholder-shown):invalid {
+            border-color: oklch(55% 0.2 25);
+          }
+          .playground .pg-input-icon {
+            position: absolute; right: 0.5rem; top: 50%;
+            transform: translateY(-50%);
+            width: 0.8rem; height: 0.8rem;
+            opacity: 0; scale: 0.5;
+            transition: opacity 200ms, scale 200ms;
+          }
+          .playground .pg-input:not(:placeholder-shown):valid ~ .pg-input-icon--ok {
+            opacity: 1; scale: 1;
+            background: oklch(55% 0.18 145);
+            clip-path: polygon(20% 50%, 40% 72%, 80% 25%, 85% 30%, 40% 80%, 15% 55%);
+          }
+          .playground .pg-input:not(:placeholder-shown):invalid ~ .pg-input-icon--err {
+            opacity: 1; scale: 1;
+            background: oklch(55% 0.2 25);
+            clip-path: polygon(20% 25%, 25% 20%, 50% 44%, 75% 20%, 80% 25%, 56% 50%, 80% 75%, 75% 80%, 50% 56%, 25% 80%, 20% 75%, 44% 50%);
+          }
+
+          /* --- Section 8: Buttons --- */
+          .playground .pg-buttons { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+          .playground .pg-btn {
+            position: relative;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.5rem 1rem; min-width: 5rem;
+            border: none; border-radius: 0.3rem;
+            background: oklch(55% 0.2 260); color: oklch(100% 0 0);
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            transition: background 80ms, transform 80ms;
+          }
+          .playground .pg-btn:hover { background: oklch(48% 0.2 260); }
+          .playground .pg-btn:active { transform: scale(0.97); }
+          .playground .pg-btn--secondary {
+            background: light-dark(oklch(95% 0 0), oklch(22% 0 0));
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            border: 1px solid light-dark(oklch(82% 0 0), oklch(35% 0 0));
+          }
+          .playground .pg-btn--secondary:hover {
+            background: light-dark(oklch(92% 0 0), oklch(26% 0 0));
+          }
+          .playground .pg-btn--danger { background: oklch(55% 0.2 25); }
+          .playground .pg-btn--danger:hover { background: oklch(48% 0.2 25); }
+          .playground .pg-btn--ghost {
+            background: transparent; color: oklch(55% 0.2 260);
+          }
+          .playground .pg-btn--ghost:hover { background: oklch(55% 0.2 260 / 0.08); }
+          .playground .pg-btn--loading { pointer-events: none; }
+          .playground .pg-btn--loading .pg-btn__text { opacity: 0; }
+          .playground .pg-btn--loading::after {
+            content: ""; position: absolute;
+            width: 0.875rem; height: 0.875rem;
+            border: 2px solid oklch(100% 0 0);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: pg-spin 600ms linear infinite;
+          }
+          .playground .pg-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+          /* --- Section 9: Cards --- */
+          .playground .pg-cards {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+            gap: 1rem;
+          }
+          .playground .pg-card {
+            position: relative; border-radius: 0.5rem; overflow: hidden;
+            background: light-dark(oklch(100% 0 0), oklch(16% 0 0));
+            border: 1px solid light-dark(oklch(92% 0 0), oklch(24% 0 0));
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.05);
+            transition: transform 200ms ease, box-shadow 200ms ease;
+          }
+          .playground .pg-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px oklch(0% 0 0 / 0.1);
+          }
+          .playground .pg-card:active {
+            transform: scale(0.98);
+            transition-duration: 100ms;
+          }
+          .playground .pg-card__img {
+            height: 5rem; overflow: hidden;
+          }
+          .playground .pg-card__img-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, oklch(65% 0.12 260), oklch(55% 0.12 300));
+            transition: scale 400ms ease;
+          }
+          .playground .pg-card:nth-child(2) .pg-card__img-inner {
+            background: linear-gradient(135deg, oklch(65% 0.12 145), oklch(55% 0.12 180));
+          }
+          .playground .pg-card:nth-child(3) .pg-card__img-inner {
+            background: linear-gradient(135deg, oklch(65% 0.12 50), oklch(55% 0.12 25));
+          }
+          .playground .pg-card:hover .pg-card__img-inner { scale: 1.05; }
+          .playground .pg-card__body { padding: 0.75rem; }
+          .playground .pg-card__body h4 { margin: 0 0 0.25rem; font-size: 0.8rem; }
+          .playground .pg-card__body p { margin: 0; font-size: 0.7rem; color: light-dark(oklch(50% 0 0), oklch(55% 0 0)); }
+          .playground .pg-card__reveal {
+            font-size: 0.65rem; font-weight: 600; color: oklch(55% 0.2 260);
+            opacity: 0; transform: translateY(0.3rem);
+            transition: opacity 200ms 50ms, transform 200ms 50ms;
+            margin-top: 0.375rem;
+          }
+          .playground .pg-card:hover .pg-card__reveal { opacity: 1; transform: translateY(0); }
+
+          /* --- Section 10: Scroll animations --- */
+          .playground .pg-scroll-section {
+            min-height: 12rem;
+            display: grid; gap: 1rem; align-content: start;
+          }
+          .playground .pg-scroll-item {
+            padding: 1rem; border-radius: 0.375rem;
+            background: light-dark(oklch(100% 0 0), oklch(16% 0 0));
+            border: 1px solid light-dark(oklch(92% 0 0), oklch(24% 0 0));
+            font-size: 0.8rem; font-weight: 500;
+            opacity: 0; transform: translateY(1.5rem);
+            animation: pg-scroll-reveal linear both;
+          }
+          @supports (animation-timeline: view()) {
+            .playground .pg-scroll-item {
+              animation-timeline: view();
+              animation-range: entry 0% entry 60%;
+            }
+          }
+          @keyframes pg-scroll-reveal {
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .playground .pg-scroll-item:nth-child(2) {
+            transform: translateX(-2rem);
+            animation-name: pg-scroll-slide-left;
+          }
+          @keyframes pg-scroll-slide-left {
+            to { opacity: 1; transform: translateX(0); }
+          }
+          .playground .pg-scroll-item:nth-child(3) {
+            transform: translateX(2rem);
+            animation-name: pg-scroll-slide-right;
+          }
+          @keyframes pg-scroll-slide-right {
+            to { opacity: 1; transform: translateX(0); }
+          }
+
+          /* --- Section 11: Page transitions (tabs) --- */
+          .playground .pg-tabs-nav {
+            display: flex; border-bottom: 1px solid light-dark(oklch(90% 0 0), oklch(25% 0 0));
+            margin-bottom: 1rem;
+          }
+          .playground .pg-tabs-nav input { display: none; }
+          .playground .pg-tabs-nav label {
+            padding: 0.4rem 0.75rem; font-size: 0.7rem; font-weight: 600;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: border-color 150ms, color 150ms;
+          }
+          .playground .pg-tabs-nav input:checked + label {
+            border-bottom-color: oklch(55% 0.2 260);
+            color: oklch(55% 0.2 260);
+          }
+          .playground .pg-tab-views { position: relative; height: 4rem; overflow: hidden; }
+          .playground .pg-tab-view {
+            position: absolute; inset: 0; display: grid; place-items: center;
+            font-size: 0.8rem; font-weight: 600;
+            opacity: 0; transform: translateX(1rem);
+            transition: opacity 200ms ease, transform 200ms ease;
+          }
+          .playground #pg-t1:checked ~ .pg-tab-views .pg-tab-view:nth-child(1),
+          .playground #pg-t2:checked ~ .pg-tab-views .pg-tab-view:nth-child(2),
+          .playground #pg-t3:checked ~ .pg-tab-views .pg-tab-view:nth-child(3) {
+            opacity: 1; transform: translateX(0);
+          }
+
+          /* --- Responsive --- */
+          @media (max-width: 30rem) {
+            .playground .pg-section { padding: 1.5rem 1rem; }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .playground .pg-spinner,
+            .playground .pg-spinner--dots span,
+            .playground .pg-spinner--pulse,
+            .playground .pg-btn--loading::after {
+              animation: none;
+            }
+            .playground .pg-card { transition-duration: 0ms; }
+            .playground .pg-scroll-item { opacity: 1; transform: none; animation: none; }
+          }
+        </style>
+        <div class="playground">
+          <input type="checkbox" id="pg-dark">
+          <div class="pg-topbar">
+            <span class="pg-topbar__brand">Playground</span>
+            <label class="pg-theme-toggle" for="pg-dark">
+              <span class="pg-theme-track"></span>
+              Theme
+            </label>
+          </div>
+
+          <!-- Toggles -->
+          <div class="pg-section">
+            <p class="pg-title">Toggles</p>
+            <div class="pg-toggles">
+              <label class="pg-toggle">
+                <input type="checkbox" checked>
+                <span class="pg-toggle__track"></span>
+                Wi-Fi
+              </label>
+              <label class="pg-toggle">
+                <input type="checkbox">
+                <span class="pg-toggle__track"></span>
+                Bluetooth
+              </label>
+              <label class="pg-toggle">
+                <input type="checkbox" checked>
+                <span class="pg-toggle__track"></span>
+                Notifications
+              </label>
+            </div>
+          </div>
+
+          <!-- Spinners -->
+          <div class="pg-section">
+            <p class="pg-title">Loading Spinners</p>
+            <div class="pg-spinners">
+              <div class="pg-spinner"></div>
+              <div class="pg-spinner pg-spinner--dots">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="pg-spinner pg-spinner--pulse"></div>
+            </div>
+          </div>
+
+          <!-- Badges -->
+          <div class="pg-section">
+            <p class="pg-title">Notification Badges</p>
+            <div class="pg-badges">
+              <div class="pg-badge-wrap">
+                <span class="pg-dot"></span>
+              </div>
+              <div class="pg-badge-wrap">
+                <span class="pg-count">3</span>
+              </div>
+              <div class="pg-badge-wrap">
+                <span class="pg-count">99+</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skeleton -->
+          <div class="pg-section">
+            <p class="pg-title">Skeleton Loading</p>
+            <div class="pg-skeleton">
+              <div class="pg-skel pg-skel--img"></div>
+              <div class="pg-skel pg-skel--title"></div>
+              <div class="pg-skel pg-skel--line"></div>
+              <div class="pg-skel pg-skel--line"></div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="pg-section">
+            <p class="pg-title">Progress Indicators</p>
+            <div class="pg-progress">
+              <div class="pg-bar-track">
+                <div class="pg-bar-fill"></div>
+              </div>
+              <div class="pg-row">
+                <div class="pg-ring"></div>
+                <span style="font-size:0.8rem; font-weight:700">72%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tooltips -->
+          <div class="pg-section">
+            <p class="pg-title">Tooltips</p>
+            <div class="pg-tooltips">
+              <span class="pg-tip-trigger" tabindex="0">
+                Hover me
+                <span class="pg-tooltip" role="tooltip">Helpful info</span>
+              </span>
+              <span class="pg-tip-trigger" tabindex="0">
+                Or me
+                <span class="pg-tooltip" role="tooltip">Another tip</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Validation -->
+          <div class="pg-section">
+            <p class="pg-title">Form Validation</p>
+            <div class="pg-validation">
+              <div class="pg-input-wrap">
+                <input class="pg-input" type="email" placeholder=" " required>
+                <span class="pg-input-icon pg-input-icon--ok"></span>
+                <span class="pg-input-icon pg-input-icon--err"></span>
+              </div>
+              <div class="pg-input-wrap">
+                <input class="pg-input" type="text" placeholder=" " required minlength="3">
+                <span class="pg-input-icon pg-input-icon--ok"></span>
+                <span class="pg-input-icon pg-input-icon--err"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="pg-section">
+            <p class="pg-title">Button States</p>
+            <div class="pg-buttons">
+              <button class="pg-btn"><span class="pg-btn__text">Primary</span></button>
+              <button class="pg-btn pg-btn--secondary"><span class="pg-btn__text">Secondary</span></button>
+              <button class="pg-btn pg-btn--ghost"><span class="pg-btn__text">Ghost</span></button>
+              <button class="pg-btn pg-btn--danger"><span class="pg-btn__text">Danger</span></button>
+              <button class="pg-btn pg-btn--loading"><span class="pg-btn__text">Loading</span></button>
+              <button class="pg-btn" disabled><span class="pg-btn__text">Disabled</span></button>
+            </div>
+          </div>
+
+          <!-- Cards -->
+          <div class="pg-section">
+            <p class="pg-title">Card Interactions</p>
+            <div class="pg-cards">
+              <article class="pg-card">
+                <div class="pg-card__img"><div class="pg-card__img-inner"></div></div>
+                <div class="pg-card__body">
+                  <h4>Lift & Shadow</h4>
+                  <p>Hover for lift, press for scale.</p>
+                  <div class="pg-card__reveal">View details</div>
+                </div>
+              </article>
+              <article class="pg-card">
+                <div class="pg-card__img"><div class="pg-card__img-inner"></div></div>
+                <div class="pg-card__body">
+                  <h4>Image Zoom</h4>
+                  <p>Image scales inside overflow.</p>
+                  <div class="pg-card__reveal">Explore</div>
+                </div>
+              </article>
+              <article class="pg-card">
+                <div class="pg-card__img"><div class="pg-card__img-inner"></div></div>
+                <div class="pg-card__body">
+                  <h4>Content Reveal</h4>
+                  <p>Text slides up on hover.</p>
+                  <div class="pg-card__reveal">Read more</div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <!-- Page transitions (tabs) -->
+          <div class="pg-section">
+            <p class="pg-title">Page Transitions</p>
+            <div class="pg-tabs-nav">
+              <input type="radio" name="pg-tab" id="pg-t1" checked>
+              <label for="pg-t1">Home</label>
+              <input type="radio" name="pg-tab" id="pg-t2">
+              <label for="pg-t2">Products</label>
+              <input type="radio" name="pg-tab" id="pg-t3">
+              <label for="pg-t3">About</label>
+            </div>
+            <div class="pg-tab-views">
+              <div class="pg-tab-view">Home view content</div>
+              <div class="pg-tab-view">Products view content</div>
+              <div class="pg-tab-view">About view content</div>
+            </div>
+          </div>
+
+          <!-- Scroll animations -->
+          <div class="pg-section">
+            <p class="pg-title">Scroll Animations (scroll this demo)</p>
+            <div class="pg-scroll-section">
+              <div class="pg-scroll-item">Fade up on scroll</div>
+              <div class="pg-scroll-item">Slide in from left</div>
+              <div class="pg-scroll-item">Slide in from right</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-17.12-dark-mode-transitions.html">&larr; Lesson 17.12</a>
+      <a href="../index.html">Module 17 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

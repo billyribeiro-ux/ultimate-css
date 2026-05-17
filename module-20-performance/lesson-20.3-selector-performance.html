@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.3 — Selector Performance at Scale · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.3 · Selectors</p>
+      <h1>Selector Performance at Scale</h1>
+      <p class="lead">Browsers match CSS selectors right-to-left. Understanding this algorithm explains why deeply nested selectors are slower — and why, in practice, it rarely matters until you hit thousands of elements.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Right-to-left matching</h2>
+      <p>When the browser encounters <code>div.container > ul > li > a.link</code>, it does <strong>not</strong> start at <code>div.container</code> and walk down. Instead, it starts at every <code>a.link</code> element in the document and walks <em>up</em> the DOM tree to verify the chain. This means the rightmost selector (the "key selector") determines the initial candidate set.</p>
+      <p>A key selector of <code>a.link</code> starts with every element matching <code>a.link</code>. A key selector of <code>*</code> starts with every element in the DOM. This is why the universal selector was historically considered slow (though modern engines have optimized this significantly).</p>
+
+      <h2>Flat selectors win</h2>
+      <p>Compare these two approaches:</p>
+      <pre><code>/* Deeply nested — 4 checks per candidate */
+div.container > ul.nav > li.nav-item > a.nav-link { color: blue; }
+
+/* Flat — 1 check per candidate */
+.nav-link { color: blue; }</code></pre>
+      <p>The flat selector finds all <code>.nav-link</code> elements in one step. The nested selector finds all <code>a.nav-link</code> elements, then checks each one's parent chain three levels deep. At 100 elements, the difference is negligible. At 10,000+ elements, it's measurable.</p>
+
+      <h2>When it actually matters</h2>
+      <ul>
+        <li><strong>Large data tables</strong> — 10,000+ cells with complex selectors</li>
+        <li><strong>Virtual scroll lists</strong> — frequent DOM insertions trigger style recalc</li>
+        <li><strong>Real-time updates</strong> — chat apps, dashboards with rapid DOM changes</li>
+      </ul>
+      <p>For a typical marketing page with 500 elements, selector performance is a rounding error. Focus on layout/paint optimization instead.</p>
+
+      <h2>:has() performance</h2>
+      <p>The <code>:has()</code> selector is powerful but potentially expensive because it requires the browser to look <em>downward</em> into descendants. Browsers implement caching to mitigate this, but in tight loops with frequent DOM mutations, <code>:has()</code> can trigger extra style recalculations. Use it freely for static pages; profile it for dynamic ones.</p>
+
+      <h2>@scope performance benefits</h2>
+      <p><code>@scope</code> limits the matching scope, which means the browser can skip entire subtrees during selector matching. This is a genuine performance optimization for large documents with scoped component styles.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Selector matching on a 1000-element list</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-3 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-20-3 .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+          }
+          .demo-20-3 .panel {
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-3 .panel h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.85rem;
+            color: oklch(40% 0.1 260);
+          }
+          .demo-20-3 .panel code {
+            display: block;
+            background: oklch(15% 0.02 260);
+            color: oklch(85% 0.05 150);
+            padding: 0.75rem;
+            border-radius: 0.4rem;
+            font-size: 0.75rem;
+            white-space: pre;
+            margin-bottom: 0.75rem;
+          }
+          .demo-20-3 .meter-track {
+            height: 1.5rem;
+            background: oklch(92% 0.01 260);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            position: relative;
+          }
+          .demo-20-3 .meter-fill {
+            height: 100%;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            padding-left: 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: oklch(98% 0 0);
+          }
+          .demo-20-3 .fill-nested {
+            width: 75%;
+            background: oklch(55% 0.2 25);
+          }
+          .demo-20-3 .fill-flat {
+            width: 20%;
+            background: oklch(55% 0.18 150);
+          }
+          .demo-20-3 .note {
+            font-size: 0.8rem;
+            color: oklch(50% 0 0);
+            margin-top: 0.5rem;
+          }
+          .demo-20-3 .selector-vis {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+          }
+          .demo-20-3 .sel-step {
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+          .demo-20-3 .sel-key    { background: oklch(55% 0.2 25); color: white; }
+          .demo-20-3 .sel-check  { background: oklch(80% 0.05 25); color: oklch(30% 0 0); }
+          .demo-20-3 .sel-single { background: oklch(55% 0.18 150); color: white; }
+          .demo-20-3 .sel-arrow  { font-size: 0.9rem; color: oklch(60% 0 0); }
+          .demo-20-3 .scope-demo {
+            border: 2px dashed oklch(65% 0.15 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 0.5rem;
+          }
+          .demo-20-3 .scope-demo p {
+            font-size: 0.8rem;
+            margin: 0;
+            color: oklch(40% 0.05 260);
+          }
+        </style>
+        <div class="demo-20-3">
+          <div class="comparison">
+            <div class="panel">
+              <h3>Deeply nested selector</h3>
+              <code>div.page > main > ul > li > a.link</code>
+              <div class="selector-vis">
+                <span class="sel-step sel-key">a.link</span>
+                <span class="sel-arrow">&larr;</span>
+                <span class="sel-step sel-check">li</span>
+                <span class="sel-arrow">&larr;</span>
+                <span class="sel-step sel-check">ul</span>
+                <span class="sel-arrow">&larr;</span>
+                <span class="sel-step sel-check">main</span>
+                <span class="sel-arrow">&larr;</span>
+                <span class="sel-step sel-check">div.page</span>
+              </div>
+              <p class="note">5 matching steps per candidate</p>
+              <div class="meter-track" style="margin-top:0.75rem">
+                <div class="meter-fill fill-nested">~0.8ms / 1000 els</div>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Flat class selector</h3>
+              <code>.link</code>
+              <div class="selector-vis">
+                <span class="sel-step sel-single">.link</span>
+              </div>
+              <p class="note">1 matching step per candidate</p>
+              <div class="meter-track" style="margin-top:0.75rem">
+                <div class="meter-fill fill-flat">~0.2ms</div>
+              </div>
+            </div>
+          </div>
+          <div class="scope-demo">
+            <p><strong>@scope benefit:</strong> With <code>@scope (.nav) { ... }</code>, the browser skips the entire DOM outside <code>.nav</code>, reducing the candidate set before matching even begins.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;main&gt;
+    &lt;ul class="list"&gt;
+      &lt;li&gt;&lt;a class="link" href="#"&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a class="link" href="#"&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a class="link" href="#"&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a class="link" href="#"&gt;Item 4&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a class="link" href="#"&gt;Item 5&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.list { list-style: none; padding: 0; }
+.list li { margin-bottom: 0.5rem; }
+
+/* Approach 1: deeply nested */
+div.page > main > ul.list > li > a.link {
+  color: oklch(45% 0.2 260);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  display: inline-block;
+  border-radius: 0.3rem;
+  transition: background 0.2s;
+}
+div.page > main > ul.list > li > a.link:hover {
+  background: oklch(92% 0.03 260);
+}
+
+/* Approach 2: flat — uncomment to compare:
+.link {
+  color: oklch(45% 0.2 150);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  display: inline-block;
+  border-radius: 0.3rem;
+  transition: background 0.2s;
+}
+.link:hover {
+  background: oklch(92% 0.03 150);
+}
+*/
+
+/* Both produce the same visual result.
+   The flat selector is faster to match. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Uncomment Approach 2 (the flat selector) and comment out Approach 1. Both should produce the same visual result. Now imagine this list has 10,000 items. In DevTools Performance panel, the "Recalculate Style" event will be measurably shorter with the flat selector. For most real-world sites, this difference is under 1ms — focus your optimization effort on layout and paint instead.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.2-compositor-animations.html">&larr; Lesson 20.2</a>
+      <a href="./lesson-20.4-critical-css.html">Lesson 20.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

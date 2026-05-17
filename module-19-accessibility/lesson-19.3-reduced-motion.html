@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.3 — prefers-reduced-motion: The Complete Guide · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.3 · Inclusive Design</p>
+      <h1>prefers-reduced-motion: The Complete Guide</h1>
+      <p class="lead">For people with vestibular disorders, motion on screen can trigger vertigo, nausea, and migraines. The prefers-reduced-motion media query lets us respect their system preference and still deliver a polished experience.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What vestibular disorders are</h2>
+      <p>The vestibular system controls balance and spatial orientation. Disorders of this system affect roughly 35% of adults over 40 to some degree. Parallax scrolling, fly-in animations, auto-playing carousels, and zoom transitions can cause genuine physical discomfort: dizziness, nausea, disorientation.</p>
+
+      <h2>The three tiers</h2>
+      <p><strong>no-preference:</strong> Full animations — the user has not set a preference. <strong>reduce:</strong> The user has explicitly asked for less motion. Only essential motion should remain. <strong>Coming soon:</strong> <code>prefers-reduced-transparency</code> for users who struggle with translucent overlays.</p>
+
+      <h2>The PE7 pattern</h2>
+      <p>In PE7, animations live in their own layer. The reduced-motion override goes at the top of that layer:</p>
+      <pre><code>@layer animations {
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}</code></pre>
+      <p>This kills all motion globally. Individual components can then opt back into essential motion (opacity crossfades) with explicit overrides below this rule.</p>
+
+      <h2>What counts as "essential motion"</h2>
+      <p><strong>Safe:</strong> opacity crossfades (0 to 1), color transitions, border changes. <strong>Unsafe:</strong> translateX/Y slides, scale transforms, parallax, rotate, path animations. The heuristic: if removing the animation would confuse the user about what happened, it is essential. A fade-in is essential (it shows new content arrived). A bounce-in is not (the fade alone communicates the same thing).</p>
+
+      <h2>Testing</h2>
+      <p>In Chrome DevTools: Rendering panel, check "Emulate CSS media feature prefers-reduced-motion." In macOS: System Preferences, Accessibility, Display, Reduce Motion. In Windows: Settings, Ease of Access, Display, Show animations.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — 5 animations, reduced-motion toggle</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-3 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .demo-19-3 .toggle-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: oklch(93% 0.02 275);
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+          }
+          .demo-19-3 .anim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+          }
+          .demo-19-3 .anim-box {
+            display: grid;
+            place-items: center;
+            height: 100px;
+            border-radius: 0.5rem;
+            background: oklch(95% 0.02 275);
+            overflow: hidden;
+          }
+          .demo-19-3 .anim-box span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: oklch(35% 0.1 275);
+            text-align: center;
+            padding: 0.25rem;
+          }
+          .demo-19-3 .ball {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: oklch(55% 0.22 275);
+          }
+          /* Animation 1: Bounce */
+          @keyframes demo-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+          }
+          .demo-19-3 .bounce .ball { animation: demo-bounce 1s ease-in-out infinite; }
+          /* Animation 2: Spin */
+          @keyframes demo-spin {
+            to { transform: rotate(360deg); }
+          }
+          .demo-19-3 .spin .ball { border-radius: 4px; animation: demo-spin 2s linear infinite; }
+          /* Animation 3: Slide */
+          @keyframes demo-slide {
+            0%, 100% { transform: translateX(-20px); }
+            50% { transform: translateX(20px); }
+          }
+          .demo-19-3 .slide .ball { animation: demo-slide 1.5s ease-in-out infinite; }
+          /* Animation 4: Pulse (opacity only - safe) */
+          @keyframes demo-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+          }
+          .demo-19-3 .pulse .ball { animation: demo-pulse 2s ease-in-out infinite; }
+          /* Animation 5: Scale */
+          @keyframes demo-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+          }
+          .demo-19-3 .scale .ball { animation: demo-scale 1.2s ease-in-out infinite; }
+
+          /* Reduced motion override */
+          .demo-19-3.reduced .bounce .ball,
+          .demo-19-3.reduced .spin .ball,
+          .demo-19-3.reduced .slide .ball,
+          .demo-19-3.reduced .scale .ball {
+            animation: none;
+          }
+          /* Pulse (opacity) stays but simplified */
+          .demo-19-3.reduced .pulse .ball {
+            animation: demo-pulse 2s ease-in-out infinite;
+          }
+        </style>
+        <div class="demo-19-3" id="demo193">
+          <div class="toggle-bar">
+            <label>
+              <input type="checkbox" id="reduce-toggle"> Simulate prefers-reduced-motion: reduce
+            </label>
+          </div>
+          <div class="anim-grid">
+            <div class="anim-box bounce">
+              <div class="ball"></div>
+              <span>Bounce (unsafe)</span>
+            </div>
+            <div class="anim-box spin">
+              <div class="ball"></div>
+              <span>Spin (unsafe)</span>
+            </div>
+            <div class="anim-box slide">
+              <div class="ball"></div>
+              <span>Slide (unsafe)</span>
+            </div>
+            <div class="anim-box pulse">
+              <div class="ball"></div>
+              <span>Pulse/Opacity (safe)</span>
+            </div>
+            <div class="anim-box scale">
+              <div class="ball"></div>
+              <span>Scale (unsafe)</span>
+            </div>
+          </div>
+        </div>
+        <script>
+          document.getElementById('reduce-toggle').addEventListener('change', function() {
+            document.getElementById('demo193').classList.toggle('reduced', this.checked);
+          });
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;h2&gt;Welcome!&lt;/h2&gt;
+  &lt;p&gt;This card slides in from the left.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="card delayed"&gt;
+  &lt;h2&gt;Features&lt;/h2&gt;
+  &lt;p&gt;This card slides in after a delay.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.card {
+  padding: 1.5rem;
+  background: oklch(95% 0.02 275);
+  border-radius: 0.5rem;
+  animation: slide-in 600ms ease-out both;
+}
+
+.card.delayed {
+  animation-delay: 300ms;
+}
+
+/* Reduced motion: keep the fade, kill the slide */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes slide-in {
+    from { opacity: 0; transform: none; }
+    to   { opacity: 1; transform: none; }
+  }
+  .card {
+    animation-duration: 300ms;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Enable "Reduce motion" in your OS settings (or use DevTools). Reload the page. The cards should fade in without any horizontal movement. Now add a third card that uses a scale animation (<code>scale(0.8)</code> to <code>scale(1)</code>). In the reduced-motion block, replace the scale with a simple opacity fade.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.2-color-contrast.html">&larr; Lesson 19.2</a>
+      <a href="./lesson-19.4-screen-reader-css.html">Lesson 19.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

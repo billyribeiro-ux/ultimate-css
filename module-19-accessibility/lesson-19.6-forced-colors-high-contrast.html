@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.6 — Forced Colors & High Contrast Mode · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.6 · Inclusive Design</p>
+      <h1>Forced Colors & High Contrast Mode</h1>
+      <p class="lead">Windows High Contrast Mode strips your carefully chosen colors, shadows, and backgrounds — leaving only structure. If your UI relies on color alone to convey meaning, it breaks. The forced-colors media query lets you provide targeted fixes.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Windows High Contrast Mode does</h2>
+      <p>When forced colors are active, the browser overrides nearly all color-related properties with system colors. Backgrounds become a uniform color (usually black or white), text becomes a high-contrast system color, and custom colors on borders, backgrounds, and shadows are stripped. Only a handful of system colors survive.</p>
+
+      <h2>The forced-colors media query</h2>
+      <pre><code>@media (forced-colors: active) {
+  .card {
+    border: 2px solid CanvasText;
+  }
+  .btn {
+    border: 1px solid ButtonText;
+  }
+}</code></pre>
+      <p>This query fires when the user has enabled forced colors (Windows High Contrast, or browser-level forced colors). Inside it, you can apply targeted fixes — usually adding borders that would otherwise be invisible.</p>
+
+      <h2>System colors</h2>
+      <p>These are the colors you can use inside <code>forced-colors: active</code>:</p>
+      <ul>
+        <li><code>Canvas</code> — page background</li>
+        <li><code>CanvasText</code> — default text color</li>
+        <li><code>LinkText</code> — link color</li>
+        <li><code>VisitedText</code> — visited link color</li>
+        <li><code>ButtonFace</code> — button background</li>
+        <li><code>ButtonText</code> — button text</li>
+        <li><code>Field</code> — input background</li>
+        <li><code>FieldText</code> — input text</li>
+        <li><code>Highlight</code> — selection/focus background</li>
+        <li><code>HighlightText</code> — selection/focus text</li>
+        <li><code>GrayText</code> — disabled text</li>
+      </ul>
+
+      <h2>forced-color-adjust</h2>
+      <p><code>forced-color-adjust: none</code> tells the browser not to override colors on a specific element. Use sparingly — only for things like syntax-highlighted code blocks where color IS the content. Default is <code>auto</code> (let the browser adjust).</p>
+
+      <h2>Common fixes</h2>
+      <p>Cards that rely on background color for boundaries need an explicit border. Buttons that use background-only styling (no border) disappear. Icons that use currentColor work well; those using custom fills do not. Add <code>border: 1px solid</code> inside the forced-colors query for any element that has no border in normal mode but needs visual separation.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Card in normal vs forced-colors</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-6 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-19-6 .mode-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: oklch(50% 0.05 275);
+          }
+          .demo-19-6 .normal-mode {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+          }
+          .demo-19-6 .forced-mode {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: oklch(5% 0 0);
+            padding: 1rem;
+            border-radius: 0.5rem;
+          }
+          .demo-19-6 .card-demo {
+            flex: 1;
+            min-width: 180px;
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+          }
+          .demo-19-6 .normal-mode .card-demo {
+            background: oklch(96% 0.02 275);
+            box-shadow: 0 2px 8px oklch(0% 0 0 / 0.08);
+          }
+          .demo-19-6 .normal-mode .card-demo h3 {
+            color: oklch(25% 0.1 275);
+            margin-block-end: 0.5rem;
+            font-size: 1rem;
+          }
+          .demo-19-6 .normal-mode .card-demo p {
+            color: oklch(40% 0.03 275);
+            font-size: 0.85rem;
+          }
+          .demo-19-6 .normal-mode .card-demo button {
+            margin-block-start: 0.75rem;
+            padding: 0.4rem 1rem;
+            background: oklch(48% 0.22 275);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+          }
+          /* Simulated forced-colors appearance */
+          .demo-19-6 .forced-mode .card-demo {
+            background: oklch(5% 0 0);
+            border: 2px solid oklch(100% 0 0);
+          }
+          .demo-19-6 .forced-mode .card-demo h3 {
+            color: oklch(100% 0 0);
+            margin-block-end: 0.5rem;
+            font-size: 1rem;
+          }
+          .demo-19-6 .forced-mode .card-demo p {
+            color: oklch(100% 0 0);
+            font-size: 0.85rem;
+          }
+          .demo-19-6 .forced-mode .card-demo button {
+            margin-block-start: 0.75rem;
+            padding: 0.4rem 1rem;
+            background: transparent;
+            color: oklch(60% 0.8 200);
+            border: 1px solid oklch(60% 0.8 200);
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+          }
+          .demo-19-6 .explanation {
+            font-size: 0.8rem;
+            color: oklch(40% 0.05 275);
+            padding: 0.75rem;
+            background: oklch(93% 0.03 200);
+            border-radius: 0.375rem;
+            line-height: 1.5;
+          }
+        </style>
+        <div class="demo-19-6">
+          <span class="mode-label">Normal Mode</span>
+          <div class="normal-mode">
+            <div class="card-demo">
+              <h3>Feature Card</h3>
+              <p>This card uses background and shadow for visual separation.</p>
+              <button>Learn more</button>
+            </div>
+            <div class="card-demo">
+              <h3>Pricing Card</h3>
+              <p>No border in normal mode — the shadow does the work.</p>
+              <button>Select plan</button>
+            </div>
+          </div>
+          <span class="mode-label">Forced Colors (simulated)</span>
+          <div class="forced-mode">
+            <div class="card-demo">
+              <h3>Feature Card</h3>
+              <p>Border added via forced-colors query. Without it, this card would be invisible.</p>
+              <button>Learn more</button>
+            </div>
+            <div class="card-demo">
+              <h3>Pricing Card</h3>
+              <p>Button gets a border too — background-only buttons vanish in forced colors.</p>
+              <button>Select plan</button>
+            </div>
+          </div>
+          <p class="explanation">In forced-colors mode, backgrounds and shadows are stripped. The fix: add explicit borders inside a <code>@media (forced-colors: active)</code> query so elements remain visually distinct.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;h2&gt;Accessible Card&lt;/h2&gt;
+  &lt;p&gt;This card works in both normal and forced-colors mode.&lt;/p&gt;
+  &lt;button&gt;Action&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class="card highlight"&gt;
+  &lt;h2&gt;Featured&lt;/h2&gt;
+  &lt;p&gt;This card has a colored left border that survives forced colors.&lt;/p&gt;
+  &lt;button&gt;View&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 200px;
+  padding: 1.25rem;
+  background: oklch(96% 0.02 275);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px oklch(0% 0 0 / 0.1);
+}
+
+.card.highlight {
+  border-inline-start: 4px solid oklch(55% 0.25 275);
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  color: oklch(25% 0.1 275);
+  margin-block-end: 0.5rem;
+}
+
+.card p {
+  font-size: 0.85rem;
+  color: oklch(40% 0.03 275);
+  margin-block-end: 0.75rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: oklch(48% 0.22 275);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+/* Forced-colors fixes */
+@media (forced-colors: active) {
+  .card {
+    border: 2px solid CanvasText;
+  }
+  button {
+    border: 1px solid ButtonText;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>In Chrome DevTools, go to Rendering and enable "Emulate CSS media feature forced-colors: active." Your cards should still have clear boundaries thanks to the border fix. Now remove the <code>@media (forced-colors: active)</code> block and re-emulate — the cards lose their visual separation entirely.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.5-text-sizing-zoom.html">&larr; Lesson 19.5</a>
+      <a href="./lesson-19.7-prefers-color-scheme.html">Lesson 19.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

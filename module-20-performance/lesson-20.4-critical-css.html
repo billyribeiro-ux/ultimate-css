@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.4 — Critical CSS &amp; Above-the-Fold Optimization · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.4 · Loading</p>
+      <h1>Critical CSS &amp; Above-the-Fold Optimization</h1>
+      <p class="lead">Critical CSS is the minimum CSS needed to render what the user sees first. Inline it in the HTML, load the rest asynchronously, and your First Contentful Paint drops by seconds. Here is the technique, the tooling, and the @layer advantage.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What is critical CSS?</h2>
+      <p>When a browser encounters a <code>&lt;link rel="stylesheet"&gt;</code>, it blocks rendering until that file is downloaded and parsed. If your stylesheet is 150KB, the user sees nothing until all 150KB arrive. Critical CSS solves this by inlining only the CSS needed for the initial viewport directly in a <code>&lt;style&gt;</code> tag in <code>&lt;head&gt;</code>.</p>
+
+      <h2>Identifying critical CSS</h2>
+      <p>Open DevTools, go to the Coverage panel (Ctrl+Shift+P, type "coverage"), reload the page. The panel shows which CSS rules were used during initial render. Rules marked red were not used above the fold — they can be deferred.</p>
+
+      <h2>The implementation pattern</h2>
+      <pre><code>&lt;head&gt;
+  &lt;!-- Critical CSS inlined --&gt;
+  &lt;style&gt;
+    /* tokens, reset, base, header, hero — above fold only */
+    :root { --brand: oklch(55% 0.22 265); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    body { font-family: system-ui; line-height: 1.6; }
+    .header { /* ... */ }
+    .hero { /* ... */ }
+  &lt;/style&gt;
+
+  &lt;!-- Rest loaded asynchronously --&gt;
+  &lt;link rel="preload" href="full.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'"&gt;
+  &lt;noscript&gt;&lt;link rel="stylesheet" href="full.css"&gt;&lt;/noscript&gt;
+&lt;/head&gt;</code></pre>
+      <p>The <code>preload</code> + <code>onload</code> trick loads the full stylesheet without blocking render. Once loaded, it switches to a regular stylesheet link.</p>
+
+      <h2>The @layer advantage</h2>
+      <p>With PE7's layered architecture, critical CSS maps cleanly to layers:</p>
+      <ul>
+        <li><strong>Inline:</strong> @layer tokens, reset, base (these are small and needed everywhere)</li>
+        <li><strong>Async:</strong> @layer layout, components, animations, overrides (these are larger and only needed as the user scrolls)</li>
+      </ul>
+      <p>Because layers enforce cascade order regardless of load order, the async CSS won't cause FOUC (Flash of Unstyled Content) when it arrives — it slots into its designated layer.</p>
+
+      <h2>The 14KB budget</h2>
+      <p>The first TCP round-trip delivers approximately 14KB of compressed data. If your critical CSS fits within this budget (after Brotli compression), the browser can render the first frame without waiting for additional network round-trips. This is the performance sweet spot.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Coverage panel visualization</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-4 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-20-4 .coverage-panel {
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: oklch(15% 0.02 260);
+          }
+          .demo-20-4 .coverage-header {
+            padding: 0.5rem 1rem;
+            background: oklch(20% 0.02 260);
+            color: oklch(70% 0 0);
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+          }
+          .demo-20-4 .coverage-row {
+            display: grid;
+            grid-template-columns: 1fr 4rem 6rem;
+            align-items: center;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+            border-top: 1px solid oklch(25% 0.01 260);
+            color: oklch(80% 0 0);
+          }
+          .demo-20-4 .bar {
+            height: 0.5rem;
+            border-radius: 0.25rem;
+            display: flex;
+            overflow: hidden;
+          }
+          .demo-20-4 .bar-used {
+            background: oklch(60% 0.2 150);
+          }
+          .demo-20-4 .bar-unused {
+            background: oklch(55% 0.2 25);
+          }
+          .demo-20-4 .strategy {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+          .demo-20-4 .strategy-card {
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-4 .strategy-card h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.85rem;
+          }
+          .demo-20-4 .strategy-card code {
+            display: block;
+            background: oklch(15% 0.02 260);
+            color: oklch(80% 0.05 150);
+            padding: 0.5rem;
+            border-radius: 0.4rem;
+            font-size: 0.7rem;
+            white-space: pre;
+            margin-top: 0.5rem;
+          }
+          .demo-20-4 .inline-tag {
+            display: inline-block;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.2rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+          }
+          .demo-20-4 .tag-critical { background: oklch(60% 0.2 150); color: white; }
+          .demo-20-4 .tag-defer    { background: oklch(70% 0.15 50); color: oklch(20% 0 0); }
+          .demo-20-4 .layer-map {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+          }
+          .demo-20-4 .layer-chip {
+            padding: 0.3rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+          .demo-20-4 .chip-inline { background: oklch(88% 0.08 150); color: oklch(25% 0.1 150); }
+          .demo-20-4 .chip-async  { background: oklch(90% 0.06 50); color: oklch(30% 0.1 50); }
+        </style>
+        <div class="demo-20-4">
+          <div class="coverage-panel">
+            <div class="coverage-header">
+              <span>DevTools Coverage Panel</span>
+              <span>Initial render</span>
+            </div>
+            <div class="coverage-row">
+              <span>tokens.css (2KB)</span>
+              <span>95% used</span>
+              <div class="bar"><div class="bar-used" style="width:95%"></div><div class="bar-unused" style="width:5%"></div></div>
+            </div>
+            <div class="coverage-row">
+              <span>reset.css (1.5KB)</span>
+              <span>100% used</span>
+              <div class="bar"><div class="bar-used" style="width:100%"></div></div>
+            </div>
+            <div class="coverage-row">
+              <span>base.css (3KB)</span>
+              <span>80% used</span>
+              <div class="bar"><div class="bar-used" style="width:80%"></div><div class="bar-unused" style="width:20%"></div></div>
+            </div>
+            <div class="coverage-row">
+              <span>layout.css (8KB)</span>
+              <span>30% used</span>
+              <div class="bar"><div class="bar-used" style="width:30%"></div><div class="bar-unused" style="width:70%"></div></div>
+            </div>
+            <div class="coverage-row">
+              <span>components.css (25KB)</span>
+              <span>15% used</span>
+              <div class="bar"><div class="bar-used" style="width:15%"></div><div class="bar-unused" style="width:85%"></div></div>
+            </div>
+            <div class="coverage-row">
+              <span>animations.css (6KB)</span>
+              <span>5% used</span>
+              <div class="bar"><div class="bar-used" style="width:5%"></div><div class="bar-unused" style="width:95%"></div></div>
+            </div>
+          </div>
+          <div class="strategy">
+            <div class="strategy-card">
+              <h3><span class="inline-tag tag-critical">INLINE</span> Critical CSS</h3>
+              <p style="font-size:0.8rem">Tokens + reset + base = ~6.5KB (fits in 14KB budget)</p>
+              <code>&lt;style&gt;
+  @layer tokens { :root { ... } }
+  @layer reset  { *, *::b... }
+  @layer base   { body { ... } }
+&lt;/style&gt;</code>
+            </div>
+            <div class="strategy-card">
+              <h3><span class="inline-tag tag-defer">ASYNC</span> Deferred CSS</h3>
+              <p style="font-size:0.8rem">Layout + components + animations = ~39KB (loaded async)</p>
+              <code>&lt;link rel="preload"
+  href="rest.css" as="style"
+  onload="this.onload=null;
+    this.rel='stylesheet'"&gt;</code>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:0.8rem;margin:0 0 0.5rem;font-weight:600">PE7 layer mapping:</p>
+            <div class="layer-map">
+              <span class="layer-chip chip-inline">tokens</span>
+              <span class="layer-chip chip-inline">reset</span>
+              <span class="layer-chip chip-inline">base</span>
+              <span class="layer-chip chip-async">layout</span>
+              <span class="layer-chip chip-async">components</span>
+              <span class="layer-chip chip-async">animations</span>
+              <span class="layer-chip chip-async">overrides</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Simulating critical CSS inline --&gt;
+&lt;header class="hero"&gt;
+  &lt;h1&gt;Welcome&lt;/h1&gt;
+  &lt;p&gt;This renders instantly — critical CSS is inlined.&lt;/p&gt;
+&lt;/header&gt;
+&lt;section class="below-fold"&gt;
+  &lt;div class="card"&gt;Card 1&lt;/div&gt;
+  &lt;div class="card"&gt;Card 2&lt;/div&gt;
+  &lt;div class="card"&gt;Card 3&lt;/div&gt;
+&lt;/section&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* === CRITICAL CSS (would be inlined) === */
+:root {
+  --brand: oklch(55% 0.22 265);
+  --surface: oklch(98% 0.005 265);
+  --text: oklch(20% 0.02 265);
+}
+body {
+  font-family: system-ui;
+  margin: 0;
+  color: var(--text);
+  background: var(--surface);
+}
+.hero {
+  padding: 3rem 2rem;
+  background: var(--brand);
+  color: white;
+}
+.hero h1 { font-size: 2rem; margin: 0; }
+.hero p  { margin: 0.5rem 0 0; opacity: 0.9; }
+
+/* === DEFERRED CSS (would load async) === */
+.below-fold {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.card {
+  background: white;
+  border: 1px solid oklch(90% 0.01 265);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.08);
+}
+
+/* The hero section renders with just the
+   critical CSS. The cards below only need
+   styles after scrolling. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open DevTools Coverage panel on any website you work on. Reload and check how much CSS is actually used above the fold. Typical result: 10-25% of the CSS is critical. Extract that critical portion, inline it in a <code>&lt;style&gt;</code> tag, and defer the rest with the preload pattern. Measure the FCP improvement with Lighthouse.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.3-selector-performance.html">&larr; Lesson 20.3</a>
+      <a href="./lesson-20.5-content-visibility-performance.html">Lesson 20.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

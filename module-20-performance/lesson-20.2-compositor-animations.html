@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.2 — Compositor-Friendly Animations · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.2 · Animation Performance</p>
+      <h1>Compositor-Friendly Animations</h1>
+      <p class="lead">The difference between a smooth 60fps animation and a janky mess comes down to one question: does your animation run on the compositor thread or the main thread? Here are the safe properties, the dangerous ones, and the tools that help the browser optimize.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The safe list: compositor-only properties</h2>
+      <p>These properties are handled entirely by the GPU compositor thread. They never trigger layout or paint:</p>
+      <ul>
+        <li><code>transform</code> — translate, rotate, scale, skew</li>
+        <li><code>opacity</code> — fade in/out</li>
+        <li><code>filter</code> — blur, brightness, contrast, etc.</li>
+        <li><code>clip-path</code> — shape clipping (when animating with basic shapes)</li>
+      </ul>
+      <p>These four cover 95% of all animation needs. Movement? Use <code>transform: translate()</code>. Size change? Use <code>transform: scale()</code>. Visibility? Use <code>opacity</code>. Effects? Use <code>filter</code>.</p>
+
+      <h2>The unsafe list: layout-triggering properties</h2>
+      <p>Animating any of these forces the browser to recalculate layout on every single frame:</p>
+      <ul>
+        <li><code>width</code>, <code>height</code>, <code>min-width</code>, <code>max-height</code></li>
+        <li><code>top</code>, <code>left</code>, <code>right</code>, <code>bottom</code></li>
+        <li><code>margin</code>, <code>padding</code>, <code>border-width</code></li>
+        <li><code>font-size</code>, <code>line-height</code></li>
+      </ul>
+      <p>The common mistake: animating <code>left</code> instead of <code>transform: translateX()</code>. Both move an element — but <code>left</code> triggers layout+paint+composite while <code>translateX</code> triggers composite only.</p>
+
+      <h2>will-change: hinting the browser</h2>
+      <p><code>will-change</code> tells the browser to pre-promote an element to its own compositor layer. This avoids the cost of layer promotion when the animation starts.</p>
+      <pre><code>/* Good: apply before the animation starts */
+.card:hover { will-change: transform; }
+.card:active { transform: scale(0.98); }
+
+/* Bad: always-on will-change wastes GPU memory */
+.card { will-change: transform; } /* Don't do this */</code></pre>
+      <p>Every <code>will-change</code> layer consumes GPU memory. On a page with 200 cards, that is 200 extra layers. Use it sparingly and remove it when the animation completes.</p>
+
+      <h2>contain: isolating reflow</h2>
+      <p>The <code>contain</code> property tells the browser that an element's internals won't affect the rest of the page:</p>
+      <pre><code>.card {
+  contain: layout style paint;
+}</code></pre>
+      <p><code>contain: layout</code> means layout changes inside this element won't cause reflow outside it. <code>contain: paint</code> means paint is clipped to this element. <code>contain: style</code> isolates counter and quote effects. Together, they dramatically reduce the cost of changes within contained elements.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Janky vs smooth: top/left vs transform</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-2 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+          }
+          .demo-20-2 .track {
+            position: relative;
+            height: 8rem;
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-2 .track-label {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: oklch(50% 0 0);
+            z-index: 1;
+          }
+          .demo-20-2 .ball {
+            position: absolute;
+            top: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            margin-top: -1.25rem;
+          }
+          .demo-20-2 .ball-janky {
+            background: oklch(55% 0.22 25);
+            left: 0.5rem;
+            animation: demo202-janky 2s ease-in-out infinite alternate;
+          }
+          .demo-20-2 .ball-smooth {
+            background: oklch(55% 0.22 150);
+            left: 0.5rem;
+            animation: demo202-smooth 2s ease-in-out infinite alternate;
+          }
+          @keyframes demo202-janky {
+            to { left: calc(100% - 3rem); }
+          }
+          @keyframes demo202-smooth {
+            to { transform: translateX(calc(100% + 6rem)); }
+          }
+          .demo-20-2 .badge-cost {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.75rem;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            color: oklch(98% 0 0);
+          }
+          .demo-20-2 .badge-expensive { background: oklch(55% 0.22 25); }
+          .demo-20-2 .badge-cheap     { background: oklch(55% 0.22 150); }
+          .demo-20-2 .hints {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+            gap: 0.75rem;
+          }
+          .demo-20-2 .hint-card {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            background: oklch(95% 0.01 260);
+            font-size: 0.8rem;
+          }
+          .demo-20-2 .hint-card strong { display: block; margin-bottom: 0.25rem; }
+          .demo-20-2 .hint-card code {
+            background: oklch(90% 0.02 260);
+            padding: 0.1rem 0.3rem;
+            border-radius: 0.2rem;
+            font-size: 0.75rem;
+          }
+        </style>
+        <div class="demo-20-2">
+          <div class="track">
+            <span class="track-label">Animating left (janky)</span>
+            <div class="ball ball-janky"></div>
+            <span class="badge-cost badge-expensive">Layout+Paint+Comp</span>
+          </div>
+          <div class="track">
+            <span class="track-label">Animating transform (smooth)</span>
+            <div class="ball ball-smooth"></div>
+            <span class="badge-cost badge-cheap">Composite only</span>
+          </div>
+          <div class="hints">
+            <div class="hint-card">
+              <strong>will-change</strong>
+              Use <code>will-change: transform</code> on hover, not permanently. Each promoted layer uses GPU memory.
+            </div>
+            <div class="hint-card">
+              <strong>contain: layout paint</strong>
+              Isolates reflow so animation inside a container does not affect siblings or parents.
+            </div>
+            <div class="hint-card">
+              <strong>Safe properties</strong>
+              <code>transform</code>, <code>opacity</code>, <code>filter</code>, <code>clip-path</code> — the compositor-friendly four.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;div class="card janky"&gt;margin-left&lt;/div&gt;
+  &lt;div class="card smooth"&gt;translateX&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.scene { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.card {
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: fit-content;
+}
+
+/* Janky: margin triggers layout every frame */
+.janky {
+  background: oklch(55% 0.22 25);
+  animation: jank 1.5s ease-in-out infinite alternate;
+}
+@keyframes jank {
+  to { margin-left: 12rem; }
+}
+
+/* Smooth: transform is compositor-only */
+.smooth {
+  background: oklch(55% 0.22 150);
+  animation: glide 1.5s ease-in-out infinite alternate;
+}
+@keyframes glide {
+  to { transform: translateX(12rem); }
+}
+
+/* Try changing .janky to use transform.
+   Then try adding will-change: transform
+   to .smooth — does it change anything? */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Convert the janky <code>margin-left</code> animation to use <code>transform: translateX()</code>. Then add <code>contain: layout paint</code> to <code>.card</code> and observe with DevTools Performance panel. Finally, experiment with <code>will-change: transform</code> — add it on hover only, not as a permanent style. Check the Layers panel to see promoted compositor layers.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.1-rendering-pipeline.html">&larr; Lesson 20.1</a>
+      <a href="./lesson-20.3-selector-performance.html">Lesson 20.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

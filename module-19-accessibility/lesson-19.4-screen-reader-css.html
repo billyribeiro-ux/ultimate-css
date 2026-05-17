@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.4 — CSS That Helps (and Hurts) Screen Readers · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.4 · Inclusive Design</p>
+      <h1>CSS That Helps (and Hurts) Screen Readers</h1>
+      <p class="lead">CSS can make content invisible to screen readers without you realizing it. display:none, visibility:hidden, and even certain transforms remove elements from the accessibility tree. Understanding which CSS properties affect assistive technology is essential for inclusive design.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What screen readers see</h2>
+      <p>Screen readers consume the <strong>accessibility tree</strong>, which is built from the DOM, ARIA attributes, and — crucially — certain CSS properties. Not all CSS is visual-only. Some properties actively modify what assistive tech can access.</p>
+
+      <h2>Properties that REMOVE from the a11y tree</h2>
+      <ul>
+        <li><code>display: none</code> — completely removed. Not rendered, not accessible.</li>
+        <li><code>visibility: hidden</code> — not visible, not accessible, but still occupies layout space.</li>
+        <li><code>content-visibility: hidden</code> — same as display:none for a11y purposes.</li>
+      </ul>
+
+      <h2>Properties that DO NOT affect the a11y tree</h2>
+      <ul>
+        <li><code>opacity: 0</code> — invisible but still in the a11y tree and still focusable.</li>
+        <li><code>transform: scale(0)</code> — visually gone but still accessible.</li>
+        <li><code>clip-path: inset(100%)</code> — visually clipped but still accessible.</li>
+        <li><code>position: absolute</code> with offscreen coordinates — still accessible.</li>
+      </ul>
+
+      <h2>The .sr-only pattern</h2>
+      <p>This is the industry standard for visually hiding content while keeping it accessible to screen readers:</p>
+      <pre><code>.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}</code></pre>
+      <p>Why not just <code>position: absolute; left: -9999px</code>? That approach causes a scroll jump in RTL layouts and creates a very large scroll area in some browsers. The clip-based pattern avoids these issues.</p>
+
+      <h2>::before/::after content</h2>
+      <p>Content added via <code>content: "..."</code> on pseudo-elements IS read by most screen readers (VoiceOver, NVDA, JAWS). This means decorative text in pseudo-elements can confuse users. Use <code>content: "" / ""</code> (alt text syntax) or add <code>aria-hidden="true"</code> to the parent if the pseudo-element content is purely decorative.</p>
+
+      <h2>aria-hidden vs CSS hiding</h2>
+      <p><code>aria-hidden="true"</code> removes from the a11y tree but keeps the element visually present. The opposite of <code>.sr-only</code>. Use case: decorative icons next to text labels — the icon is visible but the screen reader only reads the label.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — 5 hiding methods compared</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-4 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+          .demo-19-4 .method {
+            display: grid;
+            grid-template-columns: 180px 1fr 100px;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            background: oklch(96% 0.01 275);
+            font-size: 0.85rem;
+          }
+          .demo-19-4 .method-name {
+            font-weight: 700;
+            color: oklch(30% 0.1 275);
+            font-size: 0.8rem;
+            font-family: monospace;
+          }
+          .demo-19-4 .method-visual {
+            min-height: 2rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+          }
+          .demo-19-4 .method-result {
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            text-align: center;
+          }
+          .demo-19-4 .hidden-from-sr {
+            background: oklch(85% 0.15 25);
+            color: oklch(25% 0.1 25);
+          }
+          .demo-19-4 .visible-to-sr {
+            background: oklch(85% 0.15 145);
+            color: oklch(25% 0.1 145);
+          }
+          .demo-19-4 .target-none { display: none; }
+          .demo-19-4 .target-vis { visibility: hidden; }
+          .demo-19-4 .target-opacity { opacity: 0; }
+          .demo-19-4 .target-clip {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+          }
+          .demo-19-4 .target-aria { color: oklch(50% 0.1 275); }
+          .demo-19-4 .note {
+            font-size: 0.8rem;
+            color: oklch(40% 0.05 275);
+            padding: 0.75rem;
+            background: oklch(93% 0.03 200);
+            border-radius: 0.375rem;
+            line-height: 1.5;
+          }
+        </style>
+        <div class="demo-19-4">
+          <div class="method">
+            <span class="method-name">display: none</span>
+            <div class="method-visual">
+              <span class="target-none">Hidden text</span>
+              <span style="color:oklch(60% 0 0);font-style:italic;font-size:0.8rem;">(element not rendered)</span>
+            </div>
+            <span class="method-result hidden-from-sr">SR: Hidden</span>
+          </div>
+          <div class="method">
+            <span class="method-name">visibility: hidden</span>
+            <div class="method-visual">
+              <span class="target-vis">Hidden text</span>
+              <span style="color:oklch(60% 0 0);font-style:italic;font-size:0.8rem;">(space reserved)</span>
+            </div>
+            <span class="method-result hidden-from-sr">SR: Hidden</span>
+          </div>
+          <div class="method">
+            <span class="method-name">opacity: 0</span>
+            <div class="method-visual">
+              <span class="target-opacity">Hidden text</span>
+              <span style="color:oklch(60% 0 0);font-style:italic;font-size:0.8rem;">(invisible but present)</span>
+            </div>
+            <span class="method-result visible-to-sr">SR: Visible</span>
+          </div>
+          <div class="method">
+            <span class="method-name">.sr-only (clip)</span>
+            <div class="method-visual">
+              <span class="target-clip">This text is only for screen readers</span>
+              <span style="color:oklch(60% 0 0);font-style:italic;font-size:0.8rem;">(visually hidden, SR reads it)</span>
+            </div>
+            <span class="method-result visible-to-sr">SR: Visible</span>
+          </div>
+          <div class="method">
+            <span class="method-name">aria-hidden="true"</span>
+            <div class="method-visual">
+              <span class="target-aria" aria-hidden="true">Decorative icon text</span>
+              <span style="color:oklch(60% 0 0);font-style:italic;font-size:0.8rem;">(visible, SR ignores)</span>
+            </div>
+            <span class="method-result hidden-from-sr">SR: Hidden</span>
+          </div>
+          <p class="note">Use your browser accessibility inspector (DevTools &gt; Accessibility tab) to verify which elements appear in the accessibility tree. Elements marked "SR: Visible" will be announced; "SR: Hidden" will not.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;button class="icon-btn"&gt;
+  &lt;span class="icon" aria-hidden="true"&gt;*&lt;/span&gt;
+  &lt;span class="label"&gt;Settings&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;button class="icon-btn"&gt;
+  &lt;span class="icon" aria-hidden="true"&gt;+&lt;/span&gt;
+  &lt;span class="sr-only"&gt;Add new item&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;div class="alert"&gt;
+  &lt;span class="sr-only"&gt;Error: &lt;/span&gt;
+  Please enter a valid email address.
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid oklch(75% 0.05 275);
+  border-radius: 0.5rem;
+  background: oklch(98% 0.01 275);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.icon-btn .icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: oklch(45% 0.2 275);
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  background: oklch(92% 0.08 25);
+  color: oklch(30% 0.12 25);
+  border-radius: 0.375rem;
+  border-inline-start: 3px solid oklch(55% 0.2 25);
+  font-size: 0.9rem;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open DevTools, go to the Accessibility tab, and inspect each element in the preview. The icon with <code>aria-hidden="true"</code> should not appear in the accessibility tree. The <code>.sr-only</code> text should appear. Add a third button that has only an icon (no visible text) and use <code>.sr-only</code> to give it an accessible name.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.3-reduced-motion.html">&larr; Lesson 19.3</a>
+      <a href="./lesson-19.5-text-sizing-zoom.html">Lesson 19.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

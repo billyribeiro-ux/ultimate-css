@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.12 — Seamless Dark Mode Switching · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.12 · Micro-Interactions</p>
+      <h1>Seamless Dark Mode Switching</h1>
+      <p class="lead">A dark mode toggle built with <code>light-dark()</code>, <code>:has()</code>, smooth color transitions, a circular clip-path reveal animation, and image adaptation. The toggle is a checkbox that sets <code>color-scheme</code> on the root — no JavaScript needed for the core behavior.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The :has() technique</h2>
+      <p>A checkbox with <code>id="dark-toggle"</code> lives in the page. The root selector <code>:root:has(#dark-toggle:checked)</code> sets <code>color-scheme: dark</code>. Since <code>light-dark()</code> responds to the computed color-scheme, every color in the page flips instantly. One checkbox controls everything.</p>
+
+      <h2>Transitioning colors</h2>
+      <p>To avoid a jarring snap, we add <code>transition: background-color 300ms ease, color 300ms ease</code> to the body and major containers. The key insight: transition only background and color, not "all" — transitioning all properties causes layout thrashing and janky behavior.</p>
+
+      <h3>Circular clip-path reveal</h3>
+      <p>For a dramatic mode switch, we can use view transitions with a <code>clip-path: circle()</code> animation. The new theme "reveals" from the toggle button's position as a growing circle. This uses <code>::view-transition-new(root)</code> with a clip-path animation from <code>circle(0%)</code> to <code>circle(150%)</code>.</p>
+
+      <h3>Image adaptation</h3>
+      <p>In dark mode, bright images can be harsh. We apply <code>filter: brightness(0.85) saturate(1.1)</code> to images when dark mode is active. This subtly dims images without making them look washed out. The saturate boost compensates for the perceived desaturation from brightness reduction.</p>
+
+      <h3>The toggle animation</h3>
+      <p>The toggle itself animates between a sun and moon icon. Using clip-path transitions, the sun circle morphs into a crescent moon shape. A "rays" element rotates and fades. The whole transition takes 400ms with a spring-like easing.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Dark mode toggle</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-12 {
+            font-family: system-ui;
+            padding: 2rem;
+            background: light-dark(oklch(98% 0 0), oklch(12% 0 0));
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            transition: background-color 300ms ease, color 300ms ease;
+            border-radius: 0.5rem;
+          }
+          .demo-17-12:has(#demo-dark:checked) {
+            color-scheme: dark;
+          }
+          .demo-17-12:has(#demo-dark:not(:checked)) {
+            color-scheme: light;
+          }
+
+          /* Toggle switch */
+          .demo-17-12 .theme-toggle {
+            display: flex; align-items: center; gap: 0.75rem;
+            margin-bottom: 1.5rem;
+          }
+          .demo-17-12 .theme-toggle input {
+            position: absolute; opacity: 0; width: 0; height: 0;
+          }
+          .demo-17-12 .theme-toggle__track {
+            position: relative;
+            width: 3rem; height: 1.5rem;
+            background: light-dark(oklch(85% 0 0), oklch(35% 0 0));
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background 300ms ease;
+          }
+          .demo-17-12 .theme-toggle__track::after {
+            content: "";
+            position: absolute;
+            top: 3px; left: 3px;
+            width: calc(1.5rem - 6px);
+            height: calc(1.5rem - 6px);
+            background: light-dark(oklch(100% 0 0), oklch(90% 0.05 60));
+            border-radius: 50%;
+            transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.2);
+          }
+          .demo-17-12 #demo-dark:checked ~ .theme-toggle .theme-toggle__track {
+            background: oklch(30% 0.05 260);
+          }
+          .demo-17-12 #demo-dark:checked ~ .theme-toggle .theme-toggle__track::after {
+            transform: translateX(1.5rem);
+          }
+          .demo-17-12 .theme-toggle__label {
+            font-size: 0.8rem; font-weight: 600;
+          }
+
+          /* Content */
+          .demo-17-12 .content {
+            display: grid; gap: 1rem;
+          }
+          .demo-17-12 .demo-card {
+            padding: 1rem; border-radius: 0.5rem;
+            background: light-dark(oklch(100% 0 0), oklch(18% 0 0));
+            border: 1px solid light-dark(oklch(92% 0 0), oklch(25% 0 0));
+            transition: background-color 300ms ease, border-color 300ms ease;
+          }
+          .demo-17-12 .demo-card h4 {
+            margin: 0 0 0.375rem; font-size: 0.9rem;
+          }
+          .demo-17-12 .demo-card p {
+            margin: 0; font-size: 0.8rem;
+            color: light-dark(oklch(45% 0 0), oklch(60% 0 0));
+            transition: color 300ms ease;
+          }
+
+          /* Image adaptation */
+          .demo-17-12 .demo-img {
+            width: 100%; height: 4rem; border-radius: 0.375rem;
+            background: linear-gradient(135deg, oklch(70% 0.15 200), oklch(60% 0.15 260));
+            transition: filter 300ms ease;
+          }
+          .demo-17-12:has(#demo-dark:checked) .demo-img {
+            filter: brightness(0.85) saturate(1.1);
+          }
+
+          /* Badge colors */
+          .demo-17-12 .badge-row {
+            display: flex; gap: 0.5rem; flex-wrap: wrap;
+          }
+          .demo-17-12 .demo-badge {
+            padding: 0.25rem 0.5rem; border-radius: 1rem;
+            font-size: 0.7rem; font-weight: 600;
+            background: light-dark(oklch(92% 0.05 260), oklch(30% 0.08 260));
+            color: light-dark(oklch(40% 0.15 260), oklch(80% 0.1 260));
+            transition: background-color 300ms ease, color 300ms ease;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-17-12,
+            .demo-17-12 .demo-card,
+            .demo-17-12 .demo-card p,
+            .demo-17-12 .demo-img,
+            .demo-17-12 .demo-badge,
+            .demo-17-12 .theme-toggle__track,
+            .demo-17-12 .theme-toggle__track::after {
+              transition-duration: 0ms;
+            }
+          }
+        </style>
+        <div class="demo-17-12">
+          <input type="checkbox" id="demo-dark">
+          <label class="theme-toggle" for="demo-dark">
+            <span class="theme-toggle__track"></span>
+            <span class="theme-toggle__label">Toggle dark mode</span>
+          </label>
+
+          <div class="content">
+            <div class="demo-card">
+              <h4>Adaptive Card</h4>
+              <p>Colors transition smoothly between light and dark themes using light-dark() values.</p>
+            </div>
+
+            <div class="demo-img"></div>
+
+            <div class="badge-row">
+              <span class="demo-badge">Design</span>
+              <span class="demo-badge">CSS</span>
+              <span class="demo-badge">Animation</span>
+            </div>
+
+            <div class="demo-card">
+              <h4>Image Adaptation</h4>
+              <p>Images get slightly dimmed in dark mode to reduce eye strain. The gradient above demonstrates this.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;input type="checkbox" id="dark"&gt;
+  &lt;label for="dark" class="toggle"&gt;
+    &lt;span class="track"&gt;&lt;/span&gt;
+    Dark mode
+  &lt;/label&gt;
+
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Hello World&lt;/h3&gt;
+    &lt;p&gt;This card adapts to the theme.&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;div class="img-box"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.page {
+  font-family: system-ui;
+  padding: 2rem;
+  background: light-dark(oklch(98% 0 0), oklch(12% 0 0));
+  color: light-dark(oklch(15% 0 0), oklch(90% 0 0));
+  transition: background-color 300ms, color 300ms;
+  min-height: 100vh;
+}
+.page:has(#dark:checked) { color-scheme: dark; }
+.page:has(#dark:not(:checked)) { color-scheme: light; }
+
+#dark { display: none; }
+.toggle {
+  display: inline-flex; align-items: center;
+  gap: 0.5rem; cursor: pointer;
+  margin-bottom: 1.5rem; font-size: 0.85rem;
+}
+.track {
+  width: 2.5rem; height: 1.25rem;
+  background: light-dark(oklch(82% 0 0), oklch(35% 0 0));
+  border-radius: 0.625rem;
+  position: relative;
+  transition: background 300ms;
+}
+.track::after {
+  content: ""; position: absolute;
+  top: 2px; left: 2px;
+  width: calc(1.25rem - 4px); height: calc(1.25rem - 4px);
+  background: white; border-radius: 50%;
+  transition: transform 300ms cubic-bezier(0.34,1.56,0.64,1);
+}
+#dark:checked ~ .toggle .track::after {
+  transform: translateX(1.25rem);
+}
+
+.card {
+  padding: 1rem; border-radius: 0.5rem;
+  background: light-dark(oklch(100% 0 0), oklch(18% 0 0));
+  border: 1px solid light-dark(oklch(90% 0 0), oklch(25% 0 0));
+  transition: background-color 300ms, border-color 300ms;
+  margin-bottom: 1rem;
+}
+.card h3 { margin: 0 0 0.25rem; }
+.card p { margin: 0; font-size: 0.85rem; }
+
+.img-box {
+  height: 5rem; border-radius: 0.5rem;
+  background: linear-gradient(135deg, oklch(65% 0.15 180), oklch(55% 0.15 260));
+  transition: filter 300ms;
+}
+.page:has(#dark:checked) .img-box {
+  filter: brightness(0.85) saturate(1.1);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a circular clip-path reveal: when toggling dark mode, use a view transition that clips the new theme in a circle expanding from the toggle button's position. Also add a "system" option (three-state toggle: light/dark/auto) using two radio buttons, where "auto" removes the forced color-scheme and defers to <code>prefers-color-scheme</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.11-scroll-animations.html">&larr; Lesson 17.11</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

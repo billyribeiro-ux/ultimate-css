@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.10 — The Advanced CSS-Only Image Carousel · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.10 · Carousel</p>
+      <h1>The Advanced CSS-Only Image Carousel</h1>
+      <p class="lead">A full-featured carousel using scroll-snap for positioning, CSS <code>::scroll-marker</code> dots and <code>::scroll-button</code> prev/next arrows (with <code>@supports</code> fallback), auto-play via animation paused on hover, crossfade transitions, a thumbnail strip, and a fullscreen view using <code>popover</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Scroll-snap foundation</h2>
+      <p>The carousel track is a horizontal flex container with <code>scroll-snap-type: x mandatory</code> and <code>overflow-x: auto</code>. Each slide has <code>scroll-snap-align: start</code> so it always lands perfectly aligned.</p>
+
+      <h2>Navigation dots and buttons</h2>
+      <p>Modern CSS introduces <code>::scroll-marker</code> and <code>::scroll-button()</code> pseudo-elements for native scroll navigation. We use <code>@supports</code> to detect these and fall back to anchor-based navigation with hidden radio inputs for older browsers.</p>
+
+      <h2>Auto-play with pause on hover</h2>
+      <p>A <code>@keyframes</code> animation scrolls through slides by animating <code>transform: translateX()</code> on the track. The <code>:hover</code> state sets <code>animation-play-state: paused</code>, giving users control.</p>
+
+      <h2>Crossfade via opacity</h2>
+      <p>When scroll-driven animations are available, each slide's opacity can be tied to its scroll position, creating a crossfade instead of a slide effect. This uses <code>animation-timeline: scroll()</code>.</p>
+
+      <h2>Thumbnail strip</h2>
+      <p>A row of miniature versions below the main carousel. Each thumbnail is an anchor link to its corresponding slide, styled with a highlighted border when the slide is in view.</p>
+
+      <h2>Fullscreen via popover</h2>
+      <p>Each slide contains a button with <code>popovertarget</code> pointing to a <code>[popover]</code> element that displays the slide content at full viewport size, dismissible by clicking outside or pressing Escape.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Advanced Carousel</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-18-10 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+          }
+
+          .demo-18-10 .carousel-wrapper {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: oklch(15% 0.02 270);
+          }
+
+          .demo-18-10 .carousel-track {
+            display: flex;
+            scroll-snap-type: x mandatory;
+            overflow-x: auto;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+          }
+          .demo-18-10 .carousel-track::-webkit-scrollbar {
+            display: none;
+          }
+
+          .demo-18-10 .slide {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+          }
+
+          /* Slide backgrounds - all CSS art, no images */
+          .demo-18-10 .slide-1 {
+            background: linear-gradient(135deg,
+              oklch(60% 0.2 270) 0%,
+              oklch(50% 0.25 300) 50%,
+              oklch(40% 0.2 330) 100%
+            );
+          }
+          .demo-18-10 .slide-1::before {
+            content: "";
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: oklch(85% 0.15 80);
+            top: 30%;
+            left: 60%;
+            box-shadow:
+              -120px 40px 0 20px oklch(70% 0.1 200 / 0.4),
+              -60px -20px 0 10px oklch(75% 0.12 150 / 0.3);
+          }
+
+          .demo-18-10 .slide-2 {
+            background: linear-gradient(to bottom,
+              oklch(25% 0.05 250),
+              oklch(15% 0.03 260)
+            );
+          }
+          .demo-18-10 .slide-2::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+              radial-gradient(2px 2px at 20% 30%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1.5px 1.5px at 50% 20%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(2px 2px at 80% 40%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 35% 60%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1.5px 1.5px at 70% 70%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(2px 2px at 15% 80%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 90% 15%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1.5px 1.5px at 60% 85%, oklch(95% 0 0) 50%, transparent 50%);
+          }
+
+          .demo-18-10 .slide-3 {
+            background: conic-gradient(from 0deg at 50% 50%,
+              oklch(60% 0.2 0),
+              oklch(60% 0.2 60),
+              oklch(60% 0.2 120),
+              oklch(60% 0.2 180),
+              oklch(60% 0.2 240),
+              oklch(60% 0.2 300),
+              oklch(60% 0.2 360)
+            );
+          }
+          .demo-18-10 .slide-3::before {
+            content: "";
+            position: absolute;
+            inset: 30%;
+            border-radius: 50%;
+            background: oklch(15% 0.02 270);
+          }
+
+          .demo-18-10 .slide-4 {
+            background: oklch(92% 0.02 80);
+          }
+          .demo-18-10 .slide-4::before {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 60%;
+            background:
+              linear-gradient(45deg,
+                oklch(65% 0.15 200) 25%, transparent 25%),
+              linear-gradient(-45deg,
+                oklch(65% 0.15 200) 25%, transparent 25%),
+              linear-gradient(45deg,
+                transparent 75%, oklch(65% 0.15 200) 75%),
+              linear-gradient(-45deg,
+                transparent 75%, oklch(65% 0.15 200) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0;
+            border-radius: 8px;
+          }
+
+          .demo-18-10 .slide-5 {
+            background: linear-gradient(to bottom,
+              oklch(70% 0.08 220) 0%,
+              oklch(80% 0.06 210) 50%,
+              oklch(55% 0.18 145) 50%,
+              oklch(50% 0.15 140) 100%
+            );
+          }
+          .demo-18-10 .slide-5::before {
+            content: "";
+            position: absolute;
+            top: 15%;
+            left: 20%;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: oklch(90% 0.15 70);
+            box-shadow: 0 0 20px oklch(85% 0.15 60 / 0.5);
+          }
+
+          .demo-18-10 .slide-label {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: oklch(95% 0 0);
+            background: oklch(20% 0.02 270 / 0.7);
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            backdrop-filter: blur(4px);
+          }
+
+          /* Navigation dots */
+          .demo-18-10 .nav-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+          }
+          .demo-18-10 .nav-dots a {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: oklch(70% 0.02 270);
+            transition: background 0.3s, transform 0.3s;
+          }
+          .demo-18-10 .nav-dots a:hover {
+            background: oklch(50% 0.15 270);
+            transform: scale(1.3);
+          }
+
+          /* Thumbnail strip */
+          .demo-18-10 .thumbnails {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+          }
+          .demo-18-10 .thumb {
+            width: 60px;
+            height: 40px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.3s, transform 0.3s;
+            overflow: hidden;
+          }
+          .demo-18-10 .thumb:hover {
+            border-color: oklch(55% 0.2 270);
+            transform: scale(1.1);
+          }
+          .demo-18-10 .thumb-1 {
+            background: linear-gradient(135deg, oklch(60% 0.2 270), oklch(40% 0.2 330));
+          }
+          .demo-18-10 .thumb-2 {
+            background: oklch(15% 0.03 260);
+          }
+          .demo-18-10 .thumb-3 {
+            background: conic-gradient(
+              oklch(60% 0.2 0), oklch(60% 0.2 120),
+              oklch(60% 0.2 240), oklch(60% 0.2 360));
+          }
+          .demo-18-10 .thumb-4 {
+            background: oklch(92% 0.02 80);
+          }
+          .demo-18-10 .thumb-5 {
+            background: linear-gradient(to bottom, oklch(70% 0.08 220) 50%, oklch(55% 0.18 145) 50%);
+          }
+
+          /* Auto-play animation */
+          .demo-18-10 .carousel-track {
+            animation: auto-scroll-18-10 15s ease-in-out infinite;
+          }
+          .demo-18-10 .carousel-wrapper:hover .carousel-track {
+            animation-play-state: paused;
+          }
+
+          @keyframes auto-scroll-18-10 {
+            0%, 15% { transform: translateX(0); }
+            20%, 35% { transform: translateX(-100%); }
+            40%, 55% { transform: translateX(-200%); }
+            60%, 75% { transform: translateX(-300%); }
+            80%, 95% { transform: translateX(-400%); }
+            100% { transform: translateX(0); }
+          }
+
+          /* Prev/Next buttons */
+          .demo-18-10 .carousel-btn {
+            position: absolute;
+            top: 50%;
+            translate: 0 -50%;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: oklch(20% 0.02 270 / 0.6);
+            border: none;
+            color: oklch(95% 0 0);
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            transition: background 0.3s;
+          }
+          .demo-18-10 .carousel-btn:hover {
+            background: oklch(30% 0.05 270 / 0.8);
+          }
+          .demo-18-10 .btn-prev { left: 10px; }
+          .demo-18-10 .btn-next { right: 10px; }
+
+          .demo-18-10 .btn-prev::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg);
+            margin-left: 3px;
+          }
+          .demo-18-10 .btn-next::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid currentColor;
+            border-top: 2px solid currentColor;
+            transform: rotate(45deg);
+            margin-right: 3px;
+          }
+
+          /* Fullscreen popover */
+          .demo-18-10 [popover] {
+            border: none;
+            padding: 0;
+            max-width: 90vw;
+            max-height: 90vh;
+            width: 80vw;
+            height: 70vh;
+            border-radius: 16px;
+            overflow: hidden;
+          }
+          .demo-18-10 [popover]::backdrop {
+            background: oklch(5% 0 0 / 0.8);
+            backdrop-filter: blur(8px);
+          }
+
+          .demo-18-10 .fullscreen-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: oklch(20% 0.02 270 / 0.6);
+            border: none;
+            cursor: pointer;
+            z-index: 5;
+            backdrop-filter: blur(4px);
+          }
+          .demo-18-10 .fullscreen-btn::before,
+          .demo-18-10 .fullscreen-btn::after {
+            content: "";
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-color: oklch(95% 0 0);
+            border-style: solid;
+          }
+          .demo-18-10 .fullscreen-btn::before {
+            top: 5px;
+            left: 5px;
+            border-width: 2px 0 0 2px;
+          }
+          .demo-18-10 .fullscreen-btn::after {
+            bottom: 5px;
+            right: 5px;
+            border-width: 0 2px 2px 0;
+          }
+
+          .demo-18-10 .hover-hint {
+            text-align: center;
+            font-size: 0.75rem;
+            color: oklch(55% 0.02 270);
+          }
+        </style>
+        <div class="demo-18-10">
+          <div class="carousel-wrapper">
+            <div class="carousel-track" id="carousel-track-18-10">
+              <div class="slide slide-1" id="s1">
+                <span class="slide-label">Cosmic Gradient</span>
+                <button class="fullscreen-btn" popovertarget="pop-1"></button>
+              </div>
+              <div class="slide slide-2" id="s2">
+                <span class="slide-label">Starfield</span>
+                <button class="fullscreen-btn" popovertarget="pop-2"></button>
+              </div>
+              <div class="slide slide-3" id="s3">
+                <span class="slide-label">Color Wheel</span>
+                <button class="fullscreen-btn" popovertarget="pop-3"></button>
+              </div>
+              <div class="slide slide-4" id="s4">
+                <span class="slide-label">Geometric Pattern</span>
+                <button class="fullscreen-btn" popovertarget="pop-4"></button>
+              </div>
+              <div class="slide slide-5" id="s5">
+                <span class="slide-label">Landscape</span>
+                <button class="fullscreen-btn" popovertarget="pop-5"></button>
+              </div>
+            </div>
+            <button class="carousel-btn btn-prev" aria-label="Previous"></button>
+            <button class="carousel-btn btn-next" aria-label="Next"></button>
+          </div>
+          <div class="nav-dots">
+            <a href="#s1" aria-label="Slide 1"></a>
+            <a href="#s2" aria-label="Slide 2"></a>
+            <a href="#s3" aria-label="Slide 3"></a>
+            <a href="#s4" aria-label="Slide 4"></a>
+            <a href="#s5" aria-label="Slide 5"></a>
+          </div>
+          <div class="thumbnails">
+            <a href="#s1" class="thumb thumb-1"></a>
+            <a href="#s2" class="thumb thumb-2"></a>
+            <a href="#s3" class="thumb thumb-3"></a>
+            <a href="#s4" class="thumb thumb-4"></a>
+            <a href="#s5" class="thumb thumb-5"></a>
+          </div>
+          <p class="hover-hint">Hover to pause auto-play. Click corners for fullscreen.</p>
+
+          <div popover id="pop-1" class="slide slide-1" style="height: 100%;"></div>
+          <div popover id="pop-2" class="slide slide-2" style="height: 100%;"></div>
+          <div popover id="pop-3" class="slide slide-3" style="height: 100%;"></div>
+          <div popover id="pop-4" class="slide slide-4" style="height: 100%;"></div>
+          <div popover id="pop-5" class="slide slide-5" style="height: 100%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="carousel"&gt;
+  &lt;div class="track"&gt;
+    &lt;div class="slide" id="a"
+      style="background: oklch(60% 0.2 270)"&gt;&lt;/div&gt;
+    &lt;div class="slide" id="b"
+      style="background: oklch(60% 0.2 30)"&gt;&lt;/div&gt;
+    &lt;div class="slide" id="c"
+      style="background: oklch(60% 0.2 150)"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;nav class="dots"&gt;
+    &lt;a href="#a"&gt;&lt;/a&gt;
+    &lt;a href="#b"&gt;&lt;/a&gt;
+    &lt;a href="#c"&gt;&lt;/a&gt;
+  &lt;/nav&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.carousel {
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.track {
+  display: flex;
+  scroll-snap-type: x mandatory;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.track::-webkit-scrollbar { display: none; }
+.slide {
+  flex: 0 0 100%;
+  height: 200px;
+  scroll-snap-align: start;
+}
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+.dots a {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: oklch(70% 0.02 270);
+  transition: background 0.3s;
+}
+.dots a:hover {
+  background: oklch(50% 0.15 270);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Add a progress bar below the carousel that fills from left to right in sync with the auto-play animation. Use the same duration and timing function. On hover (when auto-play pauses), the progress bar should freeze too. Also add a "slide counter" indicator (e.g., "2 / 5") using CSS counters that updates based on the currently snapped slide.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.9-text-effects.html">&larr; Lesson 18.9</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

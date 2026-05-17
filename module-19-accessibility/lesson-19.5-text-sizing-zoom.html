@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.5 — Text Sizing, Zoom & Reflow · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.5 · Inclusive Design</p>
+      <h1>Text Sizing, Zoom & Reflow</h1>
+      <p class="lead">Many users zoom to 200% or even 400%. WCAG requires that content remains functional without horizontal scrolling at 320px equivalent width. The key: use rem, logical properties, and fluid type — never fixed pixel widths for text containers.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why rem, not px, for font-size</h2>
+      <p>When you set <code>font-size: 16px</code>, the text cannot scale with the user's browser font-size preference. A user who sets their default to 20px gets no benefit. Using <code>font-size: 1rem</code> respects their choice. This is a WCAG 1.4.4 requirement: text must be resizable up to 200% without loss of content or functionality.</p>
+
+      <h2>WCAG 1.4.10 — Reflow</h2>
+      <p>At 320px viewport width (equivalent to 1280px at 400% zoom), content must reflow into a single column with no horizontal scrolling. Exceptions: data tables, toolbars, and content where two-dimensional layout is essential for meaning.</p>
+      <p>The practical test: set your viewport to 320px wide (DevTools device toolbar) and verify nothing overflows or requires side-scrolling.</p>
+
+      <h2>Logical properties enable correct reflow</h2>
+      <p><code>margin-inline</code>, <code>padding-block</code>, <code>inline-size</code>, <code>block-size</code> — these adapt to writing direction. For reflow, <code>max-inline-size</code> is safer than <code>max-width</code> because it adjusts for vertical writing modes. More importantly, thinking in terms of inline/block naturally produces layouts that stack gracefully.</p>
+
+      <h2>The clamp() pattern for fluid type</h2>
+      <pre><code>h1 {
+  font-size: clamp(1.5rem, 1rem + 2vw, 3rem);
+}
+body {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+}</code></pre>
+      <p>The minimum value uses rem, so it scales with user preferences. The preferred value mixes rem and vw for fluidity. The maximum caps the growth. This pattern passes WCAG because the rem base ensures user scaling still works.</p>
+
+      <h2>Testing at 200% and 400%</h2>
+      <p>Browser zoom at 200% doubles everything — if your layout uses flexbox with <code>flex-wrap: wrap</code> or grid with <code>auto-fit</code>, it naturally reflows. Fixed-width sidebars, hardcoded pixel breakpoints, and <code>overflow: hidden</code> on text containers are the usual failure points.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Layout that reflows correctly</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-5 {
+            font-family: system-ui, sans-serif;
+            padding: 1rem;
+          }
+          .demo-19-5 .page-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: 1rem;
+          }
+          .demo-19-5 .card {
+            padding: 1.25rem;
+            background: oklch(96% 0.02 275);
+            border-radius: 0.5rem;
+            border: 1px solid oklch(88% 0.03 275);
+          }
+          .demo-19-5 .card h3 {
+            font-size: clamp(1rem, 0.85rem + 0.75vw, 1.35rem);
+            color: oklch(25% 0.1 275);
+            margin-block-end: 0.5rem;
+          }
+          .demo-19-5 .card p {
+            font-size: clamp(0.85rem, 0.8rem + 0.3vw, 1rem);
+            color: oklch(35% 0.05 275);
+            line-height: 1.6;
+          }
+          .demo-19-5 .resize-hint {
+            font-size: 0.8rem;
+            color: oklch(50% 0.05 275);
+            text-align: center;
+            padding: 0.5rem;
+            background: oklch(93% 0.03 200);
+            border-radius: 0.25rem;
+            margin-block-end: 1rem;
+          }
+          .demo-19-5 .resize-container {
+            resize: horizontal;
+            overflow: auto;
+            border: 2px dashed oklch(70% 0.1 275);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            min-width: 200px;
+            max-width: 100%;
+          }
+        </style>
+        <div class="demo-19-5">
+          <p class="resize-hint">Drag the bottom-right corner to resize and watch the grid reflow</p>
+          <div class="resize-container">
+            <div class="page-layout">
+              <div class="card">
+                <h3>Fluid typography</h3>
+                <p>This heading uses clamp() with rem-based minimum. It scales with both viewport and user preferences.</p>
+              </div>
+              <div class="card">
+                <h3>Auto-fit grid</h3>
+                <p>The grid uses auto-fit with minmax. Cards stack to a single column at narrow widths — no horizontal scroll.</p>
+              </div>
+              <div class="card">
+                <h3>Logical properties</h3>
+                <p>Padding and margins use inline/block variants. The layout adapts to any writing mode or zoom level.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;header&gt;
+  &lt;h1&gt;Article Title&lt;/h1&gt;
+  &lt;p class="meta"&gt;Published today &middot; 5 min read&lt;/p&gt;
+&lt;/header&gt;
+
+&lt;main&gt;
+  &lt;p&gt;This layout uses rem-based sizing and logical properties. Try zooming to 200% in your browser (Ctrl/Cmd + +). The text reflows without horizontal scrolling.&lt;/p&gt;
+  &lt;p&gt;The max-inline-size constraint prevents lines from becoming too long at wide viewports while allowing the content to compress at narrow ones.&lt;/p&gt;
+&lt;/main&gt;
+
+&lt;aside&gt;
+  &lt;h2&gt;Related&lt;/h2&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Understanding WCAG 1.4.4&lt;/li&gt;
+    &lt;li&gt;Reflow at 320px&lt;/li&gt;
+    &lt;li&gt;Fluid type scales&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/aside&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.2rem);
+  line-height: 1.6;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 1.5rem;
+}
+
+header {
+  grid-column: 1 / -1;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  color: oklch(25% 0.1 275);
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: oklch(50% 0.05 275);
+}
+
+main {
+  max-inline-size: 65ch;
+  color: oklch(25% 0.03 275);
+}
+
+aside {
+  padding: 1rem;
+  background: oklch(95% 0.02 275);
+  border-radius: 0.5rem;
+  align-self: start;
+}
+
+aside h2 {
+  font-size: 1rem;
+  margin-block-end: 0.5rem;
+}
+
+aside ul {
+  padding-inline-start: 1.25rem;
+  font-size: 0.9rem;
+  color: oklch(35% 0.05 275);
+}
+
+aside li {
+  margin-block-end: 0.3rem;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open the preview in a new tab and zoom to 200%. Verify there is no horizontal scrollbar. Now change the grid minmax from <code>min(250px, 100%)</code> to a fixed <code>400px</code> and zoom again — watch it break. Revert and appreciate why <code>min()</code> inside <code>minmax()</code> is the reflow-safe pattern.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.4-screen-reader-css.html">&larr; Lesson 19.4</a>
+      <a href="./lesson-19.6-forced-colors-high-contrast.html">Lesson 19.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
