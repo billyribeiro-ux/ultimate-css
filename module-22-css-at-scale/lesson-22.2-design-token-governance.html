@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.2 — Design Token Governance · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.2 · Enterprise Architecture</p>
+      <h1>Design Token Governance</h1>
+      <p class="lead">A single color token change can cascade across thousands of pages. Token governance answers the hard questions: who owns the tokens, how do changes propagate, and what constitutes a breaking change?</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Who owns the tokens?</h2>
+      <p>In enterprise teams, token ownership typically lives with the design system team. Product teams consume tokens but do not modify them. Changes require a review process because a token change is fundamentally a global change: updating <code>--color-primary</code> touches every component that references it.</p>
+
+      <h2>The review process</h2>
+      <p>Token changes follow a stricter process than component changes. The minimum viable process: (1) proposal with visual impact screenshots, (2) design review, (3) engineering review for accessibility and performance, (4) staged rollout with feature flags. A color change that fails WCAG contrast in even one context is a blocking issue.</p>
+
+      <h2>Versioning tokens with semver</h2>
+      <p>Tokens follow semantic versioning. <strong>Patch</strong>: adjusting a value within its existing role (shifting a blue by 2% lightness). <strong>Minor</strong>: adding new tokens. <strong>Major</strong>: removing tokens, renaming tokens, or changing a token's semantic meaning.</p>
+
+      <h2>Breaking vs non-breaking changes</h2>
+      <p>A <strong>breaking change</strong> is any modification that requires consumers to update their code: renaming a token, removing a token, or changing a token's type (color to gradient). A <strong>non-breaking change</strong> adjusts the value while preserving the contract: the token still represents what it always represented.</p>
+
+      <h2>The token audit</h2>
+      <p>Periodically audit the codebase for hard-coded values that should be tokens. A grep for hex colors, raw pixel values, or oklch() calls outside the token layer reveals governance failures. Every hard-coded value is technical debt that bypasses the system.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Token documentation page</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-2 {
+            --token-primary: oklch(48% 0.18 275);
+            --token-secondary: oklch(55% 0.15 320);
+            --token-success: oklch(62% 0.17 145);
+            --token-warning: oklch(75% 0.15 80);
+            --token-danger: oklch(55% 0.2 25);
+            --token-neutral-100: oklch(97% 0.005 275);
+            --token-neutral-300: oklch(85% 0.01 275);
+            --token-neutral-700: oklch(35% 0.02 275);
+            --token-neutral-900: oklch(15% 0.02 275);
+            padding: 1.5rem;
+            font-family: system-ui;
+          }
+          .demo-22-2 h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: oklch(50% 0 0);
+            margin-block-end: 1rem;
+          }
+          .demo-22-2 .token-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-block-end: 1.5rem;
+          }
+          .demo-22-2 .token-swatch {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: oklch(100% 0 0);
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.1);
+          }
+          .demo-22-2 .token-swatch .color-block {
+            height: 4rem;
+          }
+          .demo-22-2 .token-swatch .token-info {
+            padding: 0.5rem 0.75rem;
+          }
+          .demo-22-2 .token-swatch .token-name {
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: oklch(30% 0.02 275);
+            display: block;
+          }
+          .demo-22-2 .token-swatch .token-value {
+            font-size: 0.65rem;
+            color: oklch(55% 0 0);
+            display: block;
+            margin-block-start: 0.2rem;
+          }
+          .demo-22-2 .token-swatch .token-usage {
+            font-size: 0.65rem;
+            color: oklch(45% 0.1 275);
+            display: block;
+            margin-block-start: 0.2rem;
+            font-style: italic;
+          }
+        </style>
+        <div class="demo-22-2">
+          <h3>Brand Colors</h3>
+          <div class="token-grid">
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-primary)"></div>
+              <div class="token-info">
+                <span class="token-name">--color-primary</span>
+                <span class="token-value">oklch(48% 0.18 275)</span>
+                <span class="token-usage">Buttons, links, focus rings</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-secondary)"></div>
+              <div class="token-info">
+                <span class="token-name">--color-secondary</span>
+                <span class="token-value">oklch(55% 0.15 320)</span>
+                <span class="token-usage">Accents, badges, highlights</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-success)"></div>
+              <div class="token-info">
+                <span class="token-name">--color-success</span>
+                <span class="token-value">oklch(62% 0.17 145)</span>
+                <span class="token-usage">Confirmations, positive states</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-warning)"></div>
+              <div class="token-info">
+                <span class="token-name">--color-warning</span>
+                <span class="token-value">oklch(75% 0.15 80)</span>
+                <span class="token-usage">Alerts, caution states</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-danger)"></div>
+              <div class="token-info">
+                <span class="token-name">--color-danger</span>
+                <span class="token-value">oklch(55% 0.2 25)</span>
+                <span class="token-usage">Errors, destructive actions</span>
+              </div>
+            </div>
+          </div>
+          <h3>Neutral Scale</h3>
+          <div class="token-grid">
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-neutral-100)"></div>
+              <div class="token-info">
+                <span class="token-name">--neutral-100</span>
+                <span class="token-value">oklch(97% 0.005 275)</span>
+                <span class="token-usage">Page backgrounds</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-neutral-300)"></div>
+              <div class="token-info">
+                <span class="token-name">--neutral-300</span>
+                <span class="token-value">oklch(85% 0.01 275)</span>
+                <span class="token-usage">Borders, dividers</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-neutral-700)"></div>
+              <div class="token-info">
+                <span class="token-name">--neutral-700</span>
+                <span class="token-value">oklch(35% 0.02 275)</span>
+                <span class="token-usage">Body text</span>
+              </div>
+            </div>
+            <div class="token-swatch">
+              <div class="color-block" style="background: var(--token-neutral-900)"></div>
+              <div class="token-info">
+                <span class="token-name">--neutral-900</span>
+                <span class="token-value">oklch(15% 0.02 275)</span>
+                <span class="token-usage">Headings, emphasis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="token-docs"&gt;
+  &lt;h2&gt;Spacing Tokens&lt;/h2&gt;
+  &lt;div class="token-list"&gt;
+    &lt;div class="spacing-demo" style="--size: var(--space-xs)"&gt;
+      &lt;div class="block"&gt;&lt;/div&gt;
+      &lt;code&gt;--space-xs&lt;/code&gt;
+    &lt;/div&gt;
+    &lt;div class="spacing-demo" style="--size: var(--space-sm)"&gt;
+      &lt;div class="block"&gt;&lt;/div&gt;
+      &lt;code&gt;--space-sm&lt;/code&gt;
+    &lt;/div&gt;
+    &lt;div class="spacing-demo" style="--size: var(--space-md)"&gt;
+      &lt;div class="block"&gt;&lt;/div&gt;
+      &lt;code&gt;--space-md&lt;/code&gt;
+    &lt;/div&gt;
+    &lt;div class="spacing-demo" style="--size: var(--space-lg)"&gt;
+      &lt;div class="block"&gt;&lt;/div&gt;
+      &lt;code&gt;--space-lg&lt;/code&gt;
+    &lt;/div&gt;
+    &lt;div class="spacing-demo" style="--size: var(--space-xl)"&gt;
+      &lt;div class="block"&gt;&lt;/div&gt;
+      &lt;code&gt;--space-xl&lt;/code&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+}
+
+body { font-family: system-ui; padding: 2rem; }
+h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.04em; color: oklch(50% 0 0); margin-block-end: 1rem; }
+
+.token-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.spacing-demo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.spacing-demo .block {
+  inline-size: var(--size);
+  block-size: var(--size);
+  background: oklch(48% 0.18 275);
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+}
+.spacing-demo code {
+  font-size: 0.8rem;
+  color: oklch(35% 0.02 275);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a "deprecated" badge to one of the spacing tokens. Style it with <code>oklch(55% 0.2 25)</code> background. Then add a replacement token below it showing the migration path. This is how token documentation communicates breaking changes during a major version transition.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.1-naming-conventions.html">&larr; Lesson 22.1</a>
+      <a href="./lesson-22.3-multi-theme-architecture.html">Lesson 22.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
