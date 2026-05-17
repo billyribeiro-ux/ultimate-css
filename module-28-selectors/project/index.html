@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project — Selector Reference Card · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 28</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 28 · Project</p>
+      <h1>Selector Reference Card</h1>
+      <p class="lead">Every CSS selector on one page — syntax, specificity, and a one-line example. A cheat sheet for daily use.</p>
+    </header>
+
+    <section class="demo">
+      <h2>Basic Selectors</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-ref { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-ref table { width: 100%; border-collapse: collapse; }
+          .demo-28-ref th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(30% 0.1 275); color: white; font-size: 0.75rem; }
+          .demo-28-ref td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); vertical-align: top; }
+          .demo-28-ref code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+          .demo-28-ref .spec { font-family: monospace; color: oklch(50% 0.15 275); font-weight: 600; }
+        </style>
+        <div class="demo-28-ref">
+          <table>
+            <thead><tr><th>Selector</th><th>Specificity</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>*</code></td><td class="spec">(0,0,0)</td><td>Universal — matches all elements</td></tr>
+              <tr><td><code>E</code></td><td class="spec">(0,0,1)</td><td><code>p { color: black; }</code></td></tr>
+              <tr><td><code>.class</code></td><td class="spec">(0,1,0)</td><td><code>.card { padding: 1rem; }</code></td></tr>
+              <tr><td><code>#id</code></td><td class="spec">(1,0,0)</td><td><code>#hero { height: 100vh; }</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>Combinators</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-comb { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-comb table { width: 100%; border-collapse: collapse; }
+          .demo-28-comb th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(30% 0.1 200); color: white; font-size: 0.75rem; }
+          .demo-28-comb td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); vertical-align: top; }
+          .demo-28-comb code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+        </style>
+        <div class="demo-28-comb">
+          <table>
+            <thead><tr><th>Combinator</th><th>Name</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>A B</code></td><td>Descendant</td><td><code>.nav a { }</code> — any depth</td></tr>
+              <tr><td><code>A > B</code></td><td>Child</td><td><code>.menu > li { }</code> — direct only</td></tr>
+              <tr><td><code>A + B</code></td><td>Adjacent sibling</td><td><code>h2 + p { }</code> — immediately after</td></tr>
+              <tr><td><code>A ~ B</code></td><td>General sibling</td><td><code>h2 ~ p { }</code> — all after</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>Attribute Selectors</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-attr { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-attr table { width: 100%; border-collapse: collapse; }
+          .demo-28-attr th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(30% 0.1 150); color: white; font-size: 0.75rem; }
+          .demo-28-attr td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); vertical-align: top; }
+          .demo-28-attr code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+          .demo-28-attr .spec { font-family: monospace; color: oklch(50% 0.15 275); font-weight: 600; }
+        </style>
+        <div class="demo-28-attr">
+          <table>
+            <thead><tr><th>Selector</th><th>Spec</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>[attr]</code></td><td class="spec">(0,1,0)</td><td>Has the attribute</td></tr>
+              <tr><td><code>[attr=val]</code></td><td class="spec">(0,1,0)</td><td>Exact value match</td></tr>
+              <tr><td><code>[attr~=val]</code></td><td class="spec">(0,1,0)</td><td>Word in space-separated list</td></tr>
+              <tr><td><code>[attr|=val]</code></td><td class="spec">(0,1,0)</td><td>Exact or prefix-hyphen</td></tr>
+              <tr><td><code>[attr^=val]</code></td><td class="spec">(0,1,0)</td><td>Starts with</td></tr>
+              <tr><td><code>[attr$=val]</code></td><td class="spec">(0,1,0)</td><td>Ends with</td></tr>
+              <tr><td><code>[attr*=val]</code></td><td class="spec">(0,1,0)</td><td>Contains substring</td></tr>
+              <tr><td><code>[attr=val i]</code></td><td class="spec">(0,1,0)</td><td>Case-insensitive</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>Pseudo-Classes: State</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-state { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-state table { width: 100%; border-collapse: collapse; }
+          .demo-28-state th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(30% 0.12 25); color: white; font-size: 0.75rem; }
+          .demo-28-state td { padding: 0.35rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); }
+          .demo-28-state code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+        </style>
+        <div class="demo-28-state">
+          <table>
+            <thead><tr><th>Selector</th><th>Matches when...</th></tr></thead>
+            <tbody>
+              <tr><td><code>:hover</code></td><td>Pointer is over the element</td></tr>
+              <tr><td><code>:active</code></td><td>Element is being activated (clicked)</td></tr>
+              <tr><td><code>:focus</code></td><td>Element has focus (any method)</td></tr>
+              <tr><td><code>:focus-visible</code></td><td>Focus should be visually indicated</td></tr>
+              <tr><td><code>:focus-within</code></td><td>Element or descendant has focus</td></tr>
+              <tr><td><code>:disabled</code></td><td>Form element is disabled</td></tr>
+              <tr><td><code>:enabled</code></td><td>Form element is enabled</td></tr>
+              <tr><td><code>:checked</code></td><td>Checkbox/radio is checked</td></tr>
+              <tr><td><code>:indeterminate</code></td><td>Neither checked nor unchecked</td></tr>
+              <tr><td><code>:valid</code></td><td>Input passes validation</td></tr>
+              <tr><td><code>:invalid</code></td><td>Input fails validation</td></tr>
+              <tr><td><code>:user-valid</code></td><td>Valid after user interaction</td></tr>
+              <tr><td><code>:user-invalid</code></td><td>Invalid after user interaction</td></tr>
+              <tr><td><code>:required</code></td><td>Input has required attribute</td></tr>
+              <tr><td><code>:optional</code></td><td>Input without required</td></tr>
+              <tr><td><code>:placeholder-shown</code></td><td>Placeholder text is visible (empty)</td></tr>
+              <tr><td><code>:default</code></td><td>Default form element</td></tr>
+              <tr><td><code>:read-only</code></td><td>Not editable</td></tr>
+              <tr><td><code>:read-write</code></td><td>Editable</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>Pseudo-Classes: Structural</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-struct { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-struct table { width: 100%; border-collapse: collapse; }
+          .demo-28-struct th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(30% 0.12 80); color: white; font-size: 0.75rem; }
+          .demo-28-struct td { padding: 0.35rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); }
+          .demo-28-struct code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+        </style>
+        <div class="demo-28-struct">
+          <table>
+            <thead><tr><th>Selector</th><th>Matches...</th></tr></thead>
+            <tbody>
+              <tr><td><code>:first-child</code></td><td>First among siblings</td></tr>
+              <tr><td><code>:last-child</code></td><td>Last among siblings</td></tr>
+              <tr><td><code>:only-child</code></td><td>No siblings</td></tr>
+              <tr><td><code>:nth-child(An+B)</code></td><td>Position formula from start</td></tr>
+              <tr><td><code>:nth-last-child(An+B)</code></td><td>Position formula from end</td></tr>
+              <tr><td><code>:nth-child(An+B of S)</code></td><td>Nth of filtered set</td></tr>
+              <tr><td><code>:first-of-type</code></td><td>First of its element type</td></tr>
+              <tr><td><code>:last-of-type</code></td><td>Last of its element type</td></tr>
+              <tr><td><code>:only-of-type</code></td><td>Only one of its type</td></tr>
+              <tr><td><code>:nth-of-type(An+B)</code></td><td>Nth of its type</td></tr>
+              <tr><td><code>:empty</code></td><td>No children or text</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>Functional Pseudo-Classes</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-func { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-func table { width: 100%; border-collapse: collapse; }
+          .demo-28-func th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(30% 0.12 310); color: white; font-size: 0.75rem; }
+          .demo-28-func td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); vertical-align: top; }
+          .demo-28-func code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+          .demo-28-func .note { font-size: 0.75rem; color: oklch(50% 0.1 275); font-style: italic; }
+        </style>
+        <div class="demo-28-func">
+          <table>
+            <thead><tr><th>Selector</th><th>Purpose</th><th>Specificity note</th></tr></thead>
+            <tbody>
+              <tr><td><code>:not(S)</code></td><td>Negation — excludes S</td><td>Specificity of S</td></tr>
+              <tr><td><code>:is(S1, S2)</code></td><td>Matches any of the list</td><td>Highest in list</td></tr>
+              <tr><td><code>:where(S1, S2)</code></td><td>Same as :is() but...</td><td>Always (0,0,0)</td></tr>
+              <tr><td><code>:has(S)</code></td><td>Contains/is followed by S</td><td>Specificity of S</td></tr>
+            </tbody>
+          </table>
+          <p class="note">:is() and :where() are forgiving — invalid selectors in the list don't break the whole rule.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>Pseudo-Elements</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-pseudo { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-pseudo table { width: 100%; border-collapse: collapse; }
+          .demo-28-pseudo th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(35% 0.1 275); color: white; font-size: 0.75rem; }
+          .demo-28-pseudo td { padding: 0.35rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); }
+          .demo-28-pseudo code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+          .demo-28-pseudo .spec { font-family: monospace; color: oklch(50% 0.15 275); font-weight: 600; font-size: 0.75rem; }
+        </style>
+        <div class="demo-28-pseudo">
+          <table>
+            <thead><tr><th>Pseudo-Element</th><th>Spec</th><th>Creates/Targets</th></tr></thead>
+            <tbody>
+              <tr><td><code>::before</code></td><td class="spec">(0,0,1)</td><td>Generated content before children</td></tr>
+              <tr><td><code>::after</code></td><td class="spec">(0,0,1)</td><td>Generated content after children</td></tr>
+              <tr><td><code>::first-line</code></td><td class="spec">(0,0,1)</td><td>First rendered line of text</td></tr>
+              <tr><td><code>::first-letter</code></td><td class="spec">(0,0,1)</td><td>First letter of first line</td></tr>
+              <tr><td><code>::marker</code></td><td class="spec">(0,0,1)</td><td>List item bullet/number</td></tr>
+              <tr><td><code>::placeholder</code></td><td class="spec">(0,0,1)</td><td>Input placeholder text</td></tr>
+              <tr><td><code>::selection</code></td><td class="spec">(0,0,1)</td><td>User-selected text</td></tr>
+              <tr><td><code>::backdrop</code></td><td class="spec">(0,0,1)</td><td>Behind dialog/fullscreen</td></tr>
+              <tr><td><code>::file-selector-button</code></td><td class="spec">(0,0,1)</td><td>File input button</td></tr>
+              <tr><td><code>::details-content</code></td><td class="spec">(0,0,1)</td><td>Expandable details content</td></tr>
+              <tr><td><code>::view-transition-old(*)</code></td><td class="spec">(0,0,1)</td><td>Old state in view transition</td></tr>
+              <tr><td><code>::view-transition-new(*)</code></td><td class="spec">(0,0,1)</td><td>New state in view transition</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>:nth-child() Formula Cheat Sheet</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-nth { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-nth table { width: 100%; border-collapse: collapse; }
+          .demo-28-nth th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(35% 0.12 200); color: white; font-size: 0.75rem; }
+          .demo-28-nth td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); }
+          .demo-28-nth code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+        </style>
+        <div class="demo-28-nth">
+          <table>
+            <thead><tr><th>Formula</th><th>Selects</th><th>Positions (of 10)</th></tr></thead>
+            <tbody>
+              <tr><td><code>even</code> / <code>2n</code></td><td>Every even</td><td>2, 4, 6, 8, 10</td></tr>
+              <tr><td><code>odd</code> / <code>2n+1</code></td><td>Every odd</td><td>1, 3, 5, 7, 9</td></tr>
+              <tr><td><code>3n</code></td><td>Every 3rd</td><td>3, 6, 9</td></tr>
+              <tr><td><code>3n+1</code></td><td>1st of every 3</td><td>1, 4, 7, 10</td></tr>
+              <tr><td><code>-n+5</code></td><td>First 5</td><td>1, 2, 3, 4, 5</td></tr>
+              <tr><td><code>n+4</code></td><td>From 4th onward</td><td>4, 5, 6, 7, 8, 9, 10</td></tr>
+              <tr><td><code>n+3</code> + <code>-n+7</code></td><td>Range 3-7</td><td>3, 4, 5, 6, 7</td></tr>
+              <tr><td><code>last -n+3</code></td><td>Last 3</td><td>8, 9, 10</td></tr>
+              <tr><td><code>4</code></td><td>Exactly 4th</td><td>4</td></tr>
+              <tr><td><code>odd of .x</code></td><td>Odd among .x only</td><td>1st .x, 3rd .x...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>@scope Syntax</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-scope { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-scope table { width: 100%; border-collapse: collapse; }
+          .demo-28-scope th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(35% 0.1 50); color: white; font-size: 0.75rem; }
+          .demo-28-scope td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); vertical-align: top; }
+          .demo-28-scope code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+        </style>
+        <div class="demo-28-scope">
+          <table>
+            <thead><tr><th>Pattern</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td><code>@scope (.card) { }</code></td><td>Rules only match inside .card</td></tr>
+              <tr><td><code>@scope (.card) to (.footer) { }</code></td><td>Match inside .card but stop at .footer (donut)</td></tr>
+              <tr><td><code>:scope { }</code></td><td>The scope root element itself</td></tr>
+              <tr><td><code>:scope > h2 { }</code></td><td>Direct children of scope root</td></tr>
+              <tr><td><code>@scope { }</code> (inline)</td><td>Implicit scope to parent of style element</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>:has() Quick Reference</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-has { padding: 1.5rem; font-family: system-ui; font-size: 0.82rem; }
+          .demo-28-has table { width: 100%; border-collapse: collapse; }
+          .demo-28-has th { text-align: left; padding: 0.5rem 0.75rem; background: oklch(35% 0.15 275); color: white; font-size: 0.75rem; }
+          .demo-28-has td { padding: 0.4rem 0.75rem; border-bottom: 1px solid oklch(92% 0.03 275); vertical-align: top; }
+          .demo-28-has code { background: oklch(95% 0.03 275); padding: 0.1rem 0.35rem; border-radius: 0.2rem; font-size: 0.78rem; }
+        </style>
+        <div class="demo-28-has">
+          <table>
+            <thead><tr><th>Pattern</th><th>English</th></tr></thead>
+            <tbody>
+              <tr><td><code>.card:has(img)</code></td><td>Card containing an image</td></tr>
+              <tr><td><code>.card:has(> img)</code></td><td>Card with direct child image</td></tr>
+              <tr><td><code>h2:has(+ p)</code></td><td>h2 immediately followed by p</td></tr>
+              <tr><td><code>form:has(:invalid)</code></td><td>Form containing invalid input</td></tr>
+              <tr><td><code>body:has(.modal)</code></td><td>Body when a modal exists</td></tr>
+              <tr><td><code>li:has(+ li)</code></td><td>Every li except the last</td></tr>
+              <tr><td><code>:not(:has(*))</code></td><td>Leaf elements (no children)</td></tr>
+              <tr><td><code>body:has(#toggle:checked)</code></td><td>Checkbox-driven state</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-28.10-performance-best-practices.html">← Lesson 28.10</a>
+      <a href="../../index.html">Course Home →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

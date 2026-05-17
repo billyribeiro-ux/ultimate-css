@@ -78,6 +78,36 @@
 
       <h2>flex-direction reversal</h2>
       <p><code>row-reverse</code> and <code>column-reverse</code> also reorder visually. They have the same accessibility concerns as <code>order</code>. The same <code>reading-flow</code> fix applies.</p>
+
+      <h2>Practical patterns for order</h2>
+      <pre><code>/* Mobile: image above text. Desktop: text left, image right */
+.feature {
+  display: flex;
+  flex-direction: column;
+}
+.feature .image { order: -1; }  /* image first on mobile */
+
+@media (min-width: 768px) {
+  .feature { flex-direction: row; }
+  .feature .image { order: 0; }  /* natural order on desktop */
+}
+
+/* Alternating layout: every other feature reversed */
+.feature:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+/* Priority-based ordering for dashboards */
+[data-priority="high"]   { order: -2; }
+[data-priority="medium"] { order: -1; }
+[data-priority="low"]    { order: 0; }</code></pre>
+
+      <h2>Order values and stacking</h2>
+      <p>Items with the same <code>order</code> value are laid out in DOM order among themselves. Use integers (not floats) and keep values simple — typically -1, 0, and 1 are sufficient for most patterns.</p>
+      <pre><code>/* Simple three-value system */
+.order-first { order: -1; }
+.order-none  { order: 0; }   /* default */
+.order-last  { order: 1; }</code></pre>
     </section>
 
     <section class="demo">

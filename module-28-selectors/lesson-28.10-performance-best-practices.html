@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.10 — Selector Performance & Best Practices · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.10 · Reference</p>
+      <h1>Selector Performance & Best Practices</h1>
+      <p class="lead">Browsers match selectors right-to-left. Understanding this model helps you write selectors that are both fast and maintainable. In most projects, selector performance is not a bottleneck — but knowing the rules prevents accidental complexity at scale.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Right-to-left matching</h2>
+      <p>Browsers evaluate selectors from the <strong>rightmost part</strong> (the "key selector") first, then check ancestors moving left. This is because most elements don't match most selectors — starting from the right eliminates candidates quickly.</p>
+      <pre><code>/* Browser reads: find all 'a' elements, then check if
+   they're inside 'li', inside 'ul', inside 'nav' */
+nav ul li a { color: oklch(50% 0.2 275); }
+
+/* Better: single class — matches immediately */
+.nav-link { color: oklch(50% 0.2 275); }</code></pre>
+
+      <h2>Why .nav-link beats nav ul li a</h2>
+      <ul>
+        <li><strong>Performance:</strong> Class selectors are indexed by the browser. A class match is a hash-table lookup. The descendant chain requires walking up the DOM tree.</li>
+        <li><strong>Maintainability:</strong> If you restructure HTML (move the link outside the list), <code>.nav-link</code> still works. The descendant selector breaks.</li>
+        <li><strong>Specificity:</strong> <code>.nav-link</code> = (0,1,0). <code>nav ul li a</code> = (0,0,4). The class is easier to override with another class.</li>
+        <li><strong>Readability:</strong> The class communicates intent; the chain describes structure.</li>
+      </ul>
+
+      <h2>The "flat and meaningful" rule</h2>
+      <p>Write selectors that are:</p>
+      <ul>
+        <li><strong>Flat:</strong> One or two levels max. Avoid deep descendant chains.</li>
+        <li><strong>Meaningful:</strong> Name what something IS, not where it lives.</li>
+      </ul>
+      <pre><code>/* Bad: deep, fragile, high specificity */
+.header .nav .menu .item .link .icon { ... }
+
+/* Good: flat, meaningful */
+.nav-icon { ... }
+
+/* Bad: location-dependent */
+.sidebar .widget .title { ... }
+
+/* Good: component-scoped */
+.widget-title { ... }</code></pre>
+
+      <h2>When selector performance actually matters</h2>
+      <p>For most websites (under 1,000 DOM elements and under 500 CSS rules), selector performance is negligible — style recalculation takes under 1ms. Performance becomes relevant when:</p>
+      <ul>
+        <li><strong>10,000+ elements</strong> in the DOM (large tables, feeds, virtual lists)</li>
+        <li><strong>Frequent style recalculations</strong> triggered by JavaScript animations or DOM mutations</li>
+        <li><strong>Complex :has() selectors</strong> that force the engine to evaluate many elements</li>
+        <li><strong>Universal selectors with expensive combinators:</strong> <code>* > * > *</code></li>
+      </ul>
+      <p>In typical projects, focus on <em>maintainability</em> over micro-optimization. A clear selector that costs 0.01ms more is always preferable to an obscure one.</p>
+
+      <h2>The PE7 approach: layers replace selector complexity</h2>
+      <p>In the PE7 architecture, cascade layers eliminate specificity wars entirely:</p>
+      <pre><code>@layer reset, base, layout, components, utilities;
+
+@layer components {
+  .btn { background: oklch(55% 0.2 275); }
+}
+@layer utilities {
+  .bg-red { background: oklch(55% 0.22 25); }
+}
+/* .bg-red always wins — layer order, not specificity */</code></pre>
+      <p>With layers, you never need to inflate selector specificity. No more <code>.card.card</code> hacks, no more nesting to increase weight. Write the simplest selector that targets what you need.</p>
+
+      <h2>:has() performance characteristics</h2>
+      <p><code>:has()</code> requires the browser to look <em>down</em> the DOM tree (or sideways for sibling arguments). This is more expensive than ancestor-checking selectors. Guidelines:</p>
+      <ul>
+        <li>Scope <code>:has()</code> with a class: <code>.card:has(img)</code> is fast; <code>div:has(img)</code> is slower (more candidates).</li>
+        <li>Avoid <code>:has()</code> on high-frequency elements like <code>*:has(...)</code>.</li>
+        <li>Simple arguments are fast: <code>:has(.class)</code> and <code>:has(> .child)</code> are well-optimized.</li>
+        <li>Deep descendant arguments are slower: <code>:has(.deeply .nested .thing)</code>.</li>
+        <li>Browsers aggressively cache <code>:has()</code> results — re-evaluation only happens when relevant DOM mutations occur.</li>
+      </ul>
+
+      <h2>@scope performance characteristics</h2>
+      <p><code>@scope</code> can actually <em>improve</em> performance because the browser knows it can skip elements outside the scope boundary. Donut scopes (<code>to</code>) further narrow the matching range.</p>
+      <pre><code>/* Browser only checks descendants of .card, stops at .footer */
+@scope (.card) to (.footer) {
+  p { color: oklch(45% 0.05 275); }
+}</code></pre>
+
+      <h2>Selector cost ranking (approximate)</h2>
+      <table>
+        <thead><tr><th>Selector type</th><th>Relative cost</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>ID (#id)</td><td>Fastest</td><td>Single hash lookup</td></tr>
+          <tr><td>Class (.class)</td><td>Very fast</td><td>Hash lookup</td></tr>
+          <tr><td>Type (div, p)</td><td>Fast</td><td>Tag name indexed</td></tr>
+          <tr><td>Adjacent sibling (+)</td><td>Fast</td><td>Single check</td></tr>
+          <tr><td>Child (>)</td><td>Fast</td><td>One level up</td></tr>
+          <tr><td>Descendant (space)</td><td>Moderate</td><td>Walks up tree</td></tr>
+          <tr><td>Universal (*)</td><td>Moderate</td><td>Matches everything</td></tr>
+          <tr><td>Attribute ([attr])</td><td>Moderate</td><td>String comparison</td></tr>
+          <tr><td>:nth-child()</td><td>Moderate</td><td>Index calculation</td></tr>
+          <tr><td>:has()</td><td>Expensive</td><td>Downward/sibling evaluation</td></tr>
+          <tr><td>:not(:has())</td><td>Most expensive</td><td>Negated downward check</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Best practices summary</h2>
+      <ol>
+        <li><strong>Prefer classes</strong> — they are fast, flat, and meaningful.</li>
+        <li><strong>Keep selectors shallow</strong> — two levels maximum for components.</li>
+        <li><strong>Use @layer</strong> to control cascade order without specificity hacks.</li>
+        <li><strong>Use @scope</strong> for component isolation instead of deep nesting.</li>
+        <li><strong>Scope :has()</strong> to specific classes, not broad type selectors.</li>
+        <li><strong>Avoid over-qualifying:</strong> <code>div.card</code> gains nothing over <code>.card</code>.</li>
+        <li><strong>Name by function, not location:</strong> <code>.nav-link</code> not <code>.header .link</code>.</li>
+        <li><strong>Measure before optimizing:</strong> Use DevTools Performance panel. If style recalc is under 5ms, selectors are not your bottleneck.</li>
+      </ol>
+
+      <h2>DevTools: measuring selector performance</h2>
+      <p>Chrome DevTools Performance panel shows "Recalculate Style" events. Click one to see:</p>
+      <ul>
+        <li>Number of elements affected</li>
+        <li>Time spent matching selectors</li>
+        <li>Which selectors were slowest (enable "Selector Stats" in experiments)</li>
+      </ul>
+      <p>Firefox DevTools has a similar "Restyle" indicator in the Performance tool. If style recalculation is consistently over 10ms per frame, investigate your selector complexity.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>Selector performance is almost never the bottleneck in modern web applications. Focus your energy on writing <em>clear, maintainable, flat</em> selectors. Use cascade layers for ordering, <code>@scope</code> for isolation, and reserve <code>:has()</code> for scoped patterns. The performance will follow naturally.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-28.9-scope.html">← Lesson 28.9</a>
+      <a href="./project/index.html">Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

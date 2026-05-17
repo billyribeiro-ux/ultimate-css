@@ -108,6 +108,44 @@ form:has(:invalid) { border-color: oklch(55% 0.22 25); }
 /* Section followed by another section */
 section:has(+ section) { border-bottom: 1px solid oklch(90% 0 0); }</code></pre>
       <p><code>:has()</code> is covered in depth in Lesson 28.7.</p>
+
+      <h2>Specificity of structural pseudo-classes</h2>
+      <p>All pseudo-classes (including structural ones) have specificity <strong>(0, 1, 0)</strong> — same as a class:</p>
+      <table>
+        <thead><tr><th>Selector</th><th>Specificity</th></tr></thead>
+        <tbody>
+          <tr><td><code>:first-child</code></td><td>(0, 1, 0)</td></tr>
+          <tr><td><code>li:nth-child(2n)</code></td><td>(0, 1, 1)</td></tr>
+          <tr><td><code>:is(.a, .b)</code></td><td>(0, 1, 0) — highest in list</td></tr>
+          <tr><td><code>:where(.a, .b)</code></td><td>(0, 0, 0) — always zero</td></tr>
+          <tr><td><code>:not(.active)</code></td><td>(0, 1, 0) — specificity of argument</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Common patterns</h2>
+      <pre><code>/* Remove last border */
+.item:last-child { border-bottom: none; }
+
+/* Zebra striping */
+tr:nth-child(even) { background: oklch(97% 0.02 275); }
+
+/* First paragraph after heading gets larger text */
+h2 + p:first-of-type { font-size: 1.1rem; }
+
+/* Hide empty containers */
+.messages:empty { display: none; }
+
+/* :is() for grouping heading styles */
+:is(h1, h2, h3, h4) {
+  font-family: system-ui;
+  line-height: 1.2;
+}
+
+/* :where() for easily-overridden defaults */
+:where(ul, ol) { padding-inline-start: 1.5rem; }
+
+/* :not() to exclude specific items */
+.nav-item:not(.disabled) { cursor: pointer; }</code></pre>
     </section>
 
     <section class="demo">

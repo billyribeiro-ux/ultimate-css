@@ -80,6 +80,56 @@ gap: 1rem 0.5rem;       /* row-gap column-gap */</code></pre>
       <p>Shorthands for setting both axes at once:</p>
       <pre><code>place-content: center;    /* align-content + justify-content */
 place-items: center;      /* align-items + justify-items */</code></pre>
+
+      <h2>The baseline keyword</h2>
+      <p><code>align-items: baseline</code> is invaluable when items have different font sizes or padding. It aligns them on their text baseline so content reads naturally across the row:</p>
+      <pre><code>.toolbar {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+/* Even though the heading is larger, text aligns on the same line */
+.toolbar h2 { font-size: 1.5rem; }
+.toolbar button { font-size: 0.85rem; }</code></pre>
+
+      <h2>Common alignment patterns</h2>
+      <pre><code>/* Header: items centered vertically, spread horizontally */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Card footer: buttons right-aligned */
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Centered hero content */
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Stack with items at both ends */
+.between-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+}</code></pre>
+
+      <h2>gap vs margin vs padding</h2>
+      <ul>
+        <li><code>gap</code> — space between items only. No space at edges. The modern, clean approach.</li>
+        <li><code>margin</code> on items �� creates space around each item including edges. Harder to control.</li>
+        <li><code>padding</code> on container — creates space between the container edge and items. Combines well with <code>gap</code>.</li>
+      </ul>
+      <p>Best practice: <code>padding</code> on the container for edge spacing + <code>gap</code> for between-item spacing. No margins needed on flex items in most cases.</p>
     </section>
 
     <section class="demo">

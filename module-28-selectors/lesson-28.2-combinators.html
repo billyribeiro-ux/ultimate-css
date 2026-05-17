@@ -90,6 +90,40 @@ section > p:first-child { font-weight: 600; }</code></pre>
         <li><strong>Best:</strong> <code>.card-title</code> — flat class selector. No relationship checks needed.</li>
       </ul>
       <p>In practice, selector performance rarely matters unless you have thousands of elements. But keeping selectors flat is still good practice for maintainability.</p>
+
+      <h2>Real-world patterns</h2>
+      <pre><code>/* Stack spacing: adjacent siblings get top margin */
+.stack > * + * {
+  margin-block-start: 1.5rem;
+}
+
+/* Table-like row separators without last-child */
+.list-item + .list-item {
+  border-block-start: 1px solid oklch(90% 0.03 275);
+}
+
+/* Style direct children for grid items */
+.grid > * {
+  min-width: 0;   /* prevent flex/grid overflow */
+}
+
+/* Heading + lead paragraph pattern */
+.content > h2 + p {
+  font-size: 1.1rem;
+  color: oklch(45% 0.08 275);
+}</code></pre>
+
+      <h2>Specificity of combinators</h2>
+      <p>Combinators themselves add zero specificity. Only the selectors on either side count:</p>
+      <table>
+        <thead><tr><th>Selector</th><th>Specificity</th></tr></thead>
+        <tbody>
+          <tr><td><code>.nav a</code></td><td>(0, 1, 1)</td></tr>
+          <tr><td><code>.nav > .link</code></td><td>(0, 2, 0)</td></tr>
+          <tr><td><code>h2 + p</code></td><td>(0, 0, 2)</td></tr>
+          <tr><td><code>.a ~ .b</code></td><td>(0, 2, 0)</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="demo">

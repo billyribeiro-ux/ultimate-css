@@ -105,6 +105,24 @@
         <li><code>justify-content: space-between</code> — maximum spacing distributed evenly.</li>
         <li><code>margin-inline-start: auto</code> — push a specific item (and everything after) to the end. Surgical control.</li>
       </ul>
+
+      <h2>Important caveat</h2>
+      <p>Auto margins consume ALL available free space. This means <code>justify-content</code> has no effect when any item has an auto margin on the main axis — there's no free space left for <code>justify-content</code> to distribute. The auto margin already claimed it all.</p>
+      <pre><code>.container {
+  display: flex;
+  justify-content: center;  /* has no effect! */
+}
+.container .last {
+  margin-inline-start: auto; /* this overrides justify-content */
+}</code></pre>
+      <p>This is by design, not a bug. When you use auto margins for spacing, you're taking manual control away from <code>justify-content</code>.</p>
+
+      <h2>Multiple auto margins</h2>
+      <p>When multiple items have auto margins, free space is split equally between them:</p>
+      <pre><code>.container { display: flex; }
+.a { margin-inline-end: auto; }  /* gets half the free space */
+.c { margin-inline-start: auto; } /* gets the other half */
+/* Result: A is left, B is centered, C is right */</code></pre>
     </section>
 
     <section class="demo">

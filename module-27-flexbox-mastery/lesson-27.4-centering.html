@@ -97,7 +97,30 @@
         <li>Using <code>text-align: center</code> for block centering — it only centers inline/inline-block children.</li>
         <li>Forgetting <code>height</code> on the parent — vertical centering requires the parent to have more height than the child.</li>
         <li>Using <code>margin: 0 auto</code> without a width — auto margins collapse to zero when the element is full-width.</li>
+        <li>Using <code>align-items: center</code> without setting a height on the flex container — items are already as tall as the container, so no visible centering occurs.</li>
       </ul>
+
+      <h2>Centering text vs centering boxes</h2>
+      <p>These are different problems with different solutions:</p>
+      <pre><code>/* Center text INSIDE an element */
+.box { text-align: center; }
+
+/* Center a box WITHIN its parent */
+.box { margin-inline: auto; width: fit-content; }
+
+/* Center a box both axes */
+.parent { display: flex; justify-content: center; align-items: center; }</code></pre>
+      <p>Don't confuse them. <code>text-align</code> centers inline content. Flex/grid/margin centers block-level boxes.</p>
+
+      <h2>The modern default: grid place-items</h2>
+      <p>For new code, <code>display: grid; place-items: center</code> is the recommended default because:</p>
+      <ul>
+        <li>It's the fewest lines of code (2 properties).</li>
+        <li>It works on both axes simultaneously.</li>
+        <li>It handles any number of children (they stack centered).</li>
+        <li>No extra properties needed on children.</li>
+      </ul>
+      <p>Use flexbox centering when you need inline (row) arrangement of centered items. Use grid centering when you just need everything centered in a container.</p>
     </section>
 
     <section class="demo">

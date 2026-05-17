@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lesson 28.9 — @scope and :scope · PE7 CSS Course</title>
+  <title>Lesson 28.9 — @scope, :scope, and CSS Nesting · PE7 CSS Course</title>
   <link rel="stylesheet" href="../assets/css/main.css">
   <link rel="manifest" href="../manifest.webmanifest">
   <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
@@ -35,120 +35,187 @@
 
     <header>
       <p class="badge">Lesson 28.9 · Reference</p>
-      <h1>@scope and :scope</h1>
-      <p class="lead"><code>@scope</code> is CSS's native solution for component-scoped styling. It limits where selectors match — both from a root (scope start) and optionally to a boundary (scope end, the "donut scope"). Combined with <code>:scope</code>, it enables truly isolated component styles.</p>
+      <h1>@scope, :scope, and CSS Nesting</h1>
+      <p class="lead"><code>@scope</code> creates a scoping boundary for your selectors — styles only apply within that subtree. Combined with CSS nesting and the <code>&amp;</code> operator, it provides true component-level isolation without Shadow DOM or naming conventions.</p>
     </header>
 
     <section class="lesson-body stack">
-      <h2>Basic @scope syntax</h2>
+      <h2>@scope basics</h2>
+      <p>The <code>@scope</code> rule defines a scoping root. Selectors inside only match descendants of that root.</p>
       <pre><code>@scope (.card) {
-  /* These rules only match inside .card elements */
-  h2 { font-size: 1.25rem; }
-  p  { color: oklch(40% 0 0); }
+  /* These rules ONLY apply inside .card elements */
+  h2 { font-size: 1.25rem; margin: 0; }
+  p  { color: oklch(45% 0.05 275); font-size: 0.9rem; }
   a  { color: oklch(50% 0.2 275); }
 }</code></pre>
-      <p>Rules inside <code>@scope (.card)</code> only apply to elements that are descendants of <code>.card</code>. Unlike <code>.card h2</code>, the scope doesn't increase specificity of the inner selectors the same way.</p>
-
-      <h2>Donut scope with to()</h2>
-      <p>The "donut hole" — styles apply between the scope root and the boundary, but NOT inside the boundary:</p>
-      <pre><code>@scope (.card) to (.card-footer) {
-  /* Matches inside .card but NOT inside .card-footer */
-  color: oklch(30% 0 0);
-  a { color: oklch(50% 0.2 275); }
-}
-
-@scope (.layout) to (.sidebar, .modal) {
-  /* Styles the layout area but stops at sidebar and modal */
-  font-size: 1rem;
-}</code></pre>
-      <p>This is invaluable for design systems. You can style a card's body area without accidentally styling nested components like footers, modals, or embedded cards.</p>
+      <p>Without <code>@scope</code>, those bare <code>h2</code>, <code>p</code>, <code>a</code> selectors would target every matching element on the page. With it, they're safely confined.</p>
 
       <h2>The :scope pseudo-class</h2>
-      <p>Inside <code>@scope</code>, <code>:scope</code> refers to the scope root element itself:</p>
+      <p>Inside <code>@scope</code>, the <code>:scope</code> pseudo-class refers to the scoping root element itself.</p>
       <pre><code>@scope (.card) {
   :scope {
-    /* Styles the .card element itself */
-    border: 1px solid oklch(88% 0.04 275);
+    border: 1px solid oklch(85% 0.05 275);
     border-radius: 0.75rem;
     padding: 1.5rem;
   }
-  :scope > h2 {
-    /* Direct child h2 of the card */
-    margin-top: 0;
+  :scope:hover {
+    box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
   }
+}</code></pre>
+
+      <h2>Donut scope: @scope to</h2>
+      <p>The <code>to</code> keyword creates a "donut scope" — styles apply from the root <em>down to but not including</em> a boundary element. This prevents styles from leaking into nested sub-components.</p>
+      <pre><code>@scope (.card) to (.card-footer) {
+  /* Styles apply inside .card but NOT inside .card-footer */
+  color: oklch(30% 0.05 275);
+  font-size: 0.9rem;
+}
+
+@scope (.page) to (.sidebar, .modal) {
+  /* Main content styles that don't bleed into sidebar/modal */
+  h2 { color: oklch(35% 0.1 275); }
+  p  { max-width: 65ch; }
 }</code></pre>
 
       <h2>Specificity inside @scope</h2>
-      <p>The scope root (<code>.card</code> in the <code>@scope</code> declaration) does NOT add to the specificity of rules inside. A bare <code>h2</code> inside <code>@scope (.card)</code> has specificity (0,0,1), not (0,1,1). However, <code>:scope</code> adds its own specificity when used in a selector.</p>
+      <p>Selectors inside <code>@scope</code> have <em>proximity</em> advantage: when two scoped rules match the same element, the one from the closer (more nested) scope wins — regardless of specificity. The scoping root selector itself does not contribute to specificity of contained rules.</p>
       <pre><code>@scope (.card) {
-  h2 { }           /* specificity: (0,0,1) */
-  :scope h2 { }    /* specificity: (0,1,1) — :scope = (0,1,0) */
-  .title { }       /* specificity: (0,1,0) */
+  p { color: oklch(45% 0.05 275); }    /* specificity: (0,0,1) */
+}
+
+@scope (.card .body) {
+  p { color: oklch(35% 0.1 275); }     /* specificity: (0,0,1) — same! */
+  /* But this wins by PROXIMITY — .card .body is closer to the p */
 }</code></pre>
 
-      <h2>Nesting @scope blocks</h2>
-      <pre><code>@scope (.page) {
-  @scope (.sidebar) {
-    /* Only matches .sidebar inside .page */
-    nav { padding: 1rem; }
+      <h2>CSS Nesting with &amp;</h2>
+      <p>Native CSS nesting lets you write nested rules using <code>&amp;</code> to reference the parent selector. It integrates naturally with <code>@scope</code>.</p>
+      <pre><code>.card {
+  border: 1px solid oklch(85% 0.05 275);
+  border-radius: 0.75rem;
+
+  & h2 { font-size: 1.25rem; margin: 0; }
+  & p  { color: oklch(45% 0.05 275); }
+
+  &:hover {
+    box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
   }
-  @scope (.main-content) to (.widget) {
-    /* Main content area, stopping at widgets */
-    p { line-height: 1.7; }
+
+  & .badge {
+    background: oklch(55% 0.2 275);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
   }
 }</code></pre>
 
-      <h2>@scope vs other approaches</h2>
-      <ul>
-        <li><strong>vs BEM:</strong> @scope provides native scoping without naming conventions. No need for <code>.card__title</code> — just use <code>h2</code> inside the scope.</li>
-        <li><strong>vs Shadow DOM:</strong> @scope is lighter weight, doesn't break inheritance, and works with existing selectors.</li>
-        <li><strong>vs CSS Modules:</strong> @scope works in plain CSS without a build step.</li>
-        <li><strong>vs nesting:</strong> Nesting creates descendant selectors (increases specificity). @scope limits matching without adding specificity from the root.</li>
-      </ul>
+      <h2>Nesting inside @scope</h2>
+      <pre><code>@scope (.card) {
+  :scope {
+    padding: 1.5rem;
 
-      <h2>Inline @scope (in style elements)</h2>
-      <pre><code>&lt;div class="widget"&gt;
-  &lt;style&gt;
-    @scope {
-      /* Implicitly scoped to the parent of this style element */
-      p { color: oklch(45% 0.1 275); }
+    & h2 {
+      font-size: 1.25rem;
+      & span { color: oklch(55% 0.2 275); }
     }
-  &lt;/style&gt;
-  &lt;p&gt;This paragraph is styled.&lt;/p&gt;
-&lt;/div&gt;</code></pre>
+
+    &:hover { box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08); }
+  }
+}</code></pre>
+
+      <h2>Nested @scope blocks</h2>
+      <p>You can nest <code>@scope</code> inside another <code>@scope</code> for fine-grained control:</p>
+      <pre><code>@scope (.page) {
+  h1 { font-size: 2rem; }
+
+  @scope (.sidebar) {
+    h1 { font-size: 1.25rem; }  /* sidebar h1 is smaller */
+    a  { color: oklch(50% 0.15 200); }
+  }
+
+  @scope (.main-content) to (.widget) {
+    p { line-height: 1.7; max-width: 65ch; }
+  }
+}</code></pre>
+
+      <h2>@scope vs other isolation strategies</h2>
+      <table>
+        <thead><tr><th>Approach</th><th>Isolation</th><th>Specificity impact</th></tr></thead>
+        <tbody>
+          <tr><td>BEM naming</td><td>Convention-only</td><td>One class (0,1,0)</td></tr>
+          <tr><td>CSS Modules</td><td>Build-time hash</td><td>One class (0,1,0)</td></tr>
+          <tr><td>Shadow DOM</td><td>Hard boundary</td><td>Separate tree</td></tr>
+          <tr><td>@scope</td><td>Native, soft boundary</td><td>Proximity-based</td></tr>
+          <tr><td>@layer + @scope</td><td>Layer order + scope</td><td>Layer wins over specificity</td></tr>
+        </tbody>
+      </table>
+
+      <h2>PE7 integration</h2>
+      <p>In the PE7 architecture, <code>@scope</code> sits inside the <code>components</code> layer. Each component can be its own scope, preventing styles from leaking between siblings:</p>
+      <pre><code>@layer components {
+  @scope (.card) to (.card-footer) {
+    :scope { padding: 1.5rem; border-radius: 0.75rem; }
+    h2 { margin: 0; }
+    p  { color: oklch(45% 0.05 275); }
+  }
+
+  @scope (.card-footer) {
+    :scope { padding: 1rem; background: oklch(96% 0.02 275); }
+    a  { font-weight: 600; }
+  }
+}</code></pre>
     </section>
 
     <section class="demo">
-      <h2>Demo — @scope with donut</h2>
+      <h2>Demo — @scope in action</h2>
       <div class="demo-frame">
         <style>
-          .demo-28-9 { padding: 1.5rem; font-family: system-ui; }
-          @scope (.demo-28-9 .scoped-card) to (.card-footer) {
+          .demo-28-9 { padding: 1.5rem; font-family: system-ui; display: grid; gap: 1.5rem; }
+          @scope (.demo-28-9 .scoped-card) {
             :scope {
-              border: 2px solid oklch(85% 0.06 275);
+              border: 1px solid oklch(85% 0.05 275);
               border-radius: 0.75rem;
-              padding: 1.25rem;
-              max-width: 350px;
+              padding: 1.5rem;
+              max-width: 320px;
+              transition: box-shadow 200ms;
             }
-            h3 { margin: 0 0 0.5rem; color: oklch(35% 0.15 275); font-size: 1.1rem; }
-            p { margin: 0; color: oklch(40% 0 0); font-size: 0.9rem; line-height: 1.5; }
-            a { color: oklch(50% 0.2 275); }
+            :scope:hover { box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08); }
+            h3 { font-size: 1.1rem; margin: 0 0 0.5rem; color: oklch(30% 0.1 275); }
+            p { font-size: 0.85rem; color: oklch(45% 0.05 275); margin: 0; line-height: 1.5; }
           }
-          .demo-28-9 .card-footer {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid oklch(90% 0.03 275);
-            font-size: 0.8rem;
-            color: oklch(55% 0 0);
+          @scope (.demo-28-9 .scoped-card) to (.card-footer) {
+            a { color: oklch(50% 0.2 275); font-weight: 600; }
           }
-          .demo-28-9 .card-footer a { color: oklch(55% 0.15 25); }
+          @scope (.demo-28-9 .card-footer) {
+            :scope { margin-block-start: 1rem; padding-block-start: 1rem; border-top: 1px solid oklch(90% 0.03 275); }
+            a { color: oklch(45% 0.15 200); font-size: 0.8rem; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+          }
+          .demo-28-9 .donut-example { border: 2px dashed oklch(70% 0.1 275 / 0.5); border-radius: 0.5rem; padding: 1rem; max-width: 320px; }
+          .demo-28-9 .donut-example p { font-size: 0.85rem; }
+          .demo-28-9 .donut-example .inner { background: oklch(95% 0.03 200); padding: 0.75rem; border-radius: 0.375rem; margin-block-start: 0.75rem; }
+          .demo-28-9 .donut-example .inner p { color: oklch(40% 0.1 200); font-style: italic; }
+          .demo-28-9 .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: oklch(55% 0.15 275); margin-block-end: 0.5rem; }
         </style>
         <div class="demo-28-9">
-          <div class="scoped-card">
-            <h3>Scoped Card</h3>
-            <p>This text is styled by @scope rules. The <a href="#">link is purple</a>.</p>
-            <div class="card-footer">
-              <p>Footer is outside the scope boundary (donut hole). <a href="#">This link is red</a>, not purple — the scope stops here.</p>
+          <div>
+            <p class="label">@scope(.card) — isolated component</p>
+            <div class="scoped-card">
+              <h3>Scoped Card</h3>
+              <p>These styles only apply within this card boundary. The h3 and p selectors cannot leak outside.</p>
+              <div class="card-footer">
+                <a href="#">Footer link (different scope)</a>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="label">Donut scope — styles stop at .inner</p>
+            <div class="donut-example">
+              <p>This paragraph is inside the outer scope and gets styled.</p>
+              <div class="inner">
+                <p>This paragraph is inside .inner — the donut boundary — so outer scope styles do NOT apply here.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -160,44 +227,58 @@
       <div class="editor-grid">
         <label class="editor-pane">
           <span>HTML</span>
-<textarea data-editor="html" spellcheck="false">&lt;article class="post"&gt;
-  &lt;h2&gt;Blog Post Title&lt;/h2&gt;
-  &lt;p&gt;Main content paragraph with a &lt;a href="#"&gt;link&lt;/a&gt;.&lt;/p&gt;
-  &lt;p&gt;Another paragraph of content.&lt;/p&gt;
-  &lt;aside class="related"&gt;
-    &lt;h3&gt;Related Posts&lt;/h3&gt;
-    &lt;p&gt;This is inside the boundary — different styles.&lt;/p&gt;
-    &lt;a href="#"&gt;Related link&lt;/a&gt;
-  &lt;/aside&gt;
-&lt;/article&gt;</textarea>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;h2&gt;Card Title&lt;/h2&gt;
+  &lt;p&gt;Card content with scoped styles.&lt;/p&gt;
+  &lt;div class="card-footer"&gt;
+    &lt;a href="#"&gt;Read more&lt;/a&gt;
+    &lt;p&gt;Footer text (donut excludes this).&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h2&gt;Outside heading (not styled)&lt;/h2&gt;
+&lt;p&gt;Outside paragraph (not styled).&lt;/p&gt;</textarea>
         </label>
         <label class="editor-pane">
           <span>CSS</span>
 <textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
 
-/* Scope: styles .post content but stops at .related */
-@scope (.post) to (.related) {
+/* Scoped styles — only inside .card, stop at .card-footer */
+@scope (.card) to (.card-footer) {
   :scope {
-    max-width: 50ch;
-    padding: 1.5rem;
-    border: 2px solid oklch(88% 0.05 275);
+    border: 1px solid oklch(85% 0.05 275);
     border-radius: 0.75rem;
+    padding: 1.5rem;
+    max-width: 350px;
   }
-  h2 { margin: 0 0 1rem; color: oklch(30% 0.15 275); }
-  p { line-height: 1.7; color: oklch(25% 0 0); }
-  a { color: oklch(50% 0.2 275); font-weight: 500; }
+  h2 {
+    font-size: 1.25rem;
+    color: oklch(35% 0.15 275);
+    margin: 0 0 0.5rem;
+  }
+  p {
+    color: oklch(45% 0.05 275);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
 }
 
-/* The .related aside has its own styles */
-.related {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: oklch(96% 0.02 200);
-  border-radius: 0.5rem;
+/* Footer has its own scope */
+@scope (.card-footer) {
+  :scope {
+    margin-block-start: 1rem;
+    padding-block-start: 1rem;
+    border-top: 1px solid oklch(90% 0.03 275);
+  }
+  a {
+    color: oklch(50% 0.2 275);
+    font-weight: 600;
+  }
+  p {
+    font-size: 0.8rem;
+    color: oklch(60% 0 0);
+  }
 }
-.related h3 { margin: 0 0 0.5rem; font-size: 0.9rem; }
-.related p { font-size: 0.85rem; color: oklch(40% 0 0); }
-.related a { color: oklch(50% 0.15 200); }
 </textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
@@ -210,7 +291,7 @@
 
     <section class="callout">
       <h2>Mini-exercise</h2>
-      <p>Create a dashboard layout with a <code>.panel</code> component. Use <code>@scope (.panel) to (.panel)</code> to prevent nested panels from inheriting the outer panel's styles (the donut boundary is the same selector as the root — this prevents deep nesting style leaks). Then add <code>:scope</code> to style the panel container itself.</p>
+      <p>Build a page layout with a <code>.sidebar</code> and <code>.main-content</code>. Use <code>@scope(.sidebar)</code> to style navigation links differently from content links. Use a donut scope <code>@scope(.main-content) to (.widget)</code> to prevent article styles from affecting embedded widgets. Add CSS nesting with <code>&amp;</code> inside each scope for hover states.</p>
     </section>
 
     <nav class="lesson-nav cluster">

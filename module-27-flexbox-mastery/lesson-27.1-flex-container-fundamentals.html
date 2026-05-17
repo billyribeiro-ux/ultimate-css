@@ -97,6 +97,29 @@ flex-flow: row-reverse wrap;</code></pre>
         <li>Margins do not collapse between flex items.</li>
         <li>Absolutely positioned children are removed from the flex flow but still respect the container's padding box as their containing block.</li>
       </ul>
+
+      <h2>Anonymous flex items</h2>
+      <p>Text nodes directly inside a flex container become anonymous flex items. They wrap in an implicit block box:</p>
+      <pre><code>&lt;div style="display: flex;"&gt;
+  This text is an anonymous flex item.
+  &lt;span&gt;This span is a flex item too.&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+      <p>Only whitespace-only text nodes are collapsed (not rendered). Any visible text creates its own flex item.</p>
+
+      <h2>Flex formatting context</h2>
+      <p>A flex container establishes a new <strong>flex formatting context</strong> for its children. This means:</p>
+      <ul>
+        <li>Children participate in flex layout, not block or inline layout.</li>
+        <li>Percentage heights on children resolve against the flex container.</li>
+        <li>The container's padding does not collapse with children's margins.</li>
+        <li>Overflow is controlled by the flex container's <code>overflow</code> property.</li>
+      </ul>
+
+      <h2>Writing mode awareness</h2>
+      <p>Flex directions are logical, not physical. In a right-to-left writing mode (<code>dir="rtl"</code>), <code>flex-direction: row</code> lays items right-to-left. In vertical writing modes, "row" becomes vertical. This is why flexbox uses "main axis" and "cross axis" rather than "horizontal" and "vertical" — the actual direction depends on writing mode.</p>
+
+      <h2>PE7 layer placement</h2>
+      <p>Flex container declarations belong in the <strong>layout</strong> layer of PE7. The container's <code>display: flex</code> and directional properties define structure, not visual styling. Individual item flex properties (<code>flex: 1</code>) may live in the <strong>components</strong> layer if they're component-specific.</p>
     </section>
 
     <section class="demo">

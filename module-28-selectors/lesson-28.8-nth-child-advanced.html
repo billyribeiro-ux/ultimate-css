@@ -36,122 +36,163 @@
     <header>
       <p class="badge">Lesson 28.8 · Reference</p>
       <h1>:nth-child() Advanced Formulas</h1>
-      <p class="lead">The <code>:nth-child(An+B)</code> formula is more powerful than most developers realize. From selecting ranges to the new "of S" syntax for filtered matching, these patterns cover zebra striping, featured items, pagination, and quantity-aware layouts.</p>
+      <p class="lead">The <code>An+B</code> formula inside <code>:nth-child()</code> is a small programming language. Master it to target any pattern of elements: every 3rd, first 5, last 3, ranges, and the new "of S" filtered selector syntax.</p>
     </header>
 
     <section class="lesson-body stack">
       <h2>The An+B formula explained</h2>
-      <p><code>A</code> = the cycle size (repeat every A items). <code>B</code> = the offset (start position). For each n = 0, 1, 2, 3..., the formula produces matching positions:</p>
-      <pre><code>:nth-child(3n)      /* n=0→0, n=1→3, n=2→6: every 3rd (3,6,9...) */
-:nth-child(3n+1)    /* 1, 4, 7, 10 — first of every group of 3 */
-:nth-child(2n)      /* = even: 2, 4, 6, 8 */
-:nth-child(2n+1)    /* = odd: 1, 3, 5, 7 */</code></pre>
+      <p><code>:nth-child(An+B)</code> matches elements where the child index (1-based) satisfies the equation <code>index = An + B</code> for some non-negative integer n (n = 0, 1, 2, 3...).</p>
+      <table>
+        <thead><tr><th>Formula</th><th>Matches</th><th>Use case</th></tr></thead>
+        <tbody>
+          <tr><td>2n (even)</td><td>2, 4, 6, 8...</td><td>Zebra striping</td></tr>
+          <tr><td>2n+1 (odd)</td><td>1, 3, 5, 7...</td><td>Alternate rows</td></tr>
+          <tr><td>3n</td><td>3, 6, 9, 12...</td><td>Every 3rd item</td></tr>
+          <tr><td>3n+1</td><td>1, 4, 7, 10...</td><td>1st of each group of 3</td></tr>
+          <tr><td>4n+3</td><td>3, 7, 11, 15...</td><td>3rd in each group of 4</td></tr>
+          <tr><td>-n+5</td><td>5, 4, 3, 2, 1</td><td>First 5 items only</td></tr>
+          <tr><td>n+3</td><td>3, 4, 5, 6...</td><td>Everything from 3rd onward</td></tr>
+          <tr><td>-n+3</td><td>3, 2, 1</td><td>First 3 items only</td></tr>
+        </tbody>
+      </table>
 
-      <h2>Pattern: First N items</h2>
-      <pre><code>/* First 5 items only */
-:nth-child(-n+5) { font-weight: 700; }
-/* n=0→5, n=1→4, n=2→3, n=3→2, n=4→1, n=5→0 (stops) */</code></pre>
-      <p>The negative step (<code>-n</code>) counts down. Combined with a positive offset, it selects items from 1 up to that offset.</p>
+      <h2>Selecting first N items</h2>
+      <pre><code>/* First 5 items */
+li:nth-child(-n+5) {
+  font-weight: 700;
+  color: oklch(45% 0.15 275);
+}
 
-      <h2>Pattern: Last N items</h2>
+/* First 3 — negative formula counts down from 3 */
+.item:nth-child(-n+3) { background: oklch(92% 0.06 275); }</code></pre>
+
+      <h2>Selecting last N items</h2>
       <pre><code>/* Last 3 items */
-:nth-last-child(-n+3) { opacity: 0.6; }
-/* Same logic but counting from the end */</code></pre>
-
-      <h2>Pattern: Everything from Nth onward</h2>
-      <pre><code>/* From the 4th item onward */
-:nth-child(n+4) { font-size: 0.85rem; }
-/* n=0→4, n=1→5, n=2→6: matches 4, 5, 6... */</code></pre>
-
-      <h2>Pattern: Range selection (items 3 through 7)</h2>
-      <pre><code>/* Items 3–7: combine "from 3rd" AND "first 7" */
-:nth-child(n+3):nth-child(-n+7) {
-  background: oklch(92% 0.06 275);
-}
-/* Must satisfy BOTH conditions: position >= 3 AND position <= 7 */</code></pre>
-
-      <h2>Pattern: Every 3rd starting from the 2nd</h2>
-      <pre><code>:nth-child(3n+2) { /* items 2, 5, 8, 11... */ }</code></pre>
-
-      <h2>Pattern: Skip first, style rest</h2>
-      <pre><code>/* All except the first item */
-:nth-child(n+2) { border-top: 1px solid oklch(90% 0 0); }</code></pre>
-
-      <h2>The "of S" syntax (modern)</h2>
-      <p>Select the Nth matching item of a filtered set:</p>
-      <pre><code>/* The 2nd element that has class .active among siblings */
-:nth-child(2 of .active) { font-weight: 700; }
-
-/* First 3 visible items (not hidden) */
-:nth-child(-n+3 of :not(.hidden)) { animation: fade-in 300ms; }
-
-/* Every odd .card (ignoring non-card siblings) */
-:nth-child(odd of .card) { background: oklch(97% 0.02 275); }</code></pre>
-      <p>Without "of S", <code>:nth-child</code> counts ALL siblings regardless of class. With "of S", it filters first, then counts. This solves the classic problem of zebra-striping only visible rows in a filtered list.</p>
-
-      <h2>Quantity queries with :nth-child</h2>
-      <pre><code>/* Style all items IF there are at least 4 */
-.item:nth-last-child(n+4),
-.item:nth-last-child(n+4) ~ .item {
-  font-size: 0.85rem;
+li:nth-last-child(-n+3) {
+  opacity: 0.6;
+  font-style: italic;
 }
 
-/* Style all items IF there are exactly 3 */
-.item:nth-last-child(3):first-child,
-.item:nth-last-child(3):first-child ~ .item {
-  flex: 1 1 33%;
+/* The very last one */
+li:nth-last-child(1) { border-bottom: none; }</code></pre>
+
+      <h2>Selecting a range</h2>
+      <pre><code>/* Items 3 through 7 — combine two formulas */
+li:nth-child(n+3):nth-child(-n+7) {
+  background: oklch(90% 0.08 200);
+  border-inline-start: 3px solid oklch(55% 0.2 200);
 }</code></pre>
 
-      <h2>Combined with :nth-of-type</h2>
-      <pre><code>/* Every 2nd paragraph (ignoring other elements) */
-p:nth-of-type(2n) { color: oklch(50% 0.1 275); }
+      <h2>Skip the first N</h2>
+      <pre><code>/* Everything except the first item */
+li:nth-child(n+2) { border-top: 1px solid oklch(90% 0 0); }
 
-/* First heading of each type */
-:is(h1, h2, h3):first-of-type { margin-top: 0; }</code></pre>
+/* Skip first 3 */
+.card:nth-child(n+4) { opacity: 0.8; }</code></pre>
+
+      <h2>Every Nth with offset</h2>
+      <pre><code>/* Every 4th starting from the 2nd: 2, 6, 10, 14... */
+li:nth-child(4n+2) { background: oklch(92% 0.06 150); }
+
+/* Every 3rd from end */
+li:nth-last-child(3n) { font-weight: 700; }</code></pre>
+
+      <h2>The "of S" syntax (filtered nth-child)</h2>
+      <p>The <code>of S</code> syntax filters which elements are counted. Only elements matching the selector S participate in the numbering.</p>
+      <pre><code>/* 2nd highlighted item (only counting .highlight elements) */
+li:nth-child(2 of .highlight) {
+  background: oklch(85% 0.12 275);
+}
+
+/* Every odd visible item (not counting hidden ones) */
+li:nth-child(odd of :not([hidden])) {
+  background: oklch(97% 0.02 275);
+}
+
+/* First item of class .active */
+.item:nth-child(1 of .active) {
+  border-inline-start: 4px solid oklch(55% 0.2 275);
+}</code></pre>
+
+      <h2>Zebra striping patterns</h2>
+      <pre><code>/* Standard zebra */
+tr:nth-child(even) { background: oklch(97% 0.01 275); }
+
+/* Grouped rows: stripe every other pair */
+tr:nth-child(4n+1), tr:nth-child(4n+2) {
+  background: oklch(95% 0.03 275);
+}
+
+/* Column striping in grids */
+.grid > :nth-child(3n+2) { background: oklch(96% 0.02 200); }</code></pre>
+
+      <h2>Grid column targeting</h2>
+      <pre><code>/* In a 3-column grid: target the first column */
+.grid > :nth-child(3n+1) { text-align: start; }
+
+/* Middle column */
+.grid > :nth-child(3n+2) { text-align: center; }
+
+/* Last column */
+.grid > :nth-child(3n+3) { text-align: end; }</code></pre>
+
+      <h2>Specificity</h2>
+      <p><code>:nth-child()</code> has specificity <strong>(0, 1, 0)</strong> — same as any pseudo-class. The "of S" syntax adds the specificity of S to that base.</p>
+      <table>
+        <thead><tr><th>Selector</th><th>Specificity</th></tr></thead>
+        <tbody>
+          <tr><td>li:nth-child(2n)</td><td>(0, 1, 1)</td></tr>
+          <tr><td>:nth-child(3 of .active)</td><td>(0, 2, 0)</td></tr>
+          <tr><td>.list > :nth-child(odd)</td><td>(0, 2, 0)</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="demo">
-      <h2>Demo — nth-child formulas</h2>
+      <h2>Demo — nth-child formula visualizer</h2>
       <div class="demo-frame">
         <style>
           .demo-28-8 { padding: 1.5rem; font-family: system-ui; }
-          .demo-28-8 h3 { font-size: 0.8rem; margin-block: 1.25rem 0.5rem; color: oklch(60% 0 0); font-family: monospace; }
-          .demo-28-8 .grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.3rem;
-          }
-          .demo-28-8 .grid .cell {
-            width: 32px;
-            height: 32px;
-            display: grid;
-            place-items: center;
-            font-size: 0.7rem;
-            font-weight: 600;
-            background: oklch(93% 0.03 275);
-            border-radius: 0.25rem;
-          }
-          .demo-28-8 .first-5 .cell:nth-child(-n+5) { background: oklch(55% 0.2 275); color: white; }
-          .demo-28-8 .every-3 .cell:nth-child(3n) { background: oklch(55% 0.2 150); color: white; }
-          .demo-28-8 .range .cell:nth-child(n+3):nth-child(-n+7) { background: oklch(55% 0.2 200); color: white; }
-          .demo-28-8 .last-3 .cell:nth-last-child(-n+3) { background: oklch(60% 0.2 25); color: white; }
+          .demo-28-8 .grid-20 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; margin-block-end: 1.5rem; }
+          .demo-28-8 .grid-20 .item { display: flex; align-items: center; justify-content: center; padding: 0.5rem; background: oklch(94% 0.02 275); border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; min-height: 2rem; border: 2px solid transparent; transition: all 150ms; }
+          /* Pattern: even */
+          .demo-28-8 .show-even .item:nth-child(even) { background: oklch(88% 0.08 275); border-color: oklch(70% 0.12 275); }
+          /* Pattern: first 5 */
+          .demo-28-8 .show-first5 .item:nth-child(-n+5) { background: oklch(85% 0.1 150); border-color: oklch(60% 0.15 150); }
+          /* Pattern: every 3rd */
+          .demo-28-8 .show-every3 .item:nth-child(3n) { background: oklch(85% 0.1 50); border-color: oklch(60% 0.18 50); }
+          /* Pattern: range 4-8 */
+          .demo-28-8 .show-range .item:nth-child(n+4):nth-child(-n+8) { background: oklch(85% 0.1 200); border-color: oklch(55% 0.15 200); }
+          .demo-28-8 .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: oklch(55% 0.15 275); margin-block-end: 0.4rem; }
         </style>
         <div class="demo-28-8">
-          <h3>:nth-child(-n+5) — first 5</h3>
-          <div class="grid first-5">
-            <span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">9</span><span class="cell">10</span>
+          <p class="label">:nth-child(even)</p>
+          <div class="grid-20 show-even">
+            <div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div><div class="item">5</div>
+            <div class="item">6</div><div class="item">7</div><div class="item">8</div><div class="item">9</div><div class="item">10</div>
+            <div class="item">11</div><div class="item">12</div><div class="item">13</div><div class="item">14</div><div class="item">15</div>
+            <div class="item">16</div><div class="item">17</div><div class="item">18</div><div class="item">19</div><div class="item">20</div>
           </div>
-          <h3>:nth-child(3n) — every 3rd</h3>
-          <div class="grid every-3">
-            <span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">9</span><span class="cell">10</span>
+          <p class="label">:nth-child(-n+5) — first 5</p>
+          <div class="grid-20 show-first5">
+            <div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div><div class="item">5</div>
+            <div class="item">6</div><div class="item">7</div><div class="item">8</div><div class="item">9</div><div class="item">10</div>
+            <div class="item">11</div><div class="item">12</div><div class="item">13</div><div class="item">14</div><div class="item">15</div>
+            <div class="item">16</div><div class="item">17</div><div class="item">18</div><div class="item">19</div><div class="item">20</div>
           </div>
-          <h3>:nth-child(n+3):nth-child(-n+7) — range 3-7</h3>
-          <div class="grid range">
-            <span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">9</span><span class="cell">10</span>
+          <p class="label">:nth-child(3n) — every 3rd</p>
+          <div class="grid-20 show-every3">
+            <div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div><div class="item">5</div>
+            <div class="item">6</div><div class="item">7</div><div class="item">8</div><div class="item">9</div><div class="item">10</div>
+            <div class="item">11</div><div class="item">12</div><div class="item">13</div><div class="item">14</div><div class="item">15</div>
+            <div class="item">16</div><div class="item">17</div><div class="item">18</div><div class="item">19</div><div class="item">20</div>
           </div>
-          <h3>:nth-last-child(-n+3) — last 3</h3>
-          <div class="grid last-3">
-            <span class="cell">1</span><span class="cell">2</span><span class="cell">3</span><span class="cell">4</span><span class="cell">5</span><span class="cell">6</span><span class="cell">7</span><span class="cell">8</span><span class="cell">9</span><span class="cell">10</span>
+          <p class="label">:nth-child(n+4):nth-child(-n+8) — range 4-8</p>
+          <div class="grid-20 show-range">
+            <div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div><div class="item">5</div>
+            <div class="item">6</div><div class="item">7</div><div class="item">8</div><div class="item">9</div><div class="item">10</div>
+            <div class="item">11</div><div class="item">12</div><div class="item">13</div><div class="item">14</div><div class="item">15</div>
+            <div class="item">16</div><div class="item">17</div><div class="item">18</div><div class="item">19</div><div class="item">20</div>
           </div>
         </div>
       </div>
@@ -163,14 +204,18 @@ p:nth-of-type(2n) { color: oklch(50% 0.1 275); }
         <label class="editor-pane">
           <span>HTML</span>
 <textarea data-editor="html" spellcheck="false">&lt;ul class="item-list"&gt;
-  &lt;li class="item active"&gt;Item 1&lt;/li&gt;
-  &lt;li class="item"&gt;Item 2&lt;/li&gt;
-  &lt;li class="item active"&gt;Item 3&lt;/li&gt;
-  &lt;li class="item"&gt;Item 4&lt;/li&gt;
-  &lt;li class="item active"&gt;Item 5&lt;/li&gt;
-  &lt;li class="item"&gt;Item 6&lt;/li&gt;
-  &lt;li class="item active"&gt;Item 7&lt;/li&gt;
-  &lt;li class="item"&gt;Item 8&lt;/li&gt;
+  &lt;li class="highlight"&gt;Item 1 (highlight)&lt;/li&gt;
+  &lt;li&gt;Item 2&lt;/li&gt;
+  &lt;li class="highlight"&gt;Item 3 (highlight)&lt;/li&gt;
+  &lt;li&gt;Item 4&lt;/li&gt;
+  &lt;li class="highlight"&gt;Item 5 (highlight)&lt;/li&gt;
+  &lt;li&gt;Item 6&lt;/li&gt;
+  &lt;li&gt;Item 7&lt;/li&gt;
+  &lt;li class="highlight"&gt;Item 8 (highlight)&lt;/li&gt;
+  &lt;li&gt;Item 9&lt;/li&gt;
+  &lt;li&gt;Item 10&lt;/li&gt;
+  &lt;li class="highlight"&gt;Item 11 (highlight)&lt;/li&gt;
+  &lt;li&gt;Item 12&lt;/li&gt;
 &lt;/ul&gt;</textarea>
         </label>
         <label class="editor-pane">
@@ -178,27 +223,37 @@ p:nth-of-type(2n) { color: oklch(50% 0.1 275); }
 <textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
 
 .item-list { list-style: none; padding: 0; max-width: 300px; }
-.item {
-  padding: 0.6rem 1rem;
-  margin: 0.25rem 0;
-  background: oklch(96% 0.02 275);
-  border-radius: 0.375rem;
-  font-size: 0.9rem;
+.item-list li {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid oklch(92% 0.02 275);
+  font-size: 0.85rem;
 }
 
-/* Zebra stripe only the .active items using "of S" */
-:nth-child(odd of .active) {
-  background: oklch(90% 0.08 275);
-}
-:nth-child(even of .active) {
-  background: oklch(85% 0.12 200);
+/* Zebra striping */
+.item-list li:nth-child(even) {
+  background: oklch(97% 0.01 275);
 }
 
-/* First 3 items get larger text */
-.item:nth-child(-n+3) { font-size: 1rem; font-weight: 600; }
+/* First 3 items bold */
+.item-list li:nth-child(-n+3) {
+  font-weight: 700;
+}
 
-/* Last 2 items get reduced opacity */
-.item:nth-last-child(-n+2) { opacity: 0.6; }
+/* Last 2 items dimmed */
+.item-list li:nth-last-child(-n+2) {
+  opacity: 0.5;
+}
+
+/* "of S" syntax: 2nd .highlight item */
+.item-list li:nth-child(2 of .highlight) {
+  background: oklch(88% 0.1 275);
+  border-inline-start: 4px solid oklch(55% 0.2 275);
+}
+
+/* Range: items 5-8 get left accent */
+.item-list li:nth-child(n+5):nth-child(-n+8) {
+  border-inline-start: 3px solid oklch(60% 0.15 200);
+}
 </textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
@@ -211,7 +266,7 @@ p:nth-of-type(2n) { color: oklch(50% 0.1 275); }
 
     <section class="callout">
       <h2>Mini-exercise</h2>
-      <p>Build a pagination component with 10 page buttons. Style the current page (5th item) using <code>:nth-child(5)</code>. Then style items 3-7 with a range selector as "nearby pages" with a different background. Use <code>:nth-child(-n+1)</code> and <code>:nth-last-child(-n+1)</code> to style first/last as special navigation buttons.</p>
+      <p>Create a 12-item grid that mimics a calendar row. Use <code>:nth-child(7n)</code> and <code>:nth-child(7n+1)</code> to highlight weekends. Use <code>:nth-child(-n+7)</code> to bold the first week. Use the "of S" syntax to select the 2nd item with class <code>.event</code> and give it a colored background.</p>
     </section>
 
     <nav class="lesson-nav cluster">

@@ -92,12 +92,50 @@ a  { color: oklch(50% 0.2 275); }</code></pre>
         </tbody>
       </table>
 
+      <h2>Compound selectors</h2>
+      <p>You can combine any of the four basic selectors without a combinator to create compound selectors that must all match the same element:</p>
+      <pre><code>/* Type + class: an anchor with class .btn */
+a.btn { text-decoration: none; }
+
+/* Type + ID (valid but discouraged) */
+section#hero { min-height: 100vh; }
+
+/* Multiple classes: must have both */
+.btn.primary.large { font-size: 1.2rem; }
+
+/* Universal + class: same as just .card */
+*.card { padding: 1rem; }</code></pre>
+      <p>Specificity is additive. <code>a.btn</code> is (0,1,1) — the type's (0,0,1) plus the class's (0,1,0).</p>
+
+      <h2>When type selectors cause problems</h2>
+      <p>Type selectors in component layers create fragile styles that break when HTML changes:</p>
+      <pre><code>/* Fragile: breaks if heading level changes */
+.card h2 { font-size: 1.25rem; }
+
+/* Robust: works regardless of element */
+.card-title { font-size: 1.25rem; }</code></pre>
+      <p>This is why PE7 reserves type selectors for the base layer. Components should target classes, making them element-agnostic.</p>
+
+      <h2>The case against ID selectors</h2>
+      <p>Consider this real scenario: you style <code>#nav</code> in your stylesheet. Later, you need to override it for a specific page. You try <code>.special-page .nav</code> — it loses. You try <code>.special-page #nav</code> — it wins, but now you've used two IDs-worth of specificity. The specificity arms race has begun.</p>
+      <p>With <code>@layer</code>, this entire problem vanishes:</p>
+      <pre><code>@layer base, components, overrides;
+
+@layer components {
+  .nav { display: flex; gap: 1rem; }
+}
+@layer overrides {
+  .nav { gap: 0.5rem; }  /* always wins — layer order, not specificity */
+}</code></pre>
+
       <h2>Best practices</h2>
       <ul>
         <li>Use type selectors only in base/reset layers.</li>
         <li>Use classes for all component and utility styling.</li>
         <li>Avoid IDs in CSS — use cascade layers for specificity control instead.</li>
         <li>Use the universal selector sparingly and only in resets.</li>
+        <li>Prefer flat selectors — a single class is almost always enough.</li>
+        <li>When specificity conflicts arise, reach for <code>@layer</code> before reaching for more specific selectors.</li>
       </ul>
     </section>
 
@@ -106,15 +144,24 @@ a  { color: oklch(50% 0.2 275); }</code></pre>
       <div class="demo-frame">
         <style>
           .demo-28-1 { padding: 1.5rem; font-family: system-ui; }
-          .demo-28-1 p { color: oklch(50% 0.1 150); margin: 0.5rem 0; font-size: 0.9rem; }
-          .demo-28-1 .highlight { color: oklch(50% 0.2 275); font-weight: 600; }
-          .demo-28-1 #unique { color: oklch(55% 0.22 25); font-weight: 700; }
+          .demo-28-1 .selectors { display: flex; flex-direction: column; gap: 0.5rem; }
+          .demo-28-1 p { color: oklch(50% 0.1 150); margin: 0; font-size: 0.9rem; padding: 0.5rem 0.75rem; border-radius: 0.375rem; background: oklch(97% 0.02 150); border-inline-start: 4px solid oklch(55% 0.15 150); }
+          .demo-28-1 .highlight { color: oklch(50% 0.2 275); font-weight: 600; background: oklch(97% 0.02 275); border-color: oklch(55% 0.2 275); }
+          .demo-28-1 #unique { color: oklch(55% 0.22 25); font-weight: 700; background: oklch(97% 0.02 25); border-color: oklch(55% 0.22 25); }
+          .demo-28-1 .universal-demo { margin-block-start: 1rem; padding: 0.75rem; background: oklch(96% 0.01 275); border-radius: 0.5rem; font-size: 0.8rem; }
+          .demo-28-1 .universal-demo * { outline: 1px dashed oklch(55% 0.2 275 / 0.3); outline-offset: 2px; }
           .demo-28-1 .label { font-size: 0.7rem; color: oklch(60% 0 0); font-family: monospace; margin-inline-start: 0.5rem; }
         </style>
         <div class="demo-28-1">
-          <p>Styled by type selector <code>p</code> (0,0,1) <span class="label">green</span></p>
-          <p class="highlight">Styled by class <code>.highlight</code> (0,1,0) <span class="label">purple</span></p>
-          <p class="highlight" id="unique">Styled by ID <code>#unique</code> (1,0,0) wins over class <span class="label">red</span></p>
+          <div class="selectors">
+            <p>Styled by type selector <code>p</code> — specificity (0,0,1) <span class="label">green</span></p>
+            <p class="highlight">Styled by class <code>.highlight</code> — specificity (0,1,0) <span class="label">purple</span></p>
+            <p class="highlight" id="unique">Styled by ID <code>#unique</code> — specificity (1,0,0) wins <span class="label">red</span></p>
+          </div>
+          <div class="universal-demo">
+            <p style="all: revert;">Universal <code>*</code> selector outlines every element (specificity 0,0,0)</p>
+            <span>Including inline elements</span>
+          </div>
         </div>
       </div>
     </section>
