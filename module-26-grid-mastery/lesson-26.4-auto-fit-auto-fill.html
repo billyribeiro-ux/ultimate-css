@@ -213,6 +213,16 @@ h3 { color: oklch(50% 0 0); font-size: 0.9rem; }
         <li>Always wrap the min value with <code>min(value, 100%)</code> for narrow containers</li>
         <li>This is the single most useful responsive grid pattern — memorize it</li>
       </ul>
+
+      <h2>Visual cheat sheet</h2>
+      <pre><code>/* auto-fit: 3 items in 5-column-wide container */
+|  Item 1  |  Item 2  |  Item 3  |
+/* Items stretch — empty tracks collapse */
+
+/* auto-fill: 3 items in 5-column-wide container */
+| Item 1 | Item 2 | Item 3 |     |     |
+/* Items stay at min — empty tracks remain */</code></pre>
+      <p>The visual difference is subtle but important when designing for variable content amounts.</p>
     </section>
 
     <nav class="lesson-nav cluster">

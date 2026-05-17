@@ -91,6 +91,24 @@
 
       <h2>Best practices</h2>
       <p>Keep fallback chains to 2 levels maximum. Beyond that, debugging which value is active becomes impractical. Use private properties (prefixed with <code>--_</code>) for intermediate resolution. Always end a chain with a concrete literal value. Document the fallback priority in comments for future maintainers.</p>
+
+      <h2>Testing fallbacks in DevTools</h2>
+      <p>Chrome and Firefox DevTools show which custom property value is active. To test fallback behavior:</p>
+      <ol>
+        <li>Inspect the element and find the computed value of the property.</li>
+        <li>In the Styles panel, uncheck (disable) the custom property definition.</li>
+        <li>Watch the computed value shift to the next fallback level.</li>
+        <li>Repeat to walk through the entire chain.</li>
+      </ol>
+      <p>This workflow reveals the resolution order visually, making fallback chains debuggable even when the CSS is complex.</p>
+
+      <h2>Common fallback architectures</h2>
+      <p>Design systems typically use a two-tier model: a global token layer (<code>--color-primary</code>) and a component token layer (<code>--btn-bg</code>). The component token falls back to the global token, which falls back to a literal. This gives you exactly 2 levels — the sweet spot for flexibility without confusion:</p>
+      <pre><code>/* Global (system tokens) */
+:root { --color-primary: oklch(55% 0.22 275); }
+
+/* Component (references system) */
+.btn { background: var(--btn-bg, var(--color-primary)); }</code></pre>
     </section>
 
     <section class="demo">

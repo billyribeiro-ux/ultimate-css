@@ -101,6 +101,18 @@ color: var(--if-dark, oklch(90% 0 0)) var(--if-light, oklch(20% 0 0));</code></p
 
       <h2>When to use which approach</h2>
       <p>Use the <strong>numeric toggle</strong> (<code>0/1</code>) when you need intermediate values, interpolation, or <code>calc()</code> math. Use the <strong>space toggle</strong> when you need to swap entire non-numeric values (like a font-family, a gradient, or a keyword). Use <strong>neither</strong> when you can simply override the property in a selector — the simplest solution is often the right one.</p>
+
+      <h2>Real-world use case: inverted components</h2>
+      <p>A common need: a navigation bar that is normally dark on light, but on hero sections becomes light on dark. The numeric toggle handles this elegantly:</p>
+      <pre><code>.nav {
+  --inverted: 0;
+  background: oklch(calc(95% - var(--inverted) * 80%) 0.02 275);
+  color: oklch(calc(20% + var(--inverted) * 70%) 0 0);
+}
+.hero .nav {
+  --inverted: 1; /* flip all colors */
+}</code></pre>
+      <p>Every color in the nav reacts to the single <code>--inverted</code> flag. No duplication of rules, no separate dark-nav class with repeated properties.</p>
     </section>
 
     <section class="demo">

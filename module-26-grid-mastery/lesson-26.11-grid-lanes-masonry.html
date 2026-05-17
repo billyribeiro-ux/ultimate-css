@@ -97,6 +97,32 @@
         <li>Respects <code>order</code> property</li>
         <li>No resize observers or mutation observers needed</li>
       </ul>
+
+      <h2>Masonry axis options</h2>
+      <p><code>grid-template-rows: masonry</code> creates columns that fill top-to-bottom (most common, like Pinterest). <code>grid-template-columns: masonry</code> creates rows that fill left-to-right (items pack into the shortest row). The masonry axis is always the one set to <code>masonry</code>.</p>
+
+      <h2>Spanning in masonry</h2>
+      <pre><code>.wide-item { grid-column: span 2; }
+/* Works! Item spans 2 columns in the masonry grid */</code></pre>
+      <p>Items can span multiple tracks on the non-masonry axis. The masonry algorithm places them in the shortest column group that has space.</p>
+
+      <h2>The progressive enhancement strategy</h2>
+      <p>Ship with CSS columns today, upgrade to grid masonry when supported. The visual result is nearly identical — columns gives you the packed layout, masonry adds proper grid features (spans, alignment, gap instead of margins).</p>
+      <pre><code>/* Phase 1: works everywhere */
+.gallery { columns: 15rem; column-gap: 1rem; }
+.gallery > * { break-inside: avoid; margin-bottom: 1rem; }
+
+/* Phase 2: better with grid */
+@supports (grid-template-rows: masonry) {
+  .gallery {
+    columns: unset;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-template-rows: masonry;
+    gap: 1rem;
+  }
+  .gallery > * { margin-bottom: 0; }
+}</code></pre>
     </section>
 
     <section class="demo">
