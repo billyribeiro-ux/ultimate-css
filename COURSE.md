@@ -20,10 +20,11 @@ Module 10 — Modern CSS Logic and Functions
 Module 11 — No-JS UI Patterns: What CSS Can Do Alone
 Module 12 — Capstone: Production Page from Scratch
 Module 13 — CSS in 2026: Functions, Colors, and What Just Shipped (May 2026 update)
+Module 14 — Industry Patterns: Apple, Netflix, Stripe & Beyond (PE7 Deep Dive)
 ```
 
-- **Total modules:** 13
-- **Total lessons:** 96
+- **Total modules:** 14
+- **Total lessons:** 112
 - **Total projects:** 12 (one per module) + 80 mini-exercises
 - **Open** `index.html` in the repo root to start.
 
