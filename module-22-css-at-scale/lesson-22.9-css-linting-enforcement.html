@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.9 — CSS Linting & Automated Enforcement · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 22 · Enterprise</p>
+      <h1>CSS Linting & Automated Enforcement</h1>
+      <p class="lead">The 7 Non-Negotiable Rules from Lesson 3.9 are only as strong as the enforcement behind them. Manual review catches violations after they are written. Automated linting catches them as they are typed.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Stylelint: the standard CSS linter</h2>
+      <p>Stylelint is the dominant CSS linter. It parses real CSS (not regex matching), understands modern syntax including <code>@layer</code>, <code>@scope</code>, and nesting, and supports a pluggable rule system. It runs in the terminal, in CI, and in editors. It is to CSS what ESLint is to JavaScript: the single tool every team should configure before writing a line of production CSS.</p>
+      <p>Stylelint works by parsing your CSS into an abstract syntax tree and running rules against every node. Built-in rules cover syntax, convention, and known anti-patterns. Community plugins extend coverage to architecture enforcement, performance, and accessibility. Custom rules let you encode team-specific constraints that no generic tool could anticipate.</p>
+      <p>The critical property of Stylelint is that it is <strong>configurable</strong>. An unconfigured linter is noise. A well-configured linter is governance. The difference between the two is a single configuration file that encodes your architecture as machine-readable rules.</p>
+
+      <h2>A PE7 Stylelint configuration</h2>
+      <p>The following <code>.stylelintrc.json</code> encodes the 7 Non-Negotiable Rules as lint checks. Each rule maps to a specific architectural constraint from Lesson 3.9. When this configuration runs, violations are caught at authoring time rather than review time.</p>
+      <pre><code>{
+  "rules": {
+    "declaration-no-important": true,
+
+    "color-named": "never",
+    "color-no-hex": true,
+
+    "selector-max-specificity": "0,3,0",
+    "selector-max-id": 0,
+
+    "property-disallowed-list": [
+      "margin-left",
+      "margin-right",
+      "padding-left",
+      "padding-right",
+      "top",
+      "bottom",
+      "left",
+      "right"
+    ],
+
+    "custom-property-pattern": "^(color|space|radius|shadow|font|text|line|border|z)-",
+
+    "at-rule-disallowed-list": []
+  }
+}</code></pre>
+      <p>Rule by rule:</p>
+      <p><strong>Rule 1 — No <code>!important</code>:</strong> <code>declaration-no-important</code> forbids <code>!important</code> everywhere. In the PE7 architecture, layer order eliminates every legitimate use of <code>!important</code> outside the animations layer. If you need an override, move the declaration to a higher layer rather than forcing specificity.</p>
+      <p><strong>Rule 2 — No hard-coded colors:</strong> <code>color-no-hex</code> and <code>color-named: never</code> together forbid hex values and named colors like <code>red</code> or <code>rebeccapurple</code>. All color values must come from custom properties defined in the tokens layer. This guarantees theme consistency and makes dark mode support a token swap rather than a component rewrite.</p>
+      <p><strong>Rule 3 — No physical direction properties:</strong> <code>property-disallowed-list</code> bans <code>margin-left</code>, <code>margin-right</code>, <code>padding-left</code>, <code>padding-right</code>, <code>top</code>, <code>bottom</code>, <code>left</code>, and <code>right</code>. Use the logical equivalents: <code>margin-inline-start</code>, <code>margin-inline-end</code>, <code>padding-inline-start</code>, <code>padding-inline-end</code>, <code>inset-block-start</code>, <code>inset-block-end</code>, <code>inset-inline-start</code>, <code>inset-inline-end</code>. This is not optional for internationalization — it is a prerequisite.</p>
+      <p><strong>Rule 4 — No class selectors in the base layer:</strong> This rule is best enforced by file-level convention: base-layer files should contain only element selectors. Stylelint can enforce this with a per-file override using the <code>overrides</code> key, restricting <code>selector-max-class</code> to <code>0</code> in files matching a <code>base/**</code> glob pattern.</p>
+      <p><strong>Rule 5 — Max selector specificity:</strong> <code>selector-max-specificity: "0,3,0"</code> caps specificity at three classes, zero IDs. <code>selector-max-id: 0</code> makes the ID ban explicit. In a layered architecture, specificity is a secondary concern — layer order is primary — but capping it prevents the arms race that layers were designed to end.</p>
+      <p><strong>Rule 6 — Require logical properties:</strong> Covered by the <code>property-disallowed-list</code> above. The disallowed list acts as a forcing function: developers who type <code>margin-left</code> see an immediate error and learn the logical equivalent.</p>
+      <p><strong>Rule 7 — Require <code>@layer</code> wrapping:</strong> Enforcing that all rules live inside a <code>@layer</code> block is the hardest rule to automate with built-in Stylelint. The <code>at-rule-disallowed-list</code> entry is a placeholder — in practice, this is best enforced with a custom plugin or a grep-based CI check that fails if any CSS file contains top-level rules outside a <code>@layer</code> block.</p>
+
+      <h2>CI integration</h2>
+      <p>A lint check that runs only on developer machines is a suggestion. A lint check that runs in CI is a gate. The following GitHub Actions workflow runs Stylelint on every pull request:</p>
+      <pre><code>name: CSS Lint
+on: [pull_request]
+jobs:
+  stylelint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Lint CSS
+        run: npx stylelint "**/*.css" --config .stylelintrc.json</code></pre>
+      <p>This runs in seconds. A failing lint check blocks the PR from merging. No negotiation, no exceptions. The configuration file is the single source of truth for what constitutes valid CSS in your project.</p>
+      <p>Pair this with the visual regression tests from Lesson 22.8 for a two-layer CI pipeline: lint catches mechanical violations in seconds, visual regression catches rendering issues in minutes. Fail fast on the cheap check.</p>
+
+      <h2>Editor integration</h2>
+      <p>CI catches violations before merge. Editor integration catches violations before commit. Add the Stylelint extension to VS Code and configure it to validate on save:</p>
+      <pre><code>{
+  "stylelint.validate": ["css"],
+  "css.validate": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.stylelint": "explicit"
+  }
+}</code></pre>
+      <p>With this configuration, violations appear as red underlines as the developer types. Auto-fixable rules (like replacing <code>margin-left</code> with <code>margin-inline-start</code>) are corrected on save. The feedback loop shrinks from hours (code review) to seconds (editor underline).</p>
+      <p>Every developer on the team must use the same Stylelint configuration. Commit the <code>.stylelintrc.json</code> to the repository root. Commit the VS Code settings to <code>.vscode/settings.json</code>. Configuration that is not in version control is configuration that drifts.</p>
+
+      <h2>The enforcement philosophy</h2>
+      <p>Linting is the minimum viable enforcement. It catches the obvious violations: hard-coded colors, <code>!important</code>, physical properties, over-specific selectors. These are mechanical errors with unambiguous fixes.</p>
+      <p>Code review catches the architectural violations: a component that should use tokens but uses a valid OKLCH value directly, a layout that works but belongs in the wrong layer, a custom property API that is technically correct but poorly designed. These require human judgment.</p>
+      <p>Together, linting and code review make the PE7 rules self-enforcing. The linter handles the 80% of violations that are mechanical. The reviewer focuses on the 20% that are architectural. Neither is sufficient alone. Both are necessary.</p>
+      <p>The goal is not to catch every violation — it is to make violations progressively harder to introduce. A developer who sees <code>margin-left</code> underlined in red stops typing it. A developer who sees a CI failure for <code>!important</code> stops reaching for it. Over weeks, the linter trains the team. The rules become habits. The configuration file becomes unnecessary because the team has internalized the architecture.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Before and after: 5 violations fixed</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-9 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 1.5rem;
+            font-family: system-ui;
+          }
+          .demo-22-9 h3 {
+            margin-block-end: 0.75rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: oklch(60% 0 0);
+          }
+          .demo-22-9 pre {
+            font-size: 0.75rem;
+            line-height: 1.6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            white-space: pre;
+          }
+          .demo-22-9 .before pre {
+            background: oklch(95% 0.02 25);
+            border: 1px solid oklch(85% 0.05 25);
+            color: oklch(30% 0.02 25);
+          }
+          .demo-22-9 .after pre {
+            background: oklch(95% 0.02 145);
+            border: 1px solid oklch(85% 0.05 145);
+            color: oklch(30% 0.02 145);
+          }
+          .demo-22-9 .violation {
+            color: oklch(50% 0.18 25);
+            font-weight: 600;
+          }
+          .demo-22-9 .fix {
+            color: oklch(45% 0.16 145);
+            font-weight: 600;
+          }
+          .demo-22-9 .comment {
+            color: oklch(55% 0.02 275);
+            font-style: italic;
+          }
+        </style>
+        <div class="demo-22-9">
+          <div class="before">
+            <h3>Before — 5 violations</h3>
+            <pre><code>.alert {
+  <span class="comment">/* 1: hard-coded hex color */</span>
+  background: <span class="violation">#ff4444</span>;
+  <span class="comment">/* 2: physical property */</span>
+  <span class="violation">padding-left</span>: 1rem;
+  <span class="comment">/* 3: named color */</span>
+  color: <span class="violation">white</span>;
+  <span class="comment">/* 4: !important override */</span>
+  display: flex <span class="violation">!important</span>;
+}
+<span class="comment">/* 5: ID selector */</span>
+<span class="violation">#sidebar</span> .alert {
+  margin: 2rem;
+}</code></pre>
+          </div>
+          <div class="after">
+            <h3>After — all fixed</h3>
+            <pre><code>@layer components {
+  .alert {
+    <span class="comment">/* token from tokens layer */</span>
+    background: <span class="fix">var(--color-danger)</span>;
+    <span class="comment">/* logical property */</span>
+    <span class="fix">padding-inline-start</span>: 1rem;
+    <span class="comment">/* token reference */</span>
+    color: <span class="fix">var(--color-on-danger)</span>;
+    <span class="comment">/* layer order handles cascade */</span>
+    display: <span class="fix">flex</span>;
+  }
+  <span class="comment">/* class selector, low specificity */</span>
+  <span class="fix">.sidebar</span> .alert {
+    margin: 2rem;
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="alert"&gt;
+  &lt;p class="alert-title"&gt;Warning&lt;/p&gt;
+  &lt;p&gt;This component has 5 lint violations. Fix them all.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="sidebar"&gt;
+  &lt;div class="alert"&gt;
+    &lt;p class="alert-title"&gt;Sidebar alert&lt;/p&gt;
+    &lt;p&gt;This variant uses an ID selector override.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Fix all 5 violations below:
+   1. Replace #ff4444 with a custom property
+   2. Replace padding-left with its logical equivalent
+   3. Replace the named color with a custom property
+   4. Remove !important — use @layer for cascade control
+   5. Replace #sidebar with a class selector
+*/
+
+:root {
+  --color-danger: oklch(62% 0.22 25);
+  --color-on-danger: oklch(99% 0.005 25);
+}
+
+.alert {
+  background: #ff4444;
+  padding-left: 1rem;
+  padding-block: 0.75rem;
+  padding-inline-end: 1rem;
+  color: white;
+  border-radius: 0.5rem;
+  display: flex !important;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-block-end: 1rem;
+}
+
+.alert-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+#sidebar .alert {
+  border-inline-start: 4px solid oklch(50% 0.18 25);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Extend the <code>.stylelintrc.json</code> configuration above with an <code>overrides</code> block that restricts base-layer files (matching <code>layers/base/**/*.css</code>) to zero class selectors using <code>selector-max-class: 0</code>. Then add a second override for the tokens layer that requires every declaration to use a custom property name matching the <code>^(color|space|radius|shadow|font|text|line|border|z)-</code> pattern.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.8-css-testing.html">&larr; Lesson 22.8</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
