@@ -218,12 +218,58 @@
             border-color: oklch(70% 0.2 210);
             color: oklch(70% 0.2 210);
           }
+
+          /* Slow-motion option */
+          .demo-18-7:has(#ctrl-slow:checked) .cube {
+            animation-duration: 30s;
+          }
+
+          /* Shadow beneath the cube */
+          .demo-18-7 .shadow {
+            width: 100px;
+            height: 20px;
+            background: oklch(30% 0 0 / 0.15);
+            border-radius: 50%;
+            margin-top: -10px;
+            filter: blur(6px);
+            animation: shadow-pulse-18-7 10s ease-in-out infinite;
+          }
+
+          @keyframes shadow-pulse-18-7 {
+            0%, 100% { transform: scaleX(1); opacity: 0.5; }
+            25% { transform: scaleX(0.7); opacity: 0.3; }
+            50% { transform: scaleX(1.1); opacity: 0.6; }
+            75% { transform: scaleX(0.8); opacity: 0.35; }
+          }
+
+          .demo-18-7:has(#ctrl-pause:checked) .shadow {
+            animation-play-state: paused;
+          }
+
+          /* Face gradient overlays */
+          .demo-18-7 .face::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 6px;
+            background: linear-gradient(135deg, oklch(100% 0 0 / 0.15), transparent 60%);
+            pointer-events: none;
+          }
+
+          /* Info text */
+          .demo-18-7 .info-text {
+            font-size: 0.8rem;
+            color: oklch(55% 0.02 270);
+            text-align: center;
+            max-width: 300px;
+          }
         </style>
         <div class="demo-18-7">
           <div class="controls">
             <label><input type="checkbox" id="ctrl-pause"> Pause rotation</label>
             <label><input type="checkbox" id="ctrl-explode"> Explode view</label>
             <label><input type="checkbox" id="ctrl-wireframe"> Wireframe</label>
+            <label><input type="checkbox" id="ctrl-slow"> Slow motion</label>
           </div>
           <div class="scene">
             <div class="cube">
@@ -235,6 +281,8 @@
               <div class="face bottom">Bottom</div>
             </div>
           </div>
+          <div class="shadow"></div>
+          <p class="info-text">Each face uses a different OKLCH hue spaced 60 degrees apart. Toggle controls to explore different rendering modes.</p>
         </div>
       </div>
     </section>

@@ -220,14 +220,80 @@
               background: oklch(25% 0.01 270);
             }
           }
+
+          /* Second clock: smooth seconds variant */
+          .demo-18-4 .clocks-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+          }
+
+          .demo-18-4 .clock-variant {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          .demo-18-4 .clock-sm {
+            --clock-size: 160px;
+          }
+          .demo-18-4 .clock-sm .hand-hour {
+            width: 4px;
+            height: 40px;
+            margin-left: -2px;
+          }
+          .demo-18-4 .clock-sm .hand-minute {
+            width: 3px;
+            height: 55px;
+            margin-left: -1.5px;
+          }
+          .demo-18-4 .clock-sm .hand-second {
+            height: 60px;
+          }
+          .demo-18-4 .clock-sm .hand-second::after {
+            height: 12px;
+            bottom: -12px;
+          }
+          .demo-18-4 .clock-sm::after {
+            width: 10px;
+            height: 10px;
+          }
+
+          /* Smooth seconds variant */
+          .demo-18-4 .smooth-seconds .hand-second {
+            animation-timing-function: linear;
+            animation-duration: 60s;
+          }
+
+          .demo-18-4 .variant-label {
+            font-size: 0.75rem;
+            color: oklch(55% 0.02 270);
+            font-weight: 500;
+          }
         </style>
         <div class="demo-18-4">
-          <div class="clock">
-            <div class="hand hand-hour" style="animation-delay: -34200s;"></div>
-            <div class="hand hand-minute" style="animation-delay: -2700s;"></div>
-            <div class="hand hand-second" style="animation-delay: -30s;"></div>
+          <div class="clocks-row">
+            <div class="clock-variant">
+              <div class="clock">
+                <div class="hand hand-hour" style="animation-delay: -34200s;"></div>
+                <div class="hand hand-minute" style="animation-delay: -2700s;"></div>
+                <div class="hand hand-second" style="animation-delay: -30s;"></div>
+              </div>
+              <span class="variant-label">Stepped (ticking)</span>
+            </div>
+            <div class="clock-variant">
+              <div class="clock clock-sm smooth-seconds">
+                <div class="hand hand-hour" style="animation-delay: -21600s;"></div>
+                <div class="hand hand-minute" style="animation-delay: -1800s;"></div>
+                <div class="hand hand-second" style="animation-delay: -0s;"></div>
+              </div>
+              <span class="variant-label">Smooth sweep</span>
+            </div>
           </div>
-          <p class="clock-label">Showing 9:45:30 (set via animation-delay)</p>
+          <p class="clock-label">Left: 9:45:30 (stepped) / Right: 6:30:00 (smooth)</p>
           <p class="theme-note">Respects your OS light/dark preference</p>
         </div>
       </div>

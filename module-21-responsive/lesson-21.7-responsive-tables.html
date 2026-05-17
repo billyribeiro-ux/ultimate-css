@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.7 — Responsive Data Tables · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.7 · Fluid Systems</p>
+      <h1>Responsive Data Tables</h1>
+      <p class="lead">Four patterns for tables on small screens: horizontal scroll, stacked cards, column toggle, and priority columns with sticky first column. Each with trade-offs explained and a working implementation.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Pattern 1: Horizontal scroll</h2>
+      <p>The simplest approach. Wrap the table in an overflow container and let users scroll horizontally:</p>
+      <pre><code>.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+/* Pros: preserves table semantics, simple
+   Cons: content hidden off-screen, discoverability */</code></pre>
+
+      <h2>Pattern 2: Stacked cards</h2>
+      <p>Each row becomes a card with label/value pairs. Uses <code>data-label</code> attributes and CSS Grid:</p>
+      <pre><code>@container (max-width: 600px) {
+  table, thead, tbody, tr, th, td {
+    display: block;
+  }
+  thead { display: none; }
+  tr {
+    margin-block-end: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+  }
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    display: block;
+    margin-block-end: 0.25rem;
+  }
+}
+/* Pros: all data visible, mobile-friendly
+   Cons: loses tabular comparison, verbose */</code></pre>
+
+      <h2>Pattern 3: Column toggle</h2>
+      <p>Hide less-important columns at narrow widths. Priority classes control which columns remain visible:</p>
+      <pre><code>@container (max-width: 700px) {
+  .col-low { display: none; }
+}
+@container (max-width: 500px) {
+  .col-medium { display: none; }
+}
+/* Pros: keeps table format, progressive
+   Cons: data is hidden, needs priority decisions */</code></pre>
+
+      <h2>Pattern 4: Priority columns (sticky first)</h2>
+      <p>Keep the first (identifying) column sticky while the rest scroll horizontally:</p>
+      <pre><code>.table-wrap { overflow-x: auto; }
+th:first-child, td:first-child {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+/* Pros: identifier always visible, full data accessible
+   Cons: requires fixed-width first column */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Four responsive table strategies</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-7 {
+            font-family: system-ui, sans-serif;
+            background: oklch(12% 0.02 230);
+            border-radius: 0.5rem;
+            padding: clamp(0.75rem, 0.5rem + 1vw, 2rem);
+            color: oklch(88% 0.01 230);
+          }
+          .demo-21-7 .strategy-picker {
+            display: flex;
+            gap: 0.25rem;
+            margin-block-end: 1.5rem;
+            flex-wrap: wrap;
+          }
+          .demo-21-7 .strategy-picker input[type="radio"] {
+            display: none;
+          }
+          .demo-21-7 .strategy-picker label {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid oklch(35% 0.05 230);
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            background: oklch(18% 0.02 230);
+            color: oklch(70% 0.02 230);
+            transition: all 150ms;
+          }
+          .demo-21-7 .strategy-picker input:checked + label {
+            background: oklch(45% 0.15 270);
+            border-color: oklch(55% 0.15 270);
+            color: white;
+          }
+          .demo-21-7 .table-container {
+            container-type: inline-size;
+            border: 1px solid oklch(25% 0.03 230);
+            border-radius: 0.5rem;
+            overflow: hidden;
+          }
+          /* Strategy 1: Horizontal Scroll */
+          .demo-21-7 .strategy-scroll .table-wrap {
+            overflow-x: auto;
+          }
+          .demo-21-7 table {
+            inline-size: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+          }
+          .demo-21-7 th, .demo-21-7 td {
+            padding: 0.6rem 0.75rem;
+            text-align: start;
+            white-space: nowrap;
+          }
+          .demo-21-7 th {
+            background: oklch(18% 0.03 230);
+            font-weight: 600;
+            color: oklch(75% 0.05 230);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+          }
+          .demo-21-7 td {
+            border-block-start: 1px solid oklch(22% 0.02 230);
+          }
+          .demo-21-7 tr:hover td {
+            background: oklch(16% 0.02 230);
+          }
+          /* Strategy 2: Stacked Cards */
+          .demo-21-7 .strategy-stacked thead { display: none; }
+          .demo-21-7 .strategy-stacked table { display: block; }
+          .demo-21-7 .strategy-stacked tbody { display: block; }
+          .demo-21-7 .strategy-stacked tr {
+            display: block;
+            padding: 0.75rem;
+            margin: 0.5rem;
+            background: oklch(18% 0.03 230);
+            border-radius: 0.5rem;
+            border: 1px solid oklch(25% 0.03 230);
+          }
+          .demo-21-7 .strategy-stacked td {
+            display: block;
+            padding: 0.3rem 0;
+            border: none;
+            white-space: normal;
+          }
+          .demo-21-7 .strategy-stacked td::before {
+            content: attr(data-label) ": ";
+            font-weight: 600;
+            color: oklch(65% 0.08 270);
+            font-size: 0.7rem;
+          }
+          /* Strategy 3: Column Toggle */
+          .demo-21-7 .strategy-toggle .col-low { display: none; }
+          /* Strategy 4: Sticky First */
+          .demo-21-7 .strategy-sticky .table-wrap { overflow-x: auto; }
+          .demo-21-7 .strategy-sticky th:first-child,
+          .demo-21-7 .strategy-sticky td:first-child {
+            position: sticky;
+            inset-inline-start: 0;
+            background: oklch(15% 0.02 230);
+            z-index: 1;
+            border-inline-end: 2px solid oklch(35% 0.08 270);
+          }
+          .demo-21-7 .hidden { display: none; }
+        </style>
+        <div class="demo-21-7">
+          <div class="strategy-picker">
+            <input type="radio" name="strategy" id="s1" checked onchange="document.querySelectorAll('.demo-21-7 .strategy').forEach(s=>s.classList.add('hidden'));document.querySelector('.demo-21-7 .strategy-scroll').classList.remove('hidden')">
+            <label for="s1">Horizontal Scroll</label>
+            <input type="radio" name="strategy" id="s2" onchange="document.querySelectorAll('.demo-21-7 .strategy').forEach(s=>s.classList.add('hidden'));document.querySelector('.demo-21-7 .strategy-stacked').classList.remove('hidden')">
+            <label for="s2">Stacked Cards</label>
+            <input type="radio" name="strategy" id="s3" onchange="document.querySelectorAll('.demo-21-7 .strategy').forEach(s=>s.classList.add('hidden'));document.querySelector('.demo-21-7 .strategy-toggle').classList.remove('hidden')">
+            <label for="s3">Column Toggle</label>
+            <input type="radio" name="strategy" id="s4" onchange="document.querySelectorAll('.demo-21-7 .strategy').forEach(s=>s.classList.add('hidden'));document.querySelector('.demo-21-7 .strategy-sticky').classList.remove('hidden')">
+            <label for="s4">Sticky First</label>
+          </div>
+          <div class="table-container">
+            <div class="strategy strategy-scroll">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Location</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td>Alice Chen</td><td>Engineer</td><td>Platform</td><td>San Francisco</td><td>Active</td></tr>
+                    <tr><td>Bob Martinez</td><td>Designer</td><td>Product</td><td>New York</td><td>Active</td></tr>
+                    <tr><td>Carol Park</td><td>Manager</td><td>Engineering</td><td>London</td><td>On Leave</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="strategy strategy-stacked hidden">
+              <table>
+                <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Location</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td data-label="Name">Alice Chen</td><td data-label="Role">Engineer</td><td data-label="Dept">Platform</td><td data-label="Location">San Francisco</td><td data-label="Status">Active</td></tr>
+                  <tr><td data-label="Name">Bob Martinez</td><td data-label="Role">Designer</td><td data-label="Dept">Product</td><td data-label="Location">New York</td><td data-label="Status">Active</td></tr>
+                  <tr><td data-label="Name">Carol Park</td><td data-label="Role">Manager</td><td data-label="Dept">Engineering</td><td data-label="Location">London</td><td data-label="Status">On Leave</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="strategy strategy-toggle hidden">
+              <table>
+                <thead><tr><th>Name</th><th>Role</th><th class="col-low">Department</th><th class="col-low">Location</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Alice Chen</td><td>Engineer</td><td class="col-low">Platform</td><td class="col-low">San Francisco</td><td>Active</td></tr>
+                  <tr><td>Bob Martinez</td><td>Designer</td><td class="col-low">Product</td><td class="col-low">New York</td><td>Active</td></tr>
+                  <tr><td>Carol Park</td><td>Manager</td><td class="col-low">Engineering</td><td class="col-low">London</td><td>On Leave</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="strategy strategy-sticky hidden">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Location</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td>Alice Chen</td><td>Engineer</td><td>Platform</td><td>San Francisco</td><td>Active</td></tr>
+                    <tr><td>Bob Martinez</td><td>Designer</td><td>Product</td><td>New York</td><td>Active</td></tr>
+                    <tr><td>Carol Park</td><td>Manager</td><td>Engineering</td><td>London</td><td>On Leave</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="table-container"&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Email&lt;/th&gt;&lt;th&gt;Role&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td data-label="Name"&gt;Alice&lt;/td&gt;
+        &lt;td data-label="Email"&gt;alice@co.io&lt;/td&gt;
+        &lt;td data-label="Role"&gt;Engineer&lt;/td&gt;
+        &lt;td data-label="Status"&gt;Active&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td data-label="Name"&gt;Bob&lt;/td&gt;
+        &lt;td data-label="Email"&gt;bob@co.io&lt;/td&gt;
+        &lt;td data-label="Role"&gt;Designer&lt;/td&gt;
+        &lt;td data-label="Status"&gt;Away&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; background: #111; color: #eee; }
+
+.table-container { container-type: inline-size; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.6rem; text-align: start; }
+th { background: #1a1a2e; font-size: 0.8rem; }
+td { border-top: 1px solid #2a2a3e; }
+
+/* Stacked cards under 500px container width */
+@container (max-width: 500px) {
+  thead { display: none; }
+  tr { display: block; margin-bottom: 1rem; padding: 1rem; background: #1a1a2e; border-radius: 0.5rem; }
+  td { display: block; padding: 0.25rem 0; border: none; }
+  td::before { content: attr(data-label) ": "; font-weight: 600; color: oklch(65% 0.1 270); }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Implement the "sticky first column" pattern: create a table with 6+ columns where the first column (Name) stays sticky with <code>position: sticky; inset-inline-start: 0</code> while the remaining columns scroll horizontally. Add a subtle border and background to the sticky column so it visually separates from the scrolling content.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.6-logical-properties-rtl.html">&larr; Lesson 21.6</a>
+      <a href="./lesson-21.8-responsive-navigation.html">Lesson 21.8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

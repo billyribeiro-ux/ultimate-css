@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.6 — Logical Properties & RTL/Vertical Writing · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.6 · Fluid Systems</p>
+      <h1>Logical Properties &amp; RTL/Vertical Writing</h1>
+      <p class="lead">Complete physical-to-logical property mapping. The PE7 rule: logical properties everywhere in base styles. One CSS file that works in LTR, RTL, and vertical writing modes without a single override.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Physical to logical mapping</h2>
+      <p>Logical properties replace physical directions (left/right/top/bottom) with flow-relative directions (inline-start/inline-end/block-start/block-end):</p>
+      <pre><code>/* PHYSICAL → LOGICAL */
+
+/* Dimensions */
+width        → inline-size
+height       → block-size
+min-width    → min-inline-size
+max-height   → max-block-size
+
+/* Margin */
+margin-left   → margin-inline-start
+margin-right  → margin-inline-end
+margin-top    → margin-block-start
+margin-bottom → margin-block-end
+
+/* Padding */
+padding-left  → padding-inline-start
+padding-right → padding-inline-end
+
+/* Shorthand */
+margin: 1rem 2rem → margin-block: 1rem; margin-inline: 2rem;
+padding: 1rem 2rem 1rem 2rem → padding-block: 1rem; padding-inline: 2rem;
+
+/* Border */
+border-left  → border-inline-start
+border-right → border-inline-end
+border-top   → border-block-start
+
+/* Position */
+top    → inset-block-start
+bottom → inset-block-end
+left   → inset-inline-start
+right  → inset-inline-end
+inset: 0 → inset: 0 (already logical)
+
+/* Border-radius */
+border-top-left-radius     → border-start-start-radius
+border-top-right-radius    → border-start-end-radius
+border-bottom-left-radius  → border-end-start-radius
+border-bottom-right-radius → border-end-end-radius</code></pre>
+
+      <h2>Logical values</h2>
+      <p>Properties that take directional values also have logical equivalents:</p>
+      <pre><code>/* text-align */
+text-align: left  → text-align: start
+text-align: right → text-align: end
+
+/* float and clear */
+float: left  → float: inline-start
+float: right → float: inline-end
+
+/* resize */
+resize: horizontal → resize: inline
+resize: vertical   → resize: block</code></pre>
+
+      <h2>The PE7 rule</h2>
+      <p>In PE7 architecture, all base styles use logical properties exclusively. Physical properties are only allowed in the rare case where something must be physically positioned regardless of writing direction (e.g., a fixed visual decoration).</p>
+      <pre><code>/* PE7 base — always logical */
+.card {
+  padding-inline: 1.5rem;
+  padding-block: 1rem;
+  margin-block-end: 1rem;
+  border-inline-start: 3px solid var(--accent);
+  border-start-start-radius: 0.5rem;
+  border-end-start-radius: 0.5rem;
+}</code></pre>
+
+      <h2>Testing with dir and writing-mode</h2>
+      <p>A properly logical layout needs zero CSS changes for RTL or vertical writing:</p>
+      <pre><code>/* Just change the HTML attribute */
+&lt;html dir="rtl" lang="ar"&gt;
+
+/* Or change writing mode */
+html { writing-mode: vertical-rl; }
+
+/* If you used logical properties throughout,
+   everything flips/rotates correctly */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Layout in LTR, RTL, and vertical writing</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-6 {
+            font-family: system-ui, sans-serif;
+            background: oklch(12% 0.02 200);
+            border-radius: 0.5rem;
+            padding: clamp(1rem, 0.5rem + 2vw, 2rem);
+            color: oklch(88% 0.01 200);
+          }
+          .demo-21-6 .controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-block-end: 1.5rem;
+            flex-wrap: wrap;
+          }
+          .demo-21-6 .controls button {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid oklch(40% 0.08 200);
+            background: oklch(20% 0.03 200);
+            color: oklch(80% 0.02 200);
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 150ms;
+          }
+          .demo-21-6 .controls button:hover {
+            background: oklch(30% 0.05 200);
+          }
+          .demo-21-6 .controls button.active {
+            background: oklch(45% 0.15 270);
+            border-color: oklch(55% 0.15 270);
+            color: white;
+          }
+          .demo-21-6 .layout-frame {
+            border: 1px solid oklch(25% 0.03 200);
+            border-radius: 0.5rem;
+            overflow: hidden;
+          }
+          .demo-21-6 .logical-layout {
+            display: grid;
+            gap: 1rem;
+            padding: 1rem;
+            transition: all 300ms;
+          }
+          .demo-21-6 .logical-layout .nav-bar {
+            display: flex;
+            gap: 0.75rem;
+            padding-block: 0.75rem;
+            padding-inline: 1rem;
+            background: oklch(18% 0.03 200);
+            border-radius: 0.25rem;
+            align-items: center;
+          }
+          .demo-21-6 .logical-layout .logo {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-inline-end: auto;
+          }
+          .demo-21-6 .logical-layout .nav-link {
+            font-size: 0.8rem;
+            color: oklch(65% 0.03 200);
+          }
+          .demo-21-6 .logical-layout .content-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
+          .demo-21-6 .logical-layout .article {
+            padding-inline: 1.5rem;
+            padding-block: 1rem;
+            background: oklch(18% 0.03 200);
+            border-radius: 0.25rem;
+            border-inline-start: 3px solid oklch(55% 0.18 270);
+          }
+          .demo-21-6 .logical-layout .article h4 {
+            font-size: 1rem;
+            margin-block-end: 0.5rem;
+          }
+          .demo-21-6 .logical-layout .article p {
+            font-size: 0.8rem;
+            color: oklch(60% 0.02 200);
+            line-height: 1.5;
+          }
+          .demo-21-6 .logical-layout .sidebar-box {
+            padding-inline: 1rem;
+            padding-block: 0.75rem;
+            background: oklch(22% 0.04 200);
+            border-radius: 0.25rem;
+            border-inline-end: 3px solid oklch(60% 0.15 150);
+            font-size: 0.8rem;
+            color: oklch(65% 0.03 200);
+          }
+          .demo-21-6 .rtl-mode { direction: rtl; }
+          .demo-21-6 .vertical-mode { writing-mode: vertical-rl; min-block-size: 300px; }
+          .demo-21-6 .mode-label {
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: oklch(55% 0.08 200);
+            text-align: end;
+            padding-block-start: 0.5rem;
+          }
+        </style>
+        <div class="demo-21-6">
+          <div class="controls">
+            <button class="active" onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');const l=this.closest('.demo-21-6').querySelector('.logical-layout');l.className='logical-layout';this.closest('.demo-21-6').querySelector('.mode-label').textContent='direction: ltr (default)'">LTR</button>
+            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');const l=this.closest('.demo-21-6').querySelector('.logical-layout');l.className='logical-layout rtl-mode';this.closest('.demo-21-6').querySelector('.mode-label').textContent='direction: rtl'">RTL</button>
+            <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');const l=this.closest('.demo-21-6').querySelector('.logical-layout');l.className='logical-layout vertical-mode';this.closest('.demo-21-6').querySelector('.mode-label').textContent='writing-mode: vertical-rl'">Vertical</button>
+          </div>
+          <div class="layout-frame">
+            <div class="logical-layout">
+              <div class="nav-bar">
+                <span class="logo">Brand</span>
+                <span class="nav-link">Home</span>
+                <span class="nav-link">About</span>
+                <span class="nav-link">Contact</span>
+              </div>
+              <div class="content-area">
+                <div class="article">
+                  <h4>Logical Properties</h4>
+                  <p>This border-inline-start accent flips automatically in RTL and rotates in vertical writing mode. Zero CSS overrides needed.</p>
+                </div>
+                <div class="sidebar-box">
+                  This box has border-inline-end. Watch it flip sides in RTL without any direction-specific CSS rules.
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="mode-label">direction: ltr (default)</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card" dir="ltr"&gt;
+  &lt;div class="card-accent"&gt;&lt;/div&gt;
+  &lt;div class="card-body"&gt;
+    &lt;h3&gt;Logical Card&lt;/h3&gt;
+    &lt;p&gt;Change dir="ltr" to dir="rtl" above.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; background: #111; color: #eee; }
+
+.card {
+  display: flex;
+  background: #1a1a2e;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  max-inline-size: 400px;
+}
+
+.card-accent {
+  inline-size: 4px;
+  background: oklch(60% 0.2 270);
+  /* This sits at inline-start — flips in RTL */
+}
+
+.card-body {
+  padding-inline: 1.5rem;
+  padding-block: 1rem;
+}
+
+.card-body h3 {
+  margin-block-end: 0.5rem;
+  text-align: start; /* Not "left" */
+}
+
+.card-body p {
+  color: oklch(65% 0.02 270);
+  font-size: 0.9rem;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Convert a card component from physical to logical properties: replace all margin-left/right with margin-inline-start/end, all padding-top/bottom with padding-block-start/end, all border-radius corners with their logical equivalents. Then test with <code>dir="rtl"</code> and <code>writing-mode: vertical-rl</code> to confirm it renders correctly in all three modes.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.5-responsive-images-css.html">&larr; Lesson 21.5</a>
+      <a href="./lesson-21.7-responsive-tables.html">Lesson 21.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

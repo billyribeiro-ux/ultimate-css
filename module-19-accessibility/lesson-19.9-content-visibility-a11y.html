@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.9 — content-visibility & Accessibility Pitfalls · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.9 · Inclusive Design</p>
+      <h1>content-visibility & Accessibility Pitfalls</h1>
+      <p class="lead">content-visibility: auto is a powerful performance optimization — it skips rendering of off-screen content. But it also hides that content from browser find-in-page (Ctrl+F) and can confuse screen readers. Here is when to use it and when to avoid it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What content-visibility: auto does</h2>
+      <p>When an element with <code>content-visibility: auto</code> is off-screen, the browser skips its layout, paint, and style calculations entirely. This can dramatically improve initial render time for long pages. When the element scrolls into view, it renders normally.</p>
+
+      <h2>The find-in-page problem</h2>
+      <p>Browser find-in-page (Ctrl+F / Cmd+F) may not search text inside elements with <code>content-visibility: auto</code> that are currently off-screen. This means users searching for content will not find it. Chromium browsers have improved this, but the behavior is still inconsistent across engines.</p>
+
+      <h2>The contain-intrinsic-size requirement</h2>
+      <p>Without <code>contain-intrinsic-size</code>, the off-screen element has 0 height, causing the scrollbar to jump as content renders. Always pair them:</p>
+      <pre><code>.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}</code></pre>
+      <p>The <code>auto</code> keyword remembers the last rendered size, preventing layout shifts on re-scroll.</p>
+
+      <h2>When NOT to use it</h2>
+      <ul>
+        <li><strong>Main content area:</strong> If the primary text of your page uses content-visibility, search engines and find-in-page may miss it.</li>
+        <li><strong>Critical text:</strong> Legal notices, terms, accessibility statements — content users actively search for.</li>
+        <li><strong>Above-the-fold content:</strong> Already visible on load, so there is no benefit and potential CLS risk.</li>
+        <li><strong>Landmark regions:</strong> Screen readers navigate by landmarks; hiding them disrupts navigation.</li>
+      </ul>
+
+      <h2>Safe patterns</h2>
+      <p>Use <code>content-visibility: auto</code> on below-fold sections that are supplementary: image galleries, comments sections, footer widgets, related-articles grids. The content is still accessible — it just does not render until the user scrolls to it.</p>
+
+      <h2>The contentvisibilityautostatechange event</h2>
+      <p>This JavaScript event fires when the element transitions between visible and hidden states. For JS-dependent content (lazy-loaded images, interactive widgets), listen for this event to initialize when the section becomes visible.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — content-visibility and find-in-page</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-9 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .demo-19-9 .scroll-container {
+            height: 300px;
+            overflow-y: auto;
+            border: 2px solid oklch(80% 0.05 275);
+            border-radius: 0.5rem;
+            padding: 1rem;
+          }
+          .demo-19-9 .content-section {
+            padding: 1.25rem;
+            margin-block-end: 1rem;
+            background: oklch(96% 0.02 275);
+            border-radius: 0.5rem;
+            border-inline-start: 3px solid oklch(65% 0.2 275);
+          }
+          .demo-19-9 .content-section h3 {
+            font-size: 0.95rem;
+            color: oklch(25% 0.1 275);
+            margin-block-end: 0.5rem;
+          }
+          .demo-19-9 .content-section p {
+            font-size: 0.85rem;
+            color: oklch(35% 0.05 275);
+            line-height: 1.5;
+          }
+          .demo-19-9 .cv-section {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 120px;
+          }
+          .demo-19-9 .warning-box {
+            padding: 0.75rem;
+            background: oklch(93% 0.08 60);
+            border: 1px solid oklch(80% 0.12 60);
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            color: oklch(30% 0.08 60);
+            line-height: 1.5;
+          }
+          .demo-19-9 .hint {
+            font-size: 0.8rem;
+            color: oklch(45% 0.05 275);
+            font-style: italic;
+          }
+        </style>
+        <div class="demo-19-9">
+          <p class="hint">Try Ctrl+F and search for "hidden treasure" — it may not be found until you scroll to it.</p>
+          <div class="scroll-container">
+            <div class="content-section">
+              <h3>Section 1 — Always visible</h3>
+              <p>This section has no content-visibility applied. It renders immediately and is always findable via Ctrl+F. It contains important introductory text.</p>
+            </div>
+            <div class="content-section">
+              <h3>Section 2 — Always visible</h3>
+              <p>Another normally-rendered section. All text here is searchable at all times. This is the safe pattern for critical content.</p>
+            </div>
+            <div class="content-section cv-section">
+              <h3>Section 3 — content-visibility: auto</h3>
+              <p>This section uses content-visibility: auto. If it is off-screen when you search, it might not be found. The hidden treasure is here.</p>
+            </div>
+            <div class="content-section cv-section">
+              <h3>Section 4 — content-visibility: auto</h3>
+              <p>Another deferred section. Performance is better because the browser skips rendering until scroll. But discoverability is reduced.</p>
+            </div>
+            <div class="content-section cv-section">
+              <h3>Section 5 — content-visibility: auto</h3>
+              <p>This is supplementary content — a good candidate for content-visibility. Comments, related articles, and image galleries are safe choices.</p>
+            </div>
+            <div class="content-section cv-section">
+              <h3>Section 6 — content-visibility: auto</h3>
+              <p>The further below the fold, the more benefit you get from deferring render. But always test find-in-page across browsers.</p>
+            </div>
+          </div>
+          <div class="warning-box">
+            <strong>Accessibility note:</strong> Screen readers may skip content-visibility: auto sections that are off-screen. Never use it on primary navigation, headings that serve as landmarks, or content essential for understanding the page.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Long Article&lt;/h1&gt;
+  &lt;section class="intro"&gt;
+    &lt;h2&gt;Introduction&lt;/h2&gt;
+    &lt;p&gt;This is the main content. It should always be searchable and accessible. Never apply content-visibility here.&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class="deferred"&gt;
+    &lt;h2&gt;Related Reading&lt;/h2&gt;
+    &lt;p&gt;These are supplementary links. Safe for content-visibility: auto.&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class="deferred"&gt;
+    &lt;h2&gt;Comments (142)&lt;/h2&gt;
+    &lt;p&gt;User comments are below the fold. Perfect content-visibility candidate.&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  max-width: 600px;
+}
+
+h1 { font-size: 1.5rem; color: oklch(25% 0.1 275); }
+h2 { font-size: 1.1rem; color: oklch(30% 0.08 275); }
+p { font-size: 0.9rem; line-height: 1.6; color: oklch(35% 0.03 275); }
+
+section {
+  padding: 1.25rem;
+  margin-block-end: 1rem;
+  background: oklch(96% 0.02 275);
+  border-radius: 0.5rem;
+}
+
+/* Safe: only supplementary content */
+.deferred {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100px;
+}
+
+/* Never defer the intro */
+.intro {
+  border-inline-start: 3px solid oklch(55% 0.25 275);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Move the <code>content-visibility: auto</code> to the <code>.intro</code> section and remove it from <code>.deferred</code>. Reload and use Ctrl+F to search for "main content." In some browsers, you will not find it because the intro is off-screen (if you scroll it out of view). Revert the change — primary content must never use content-visibility.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.8-touch-targets.html">&larr; Lesson 19.8</a>
+      <a href="./lesson-19.10-aria-css-patterns.html">Lesson 19.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

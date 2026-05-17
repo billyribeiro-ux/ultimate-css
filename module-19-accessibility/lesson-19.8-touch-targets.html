@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.8 — Touch Target Sizing & Spacing · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.8 · Inclusive Design</p>
+      <h1>Touch Target Sizing & Spacing</h1>
+      <p class="lead">A finger is not a pixel-precise pointer. WCAG 2.5.8 requires a minimum 24x24px target size (AA), with 44x44px as the recommended target. Undersized touch targets are the most common mobile accessibility failure — and the easiest to fix with CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The requirement</h2>
+      <p>WCAG 2.5.8 (Target Size - Minimum) at AA requires 24x24 CSS pixels. The older WCAG 2.5.5 (Enhanced) and Apple/Google guidelines recommend 44x44px. For comfortable touch interaction, 44px is the practical target. The average adult fingertip covers approximately 48px of screen area.</p>
+
+      <h2>Padding-based enlargement</h2>
+      <p>The simplest approach: add enough padding so the interactive element reaches 44px in both dimensions:</p>
+      <pre><code>.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding: 0.5rem 1rem;
+}</code></pre>
+
+      <h2>The ::after stretch pattern</h2>
+      <p>When you cannot change the visual size of an element (e.g., a small icon button), extend the hit area with an invisible pseudo-element:</p>
+      <pre><code>.icon-btn {
+  position: relative;
+}
+.icon-btn::after {
+  content: "";
+  position: absolute;
+  inset: -8px; /* extends 8px in every direction */
+  /* no background — invisible but clickable */
+}</code></pre>
+      <p>This makes the clickable area larger without changing the visual footprint.</p>
+
+      <h2>Spacing between targets</h2>
+      <p>Adjacent targets must have enough space that a tap on one does not accidentally activate the other. A minimum gap of 8px between targets is recommended. In a tight toolbar, <code>gap: 0.5rem</code> (8px) between buttons prevents mis-taps.</p>
+
+      <h2>min-height vs height</h2>
+      <p>Use <code>min-block-size: 44px</code> rather than <code>block-size: 44px</code>. Fixed height can clip content when text wraps or when the user increases font size. Minimum height ensures accessibility without breaking content flow.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Proper vs improper touch targets</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-8 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-19-8 .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: oklch(50% 0.05 275);
+          }
+          .demo-19-8 .toolbar {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            background: oklch(95% 0.02 275);
+            border-radius: 0.5rem;
+            border: 1px solid oklch(88% 0.03 275);
+          }
+          /* Bad toolbar */
+          .demo-19-8 .toolbar-bad {
+            gap: 2px;
+          }
+          .demo-19-8 .toolbar-bad button {
+            padding: 4px 6px;
+            font-size: 0.65rem;
+            background: oklch(88% 0.03 275);
+            border: 1px solid oklch(75% 0.03 275);
+            border-radius: 3px;
+            cursor: pointer;
+            min-height: auto;
+          }
+          /* Good toolbar */
+          .demo-19-8 .toolbar-good {
+            gap: 0.5rem;
+          }
+          .demo-19-8 .toolbar-good button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-block-size: 44px;
+            min-inline-size: 44px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            background: oklch(48% 0.22 275);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+          }
+          .demo-19-8 .toolbar-good button:hover {
+            background: oklch(42% 0.22 275);
+          }
+          .demo-19-8 .size-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: oklch(45% 0.05 275);
+          }
+          .demo-19-8 .size-box {
+            display: inline-block;
+            border: 2px dashed oklch(65% 0.15 25);
+            width: 24px;
+            height: 24px;
+          }
+          .demo-19-8 .size-box.good {
+            border-color: oklch(55% 0.2 145);
+            width: 44px;
+            height: 44px;
+          }
+          .demo-19-8 .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+          .demo-19-8 .fail-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: oklch(45% 0.2 25);
+            background: oklch(90% 0.1 25);
+            padding: 0.15rem 0.5rem;
+            border-radius: 1rem;
+          }
+          .demo-19-8 .pass-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: oklch(30% 0.15 145);
+            background: oklch(88% 0.12 145);
+            padding: 0.15rem 0.5rem;
+            border-radius: 1rem;
+          }
+        </style>
+        <div class="demo-19-8">
+          <div class="comparison">
+            <div>
+              <span class="section-label">Too small <span class="fail-badge">Fail</span></span>
+              <div class="toolbar toolbar-bad">
+                <button>B</button>
+                <button>I</button>
+                <button>U</button>
+                <button>S</button>
+                <button>H1</button>
+                <button>H2</button>
+              </div>
+              <div class="size-indicator" style="margin-top:0.5rem">
+                <span class="size-box"></span>
+                <span>~20x20px targets, 2px gap</span>
+              </div>
+            </div>
+            <div>
+              <span class="section-label">Correct size <span class="pass-badge">Pass</span></span>
+              <div class="toolbar toolbar-good">
+                <button>B</button>
+                <button>I</button>
+                <button>U</button>
+                <button>S</button>
+              </div>
+              <div class="size-indicator" style="margin-top:0.5rem">
+                <span class="size-box good"></span>
+                <span>44x44px targets, 8px gap</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="toolbar" aria-label="Formatting"&gt;
+  &lt;button aria-label="Bold"&gt;B&lt;/button&gt;
+  &lt;button aria-label="Italic"&gt;I&lt;/button&gt;
+  &lt;button aria-label="Underline"&gt;U&lt;/button&gt;
+  &lt;button aria-label="Link"&gt;Lk&lt;/button&gt;
+&lt;/nav&gt;
+
+&lt;nav class="icon-nav" aria-label="Actions"&gt;
+  &lt;a href="#" class="icon-link"&gt;
+    &lt;span aria-hidden="true"&gt;+&lt;/span&gt;
+    &lt;span class="sr-only"&gt;Add item&lt;/span&gt;
+  &lt;/a&gt;
+  &lt;a href="#" class="icon-link"&gt;
+    &lt;span aria-hidden="true"&gt;x&lt;/span&gt;
+    &lt;span class="sr-only"&gt;Delete&lt;/span&gt;
+  &lt;/a&gt;
+&lt;/nav&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* Toolbar with proper targets */
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: oklch(95% 0.02 275);
+  border-radius: 0.5rem;
+}
+
+.toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding: 0.5rem;
+  background: oklch(48% 0.22 275);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* Icon links with ::after stretch */
+.icon-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.icon-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: oklch(90% 0.05 275);
+  border-radius: 50%;
+  text-decoration: none;
+  font-weight: bold;
+  color: oklch(30% 0.1 275);
+}
+
+/* Invisible touch area extension */
+.icon-link::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Inspect the icon links in DevTools. Hover over the <code>::after</code> pseudo-element — you will see the extended hit area highlighted. Now remove the <code>::after</code> rule and try tapping the icons on a touch device (or in mobile simulation). The miss rate increases significantly. Add the rule back and increase <code>inset: -10px</code> to <code>inset: -14px</code> for an even more forgiving target.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.7-prefers-color-scheme.html">&larr; Lesson 19.7</a>
+      <a href="./lesson-19.9-content-visibility-a11y.html">Lesson 19.9 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
