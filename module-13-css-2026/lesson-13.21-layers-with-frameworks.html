@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.21 — Integrating @layer with Tailwind, Bootstrap &amp; Third-Party CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.21</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · architectural pattern</p>
+      <p class="badge">Lesson 13.21</p>
+      <h1>Integrating @layer with Tailwind, Bootstrap &amp; Third-Party CSS</h1>
+      <p class="lead">The single most asked question about <code>@layer</code> in production: how do I use it with my existing framework? Three patterns that permanently solve framework specificity wars.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem</h2>
+      <p>You adopt a CSS framework — Tailwind, Bootstrap, a component library. You write custom component styles. Specificity conflicts appear immediately. Your <code>.card</code> component is overridden by Bootstrap's <code>.card</code>. Your custom button color loses to a utility class. You start adding <code>!important</code>, then more <code>!important</code>, then inline styles. The specificity war has begun and there are no winners.</p>
+      <p><code>@layer</code> ends this permanently. Layered styles always lose to unlayered styles. Lower layers always lose to higher layers. Specificity within a layer only competes against the same layer. The architecture is deterministic.</p>
+
+      <h2>Pattern 1: Wrapping Tailwind in layers</h2>
+      <pre><code>/* Layer order declaration — lower = less priority */
+@layer vendor, reset, layout, components, utilities;
+
+/* Tailwind's layers wrapped in your architecture */
+@import "tailwindcss/base" layer(vendor);
+@import "tailwindcss/components" layer(vendor);
+@import "tailwindcss/utilities" layer(utilities);
+
+/* Your styles live in higher-priority layers */
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+}
+
+@layer components {
+  .card {
+    /* This beats Tailwind's .card automatically —
+       components layer > vendor layer */
+    padding: var(--space-md);
+    background: var(--surface-raised);
+    border-radius: var(--radius-md);
+  }
+}</code></pre>
+      <p>Tailwind's base and components go in the <code>vendor</code> layer — the lowest priority. Tailwind's utilities go in the <code>utilities</code> layer — the highest priority, which preserves their intended behavior as overrides. Your component styles live in between and beat vendor styles without specificity tricks.</p>
+
+      <h2>Pattern 2: Wrapping Bootstrap in a layer</h2>
+      <pre><code>@layer vendor, reset, layout, components, utilities;
+
+/* One line: all of Bootstrap in a single layer */
+@import url("bootstrap.min.css") layer(vendor);
+
+@layer components {
+  /* Your .btn beats Bootstrap's .btn —
+     no !important, no specificity hacks */
+  .btn {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-sm);
+    font-weight: var(--weight-semibold);
+  }
+}</code></pre>
+      <p>Wrapping the entire framework in one <code>layer(vendor)</code> import means every Bootstrap selector — no matter how specific — is lower priority than your <code>components</code> layer. A single-class selector in <code>components</code> beats a three-class selector in <code>vendor</code>. Specificity only matters within the same layer.</p>
+
+      <h2>Pattern 3: The escape hatch</h2>
+      <pre><code>@layer vendor, reset, layout, components, utilities;
+
+@import url("framework.css") layer(vendor);
+
+@layer components {
+  .modal { /* normal component styles */ }
+}
+
+/* Unlayered styles beat ALL layers — emergency fix */
+.modal-override {
+  z-index: 9999;
+  position: fixed;
+}</code></pre>
+      <p>Styles that are not inside any <code>@layer</code> block have higher priority than all layered styles, regardless of specificity. This is the escape hatch for emergency production fixes — a surgical override that bypasses the entire layer stack. Use it intentionally and rarely.</p>
+
+      <h2>The PE7 integration strategy</h2>
+      <pre><code>/* Full PE7 layer stack with vendor integration */
+@layer vendor, reset, tokens, layout, components, utilities;
+
+/* Third-party CSS always goes in vendor */
+@import url("bootstrap.min.css") layer(vendor);
+@import url("some-carousel.css") layer(vendor);
+
+/* Your architecture sits above */
+@layer tokens   { :root { --color-primary: oklch(55% 0.22 275); } }
+@layer reset    { *, *::before, *::after { box-sizing: border-box; } }
+@layer layout   { .stack > * + * { margin-block-start: var(--space-md); } }
+@layer components { .card { /* your card */ } }
+@layer utilities { .visually-hidden { /* a11y utility */ } }</code></pre>
+      <p>Vendor CSS goes in a <code>vendor</code> layer below <code>reset</code>. Your architecture layers sit above it. Framework specificity wars are permanently solved because the layer order is explicit, deterministic, and documented in a single line at the top of your stylesheet.</p>
+
+      <h2>What about frameworks that use @layer internally?</h2>
+      <p>Some modern frameworks ship their own <code>@layer</code> declarations. When you wrap them in <code>layer(vendor)</code>, their internal layers become nested: <code>vendor.base</code>, <code>vendor.components</code>, etc. Nested layers are always lower priority than the parent layer's siblings. This works correctly — the framework's internal layer order is preserved within the vendor layer, and the vendor layer as a whole is still lower than your layers.</p>
+
+      <h2>Browser support</h2>
+      <p><code>@layer</code> is supported in Chrome 99+, Firefox 97+, Safari 15.4+. The <code>@import ... layer()</code> syntax is supported in the same versions. Production-ready.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — a Bootstrap button overridden by a PE7 component layer</h2>
+      <div class="demo-frame">
+        <style>
+          /* Simulated layer stack */
+          @layer vendor, components;
+
+          /* Simulated Bootstrap styles in vendor layer */
+          @layer vendor {
+            .demo-13-21 .btn {
+              display: inline-block;
+              padding: 0.375rem 0.75rem;
+              font-size: 1rem;
+              font-weight: 400;
+              line-height: 1.5;
+              text-align: center;
+              border: 1px solid transparent;
+              border-radius: 0.375rem;
+              cursor: pointer;
+              text-decoration: none;
+              font-family: system-ui, sans-serif;
+            }
+            .demo-13-21 .btn-primary {
+              background-color: oklch(55% 0.15 250);
+              color: oklch(100% 0 0);
+              border-color: oklch(55% 0.15 250);
+            }
+            .demo-13-21 .btn-secondary {
+              background-color: oklch(50% 0.02 264);
+              color: oklch(100% 0 0);
+              border-color: oklch(50% 0.02 264);
+            }
+          }
+
+          /* PE7 component layer overrides — no !important needed */
+          @layer components {
+            .demo-13-21 .btn {
+              padding: 0.5rem 1.25rem;
+              font-weight: 600;
+              font-size: 0.875rem;
+              border-radius: 0.5rem;
+              letter-spacing: 0.01em;
+            }
+            .demo-13-21 .btn-primary {
+              background-color: oklch(55% 0.22 275);
+              border-color: oklch(55% 0.22 275);
+            }
+          }
+
+          .demo-13-21 {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .demo-13-21 .row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+          }
+          .demo-13-21 .label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 0;
+          }
+          .demo-13-21 .label-vendor { color: oklch(55% 0.15 250); }
+          .demo-13-21 .label-component { color: oklch(55% 0.22 275); }
+        </style>
+        <div class="demo-13-21">
+          <p class="label label-component">Component layer wins — no !important, no specificity hacks</p>
+          <div class="row">
+            <button class="btn btn-primary">Primary (PE7 styled)</button>
+            <button class="btn btn-secondary">Secondary (vendor base)</button>
+          </div>
+          <p class="label label-vendor">The vendor layer provides defaults; the component layer refines them</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="app"&gt;
+  &lt;button class="btn btn-primary"&gt;Primary&lt;/button&gt;
+  &lt;button class="btn btn-outline"&gt;Outline&lt;/button&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Card title&lt;/h3&gt;
+    &lt;p&gt;This card beats the vendor card styles.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@layer vendor, components;
+
+/* Simulated framework in vendor layer */
+@layer vendor {
+  .btn {
+    padding: .375rem .75rem;
+    border: 1px solid oklch(80% 0.01 264);
+    border-radius: .25rem;
+    background: oklch(95% 0.005 264);
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: oklch(55% 0.12 250);
+    color: #fff; border: none;
+  }
+  .card {
+    padding: 1rem;
+    border: 1px solid oklch(88% 0.01 264);
+    border-radius: .25rem;
+  }
+}
+
+/* Your components layer — always wins */
+@layer components {
+  .btn {
+    font-weight: 600;
+    font-size: .875rem;
+    padding: .5rem 1.25rem;
+    border-radius: .5rem;
+  }
+  .btn-primary {
+    background: oklch(55% 0.22 275);
+  }
+  .card {
+    padding: 1.5rem;
+    border-radius: .75rem;
+    border-color: oklch(90% 0.02 275);
+  }
+  .card h3 { margin: 0 0 .25rem; }
+  .card p { margin: 0; font-size: .875rem; }
+}
+
+.app {
+  font-family: system-ui;
+  display: flex; flex-direction: column;
+  gap: 1rem; padding: 1.5rem;
+}
+.app > .btn { align-self: flex-start; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add an unlayered style rule that overrides the <code>.btn-primary</code> background to a vivid red: <code>oklch(60% 0.24 25)</code>. Place it outside any <code>@layer</code> block. Observe how it beats both the vendor and component layers without <code>!important</code>. This is the escape hatch — useful for emergency production fixes, but use it sparingly. If your codebase has more than a handful of unlayered overrides, it is time to add a new layer instead.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.20-at-counter-style.html">&larr; Lesson 13.20</a>
+      <a href="./project/index.html">Module 13 Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

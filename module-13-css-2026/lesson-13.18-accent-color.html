@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.18 — accent-color: One-Line Form Theming · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.18</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · all modern browsers (Chrome 93+, Firefox 92+, Safari 15.4+)</p>
+      <p class="badge">Lesson 13.18</p>
+      <h1>accent-color: One-Line Form Theming</h1>
+      <p class="lead"><code>accent-color: oklch(55% 0.22 275)</code> — one property, one line, every form control themed: checkboxes, radio buttons, range sliders, progress bars. The end of checkbox-rebuilding hacks.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem it solves</h2>
+      <p>Before <code>accent-color</code>, theming a checkbox required hiding the native control with <code>appearance: none</code>, rebuilding it from scratch with pseudo-elements, managing focus states, handling keyboard accessibility, and testing across browsers. A single themed checkbox could require 30+ lines of CSS. Multiply that by every form control type and every brand color variant.</p>
+      <p><code>accent-color</code> replaces all of that with one line.</p>
+
+      <h2>The syntax</h2>
+      <pre><code>/* Theme every form control on the page */
+:root {
+  accent-color: oklch(55% 0.22 275);
+}
+
+/* Or scope to a specific form */
+.settings-form {
+  accent-color: oklch(65% 0.20 150);
+}</code></pre>
+      <p>The browser applies the accent color to the "accented" parts of form controls: the checked state of checkboxes and radio buttons, the filled portion of range sliders and progress bars. The browser automatically handles contrast for checkmark colors and other internal elements.</p>
+
+      <h2>What it themes</h2>
+      <ul>
+        <li><strong>Checkboxes</strong> — the checked background fill</li>
+        <li><strong>Radio buttons</strong> — the selected dot and ring</li>
+        <li><strong>Range sliders</strong> — the filled track portion</li>
+        <li><strong>Progress bars</strong> — the filled bar</li>
+      </ul>
+
+      <h2>Combined with color-scheme</h2>
+      <pre><code>:root {
+  accent-color: oklch(55% 0.22 275);
+  color-scheme: light dark;
+}</code></pre>
+      <p>When you combine <code>accent-color</code> with <code>color-scheme: light dark</code>, the form controls adapt to both light and dark modes automatically. The browser adjusts the accent color's contrast relationships for each scheme. Zero media queries needed for form control theming.</p>
+
+      <h2>When accent-color is not enough</h2>
+      <p>Use custom controls instead of <code>accent-color</code> when you need:</p>
+      <ul>
+        <li>Custom shapes (a toggle switch instead of a checkbox)</li>
+        <li>Animation on state change</li>
+        <li>Multiple colors within a single control</li>
+        <li>Custom icons inside the control (a brand-specific checkmark)</li>
+      </ul>
+      <p>For everything else — settings pages, admin panels, consent forms, surveys — <code>accent-color</code> is the right tool. It preserves native accessibility, keyboard behavior, and platform conventions.</p>
+
+      <h2>In the PE7 layer stack</h2>
+      <pre><code>@layer reset {
+  :root {
+    accent-color: var(--color-primary);
+    color-scheme: light dark;
+  }
+}</code></pre>
+      <p>Place it in the reset layer. It is a global default that components can override when needed.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 93+, Firefox 92+, Safari 15.4+. All modern browsers. Ship without fallback — browsers that do not support it simply render the default OS accent color.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — one accent-color, six control types</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-18 {
+            font-family: system-ui, sans-serif;
+            accent-color: oklch(55% 0.22 275);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 0.5rem;
+          }
+          .demo-13-18 .row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+          .demo-13-18 label {
+            font-size: 0.875rem;
+            color: oklch(30% 0.02 264);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+          }
+          .demo-13-18 input[type="range"] {
+            flex: 1;
+            max-width: 14rem;
+          }
+          .demo-13-18 progress {
+            flex: 1;
+            max-width: 14rem;
+            height: 0.5rem;
+          }
+          .demo-13-18 .section-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: oklch(55% 0.22 275);
+            margin: 0;
+          }
+        </style>
+        <div class="demo-13-18">
+          <p class="section-label">All controls themed by a single accent-color value</p>
+          <div class="row">
+            <label><input type="checkbox" checked> Notifications</label>
+            <label><input type="checkbox"> Dark mode</label>
+            <label><input type="checkbox" checked> Auto-save</label>
+          </div>
+          <div class="row">
+            <label><input type="radio" name="plan" checked> Free</label>
+            <label><input type="radio" name="plan"> Pro</label>
+            <label><input type="radio" name="plan"> Enterprise</label>
+          </div>
+          <div class="row">
+            <label>Volume</label>
+            <input type="range" value="65" min="0" max="100">
+          </div>
+          <div class="row">
+            <label>Upload</label>
+            <progress value="72" max="100"></progress>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;form class="settings"&gt;
+  &lt;label&gt;&lt;input type="checkbox" checked&gt; Enable notifications&lt;/label&gt;
+  &lt;label&gt;&lt;input type="checkbox"&gt; Dark mode&lt;/label&gt;
+  &lt;label&gt;&lt;input type="radio" name="size" checked&gt; Small&lt;/label&gt;
+  &lt;label&gt;&lt;input type="radio" name="size"&gt; Medium&lt;/label&gt;
+  &lt;label&gt;&lt;input type="radio" name="size"&gt; Large&lt;/label&gt;
+  &lt;label&gt;Brightness &lt;input type="range" value="75"&gt;&lt;/label&gt;
+  &lt;label&gt;Progress &lt;progress value="60" max="100"&gt;&lt;/progress&gt;&lt;/label&gt;
+&lt;/form&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1.5rem; }
+
+.settings {
+  /* Change this one value to re-theme every control */
+  accent-color: oklch(55% 0.22 275);
+  color-scheme: light dark;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* Try: oklch(65% 0.20 150) for green
+   Try: oklch(60% 0.24 25)  for red
+   Try: oklch(70% 0.18 85)  for amber */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the <code>accent-color</code> value to three different OKLCH colors and watch every control update simultaneously. Then remove <code>accent-color</code> entirely and observe the browser's default — that is what your users see when you do not set it. One line versus thirty lines of checkbox hacks. The choice is clear.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.17-p3-wide-gamut-color.html">&larr; Lesson 13.17</a>
+      <a href="./lesson-13.19-shape-outside.html">Lesson 13.19 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

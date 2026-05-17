@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.20 — Custom List Markers with @counter-style · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.20</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · Chrome 91+, Firefox 33+, Safari 17+</p>
+      <p class="badge">Lesson 13.20</p>
+      <h1>Custom List Markers with @counter-style</h1>
+      <p class="lead"><code>@counter-style</code> lets you define custom numbering systems and bullet symbols for lists — cyclic symbols, language-specific numbering, legal document formatting, all without JavaScript or pseudo-element hacks.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The basic pattern</h2>
+      <pre><code>@counter-style arrow-bullets {
+  system: cyclic;
+  symbols: "\2192" "\2726" "\25C6" "\25CF";
+  suffix: " ";
+}
+
+ul.fancy {
+  list-style-type: arrow-bullets;
+}</code></pre>
+      <p>Define a <code>@counter-style</code> rule with a name, a system, and symbols. Then reference it with <code>list-style-type</code>. The browser cycles through the symbols for each list item.</p>
+
+      <h2>The system types</h2>
+      <dl>
+        <dt><code>cyclic</code></dt>
+        <dd>Loops through the symbols repeatedly: A, B, C, A, B, C, ... Perfect for bullet-point variations.</dd>
+
+        <dt><code>numeric</code></dt>
+        <dd>Uses symbols as digits in a positional numbering system. Two symbols create binary. Ten symbols recreate decimal with custom glyphs.</dd>
+
+        <dt><code>alphabetic</code></dt>
+        <dd>Uses symbols as digits in an alphabetic numbering system (no zero). One symbol = a, b, c, ... Two symbols with "A" and "B" = A, B, AA, AB, BA, BB, ...</dd>
+
+        <dt><code>additive</code></dt>
+        <dd>Defines value-symbol pairs that are combined additively. This is how Roman numerals work: <code>additive-symbols: 1000 M, 900 CM, 500 D, 400 CD, 100 C, 90 XC, 50 L, 40 XL, 10 X, 9 IX, 5 V, 4 IV, 1 I;</code></dd>
+
+        <dt><code>fixed</code></dt>
+        <dd>Uses each symbol once, then falls back to a specified style. Useful for a short, finite list of custom markers.</dd>
+      </dl>
+
+      <h2>Practical: legal document numbering</h2>
+      <pre><code>@counter-style legal-nested {
+  system: numeric;
+  symbols: "0" "1" "2" "3" "4" "5" "6" "7" "8" "9";
+  prefix: "1.";
+  suffix: " ";
+}
+
+ol.legal {
+  list-style-type: legal-nested;
+}</code></pre>
+      <p>This produces items labeled 1.1, 1.2, 1.3, and so on. The <code>prefix</code> and <code>suffix</code> descriptors let you wrap the counter value with custom text.</p>
+
+      <h2>Practical: custom ordered steps</h2>
+      <pre><code>@counter-style recipe-steps {
+  system: fixed;
+  symbols: "Prep" "Mix" "Bake" "Cool" "Serve";
+  suffix: ": ";
+}
+
+ol.recipe {
+  list-style-type: recipe-steps;
+}</code></pre>
+      <p>Each item gets a named step marker. After the symbols run out, the list falls back to the default decimal counter.</p>
+
+      <h2>The fallback descriptor</h2>
+      <pre><code>@counter-style custom {
+  system: cyclic;
+  symbols: "\25B6";
+  fallback: disc;
+}</code></pre>
+      <p>If the browser cannot render a symbol (or the counter system is exhausted in <code>fixed</code> mode), it uses the <code>fallback</code> style. Always specify one for resilience.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 91+, Firefox 33+, Safari 17+. Production-ready across all modern browsers.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — 4 counter styles on the same list structure</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-20 {
+            font-family: system-ui, sans-serif;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+            gap: 1.5rem;
+          }
+          .demo-13-20 .column h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: oklch(55% 0.22 275);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+          }
+          .demo-13-20 ol, .demo-13-20 ul {
+            margin: 0;
+            padding-inline-start: 2rem;
+          }
+          .demo-13-20 li {
+            font-size: 0.875rem;
+            line-height: 1.8;
+            color: oklch(30% 0.02 264);
+          }
+
+          @counter-style arrows {
+            system: cyclic;
+            symbols: "\2192" "\2726" "\25C6" "\25CF";
+            suffix: " ";
+          }
+          @counter-style roman-custom {
+            system: additive;
+            additive-symbols: 1000 M, 900 CM, 500 D, 400 CD, 100 C, 90 XC, 50 L, 40 XL, 10 X, 9 IX, 5 V, 4 IV, 1 I;
+            suffix: ". ";
+          }
+          @counter-style section-nums {
+            system: numeric;
+            symbols: "0" "1" "2" "3" "4" "5" "6" "7" "8" "9";
+            prefix: "\A7";
+            suffix: " ";
+          }
+          @counter-style check-bullets {
+            system: cyclic;
+            symbols: "\2713";
+            suffix: " ";
+          }
+
+          .demo-13-20 .list-arrows { list-style-type: arrows; }
+          .demo-13-20 .list-roman { list-style-type: roman-custom; }
+          .demo-13-20 .list-section { list-style-type: section-nums; }
+          .demo-13-20 .list-check { list-style-type: check-bullets; }
+        </style>
+        <div class="demo-13-20">
+          <div class="column">
+            <h3>Cyclic arrows</h3>
+            <ul class="list-arrows">
+              <li>Layout tokens</li>
+              <li>Color tokens</li>
+              <li>Type scale</li>
+              <li>Spacing scale</li>
+            </ul>
+          </div>
+          <div class="column">
+            <h3>Additive Roman</h3>
+            <ol class="list-roman">
+              <li>Introduction</li>
+              <li>Background</li>
+              <li>Methodology</li>
+              <li>Results</li>
+            </ol>
+          </div>
+          <div class="column">
+            <h3>Section numbers</h3>
+            <ol class="list-section">
+              <li>Definitions</li>
+              <li>Scope</li>
+              <li>Obligations</li>
+              <li>Termination</li>
+            </ol>
+          </div>
+          <div class="column">
+            <h3>Checkmark bullets</h3>
+            <ul class="list-check">
+              <li>Accessible colors</li>
+              <li>Responsive type</li>
+              <li>Logical props</li>
+              <li>Layer architecture</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;ul class="custom-list"&gt;
+  &lt;li&gt;Define your tokens&lt;/li&gt;
+  &lt;li&gt;Build your reset layer&lt;/li&gt;
+  &lt;li&gt;Create layout primitives&lt;/li&gt;
+  &lt;li&gt;Add component styles&lt;/li&gt;
+  &lt;li&gt;Apply utility overrides&lt;/li&gt;
+&lt;/ul&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1.5rem; }
+
+@counter-style step-markers {
+  system: cyclic;
+  symbols: "\2192" "\2726" "\25C6" "\25CF" "\25B6";
+  suffix: " ";
+}
+
+.custom-list {
+  list-style-type: step-markers;
+  padding-inline-start: 2rem;
+}
+
+li {
+  font-size: 0.9375rem;
+  line-height: 2;
+  color: oklch(30% 0.02 264);
+}
+
+/* Try changing system to "fixed"
+   and watch what happens after
+   the symbols run out. */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create an <code>@counter-style</code> with <code>system: additive</code> that uses custom glyphs for a base-5 tally system: <code>additive-symbols: 5 "\2585", 1 "\2581";</code>. Apply it to an ordered list with 12 items. Observe how the browser constructs compound markers by combining additive symbols — item 7 should display as one "5-block" followed by two "1-blocks".</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.19-shape-outside.html">&larr; Lesson 13.19</a>
+      <a href="./lesson-13.21-layers-with-frameworks.html">Lesson 13.21 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
