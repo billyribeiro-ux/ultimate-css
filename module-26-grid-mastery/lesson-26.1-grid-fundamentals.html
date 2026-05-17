@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.1 — Grid Fundamentals: Tracks, Cells, and Areas · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.1 · Layout</p>
+      <h1>Grid Fundamentals: Tracks, Cells, and Areas</h1>
+      <p class="lead">Every grid layout begins with <code>display: grid</code> and track definitions. Understanding the difference between explicit tracks (you define them) and implicit tracks (the browser auto-creates them) is the key to predictable layouts.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The mental model</h2>
+      <p>A grid container creates a coordinate system of rows and columns. The intersections form <strong>cells</strong>. A rectangular collection of cells is an <strong>area</strong>. The columns and rows themselves are <strong>tracks</strong>.</p>
+
+      <h2>Defining columns and rows</h2>
+      <pre><code>.grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 1rem;
+}</code></pre>
+      <p>This creates 3 column tracks (one fixed, two flexible) and 2 row tracks. The <code>fr</code> unit distributes remaining space proportionally — <code>1fr 1fr</code> means equal shares.</p>
+
+      <h3>The fr unit</h3>
+      <p><code>fr</code> stands for "fraction of available space." It only divides what remains after fixed tracks, min-content, and gaps are accounted for. <code>1fr 2fr</code> gives the second column twice the remaining space of the first.</p>
+
+      <h3>gap</h3>
+      <p><code>gap</code> (shorthand for <code>row-gap</code> and <code>column-gap</code>) adds gutters between tracks without affecting the outer edges. Unlike margins, gaps never collapse and never affect the first/last item.</p>
+
+      <h2>Explicit vs implicit tracks</h2>
+      <p><strong>Explicit</strong> tracks are the ones you define with <code>grid-template-columns</code> and <code>grid-template-rows</code>. <strong>Implicit</strong> tracks are created by the browser when items are placed beyond your explicit grid.</p>
+      <pre><code>.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* No rows defined — they're all implicit */
+  grid-auto-rows: minmax(8rem, auto);
+}</code></pre>
+      <p><code>grid-auto-rows</code> sizes implicit rows. Without it, implicit rows are <code>auto</code>-sized (shrink to content). Set it to control minimum heights for unknown quantities of items.</p>
+
+      <h2>repeat() notation</h2>
+      <p><code>repeat(3, 1fr)</code> is shorthand for <code>1fr 1fr 1fr</code>. You can repeat patterns: <code>repeat(3, 1fr 2fr)</code> creates 6 columns alternating 1fr and 2fr.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Basic 3-column grid</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-1 {
+            display: grid;
+            grid-template-columns: 10rem 1fr 1fr;
+            grid-auto-rows: minmax(5rem, auto);
+            gap: 0.75rem;
+            padding: 1rem;
+            font-family: system-ui;
+          }
+          .demo-26-1 .cell {
+            display: grid;
+            place-items: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+          }
+          .demo-26-1 .cell:nth-child(1) { background: oklch(75% 0.15 160); color: oklch(20% 0.05 160); }
+          .demo-26-1 .cell:nth-child(2) { background: oklch(75% 0.15 220); color: oklch(20% 0.05 220); }
+          .demo-26-1 .cell:nth-child(3) { background: oklch(75% 0.15 280); color: oklch(20% 0.05 280); }
+          .demo-26-1 .cell:nth-child(4) { background: oklch(75% 0.12 30); color: oklch(20% 0.05 30); }
+          .demo-26-1 .cell:nth-child(5) { background: oklch(75% 0.12 60); color: oklch(20% 0.05 60); }
+          .demo-26-1 .cell:nth-child(6) { background: oklch(75% 0.12 90); color: oklch(20% 0.05 90); }
+        </style>
+        <div class="demo-26-1">
+          <div class="cell">200px fixed</div>
+          <div class="cell">1fr flexible</div>
+          <div class="cell">1fr flexible</div>
+          <div class="cell">Implicit row</div>
+          <div class="cell">Implicit row</div>
+          <div class="cell">Implicit row</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
+  &lt;div class="cell"&gt;Sidebar&lt;/div&gt;
+  &lt;div class="cell"&gt;Main&lt;/div&gt;
+  &lt;div class="cell"&gt;Aside&lt;/div&gt;
+  &lt;div class="cell"&gt;Footer 1&lt;/div&gt;
+  &lt;div class="cell"&gt;Footer 2&lt;/div&gt;
+  &lt;div class="cell"&gt;Footer 3&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 10rem 1fr 1fr;
+  grid-auto-rows: minmax(5rem, auto);
+  gap: 0.75rem;
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: oklch(80% 0.1 250);
+  font-weight: 600;
+}
+
+/* Try changing to: repeat(4, 1fr) */
+/* Try adding: grid-template-rows: 4rem 8rem; */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the grid to 4 columns using <code>repeat(4, 1fr)</code>. Add 8 items and observe how implicit rows form. Then set <code>grid-auto-rows: 10rem</code> to control their height. Finally, try <code>gap: 0.5rem 2rem</code> for different row and column gaps.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 26</a>
+      <a href="./lesson-26.2-grid-placement.html">Lesson 26.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
