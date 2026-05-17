@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project — Responsive Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 21</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 21 · Project</p>
+      <h1>Responsive Showcase</h1>
+      <p class="lead">A single page demonstrating fluid type, fluid spacing, intrinsic grids, container-query widgets, a responsive table, responsive navigation, and correct viewport units. Resize from 320px to 2560px — nothing breaks, nothing snaps.</p>
+    </header>
+
+    <section class="demo">
+      <div class="demo-frame">
+        <style>
+          .demo-21-project {
+            /* Fluid spacing system */
+            --sp: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+            --sp-s: var(--sp);
+            --sp-m: calc(var(--sp) * 1.5);
+            --sp-l: calc(var(--sp) * 2.5);
+            --sp-xl: calc(var(--sp) * 4);
+
+            /* Fluid type scale */
+            --text-xs: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+            --text-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.9rem);
+            --text-base: clamp(0.9rem, 0.82rem + 0.4vw, 1.05rem);
+            --text-lg: clamp(1.1rem, 0.9rem + 0.8vw, 1.5rem);
+            --text-xl: clamp(1.3rem, 0.9rem + 1.5vw, 2.2rem);
+            --text-2xl: clamp(1.8rem, 1rem + 3vw, 3.5rem);
+
+            font-family: system-ui, sans-serif;
+            background: oklch(8% 0.01 260);
+            color: oklch(87% 0.01 260);
+            border-radius: 0.75rem;
+            overflow: hidden;
+          }
+
+          /* === PAGE STRUCTURE (zero breakpoints) === */
+          .demo-21-project .showcase-page {
+            inline-size: min(80rem, 100%);
+            margin-inline: auto;
+            padding-inline: var(--sp-s);
+          }
+
+          /* === HEADER / NAV === */
+          .demo-21-project .showcase-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--sp-s);
+            padding-block: var(--sp-s);
+            border-block-end: 1px solid oklch(18% 0.02 260);
+          }
+          .demo-21-project .showcase-logo {
+            font-weight: 800;
+            font-size: var(--text-lg);
+            margin-inline-end: auto;
+            background: linear-gradient(135deg, oklch(70% 0.18 270), oklch(65% 0.2 200));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+          .demo-21-project .showcase-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sp-s);
+          }
+          .demo-21-project .showcase-nav a {
+            font-size: var(--text-sm);
+            color: oklch(60% 0.03 260);
+            text-decoration: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.25rem;
+            transition: background 150ms;
+          }
+          .demo-21-project .showcase-nav a:hover {
+            background: oklch(18% 0.03 260);
+            color: oklch(80% 0.03 260);
+          }
+
+          /* === HERO (fluid type) === */
+          .demo-21-project .showcase-hero {
+            padding-block: var(--sp-xl);
+            text-align: center;
+          }
+          .demo-21-project .showcase-hero h2 {
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-block-end: var(--sp-s);
+          }
+          .demo-21-project .showcase-hero p {
+            font-size: var(--text-base);
+            color: oklch(60% 0.02 260);
+            max-inline-size: 50ch;
+            margin-inline: auto;
+          }
+
+          /* === WIDGETS (container queries) === */
+          .demo-21-project .widget-section {
+            padding-block: var(--sp-l);
+          }
+          .demo-21-project .widget-section h3 {
+            font-size: var(--text-lg);
+            margin-block-end: var(--sp-m);
+          }
+          .demo-21-project .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+            gap: var(--sp-s);
+          }
+          .demo-21-project .widget-cell {
+            container-type: inline-size;
+            container-name: wcell;
+          }
+          .demo-21-project .widget {
+            background: oklch(14% 0.02 260);
+            border: 1px solid oklch(20% 0.03 260);
+            border-radius: calc(var(--sp) * 0.75);
+            padding: 4cqi;
+            display: grid;
+            gap: 2cqi;
+            block-size: 100%;
+          }
+          .demo-21-project .widget-label {
+            font-size: clamp(0.7rem, 2cqi, 0.85rem);
+            color: oklch(55% 0.03 260);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+          }
+          .demo-21-project .widget-value {
+            font-size: clamp(1.5rem, 6cqi, 2.8rem);
+            font-weight: 700;
+            line-height: 1;
+          }
+          .demo-21-project .widget-bar-chart {
+            display: flex;
+            align-items: end;
+            gap: 2cqi;
+            block-size: clamp(1.5rem, 8cqi, 3.5rem);
+          }
+          .demo-21-project .wbar {
+            flex: 1;
+            background: oklch(45% 0.14 270);
+            border-radius: 2px 2px 0 0;
+            min-block-size: 3px;
+          }
+          .demo-21-project .wbar:nth-child(1) { block-size: 55%; }
+          .demo-21-project .wbar:nth-child(2) { block-size: 75%; }
+          .demo-21-project .wbar:nth-child(3) { block-size: 40%; }
+          .demo-21-project .wbar:nth-child(4) { block-size: 90%; }
+          .demo-21-project .wbar:nth-child(5) { block-size: 65%; }
+
+          /* === CARD GRID (intrinsic) === */
+          .demo-21-project .cards-section {
+            padding-block: var(--sp-l);
+          }
+          .demo-21-project .cards-section h3 {
+            font-size: var(--text-lg);
+            margin-block-end: var(--sp-m);
+          }
+          .demo-21-project .intrinsic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+            gap: var(--sp-s);
+          }
+          .demo-21-project .grid-card {
+            background: oklch(14% 0.02 260);
+            border: 1px solid oklch(20% 0.03 260);
+            border-radius: calc(var(--sp) * 0.75);
+            padding: var(--sp-m);
+            display: grid;
+            gap: var(--sp-s);
+          }
+          .demo-21-project .grid-card .card-swatch {
+            inline-size: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: calc(var(--sp) * 0.4);
+            background: linear-gradient(135deg, oklch(40% 0.15 270), oklch(30% 0.12 200));
+          }
+          .demo-21-project .grid-card:nth-child(2) .card-swatch {
+            background: linear-gradient(135deg, oklch(45% 0.18 150), oklch(30% 0.12 180));
+          }
+          .demo-21-project .grid-card:nth-child(3) .card-swatch {
+            background: linear-gradient(135deg, oklch(50% 0.15 30), oklch(35% 0.12 50));
+          }
+          .demo-21-project .grid-card:nth-child(4) .card-swatch {
+            background: linear-gradient(135deg, oklch(40% 0.12 300), oklch(28% 0.1 320));
+          }
+          .demo-21-project .grid-card h4 {
+            font-size: var(--text-sm);
+            font-weight: 600;
+          }
+          .demo-21-project .grid-card p {
+            font-size: var(--text-xs);
+            color: oklch(55% 0.02 260);
+            line-height: 1.5;
+          }
+
+          /* === RESPONSIVE TABLE === */
+          .demo-21-project .table-section {
+            padding-block: var(--sp-l);
+          }
+          .demo-21-project .table-section h3 {
+            font-size: var(--text-lg);
+            margin-block-end: var(--sp-m);
+          }
+          .demo-21-project .table-wrap {
+            container-type: inline-size;
+            overflow-x: auto;
+            border: 1px solid oklch(20% 0.03 260);
+            border-radius: calc(var(--sp) * 0.75);
+          }
+          .demo-21-project table {
+            inline-size: 100%;
+            border-collapse: collapse;
+            font-size: var(--text-xs);
+          }
+          .demo-21-project th,
+          .demo-21-project td {
+            padding: 0.5rem 0.75rem;
+            text-align: start;
+            white-space: nowrap;
+          }
+          .demo-21-project th {
+            background: oklch(14% 0.02 260);
+            font-weight: 600;
+            color: oklch(65% 0.05 260);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-size: 0.65rem;
+          }
+          .demo-21-project td {
+            border-block-start: 1px solid oklch(16% 0.02 260);
+            color: oklch(75% 0.01 260);
+          }
+          .demo-21-project th:first-child,
+          .demo-21-project td:first-child {
+            position: sticky;
+            inset-inline-start: 0;
+            background: oklch(11% 0.01 260);
+            z-index: 1;
+          }
+
+          /* === VIEWPORT UNITS SECTION === */
+          .demo-21-project .viewport-section {
+            padding-block: var(--sp-l);
+          }
+          .demo-21-project .viewport-section h3 {
+            font-size: var(--text-lg);
+            margin-block-end: var(--sp-m);
+          }
+          .demo-21-project .viewport-demo {
+            min-block-size: min(30svh, 200px);
+            background: linear-gradient(180deg, oklch(18% 0.06 270), oklch(10% 0.03 260));
+            border-radius: calc(var(--sp) * 0.75);
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: var(--sp-l);
+            border: 1px solid oklch(22% 0.04 270);
+          }
+          .demo-21-project .viewport-demo h4 {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            margin-block-end: var(--sp-s);
+          }
+          .demo-21-project .viewport-demo p {
+            font-size: var(--text-sm);
+            color: oklch(58% 0.03 260);
+          }
+          .demo-21-project .viewport-demo code {
+            display: inline-block;
+            margin-block-start: var(--sp-s);
+            padding: 0.25rem 0.5rem;
+            background: oklch(8% 0.01 260);
+            border-radius: 0.2rem;
+            font-family: monospace;
+            font-size: var(--text-xs);
+            color: oklch(70% 0.1 160);
+          }
+
+          /* === FOOTER === */
+          .demo-21-project .showcase-footer {
+            padding-block: var(--sp-m);
+            border-block-start: 1px solid oklch(18% 0.02 260);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: var(--sp-s);
+            font-size: var(--text-xs);
+            color: oklch(50% 0.02 260);
+          }
+        </style>
+        <div class="demo-21-project">
+          <div class="showcase-page">
+            <!-- Header with responsive nav -->
+            <header class="showcase-header">
+              <span class="showcase-logo">Responsive</span>
+              <nav class="showcase-nav">
+                <a href="#">Type</a>
+                <a href="#">Spacing</a>
+                <a href="#">Grid</a>
+                <a href="#">Widgets</a>
+                <a href="#">Table</a>
+              </nav>
+            </header>
+
+            <!-- Hero: fluid type scale -->
+            <section class="showcase-hero">
+              <h2>Zero Breakpoints, Infinite Adaptability</h2>
+              <p>This entire page adapts from 320px to 2560px without a single media query. Fluid type, fluid spacing, intrinsic grids, and container queries working in harmony.</p>
+            </section>
+
+            <!-- Widgets: container queries -->
+            <section class="widget-section">
+              <h3>Container-Query Widgets</h3>
+              <div class="widget-grid">
+                <div class="widget-cell">
+                  <div class="widget">
+                    <span class="widget-label">Revenue</span>
+                    <span class="widget-value">$92.4k</span>
+                    <div class="widget-bar-chart">
+                      <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="widget-cell">
+                  <div class="widget">
+                    <span class="widget-label">Users</span>
+                    <span class="widget-value">24,891</span>
+                    <div class="widget-bar-chart">
+                      <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="widget-cell">
+                  <div class="widget">
+                    <span class="widget-label">Growth</span>
+                    <span class="widget-value">+18%</span>
+                    <div class="widget-bar-chart">
+                      <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Card grid: intrinsic sizing -->
+            <section class="cards-section">
+              <h3>Intrinsic Grid</h3>
+              <div class="intrinsic-grid">
+                <div class="grid-card">
+                  <div class="card-swatch"></div>
+                  <h4>Fluid Typography</h4>
+                  <p>Every size token uses clamp() with rem+vw for accessible scaling.</p>
+                </div>
+                <div class="grid-card">
+                  <div class="card-swatch"></div>
+                  <h4>Fluid Spacing</h4>
+                  <p>One base unit, all others derived proportionally with calc().</p>
+                </div>
+                <div class="grid-card">
+                  <div class="card-swatch"></div>
+                  <h4>Container Queries</h4>
+                  <p>Components adapt to their container, not the viewport.</p>
+                </div>
+                <div class="grid-card">
+                  <div class="card-swatch"></div>
+                  <h4>Intrinsic Sizing</h4>
+                  <p>min(), max(), fit-content for intelligent self-sizing.</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Responsive table -->
+            <section class="table-section">
+              <h3>Responsive Table (sticky first column)</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr><th>Feature</th><th>Technique</th><th>Browser Support</th><th>Complexity</th><th>Performance</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Fluid Type</td><td>clamp(rem + vw)</td><td>97%+</td><td>Low</td><td>Excellent</td></tr>
+                    <tr><td>Container Queries</td><td>@container</td><td>93%+</td><td>Medium</td><td>Good</td></tr>
+                    <tr><td>Intrinsic Sizing</td><td>min()/max()</td><td>97%+</td><td>Low</td><td>Excellent</td></tr>
+                    <tr><td>Viewport Units</td><td>svh/dvh</td><td>91%+</td><td>Low</td><td>Excellent</td></tr>
+                    <tr><td>Logical Props</td><td>inline/block</td><td>95%+</td><td>Low</td><td>Excellent</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Viewport units -->
+            <section class="viewport-section">
+              <h3>Correct Viewport Units</h3>
+              <div class="viewport-demo">
+                <div>
+                  <h4>Mobile-Safe Section</h4>
+                  <p>Uses svh instead of vh to avoid the URL bar overflow bug on mobile browsers</p>
+                  <code>min-block-size: 100svh;</code>
+                </div>
+              </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="showcase-footer">
+              <span>Module 21 Project — Advanced Responsive Design</span>
+              <span>Zero media queries used on this page</span>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-21.10-no-breakpoint-layouts.html">&larr; Lesson 21.10</a>
+      <a href="../../index.html">Back to Course &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.3 — Multi-Theme Architecture · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.3 · Enterprise Architecture</p>
+      <h1>Multi-Theme Architecture</h1>
+      <p class="lead">Supporting two themes is manageable. Supporting four or more demands architecture. The data-attribute pattern, token aliasing, and a strict file structure let you add themes without touching a single component file.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The data-attribute pattern</h2>
+      <p>Themes are activated via <code>[data-theme="name"]</code> on a root element. Each theme defines the same set of semantic tokens with different values. Components reference only semantic tokens, never raw colors. This decoupling means zero component changes when a new theme is added.</p>
+
+      <h2>Token aliasing at the theme level</h2>
+      <p>A two-tier token system: <strong>primitive tokens</strong> (the raw palette: <code>--blue-500</code>) and <strong>semantic tokens</strong> (the meaning: <code>--color-surface</code>, <code>--color-on-surface</code>). Themes reassign semantic tokens to different primitives. Components only use semantic tokens.</p>
+
+      <h2>Theme-specific overrides without duplication</h2>
+      <p>If a component needs different spacing or border-radius in a specific theme, the override lives in the theme token file, not in the component. The component reads <code>var(--card-radius, 0.75rem)</code>. A theme that wants sharper cards sets <code>--card-radius: 0.25rem</code> at the theme level.</p>
+
+      <h2>The theme file structure</h2>
+      <p>One file per theme: <code>theme-light.css</code>, <code>theme-dark.css</code>, <code>theme-ocean.css</code>, <code>theme-contrast.css</code>. Each file contains only custom property declarations scoped to <code>[data-theme="name"]</code>. Zero selectors targeting elements or classes. Zero component-specific rules.</p>
+
+      <h2>Runtime theme switching with :has()</h2>
+      <p>Using <code>:has()</code> on a <code>&lt;select&gt;</code> element, themes can be switched with zero JavaScript. The selector <code>:root:has(select[name="theme"] option[value="dark"]:checked)</code> applies dark theme tokens when the dark option is selected. Pure CSS interactivity.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — 4-theme switcher</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-3 {
+            font-family: system-ui;
+            padding: 1.5rem;
+            --surface: oklch(98% 0.005 275);
+            --on-surface: oklch(20% 0.02 275);
+            --primary: oklch(48% 0.18 275);
+            --on-primary: oklch(100% 0 0);
+            --card-bg: oklch(100% 0 0);
+            --card-border: oklch(90% 0.01 275);
+            --muted: oklch(60% 0.02 275);
+            background: var(--surface);
+            color: var(--on-surface);
+            border-radius: 0.75rem;
+            transition: background 300ms, color 300ms;
+          }
+          .demo-22-3:has(select option[value="dark"]:checked) {
+            --surface: oklch(15% 0.02 275);
+            --on-surface: oklch(90% 0.01 275);
+            --primary: oklch(65% 0.18 275);
+            --on-primary: oklch(10% 0.02 275);
+            --card-bg: oklch(22% 0.02 275);
+            --card-border: oklch(30% 0.02 275);
+            --muted: oklch(55% 0.02 275);
+          }
+          .demo-22-3:has(select option[value="ocean"]:checked) {
+            --surface: oklch(95% 0.02 220);
+            --on-surface: oklch(20% 0.04 220);
+            --primary: oklch(50% 0.15 220);
+            --on-primary: oklch(98% 0.005 220);
+            --card-bg: oklch(99% 0.01 220);
+            --card-border: oklch(85% 0.03 220);
+            --muted: oklch(55% 0.03 220);
+          }
+          .demo-22-3:has(select option[value="contrast"]:checked) {
+            --surface: oklch(0% 0 0);
+            --on-surface: oklch(100% 0 0);
+            --primary: oklch(85% 0.2 90);
+            --on-primary: oklch(0% 0 0);
+            --card-bg: oklch(10% 0 0);
+            --card-border: oklch(100% 0 0);
+            --muted: oklch(75% 0 0);
+          }
+          .demo-22-3 .theme-controls {
+            margin-block-end: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+          .demo-22-3 label { font-size: 0.85rem; font-weight: 500; }
+          .demo-22-3 select {
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--on-surface);
+            font-size: 0.85rem;
+          }
+          .demo-22-3 .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+          .demo-22-3 .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: background 300ms, border-color 300ms;
+          }
+          .demo-22-3 .card h4 {
+            font-size: 0.95rem;
+            margin-block-end: 0.5rem;
+          }
+          .demo-22-3 .card p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-block-end: 0.75rem;
+          }
+          .demo-22-3 .card button {
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 0.4rem 0.9rem;
+            border-radius: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 300ms, color 300ms;
+          }
+        </style>
+        <div class="demo-22-3">
+          <div class="theme-controls">
+            <label for="theme-select-demo">Theme:</label>
+            <select id="theme-select-demo" name="theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="ocean">Ocean</option>
+              <option value="contrast">High Contrast</option>
+            </select>
+          </div>
+          <div class="card-grid">
+            <div class="card">
+              <h4>Component A</h4>
+              <p>This card uses only semantic tokens. Zero component CSS changes per theme.</p>
+              <button>Action</button>
+            </div>
+            <div class="card">
+              <h4>Component B</h4>
+              <p>Same tokens, same structure. Themes are pure token reassignment.</p>
+              <button>Action</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="themed-app"&gt;
+  &lt;label&gt;Theme:
+    &lt;select name="theme"&gt;
+      &lt;option value="light"&gt;Light&lt;/option&gt;
+      &lt;option value="dark"&gt;Dark&lt;/option&gt;
+      &lt;option value="forest"&gt;Forest&lt;/option&gt;
+      &lt;option value="sunset"&gt;Sunset&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/label&gt;
+  &lt;article class="card"&gt;
+    &lt;h2&gt;Themed Card&lt;/h2&gt;
+    &lt;p&gt;Switch themes above. This component never changes.&lt;/p&gt;
+    &lt;button&gt;Primary Action&lt;/button&gt;
+  &lt;/article&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.themed-app {
+  --bg: oklch(98% 0.005 275);
+  --text: oklch(20% 0.02 275);
+  --accent: oklch(48% 0.18 275);
+  --card: oklch(100% 0 0);
+  font-family: system-ui;
+  padding: 2rem;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 50vh;
+  transition: all 300ms;
+}
+/* Dark */
+.themed-app:has(option[value="dark"]:checked) {
+  --bg: oklch(15% 0.02 275);
+  --text: oklch(90% 0.01 275);
+  --accent: oklch(65% 0.18 275);
+  --card: oklch(22% 0.02 275);
+}
+/* Forest */
+.themed-app:has(option[value="forest"]:checked) {
+  --bg: oklch(25% 0.05 145);
+  --text: oklch(92% 0.02 145);
+  --accent: oklch(70% 0.15 145);
+  --card: oklch(30% 0.04 145);
+}
+/* Sunset */
+.themed-app:has(option[value="sunset"]:checked) {
+  --bg: oklch(25% 0.06 30);
+  --text: oklch(92% 0.02 50);
+  --accent: oklch(70% 0.18 50);
+  --card: oklch(30% 0.05 30);
+}
+
+select { padding: 0.4rem; border-radius: 0.3rem; margin-block-end: 1.5rem; }
+.card { background: var(--card); padding: 1.5rem; border-radius: 0.75rem; transition: background 300ms; }
+.card h2 { margin-block-end: 0.5rem; }
+.card p { color: var(--text); opacity: 0.7; margin-block-end: 1rem; }
+.card button { background: var(--accent); color: var(--bg); border: none; padding: 0.5rem 1.2rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a fifth theme called "midnight" with deep navy blues. Only add token declarations in the CSS — do not modify the card component styles at all. Add the new option to the select. The card should adapt automatically. This proves the architecture: themes are purely additive.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.2-design-token-governance.html">&larr; Lesson 22.2</a>
+      <a href="./lesson-22.4-component-api-design.html">Lesson 22.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

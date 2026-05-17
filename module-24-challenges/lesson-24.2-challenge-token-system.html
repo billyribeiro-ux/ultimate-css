@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 2 — Build a Token System from a Design Spec · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 2 · Intermediate</p>
+      <h1>Build a Token System from a Design Spec</h1>
+      <p class="lead">A designer hands you a visual spec. Your job: translate it into a complete design token system with OKLCH primitives, semantic aliases, and automatic dark mode via <code>light-dark()</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The scenario</h2>
+      <p>Below is a visual design spec showing color swatches, spacing values, and type sizes. You must build a <code>tokens.css</code> from scratch that defines all the primitives, maps them to semantic names, and supports both light and dark modes automatically.</p>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>All colors must use OKLCH color space</li>
+        <li>You must define primitive tokens (raw values) AND semantic tokens (contextual aliases)</li>
+        <li>Dark mode must use <code>light-dark()</code> with <code>color-scheme</code> on <code>:root</code></li>
+        <li>Spacing must use a consistent scale (e.g., powers of 2 or a ratio)</li>
+        <li>Type sizes must use <code>clamp()</code> for fluid scaling</li>
+        <li>Token names must follow a clear naming convention</li>
+        <li>The entire system should fit in one <code>:root</code> block plus one <code>@media (prefers-color-scheme: dark)</code> or use <code>light-dark()</code> exclusively</li>
+      </ul>
+
+      <h2>Design spec</h2>
+      <p>Study the demo below. It shows the exact colors, spacing, and sizes your tokens must produce.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Design spec reference</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-2 {
+            padding: 2rem;
+            font-family: system-ui;
+            display: grid;
+            gap: 2rem;
+          }
+          .demo-24-2 h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: oklch(50% 0 0);
+            margin-block-end: 0.75rem;
+          }
+          .demo-24-2 .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+            gap: 0.5rem;
+          }
+          .demo-24-2 .swatch {
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            display: grid;
+            place-items: end start;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+          }
+          .demo-24-2 .spacing-row {
+            display: flex;
+            align-items: end;
+            gap: 0.75rem;
+          }
+          .demo-24-2 .spacing-block {
+            background: oklch(70% 0.15 260);
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            padding-block-end: 0.25rem;
+            font-size: 0.6rem;
+            color: white;
+            font-weight: 600;
+          }
+          .demo-24-2 .type-row {
+            display: grid;
+            gap: 0.25rem;
+          }
+          .demo-24-2 .type-sample {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+          }
+          .demo-24-2 .type-sample span {
+            font-size: 0.65rem;
+            color: oklch(50% 0 0);
+            min-inline-size: 4rem;
+          }
+        </style>
+        <div class="demo-24-2">
+          <div>
+            <h3>Colors — primitives</h3>
+            <div class="color-grid">
+              <div class="swatch" style="background: oklch(55% 0.2 260); color: white;">primary-500</div>
+              <div class="swatch" style="background: oklch(70% 0.15 260); color: white;">primary-400</div>
+              <div class="swatch" style="background: oklch(85% 0.08 260); color: oklch(30% 0.1 260);">primary-200</div>
+              <div class="swatch" style="background: oklch(95% 0.03 260); color: oklch(30% 0.1 260);">primary-100</div>
+              <div class="swatch" style="background: oklch(60% 0.18 150); color: white;">success-500</div>
+              <div class="swatch" style="background: oklch(55% 0.2 25); color: white;">danger-500</div>
+              <div class="swatch" style="background: oklch(20% 0.02 260); color: white;">neutral-900</div>
+              <div class="swatch" style="background: oklch(50% 0.01 260); color: white;">neutral-500</div>
+              <div class="swatch" style="background: oklch(92% 0.005 260); color: oklch(30% 0 0);">neutral-100</div>
+              <div class="swatch" style="background: oklch(98% 0.002 260); color: oklch(30% 0 0);">neutral-50</div>
+            </div>
+          </div>
+          <div>
+            <h3>Spacing scale (rem)</h3>
+            <div class="spacing-row">
+              <div class="spacing-block" style="width: 1rem; height: 1rem;">0.25</div>
+              <div class="spacing-block" style="width: 1.5rem; height: 1.5rem;">0.5</div>
+              <div class="spacing-block" style="width: 2rem; height: 2rem;">0.75</div>
+              <div class="spacing-block" style="width: 2.5rem; height: 2.5rem;">1</div>
+              <div class="spacing-block" style="width: 3rem; height: 3rem;">1.5</div>
+              <div class="spacing-block" style="width: 4rem; height: 4rem;">2</div>
+              <div class="spacing-block" style="width: 5rem; height: 5rem;">3</div>
+              <div class="spacing-block" style="width: 6rem; height: 6rem;">4</div>
+            </div>
+          </div>
+          <div>
+            <h3>Type scale (fluid)</h3>
+            <div class="type-row">
+              <div class="type-sample"><span>xs</span><p style="font-size: 0.75rem;">0.75rem</p></div>
+              <div class="type-sample"><span>sm</span><p style="font-size: 0.875rem;">0.875rem</p></div>
+              <div class="type-sample"><span>base</span><p style="font-size: 1rem;">clamp(1rem, 0.5vi + 0.875rem, 1.125rem)</p></div>
+              <div class="type-sample"><span>lg</span><p style="font-size: 1.25rem;">clamp(1.125rem, 1vi + 1rem, 1.375rem)</p></div>
+              <div class="type-sample"><span>xl</span><p style="font-size: 1.5rem;">clamp(1.25rem, 2vi + 1rem, 1.75rem)</p></div>
+              <div class="type-sample"><span>2xl</span><p style="font-size: 2rem;">clamp(1.75rem, 3vi + 1rem, 2.5rem)</p></div>
+              <div class="type-sample"><span>3xl</span><p style="font-size: 2.5rem;">clamp(2rem, 4vi + 1rem, 3rem)</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge — build tokens.css</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Test page to verify your tokens work --&gt;
+&lt;div class="test-page"&gt;
+  &lt;h1&gt;Token Test&lt;/h1&gt;
+  &lt;p class="subtitle"&gt;If your tokens are correct, this page styles itself.&lt;/p&gt;
+  &lt;div class="card"&gt;
+    &lt;h2&gt;Card heading&lt;/h2&gt;
+    &lt;p&gt;Card body text using semantic color tokens.&lt;/p&gt;
+    &lt;button class="btn-primary"&gt;Action&lt;/button&gt;
+    &lt;button class="btn-danger"&gt;Delete&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* BUILD YOUR TOKEN SYSTEM HERE
+   Requirements:
+   1. :root with color-scheme: light dark
+   2. Primitive color tokens (--color-primary-500, etc.)
+   3. Semantic tokens using light-dark()
+      (--surface, --on-surface, --primary, --on-primary, etc.)
+   4. Spacing scale (--space-1 through --space-8)
+   5. Type scale (--text-xs through --text-3xl) using clamp()
+*/
+
+:root {
+  color-scheme: light dark;
+
+  /* Primitive colors — OKLCH */
+
+  /* Semantic colors — using light-dark() */
+
+  /* Spacing scale */
+
+  /* Type scale — fluid with clamp() */
+}
+
+/* Test styles — these use YOUR tokens.
+   DO NOT modify below this line. */
+.test-page {
+  font-family: system-ui;
+  padding: var(--space-6, 2rem);
+  background: var(--surface, white);
+  color: var(--on-surface, black);
+  min-height: 100vh;
+}
+.test-page h1 {
+  font-size: var(--text-3xl, 2rem);
+  color: var(--primary, blue);
+}
+.test-page .subtitle {
+  font-size: var(--text-lg, 1.25rem);
+  color: var(--on-surface-muted, gray);
+}
+.test-page .card {
+  margin-block-start: var(--space-5, 1.5rem);
+  padding: var(--space-5, 1.5rem);
+  background: var(--surface-elevated, white);
+  border-radius: var(--space-3, 0.75rem);
+  box-shadow: 0 2px 8px var(--shadow-color, oklch(0% 0 0 / 0.1));
+}
+.test-page .card h2 {
+  font-size: var(--text-xl, 1.5rem);
+  margin-block-end: var(--space-2, 0.5rem);
+}
+.test-page .card p {
+  font-size: var(--text-base, 1rem);
+  margin-block-end: var(--space-4, 1rem);
+}
+.test-page button {
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  border: none;
+  border-radius: var(--space-2, 0.5rem);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+  margin-inline-end: var(--space-2, 0.5rem);
+}
+.btn-primary {
+  background: var(--primary, blue);
+  color: var(--on-primary, white);
+}
+.btn-danger {
+  background: var(--danger, red);
+  color: var(--on-danger, white);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Hint</h2>
+      <p>Start with primitives: <code>--color-primary-500: oklch(55% 0.2 260)</code>. Then create semantic tokens: <code>--primary: light-dark(var(--color-primary-500), var(--color-primary-400))</code>. For dark mode surfaces, invert the neutral scale — light mode uses neutral-50 for surfaces, dark mode uses neutral-900.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-24.1-challenge-specificity.html">&larr; Challenge 1</a>
+      <a href="./lesson-24.3-challenge-layout-no-media.html">Challenge 3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

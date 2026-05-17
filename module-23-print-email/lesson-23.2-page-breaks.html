@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.2 — Controlling Page Breaks · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.2 · Print Stylesheets</p>
+      <h1>Controlling Page Breaks</h1>
+      <p class="lead">Nothing looks worse in a printed document than a heading orphaned at the bottom of a page, or a figure split from its caption. CSS gives you fine-grained control over where page breaks happen — and where they must not.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The break properties</h2>
+      <p>CSS fragmentation is controlled by three properties:</p>
+      <pre><code>/* Force a break before this element */
+h1 { break-before: page; }
+
+/* Prevent a break after this element */
+h2, h3 { break-after: avoid; }
+
+/* Prevent a break inside this element */
+figure, .card { break-inside: avoid; }</code></pre>
+      <p>The values include <code>auto</code> (default), <code>avoid</code>, <code>page</code>, <code>left</code>, <code>right</code>, <code>column</code>, and <code>avoid-page</code>.</p>
+
+      <h2>Preventing orphaned headings</h2>
+      <p>A heading at the bottom of a page with no content following it looks broken. The fix is simple:</p>
+      <pre><code>@media print {
+  h1, h2, h3, h4, h5, h6 {
+    break-after: avoid;
+  }
+}</code></pre>
+      <p>This tells the browser: if a heading would end up at the bottom of a page with nothing after it, move it to the next page instead.</p>
+
+      <h2>Keeping figures with captions</h2>
+      <p>A figure and its caption must stay together — splitting them across pages is confusing:</p>
+      <pre><code>@media print {
+  figure {
+    break-inside: avoid;
+  }
+}</code></pre>
+
+      <h2>Chapter breaks</h2>
+      <p>For long documents with chapters or major sections, force each chapter to start on a new page:</p>
+      <pre><code>@media print {
+  .chapter {
+    break-before: page;
+  }
+  /* Start chapters on right-hand pages (for books) */
+  .chapter-recto {
+    break-before: right;
+  }
+}</code></pre>
+
+      <h2>Orphans and widows</h2>
+      <p>These properties control how many lines of a paragraph must appear at the bottom of a page (<code>orphans</code>) or the top of the next page (<code>widows</code>):</p>
+      <pre><code>@media print {
+  p {
+    orphans: 3; /* At least 3 lines before a break */
+    widows: 3;  /* At least 3 lines after a break */
+  }
+}</code></pre>
+      <p>The default is typically 2 for both. Setting 3 produces more professional-looking documents — no single-line dangling paragraphs.</p>
+
+      <h2>Legacy properties</h2>
+      <p>You may encounter <code>page-break-before</code>, <code>page-break-after</code>, and <code>page-break-inside</code> in older code. These are the old syntax — the <code>break-*</code> properties supersede them, but the legacy versions still work for backwards compatibility.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Multi-page document with controlled breaks</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-2 {
+            font-family: Georgia, serif;
+            padding: 1.5rem;
+            background: oklch(95% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-2 .pages {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+          }
+          .demo-23-2 .page {
+            background: #fff;
+            border: 1px solid oklch(85% 0.02 270);
+            padding: 1.25rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 2px 6px oklch(0% 0 0 / 0.06);
+            font-size: 0.8rem;
+            line-height: 1.6;
+            min-height: 200px;
+          }
+          .demo-23-2 .page h3 {
+            font-size: 1rem;
+            margin: 0 0 0.5rem;
+            color: oklch(30% 0.1 270);
+          }
+          .demo-23-2 .page p { margin: 0 0 0.5rem; color: oklch(35% 0.02 270); }
+          .demo-23-2 .page-label {
+            font-size: 0.65rem;
+            color: oklch(60% 0.02 270);
+            text-align: center;
+            margin-top: 0.5rem;
+            font-style: italic;
+          }
+          .demo-23-2 .break-marker {
+            display: inline-block;
+            background: oklch(85% 0.12 25);
+            color: oklch(35% 0.15 25);
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.15rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            font-family: system-ui;
+          }
+          .demo-23-2 .avoid-marker {
+            background: oklch(85% 0.12 145);
+            color: oklch(30% 0.15 145);
+          }
+          .demo-23-2 figure {
+            border: 1px dashed oklch(75% 0.05 270);
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 0.2rem;
+          }
+          .demo-23-2 figcaption {
+            font-size: 0.7rem;
+            color: oklch(50% 0.03 270);
+            font-style: italic;
+          }
+        </style>
+        <div class="demo-23-2">
+          <div class="pages">
+            <div>
+              <div class="page">
+                <h3>Chapter 1: Introduction</h3>
+                <p>The first chapter content flows naturally until the page is full. Headings never get orphaned at the bottom.</p>
+                <p>More content fills the remainder of this page with comfortable spacing...</p>
+                <figure>
+                  <div style="height:40px;background:oklch(92% 0.03 270);border-radius:0.15rem;"></div>
+                  <figcaption>Figure 1.1 — stays together <span class="break-marker avoid-marker">break-inside: avoid</span></figcaption>
+                </figure>
+              </div>
+              <p class="page-label">Page 1</p>
+            </div>
+            <div>
+              <div class="page">
+                <p><span class="break-marker">break-before: page</span></p>
+                <h3>Chapter 2: Methodology</h3>
+                <p>This chapter starts on a new page thanks to <code>break-before: page</code>. The heading stays with its first paragraph.</p>
+                <p>Orphans and widows ensure at least 3 lines appear on each side of any break.</p>
+              </div>
+              <p class="page-label">Page 2</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;section class="chapter"&gt;
+    &lt;h2&gt;Chapter 1: Origins&lt;/h2&gt;
+    &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&lt;/p&gt;
+    &lt;figure&gt;
+      &lt;div class="placeholder-img"&gt;&lt;/div&gt;
+      &lt;figcaption&gt;Figure 1 — The original diagram&lt;/figcaption&gt;
+    &lt;/figure&gt;
+    &lt;p&gt;Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section class="chapter"&gt;
+    &lt;h2&gt;Chapter 2: Evolution&lt;/h2&gt;
+    &lt;p&gt;Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.&lt;/p&gt;
+    &lt;p&gt;Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: Georgia, serif;
+  max-width: 60ch;
+  margin: 2rem auto;
+  padding: 1rem;
+  line-height: 1.7;
+}
+
+h2 { margin-top: 2rem; color: #2a2a5a; }
+p { margin-bottom: 1rem; }
+.placeholder-img {
+  height: 80px;
+  background: #e8e8f0;
+  border-radius: 0.25rem;
+}
+figcaption { font-size: 0.85rem; color: #666; font-style: italic; margin-top: 0.5rem; }
+
+/* Print break controls */
+@media print {
+  .chapter {
+    break-before: page;
+  }
+  .chapter:first-child {
+    break-before: auto;
+  }
+  h2, h3 {
+    break-after: avoid;
+  }
+  figure {
+    break-inside: avoid;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a 3-chapter document. Force each chapter onto a new page. Add a figure with a caption in chapter 2 and ensure it never splits. Set orphans and widows to 4 (stricter than default). Open print preview and resize the browser to see how the breaks respond to different content lengths.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-23.1-print-basics.html">&larr; Lesson 23.1</a>
+      <a href="./lesson-23.3-print-layout.html">Lesson 23.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

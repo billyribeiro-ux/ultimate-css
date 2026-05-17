@@ -125,19 +125,68 @@
 
       <h2>How to run the audit</h2>
 
-      <h3>Browser DevTools Accessibility Panel</h3>
-      <p>Chrome, Firefox, and Edge all have built-in accessibility inspectors. Open DevTools, go to the Accessibility tab (Chrome) or Accessibility Properties panel (Firefox). This shows the computed accessible name, role, and state for every element.</p>
+      <h3>Step 1: Keyboard walkthrough</h3>
+      <p>Put your mouse away. Starting from the browser address bar, press Tab to move through every interactive element on the page. Verify:</p>
+      <ul>
+        <li>You can reach every button, link, and form control.</li>
+        <li>Focus order is logical (follows visual reading order).</li>
+        <li>Each focused element has a clearly visible indicator.</li>
+        <li>Modal dialogs trap focus — Tab does not escape to the background.</li>
+        <li>Escape key closes modals and returns focus to the trigger.</li>
+        <li>Skip link appears on first Tab press and jumps past navigation.</li>
+      </ul>
 
-      <h3>Automated tools</h3>
+      <h3>Step 2: Browser DevTools Accessibility Panel</h3>
+      <p>Chrome, Firefox, and Edge all have built-in accessibility inspectors. Open DevTools, go to the Accessibility tab (Chrome) or Accessibility Properties panel (Firefox). This shows the computed accessible name, role, and state for every element. Walk through the accessibility tree and verify:</p>
+      <ul>
+        <li>Every interactive element has an accessible name.</li>
+        <li>ARIA states match the visual state (expanded matches open, etc.).</li>
+        <li>No elements are accidentally removed from the tree by <code>display: none</code> or <code>visibility: hidden</code>.</li>
+        <li>Decorative elements are properly marked with <code>aria-hidden="true"</code>.</li>
+      </ul>
+
+      <h3>Step 3: Automated scanning</h3>
       <p><strong>Chrome Lighthouse:</strong> Run an accessibility audit from the DevTools Audits/Lighthouse panel. It catches many contrast failures, missing labels, and focus issues. <strong>axe DevTools extension:</strong> More thorough automated testing with clear fix suggestions. <strong>WAVE browser extension:</strong> Visual overlay showing errors directly on the page.</p>
+      <p>Note: automated tools catch only ~30-50% of accessibility issues. They are a starting point, not a complete audit.</p>
 
-      <h3>Manual testing</h3>
-      <p>Automated tools catch only ~30-50% of accessibility issues. Manual testing is required for: keyboard navigation flow, logical reading order, reduced-motion behavior, forced-colors appearance, and screen reader announcements. Tab through the entire page. Use VoiceOver (macOS), NVDA (Windows), or Orca (Linux) for screen reader testing.</p>
+      <h3>Step 4: Visual checks</h3>
+      <ul>
+        <li><strong>Zoom test:</strong> Set browser zoom to 200%. Verify no horizontal scrollbar appears and all content is readable. Repeat at 400%.</li>
+        <li><strong>Reduced motion:</strong> In DevTools Rendering panel, emulate <code>prefers-reduced-motion: reduce</code>. Verify animations are suppressed or simplified.</li>
+        <li><strong>Forced colors:</strong> In DevTools Rendering panel, emulate <code>forced-colors: active</code>. Verify all elements remain visible with proper borders.</li>
+        <li><strong>Dark mode:</strong> Toggle to dark mode. Re-check all contrast ratios — colors that pass in light mode may fail in dark mode.</li>
+        <li><strong>Viewport resize:</strong> Drag the browser window to 320px width. Verify single-column reflow without overflow.</li>
+      </ul>
+
+      <h3>Step 5: Screen reader testing</h3>
+      <p>Use VoiceOver (macOS, Cmd+F5), NVDA (Windows, free), or Orca (Linux). Navigate the page using screen reader commands (not Tab alone). Verify:</p>
+      <ul>
+        <li>Headings create a logical outline (navigate by heading shortcuts).</li>
+        <li>Landmark regions are announced (nav, main, banner, contentinfo).</li>
+        <li>Form fields announce their labels and error states.</li>
+        <li>Dynamic content changes are announced (live regions, aria-live).</li>
+        <li>Decorative content is not announced.</li>
+      </ul>
+
+      <h3>Step 6: Touch target verification</h3>
+      <p>Using DevTools, inspect every button and link. Check computed dimensions — the clickable area (including padding) should be at least 44x44px. For elements using the <code>::after</code> stretch pattern, verify the pseudo-element extends the hit area sufficiently. On mobile devices or in responsive mode, attempt to tap each target without accidental mis-taps.</p>
+
+      <h2>Common failure patterns</h2>
+      <p>These are the CSS-related accessibility failures encountered most frequently in production:</p>
+      <ul>
+        <li><strong>outline: none without replacement:</strong> Removes focus visibility entirely. Fix: replace with <code>:focus-visible</code> custom styles.</li>
+        <li><strong>Low contrast placeholder text:</strong> Default browser gray often fails 4.5:1. Fix: style <code>::placeholder</code> with sufficient contrast.</li>
+        <li><strong>Fixed-width containers:</strong> <code>width: 800px</code> causes horizontal scroll at zoom. Fix: use <code>max-inline-size</code> with fluid values.</li>
+        <li><strong>Hover-only interactions:</strong> Dropdown menus that only open on hover are inaccessible to keyboard and touch users. Fix: use <code>:focus-within</code> alongside <code>:hover</code>.</li>
+        <li><strong>Color as the only indicator:</strong> Red text for errors without any other visual cue (border, icon) fails for color-blind users. Fix: add border changes and text labels.</li>
+        <li><strong>Tiny close buttons:</strong> Modal close buttons at 16x16px are impossible to tap on mobile. Fix: minimum 44x44px with padding or <code>::after</code> stretch.</li>
+      </ul>
     </section>
 
     <section class="callout">
       <h2>Using this checklist</h2>
       <p>Print this page or save it as a reference. Before shipping any component, page, or design system update, run through each section. The items are ordered by frequency of failure — focus and contrast issues are the most common, followed by reflow and touch target problems. Catching these in development is 10x cheaper than fixing them after deployment.</p>
+      <p>For teams: incorporate this checklist into your pull request template. A quick 5-minute keyboard walkthrough before merge catches the majority of regressions. Pair it with automated CI checks (axe-core in your test suite) for comprehensive coverage.</p>
     </section>
 
     <nav class="lesson-nav cluster">

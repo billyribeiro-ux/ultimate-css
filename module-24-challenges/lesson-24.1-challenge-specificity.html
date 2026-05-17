@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 1 — Fix the Specificity War · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 1 · Beginner</p>
+      <h1>Fix the Specificity War</h1>
+      <p class="lead">You've inherited a stylesheet where 6 rules conflict with each other. Colors are wrong, spacing is off, fonts are overridden. Your mission: fix all 6 conflicts using ONLY <code>@layer</code> — no selector changes, no <code>!important</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The scenario</h2>
+      <p>A previous developer wrote CSS in no particular order. A card component has rules scattered across a utility file, a component file, and inline overrides. The result: the card looks nothing like the design. Your job is to wrap the existing rules in <code>@layer</code> declarations to establish the correct cascade order — without touching any selectors or adding <code>!important</code>.</p>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>You may ONLY add <code>@layer</code> declarations and the layer order statement</li>
+        <li>You may NOT change any selector</li>
+        <li>You may NOT add <code>!important</code></li>
+        <li>You may NOT delete any existing rule</li>
+        <li>You may NOT add new property declarations</li>
+        <li>All 6 conflicts must resolve to match the target</li>
+      </ul>
+
+      <h2>Target result</h2>
+      <p>When correctly layered, the card should show:</p>
+      <ul>
+        <li>Background: the teal color from the component layer</li>
+        <li>Text color: white from the component layer</li>
+        <li>Padding: the larger padding from the component layer</li>
+        <li>Border-radius: the rounded corners from the component layer</li>
+        <li>Font-size: the size from the base layer</li>
+        <li>Box-shadow: the shadow from the utility layer</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Target — correctly layered card</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-1 {
+            padding: 2rem;
+            display: grid;
+            place-items: center;
+            font-family: system-ui;
+            background: oklch(95% 0.01 260);
+          }
+          .demo-24-1 .target-card {
+            background: oklch(55% 0.15 180);
+            color: oklch(100% 0 0);
+            padding: 2rem 2.5rem;
+            border-radius: 1rem;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.15);
+            max-inline-size: 20rem;
+          }
+          .demo-24-1 .target-card h3 {
+            margin-block-end: 0.5rem;
+            font-size: 1.25rem;
+          }
+          .demo-24-1 .target-card p {
+            opacity: 0.9;
+            line-height: 1.5;
+          }
+          .demo-24-1 .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: oklch(50% 0.02 260);
+            margin-block-end: 0.5rem;
+          }
+        </style>
+        <div class="demo-24-1">
+          <p class="label">Target rendering</p>
+          <div class="target-card">
+            <h3>Notification</h3>
+            <p>Your changes have been saved successfully. The new settings will take effect immediately.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;div class="card notification"&gt;
+    &lt;h3&gt;Notification&lt;/h3&gt;
+    &lt;p&gt;Your changes have been saved successfully. The new settings will take effect immediately.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* BROKEN: 6 specificity conflicts.
+   Fix using ONLY @layer — no selector changes, no !important.
+
+   Add your @layer order statement here:
+*/
+
+/* --- These rules come from "utilities.css" --- */
+.card {
+  background: oklch(98% 0 0);
+  padding: 1rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 12px oklch(0% 0 0 / 0.15);
+}
+
+/* --- These rules come from "base.css" --- */
+.page .card {
+  font-size: 1rem;
+  color: oklch(20% 0 0);
+  background: oklch(92% 0.02 260);
+}
+
+/* --- These rules come from "components.css" --- */
+.notification {
+  background: oklch(55% 0.15 180);
+  color: oklch(100% 0 0);
+  padding: 2rem 2.5rem;
+  border-radius: 1rem;
+}
+
+/* --- Page styles --- */
+.page {
+  padding: 2rem;
+  display: grid;
+  place-items: center;
+  font-family: system-ui;
+  background: oklch(95% 0.01 260);
+}
+.card h3 { margin-block-end: 0.5rem; font-size: 1.25rem; }
+.card p { opacity: 0.9; line-height: 1.5; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Hint</h2>
+      <p>The layer order statement goes at the very top: <code>@layer base, utilities, components;</code> — this establishes priority regardless of source order. Then wrap each group in its corresponding <code>@layer name { ... }</code> block. The component layer wins because it's declared last in the order.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 24</a>
+      <a href="./lesson-24.2-challenge-token-system.html">Challenge 2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

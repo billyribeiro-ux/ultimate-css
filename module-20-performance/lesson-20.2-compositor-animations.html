@@ -76,6 +76,34 @@
   contain: layout style paint;
 }</code></pre>
       <p><code>contain: layout</code> means layout changes inside this element won't cause reflow outside it. <code>contain: paint</code> means paint is clipped to this element. <code>contain: style</code> isolates counter and quote effects. Together, they dramatically reduce the cost of changes within contained elements.</p>
+
+      <h2>The performance gap in numbers</h2>
+      <p>On a mid-range mobile device, the difference between compositor-only and layout-triggering animations is stark:</p>
+      <ul>
+        <li><code>transform: translateX(100px)</code> — 0.1ms per frame, GPU thread, 60fps guaranteed</li>
+        <li><code>left: 100px</code> — 4-12ms per frame on main thread, drops to 15-30fps under load</li>
+        <li><code>opacity: 0</code> — 0.1ms per frame, compositor handles blending</li>
+        <li><code>visibility: hidden</code> — triggers paint, no animation support anyway</li>
+      </ul>
+      <p>The rule is simple: if the browser can handle an animation purely by moving, scaling, rotating, or fading an already-painted texture on the GPU, it will be smooth. The moment it needs to recalculate geometry or repaint pixels, you are at the mercy of the main thread workload.</p>
+
+      <h2>Rewriting common patterns</h2>
+      <p>Every layout animation has a compositor equivalent:</p>
+      <pre><code>/* Instead of animating height for a reveal: */
+.panel { max-height: 0; transition: max-height 0.3s; }
+.panel.open { max-height: 500px; }
+
+/* Use scale + clip-path (compositor): */
+.panel { transform: scaleY(0); transform-origin: top; transition: transform 0.3s; }
+.panel.open { transform: scaleY(1); }
+
+/* Instead of animating left for a slide: */
+.drawer { left: -300px; transition: left 0.3s; }
+.drawer.open { left: 0; }
+
+/* Use translateX (compositor): */
+.drawer { transform: translateX(-100%); transition: transform 0.3s; }
+.drawer.open { transform: translateX(0); }</code></pre>
     </section>
 
     <section class="demo">
