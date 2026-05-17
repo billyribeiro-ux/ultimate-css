@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.9 — Linear: The Spotlight Border · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.9</p>
+      <h1>Linear: The Spotlight Border</h1>
+      <p class="lead">Linear's cards have borders that glow brighter near the cursor — a spotlight sweep effect along the card edge. This pure-CSS version uses a <code>conic-gradient</code> rotated via <code>@property --angle</code> animation, creating a continuous sweeping light around the border.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Linear does</h2>
+      <p>Linear's cards have a subtle border that is not a uniform color — it appears brighter on one side, as if a light source is sweeping around the edge. In the mouse-following version, the bright spot tracks the cursor. In the ambient version, the bright spot rotates continuously around the card perimeter.</p>
+
+      <h2>The @property --angle technique</h2>
+      <p>CSS cannot normally animate a gradient's angle because angles inside gradient functions are not interpolatable. But with <code>@property</code>, you register a custom property as an <code>&lt;angle&gt;</code> type, which makes it smoothly animatable. The gradient uses <code>var(--angle)</code> and the keyframes animate <code>--angle</code> from <code>0deg</code> to <code>360deg</code>.</p>
+      <p>The property registration:</p>
+      <ul>
+        <li><code>@property --angle { syntax: "&lt;angle&gt;"; inherits: false; initial-value: 0deg; }</code></li>
+      </ul>
+
+      <h2>The conic-gradient border</h2>
+      <p>A <code>conic-gradient(from var(--angle), ...)</code> creates a gradient that sweeps around a center point. By placing a bright color at one position and transparent/dark elsewhere, you get a spotlight effect. This gradient is applied to a <code>::before</code> pseudo-element that is slightly larger than the card, with the card itself covering the center — leaving only the border visible.</p>
+
+      <h2>The mask technique</h2>
+      <p>An alternative is to use <code>border-image</code> with a conic gradient. However, <code>border-image</code> does not respect <code>border-radius</code>. The more robust approach is the pseudo-element overlay masked to show only the edges, or the "padding-box cutout" technique where the card's background clips to <code>padding-box</code>, revealing the pseudo-element border ring behind it.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — rotating spotlight border</h2>
+      <div class="demo-frame">
+        <style>
+          @property --border-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+          }
+          .demo-14-9 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            background: oklch(8% 0.015 264);
+            border-radius: 0.75rem;
+          }
+          .demo-14-9 .spotlight-card {
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            background: oklch(12% 0.015 264);
+            color: oklch(85% 0.01 264);
+            font-family: system-ui, sans-serif;
+            overflow: hidden;
+          }
+          .demo-14-9 .spotlight-card::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: conic-gradient(
+              from var(--border-angle),
+              oklch(70% 0.2 275 / 0.6),
+              transparent 30%,
+              transparent 70%,
+              oklch(70% 0.2 275 / 0.6)
+            );
+            z-index: -1;
+            animation: spin-border 4s linear infinite;
+          }
+          .demo-14-9 .spotlight-card::after {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: calc(0.75rem - 1px);
+            background: oklch(12% 0.015 264);
+            z-index: -1;
+          }
+          @keyframes spin-border {
+            to { --border-angle: 360deg; }
+          }
+          .demo-14-9 h3 { font-size: 0.9375rem; font-weight: 600; margin: 0 0 0.5rem; }
+          .demo-14-9 p { font-size: 0.75rem; opacity: 0.6; margin: 0; line-height: 1.5; }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-14-9 .spotlight-card::before { animation: none; }
+          }
+        </style>
+        <div class="demo-14-9">
+          <div class="spotlight-card">
+            <h3>Workflows</h3>
+            <p>Automate repetitive tasks and focus on building great products.</p>
+          </div>
+          <div class="spotlight-card">
+            <h3>Integrations</h3>
+            <p>Connect Linear to your favorite tools — GitHub, Slack, Figma, and more.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card-grid"&gt;
+  &lt;div class="spotlight-card"&gt;
+    &lt;h3&gt;Workflows&lt;/h3&gt;
+    &lt;p&gt;Automate tasks and focus on
+       building great products.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="spotlight-card"&gt;
+    &lt;h3&gt;Integrations&lt;/h3&gt;
+    &lt;p&gt;Connect to GitHub, Slack,
+       Figma, and more.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="spotlight-card"&gt;
+    &lt;h3&gt;Analytics&lt;/h3&gt;
+    &lt;p&gt;Track velocity and cycle time
+       across your team.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Register the angle for smooth animation */
+@property --angle {
+  syntax: "&lt;angle&gt;";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit, minmax(14rem, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  background: oklch(6% 0.015 264);
+}
+
+.spotlight-card {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background: oklch(12% 0.015 264);
+  color: oklch(88% 0.01 264);
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* Rotating conic-gradient border */
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--angle),
+    oklch(65% 0.2 275 / 0.7),
+    transparent 25%,
+    transparent 75%,
+    oklch(65% 0.2 275 / 0.7)
+  );
+  z-index: -1;
+  animation: rotate 4s linear infinite;
+}
+
+/* Inner fill hides the gradient center */
+.spotlight-card::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: calc(0.75rem - 1px);
+  background: oklch(12% 0.015 264);
+  z-index: -1;
+}
+
+@keyframes rotate {
+  to { --angle: 360deg; }
+}
+
+.spotlight-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.spotlight-card p {
+  font-size: 0.8125rem;
+  opacity: 0.6;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-card::before {
+    animation: none;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the spotlight color from <code>oklch(65% 0.2 275 / 0.7)</code> to <code>oklch(75% 0.25 150 / 0.8)</code> — a vivid green spotlight. Then change <code>transparent 25%</code> to <code>transparent 10%</code> to make the spotlight wider. A narrow spotlight feels like a laser; a wide one feels like ambient light. Linear uses a narrow one for precision.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.8-linear-glow-card.html">&larr; Lesson 14.8</a>
+      <a href="./lesson-14.10-vercel-shimmer-skeleton.html">Lesson 14.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

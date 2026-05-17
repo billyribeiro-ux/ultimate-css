@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.18 — MD3: Elevation &amp; Surface Tinting · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.18</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.18 · Google Material Design 3</p>
+      <h1>MD3: Elevation &amp; Surface Tinting</h1>
+      <p class="lead">Material Design 3 retired drop shadows as the primary depth signal. Instead, surfaces rise through "tonal elevation" — progressively tinted with the primary color. Level 0 is the base. Level 5 glows with 18% primary. Shadows are optional, not the main event.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why tonal elevation replaced shadows</h2>
+      <p>Shadows work on light backgrounds but collapse in dark mode — a dark card on a dark background produces an invisible shadow. Google needed an elevation system that worked equally well in both schemes. Tonal elevation solves this: a Level 3 surface is visibly lighter than Level 0 regardless of scheme, because the primary tint pushes the surface color away from the base.</p>
+
+      <h2>The six elevation levels</h2>
+      <p>MD3 defines levels 0 through 5. Each maps to a percentage of primary color mixed into the surface:</p>
+      <ul>
+        <li><strong>Level 0</strong> — 0% tint (pure surface)</li>
+        <li><strong>Level 1</strong> — 5% primary tint (cards, menus)</li>
+        <li><strong>Level 2</strong> — 8% tint (raised containers)</li>
+        <li><strong>Level 3</strong> — 11% tint (navigation bars)</li>
+        <li><strong>Level 4</strong> — 14% tint (app bars)</li>
+        <li><strong>Level 5</strong> — 18% tint (FABs, highest surfaces)</li>
+      </ul>
+
+      <h3>The CSS implementation</h3>
+      <p>The <code>color-mix()</code> function is purpose-built for this pattern. We mix in OKLCH so the tint shifts both lightness and chroma predictably:</p>
+      <pre><code>--md3-surface: oklch(98% 0.003 264);
+--md3-primary: oklch(48% 0.22 275);
+
+--elev-0: var(--md3-surface);
+--elev-1: color-mix(in oklch, var(--md3-surface) 95%, var(--md3-primary));
+--elev-2: color-mix(in oklch, var(--md3-surface) 92%, var(--md3-primary));
+--elev-3: color-mix(in oklch, var(--md3-surface) 89%, var(--md3-primary));
+--elev-4: color-mix(in oklch, var(--md3-surface) 86%, var(--md3-primary));
+--elev-5: color-mix(in oklch, var(--md3-surface) 82%, var(--md3-primary));</code></pre>
+
+      <h3>Why OKLCH for the mix?</h3>
+      <p>Mixing in sRGB would produce muddy mid-tones because sRGB interpolation is not perceptually uniform. OKLCH ensures the tint shifts feel linear to the eye — Level 3 looks halfway between Level 1 and Level 5, which would not be the case in sRGB.</p>
+
+      <h3>Shadows as an optional layer</h3>
+      <p>MD3 pairs an optional <code>box-shadow</code> with tonal elevation for additional depth cues, especially in dark mode. The shadow is never the sole signal — it reinforces the tint. On hover, a card might transition from Level 1 to Level 3, gaining both a stronger tint and a shadow in one smooth motion.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The <code>color-mix()</code> declarations belong in the <strong>tokens layer</strong> (they are primitive color values). The card component that references <code>--elev-N</code> lives in <strong>components</strong>. The hover transition is <strong>animations</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — MD3 elevation levels</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-18 {
+            --md3-surface: oklch(98% 0.003 264);
+            --md3-primary: oklch(48% 0.22 275);
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
+            padding: 1.5rem;
+            font-family: system-ui;
+            background: var(--md3-surface);
+            border-radius: 0.75rem;
+          }
+          .demo-14-18 .elev-card {
+            padding: 1.25rem 0.75rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: oklch(30% 0.05 275);
+            transition: background-color 300ms, box-shadow 300ms;
+          }
+          .demo-14-18 .elev-card span { display: block; font-size: 1.5rem; font-weight: 700; margin-block-end: 0.25rem; }
+          .demo-14-18 .lv0 { background: var(--md3-surface); }
+          .demo-14-18 .lv1 { background: color-mix(in oklch, var(--md3-surface) 95%, var(--md3-primary)); }
+          .demo-14-18 .lv2 { background: color-mix(in oklch, var(--md3-surface) 92%, var(--md3-primary)); }
+          .demo-14-18 .lv3 { background: color-mix(in oklch, var(--md3-surface) 89%, var(--md3-primary)); }
+          .demo-14-18 .lv4 { background: color-mix(in oklch, var(--md3-surface) 86%, var(--md3-primary)); }
+          .demo-14-18 .lv5 { background: color-mix(in oklch, var(--md3-surface) 82%, var(--md3-primary)); }
+          .demo-14-18 .elev-card:hover {
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.12);
+          }
+        </style>
+        <div class="demo-14-18">
+          <div class="elev-card lv0"><span>0</span>0%</div>
+          <div class="elev-card lv1"><span>1</span>5%</div>
+          <div class="elev-card lv2"><span>2</span>8%</div>
+          <div class="elev-card lv3"><span>3</span>11%</div>
+          <div class="elev-card lv4"><span>4</span>14%</div>
+          <div class="elev-card lv5"><span>5</span>18%</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="surface"&gt;
+  &lt;div class="card lv0"&gt;&lt;span&gt;0&lt;/span&gt;Surface&lt;/div&gt;
+  &lt;div class="card lv1"&gt;&lt;span&gt;1&lt;/span&gt;5 % tint&lt;/div&gt;
+  &lt;div class="card lv2"&gt;&lt;span&gt;2&lt;/span&gt;8 % tint&lt;/div&gt;
+  &lt;div class="card lv3"&gt;&lt;span&gt;3&lt;/span&gt;11 % tint&lt;/div&gt;
+  &lt;div class="card lv4"&gt;&lt;span&gt;4&lt;/span&gt;14 % tint&lt;/div&gt;
+  &lt;div class="card lv5"&gt;&lt;span&gt;5&lt;/span&gt;18 % tint&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Change --md3-primary to any OKLCH color and watch all 6 levels adapt */
+:root {
+  --md3-surface: oklch(98% 0.003 264);
+  --md3-primary: oklch(48% 0.22 275);
+
+  --elev-0: var(--md3-surface);
+  --elev-1: color-mix(in oklch, var(--md3-surface) 95%, var(--md3-primary));
+  --elev-2: color-mix(in oklch, var(--md3-surface) 92%, var(--md3-primary));
+  --elev-3: color-mix(in oklch, var(--md3-surface) 89%, var(--md3-primary));
+  --elev-4: color-mix(in oklch, var(--md3-surface) 86%, var(--md3-primary));
+  --elev-5: color-mix(in oklch, var(--md3-surface) 82%, var(--md3-primary));
+
+  --shadow-1: 0 1px 3px oklch(0% 0 0 / 0.08);
+  --shadow-3: 0 4px 12px oklch(0% 0 0 / 0.12);
+  --shadow-5: 0 8px 24px oklch(0% 0 0 / 0.16);
+}
+body { font-family: system-ui; margin: 0; }
+
+.surface {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--md3-surface);
+  min-height: 100vh;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: oklch(30% 0.05 275);
+  transition: background-color 300ms cubic-bezier(0.2, 0, 0, 1),
+              box-shadow 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+.card span {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-block-end: 0.5rem;
+}
+
+.lv0 { background: var(--elev-0); }
+.lv1 { background: var(--elev-1); box-shadow: var(--shadow-1); }
+.lv2 { background: var(--elev-2); box-shadow: var(--shadow-1); }
+.lv3 { background: var(--elev-3); box-shadow: var(--shadow-3); }
+.lv4 { background: var(--elev-4); box-shadow: var(--shadow-3); }
+.lv5 { background: var(--elev-5); box-shadow: var(--shadow-5); }
+
+/* Hover: bump each card up one elevation level */
+.lv0:hover { background: var(--elev-1); box-shadow: var(--shadow-1); }
+.lv1:hover { background: var(--elev-2); box-shadow: var(--shadow-3); }
+.lv2:hover { background: var(--elev-3); box-shadow: var(--shadow-3); }
+.lv3:hover { background: var(--elev-4); box-shadow: var(--shadow-5); }
+.lv4:hover { background: var(--elev-5); box-shadow: var(--shadow-5); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--md3-primary</code> to <code>oklch(55% 0.20 150)</code> (green) and watch all six levels shift from indigo-tinted to green-tinted. Then try a warm hue like <code>oklch(55% 0.18 30)</code>. Notice how the neutral surface acquires personality from a single variable. This is the power of tonal elevation: one token drives the entire depth system.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.17-md3-ripple-effect.html">&larr; Lesson 14.17</a>
+      <a href="./lesson-14.19-md3-shape-morph.html">Lesson 14.19 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

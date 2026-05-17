@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.20 — MD3: Dynamic Color &amp; Tonal Palettes · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.20</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.20 · Google Material Design 3</p>
+      <h1>MD3: Dynamic Color &amp; Tonal Palettes</h1>
+      <p class="lead">Material You generates an entire UI palette from a single seed color — five tonal palettes, each with 13 lightness stops. We rebuild this system in OKLCH so one custom property drives every surface, accent, and text color in the interface.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The five palette roles</h2>
+      <p>Google's dynamic color algorithm extracts a seed hue from wallpaper or brand, then generates:</p>
+      <ul>
+        <li><strong>Primary</strong> — the seed hue at full chroma</li>
+        <li><strong>Secondary</strong> — the seed hue at one-third chroma (subdued complement)</li>
+        <li><strong>Tertiary</strong> — the seed hue rotated 60 degrees (harmonic contrast)</li>
+        <li><strong>Neutral</strong> — the seed hue at near-zero chroma (tinted gray)</li>
+        <li><strong>Neutral variant</strong> — slightly more chroma than neutral (borders, dividers)</li>
+      </ul>
+
+      <h2>Why OKLCH is the right space</h2>
+      <p>Google's internal algorithm uses HCT (Hue-Chroma-Tone), a color space developed specifically for Material You. OKLCH is the closest CSS-native equivalent: it separates lightness (L), chroma (C), and hue (H) into independent channels. This means we can hold hue constant while sweeping lightness to generate tonal stops — exactly what HCT does.</p>
+
+      <h3>The 13 lightness stops</h3>
+      <p>Each palette contains stops at lightness values: 0, 10, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100. In practice, a UI uses about 6 of these. In OKLCH, these map to L values from 0% to 100%.</p>
+
+      <h3>Chroma manipulation</h3>
+      <p>The secondary palette uses <code>c * 0.33</code> — one third of the primary chroma. This desaturates the hue enough to be a supporting role rather than competing with the primary. The tertiary palette keeps full chroma but rotates hue by 60 degrees, creating a triadic harmony that feels vibrant without clashing.</p>
+
+      <h3>Light and dark mode</h3>
+      <p>The same 13 stops serve both modes. In light mode, surfaces use high-lightness stops (L: 98-99) and text uses low stops (L: 10-20). Dark mode inverts this mapping. The <code>light-dark()</code> function handles the swap without duplicating the palette.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The <code>--seed-hue</code> and all derived palette stops are <strong>tokens</strong>. Components reference semantic aliases like <code>--color-primary</code> that resolve to specific stops. The generator logic lives entirely in CSS custom properties.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — dynamic tonal palettes</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-20 {
+            --seed-hue: 275;
+            --seed-c: 0.15;
+            font-family: system-ui;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+          .demo-14-20 .row { display: flex; gap: 2px; }
+          .demo-14-20 .row span {
+            flex: 1;
+            padding: 0.5rem 0.25rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-align: center;
+          }
+          .demo-14-20 .label { font-size: 0.7rem; font-weight: 600; color: oklch(40% 0.02 264); margin-block-start: 0.25rem; }
+          .demo-14-20 .p10 { background: oklch(98% var(--seed-c) var(--seed-hue)); color: oklch(20% 0.05 var(--seed-hue)); }
+          .demo-14-20 .p30 { background: oklch(90% var(--seed-c) var(--seed-hue)); color: oklch(20% 0.05 var(--seed-hue)); }
+          .demo-14-20 .p50 { background: oklch(70% var(--seed-c) var(--seed-hue)); color: white; }
+          .demo-14-20 .p70 { background: oklch(50% var(--seed-c) var(--seed-hue)); color: white; }
+          .demo-14-20 .p90 { background: oklch(30% var(--seed-c) var(--seed-hue)); color: white; }
+          .demo-14-20 .p99 { background: oklch(15% var(--seed-c) var(--seed-hue)); color: white; }
+          .demo-14-20 .s10 { background: oklch(98% calc(var(--seed-c)*0.33) var(--seed-hue)); color: oklch(20% 0.02 var(--seed-hue)); }
+          .demo-14-20 .s50 { background: oklch(70% calc(var(--seed-c)*0.33) var(--seed-hue)); color: white; }
+          .demo-14-20 .s90 { background: oklch(30% calc(var(--seed-c)*0.33) var(--seed-hue)); color: white; }
+          .demo-14-20 .t10 { background: oklch(98% var(--seed-c) calc(var(--seed-hue) + 60)); color: oklch(20% 0.05 calc(var(--seed-hue) + 60)); }
+          .demo-14-20 .t50 { background: oklch(70% var(--seed-c) calc(var(--seed-hue) + 60)); color: white; }
+          .demo-14-20 .t90 { background: oklch(30% var(--seed-c) calc(var(--seed-hue) + 60)); color: white; }
+          .demo-14-20 .n10 { background: oklch(98% calc(var(--seed-c)*0.05) var(--seed-hue)); color: oklch(20% 0.01 var(--seed-hue)); }
+          .demo-14-20 .n50 { background: oklch(70% calc(var(--seed-c)*0.05) var(--seed-hue)); color: white; }
+          .demo-14-20 .n90 { background: oklch(30% calc(var(--seed-c)*0.05) var(--seed-hue)); color: white; }
+        </style>
+        <div class="demo-14-20">
+          <p class="label">Primary (seed hue 275)</p>
+          <div class="row">
+            <span class="p10">98</span><span class="p30">90</span><span class="p50">70</span><span class="p70">50</span><span class="p90">30</span><span class="p99">15</span>
+          </div>
+          <p class="label">Secondary (chroma * 0.33)</p>
+          <div class="row">
+            <span class="s10">98</span><span class="s50">70</span><span class="s90">30</span>
+          </div>
+          <p class="label">Tertiary (hue + 60)</p>
+          <div class="row">
+            <span class="t10">98</span><span class="t50">70</span><span class="t90">30</span>
+          </div>
+          <p class="label">Neutral (chroma * 0.05)</p>
+          <div class="row">
+            <span class="n10">98</span><span class="n50">70</span><span class="n90">30</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="theme-gen"&gt;
+  &lt;!-- Palette strips --&gt;
+  &lt;p class="label"&gt;Primary&lt;/p&gt;
+  &lt;div class="strip primary"&gt;
+    &lt;span class="s99"&gt;99&lt;/span&gt;&lt;span class="s95"&gt;95&lt;/span&gt;&lt;span class="s90"&gt;90&lt;/span&gt;
+    &lt;span class="s80"&gt;80&lt;/span&gt;&lt;span class="s60"&gt;60&lt;/span&gt;&lt;span class="s40"&gt;40&lt;/span&gt;
+    &lt;span class="s20"&gt;20&lt;/span&gt;&lt;span class="s10"&gt;10&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class="label"&gt;Secondary&lt;/p&gt;
+  &lt;div class="strip secondary"&gt;
+    &lt;span class="s99"&gt;99&lt;/span&gt;&lt;span class="s90"&gt;90&lt;/span&gt;
+    &lt;span class="s60"&gt;60&lt;/span&gt;&lt;span class="s40"&gt;40&lt;/span&gt;&lt;span class="s10"&gt;10&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class="label"&gt;Tertiary&lt;/p&gt;
+  &lt;div class="strip tertiary"&gt;
+    &lt;span class="s99"&gt;99&lt;/span&gt;&lt;span class="s90"&gt;90&lt;/span&gt;
+    &lt;span class="s60"&gt;60&lt;/span&gt;&lt;span class="s40"&gt;40&lt;/span&gt;&lt;span class="s10"&gt;10&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;p class="label"&gt;Neutral&lt;/p&gt;
+  &lt;div class="strip neutral"&gt;
+    &lt;span class="s99"&gt;99&lt;/span&gt;&lt;span class="s90"&gt;90&lt;/span&gt;
+    &lt;span class="s60"&gt;60&lt;/span&gt;&lt;span class="s40"&gt;40&lt;/span&gt;&lt;span class="s10"&gt;10&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Card using the palette --&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;Dynamic Color Card&lt;/div&gt;
+    &lt;p class="card-body"&gt;This card uses only palette-derived colors. Change the seed hue and everything adapts.&lt;/p&gt;
+    &lt;div class="card-actions"&gt;
+      &lt;button class="btn-primary"&gt;Accept&lt;/button&gt;
+      &lt;button class="btn-tonal"&gt;Dismiss&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Change this single value and watch everything adapt */
+:root {
+  --seed-hue: 275;
+  --seed-chroma: 0.15;
+
+  /* Primary palette */
+  --p99: oklch(99% var(--seed-chroma) var(--seed-hue));
+  --p95: oklch(95% var(--seed-chroma) var(--seed-hue));
+  --p90: oklch(90% var(--seed-chroma) var(--seed-hue));
+  --p80: oklch(80% var(--seed-chroma) var(--seed-hue));
+  --p60: oklch(60% var(--seed-chroma) var(--seed-hue));
+  --p40: oklch(40% var(--seed-chroma) var(--seed-hue));
+  --p20: oklch(20% var(--seed-chroma) var(--seed-hue));
+  --p10: oklch(10% var(--seed-chroma) var(--seed-hue));
+
+  /* Secondary: seed hue, 1/3 chroma */
+  --sec-c: calc(var(--seed-chroma) * 0.33);
+  --s99: oklch(99% var(--sec-c) var(--seed-hue));
+  --s90-sec: oklch(90% var(--sec-c) var(--seed-hue));
+  --s60-sec: oklch(60% var(--sec-c) var(--seed-hue));
+  --s40-sec: oklch(40% var(--sec-c) var(--seed-hue));
+  --s10-sec: oklch(10% var(--sec-c) var(--seed-hue));
+
+  /* Tertiary: hue + 60, full chroma */
+  --t-hue: calc(var(--seed-hue) + 60);
+  --t99: oklch(99% var(--seed-chroma) var(--t-hue));
+  --t90: oklch(90% var(--seed-chroma) var(--t-hue));
+  --t60: oklch(60% var(--seed-chroma) var(--t-hue));
+  --t40: oklch(40% var(--seed-chroma) var(--t-hue));
+  --t10: oklch(10% var(--seed-chroma) var(--t-hue));
+
+  /* Neutral: seed hue, ~5% chroma */
+  --n-c: calc(var(--seed-chroma) * 0.05);
+  --n99: oklch(99% var(--n-c) var(--seed-hue));
+  --n90: oklch(90% var(--n-c) var(--seed-hue));
+  --n60: oklch(60% var(--n-c) var(--seed-hue));
+  --n40: oklch(40% var(--n-c) var(--seed-hue));
+  --n10: oklch(10% var(--n-c) var(--seed-hue));
+}
+
+body { font-family: system-ui; margin: 0; padding: 1.5rem; background: var(--n99); color: var(--n10); }
+
+.theme-gen { display: flex; flex-direction: column; gap: 0.5rem; }
+.label { margin: 0.5rem 0 0; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.strip { display: flex; gap: 2px; }
+.strip span {
+  flex: 1; padding: 0.6rem 0.25rem;
+  text-align: center; font-size: 0.65rem; font-weight: 600;
+  border-radius: 4px;
+}
+.primary .s99 { background: var(--p99); color: var(--p20); }
+.primary .s95 { background: var(--p95); color: var(--p20); }
+.primary .s90 { background: var(--p90); color: var(--p10); }
+.primary .s80 { background: var(--p80); color: var(--p10); }
+.primary .s60 { background: var(--p60); color: white; }
+.primary .s40 { background: var(--p40); color: white; }
+.primary .s20 { background: var(--p20); color: var(--p90); }
+.primary .s10 { background: var(--p10); color: var(--p90); }
+
+.secondary .s99 { background: var(--s99); color: var(--s10-sec); }
+.secondary .s90 { background: var(--s90-sec); color: var(--s10-sec); }
+.secondary .s60 { background: var(--s60-sec); color: white; }
+.secondary .s40 { background: var(--s40-sec); color: white; }
+.secondary .s10 { background: var(--s10-sec); color: var(--s90-sec); }
+
+.tertiary .s99 { background: var(--t99); color: var(--t10); }
+.tertiary .s90 { background: var(--t90); color: var(--t10); }
+.tertiary .s60 { background: var(--t60); color: white; }
+.tertiary .s40 { background: var(--t40); color: white; }
+.tertiary .s10 { background: var(--t10); color: var(--t90); }
+
+.neutral .s99 { background: var(--n99); color: var(--n10); }
+.neutral .s90 { background: var(--n90); color: var(--n10); }
+.neutral .s60 { background: var(--n60); color: white; }
+.neutral .s40 { background: var(--n40); color: white; }
+.neutral .s10 { background: var(--n10); color: var(--n90); }
+
+/* Sample card using the palette */
+.card {
+  margin-block-start: 1rem;
+  background: color-mix(in oklch, var(--n99) 95%, var(--p40));
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-header {
+  background: var(--p40);
+  color: white;
+  padding: 1rem;
+  font-weight: 600;
+}
+.card-body { padding: 1rem; font-size: 0.85rem; color: var(--n10); }
+.card-actions { display: flex; gap: 0.5rem; padding: 0 1rem 1rem; }
+.btn-primary, .btn-tonal {
+  border: none; padding: 0.5rem 1rem; border-radius: 20px;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+.btn-primary { background: var(--p40); color: white; }
+.btn-tonal { background: var(--p90); color: var(--p10); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--seed-hue</code> to <code>150</code> (green), then <code>30</code> (warm coral), then <code>210</code> (sky blue). Watch all four palette strips and the card recolor simultaneously. Then increase <code>--seed-chroma</code> to <code>0.25</code> — the secondary and neutral palettes gain more personality. Material You's magic is that a single number produces a coherent, accessible color system.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.19-md3-shape-morph.html">&larr; Lesson 14.19</a>
+      <a href="./lesson-14.21-md3-container-transform.html">Lesson 14.21 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

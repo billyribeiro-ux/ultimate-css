@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.23 — Fluent: Reveal Highlight · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.23</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.23 · Microsoft Fluent Design</p>
+      <h1>Fluent: Reveal Highlight</h1>
+      <p class="lead">Reveal Highlight is a border-light effect that follows the cursor across a grid of controls. Nearby borders glow as the mouse passes, creating a sense of illumination. The effect spans card boundaries, as if a flashlight is sweeping across the interface.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The illusion of light</h2>
+      <p>Fluent's Reveal Highlight simulates a point light source at the cursor position. As the cursor moves, borders near it brighten while distant borders remain dark. This creates a spatial awareness effect — the UI feels like a physical surface responding to an external light source rather than a flat screen emitting pixels.</p>
+
+      <h2>The implementation pattern</h2>
+      <p>The effect uses a radial gradient centered on the cursor coordinates, applied as an overlay across the entire grid container. Each card's border appears to glow because the gradient bleeds across card boundaries.</p>
+
+      <h3>The grid-level overlay</h3>
+      <pre><code>.grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 200px at var(--x) var(--y),
+    oklch(100% 0 0 / 0.08),
+    transparent
+  );
+  pointer-events: none;
+}</code></pre>
+
+      <h3>Why grid-level, not per-card?</h3>
+      <p>If each card had its own glow, the effect would stop at card edges — the glow would be clipped by <code>overflow: hidden</code>. By placing the gradient on the grid container, it naturally spans the gaps between cards. The 1px borders between cards act as "light channels" that the gradient illuminates.</p>
+
+      <h3>The 200px radius</h3>
+      <p>The radial gradient uses a 200px radius. This matches the approximate area of foveal + parafoveal vision at typical viewing distance — the user sees the glow on cards they are already looking at, plus the immediate neighbors. A larger radius would illuminate too much, destroying the directional quality. A smaller radius would feel like a laser pointer.</p>
+
+      <h3>Production: 4 lines of JS</h3>
+      <p>In the static demo, the glow is fixed at center. In production, you need a <code>mousemove</code> listener on the grid that sets <code>--x</code> and <code>--y</code>. This is identical to the technique from Lesson 14.8 (Linear's glow card):</p>
+      <pre><code>grid.addEventListener('mousemove', (e) => {
+  const r = grid.getBoundingClientRect();
+  grid.style.setProperty('--x', e.clientX - r.left + 'px');
+  grid.style.setProperty('--y', e.clientY - r.top + 'px');
+});</code></pre>
+
+      <h2>PE7 placement</h2>
+      <p>The <code>::before</code> overlay is a <strong>component</strong> detail of the grid. The <code>--x</code>/<code>--y</code> properties are runtime values set by JS. The gradient radius and opacity are <strong>tokens</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fluent reveal highlight (static)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-23 {
+            --x: 50%;
+            --y: 50%;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            padding: 1px;
+            background: oklch(80% 0.01 264);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            font-family: system-ui;
+          }
+          .demo-14-23::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle 180px at var(--x) var(--y), oklch(100% 0 0 / 0.12), transparent);
+            pointer-events: none;
+            z-index: 1;
+          }
+          .demo-14-23 .item {
+            background: oklch(97% 0.003 264);
+            padding: 1.25rem 1rem;
+            font-size: 0.8rem;
+            color: oklch(30% 0.02 264);
+          }
+          .demo-14-23 .item strong { display: block; margin-block-end: 0.25rem; font-size: 0.85rem; }
+        </style>
+        <div class="demo-14-23">
+          <div class="item"><strong>Documents</strong>Recent files</div>
+          <div class="item"><strong>Photos</strong>Camera roll</div>
+          <div class="item"><strong>Music</strong>Playlists</div>
+          <div class="item"><strong>Videos</strong>Downloads</div>
+          <div class="item"><strong>Mail</strong>3 unread</div>
+          <div class="item"><strong>Calendar</strong>Today</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="reveal-grid"&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Documents&lt;/strong&gt;&lt;span&gt;23 files&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Photos&lt;/strong&gt;&lt;span&gt;1,204 items&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Music&lt;/strong&gt;&lt;span&gt;8 playlists&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Videos&lt;/strong&gt;&lt;span&gt;12 downloads&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Mail&lt;/strong&gt;&lt;span&gt;3 unread&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Calendar&lt;/strong&gt;&lt;span&gt;2 events today&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Settings&lt;/strong&gt;&lt;span&gt;System&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Apps&lt;/strong&gt;&lt;span&gt;Installed&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="item"&gt;&lt;strong&gt;Security&lt;/strong&gt;&lt;span&gt;All clear&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Static demo — --x and --y fixed at 50%.
+   In production, set them via mousemove on .reveal-grid:
+   grid.addEventListener('mousemove', (e) => {
+     const r = grid.getBoundingClientRect();
+     grid.style.setProperty('--x', e.clientX - r.left + 'px');
+     grid.style.setProperty('--y', e.clientY - r.top + 'px');
+   }); */
+
+:root {
+  --glow-radius: 200px;
+  --glow-opacity: 0.1;
+  --border-color: oklch(82% 0.01 264);
+  --surface: oklch(97% 0.003 264);
+}
+
+body { font-family: system-ui; margin: 0; padding: 2rem; background: oklch(92% 0.005 264); }
+
+.reveal-grid {
+  --x: 50%;
+  --y: 50%;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  padding: 1px;
+  background: var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Reveal light overlay — spans the entire grid */
+.reveal-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(
+    circle var(--glow-radius) at var(--x) var(--y),
+    oklch(100% 0 0 / var(--glow-opacity)),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Per-card border glow (highlights the nearest border) */
+.item {
+  position: relative;
+  background: var(--surface);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.item::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  background: radial-gradient(
+    circle var(--glow-radius) at var(--x) var(--y),
+    oklch(100% 0 0 / 0.15),
+    transparent
+  );
+  pointer-events: none;
+}
+.item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--surface);
+  pointer-events: none;
+}
+
+.item strong {
+  position: relative;
+  z-index: 3;
+  font-size: 0.9rem;
+  color: oklch(20% 0.02 264);
+}
+.item span {
+  position: relative;
+  z-index: 3;
+  font-size: 0.75rem;
+  color: oklch(50% 0.02 264);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--glow-radius</code> to <code>80px</code> for a tight spotlight effect, then to <code>400px</code> for a broad wash. Notice how the small radius creates urgency (laser pointer) while the large radius loses directionality. Then increase <code>--glow-opacity</code> to <code>0.25</code> — the borders become too prominent and distract from content. Fluent keeps the reveal subtle precisely because it is always-on during mouse movement.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.22-fluent-acrylic.html">&larr; Lesson 14.22</a>
+      <a href="./lesson-14.24-fluent-depth-motion.html">Lesson 14.24 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.21 — MD3: The Container Transform · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.21</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.21 · Google Material Design 3</p>
+      <h1>MD3: The Container Transform</h1>
+      <p class="lead">When a list item is tapped, its card surface morphs into the detail view — the container stretches, the border-radius flattens, and the content crossfades. This "shared element" transition maintains spatial continuity. The View Transitions API makes it achievable in CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Spatial continuity and why it matters</h2>
+      <p>When a user taps a card and the detail view simply appears, the brain has to rebuild spatial context: "Where did this come from? How do I get back?" The container transform solves this by animating the card into the detail view. The surface is the same element, morphing in place. The user never loses track of where they are in the information hierarchy.</p>
+
+      <h2>The View Transitions API</h2>
+      <p>The CSS <code>view-transition-name</code> property assigns an identity to an element. When <code>document.startViewTransition()</code> is called, the browser snapshots the old state, applies the DOM change, snapshots the new state, and crossfades between them. If two elements across states share the same <code>view-transition-name</code>, the browser animates between their positions and sizes — a shared-element transition.</p>
+
+      <h3>The critical CSS</h3>
+      <pre><code>/* On the card in list view */
+.card { view-transition-name: card-hero; }
+
+/* On the header in detail view */
+.detail-header { view-transition-name: card-hero; }
+
+/* Style the transition */
+::view-transition-group(card-hero) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-new(card-hero) {
+  animation: fade-in 200ms 150ms both;
+}</code></pre>
+
+      <h3>Content crossfade delay</h3>
+      <p>The 150ms delay on the content fade-in is deliberate. The container moves first (for 350ms), and the new content fades in partway through. This "container-first, content-second" choreography is a core MD3 principle — the surface establishes spatial context before the details arrive. Without the delay, everything moves at once and the transition feels chaotic.</p>
+
+      <h3>Border-radius transition</h3>
+      <p>The card has <code>border-radius: 12px</code>. The detail header has <code>border-radius: 0</code>. The <code>::view-transition-group</code> automatically interpolates between them, so the corners animate from rounded to flat as the surface expands. This geometric morph is what makes the transition feel physical.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The <code>view-transition-name</code> is a <strong>component</strong> property (it identifies the element). The <code>::view-transition-group</code> animation styles are <strong>animations</strong>. The timing and easing reference <strong>tokens</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — container transform (static)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-21 {
+            font-family: system-ui;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+          }
+          .demo-14-21 .list-card {
+            width: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: oklch(95% 0.04 275);
+          }
+          .demo-14-21 .list-card .thumb {
+            height: 80px;
+            background: linear-gradient(135deg, oklch(60% 0.18 275), oklch(45% 0.20 300));
+          }
+          .demo-14-21 .list-card .info {
+            padding: 0.75rem;
+            font-size: 0.75rem;
+            color: oklch(25% 0.05 275);
+          }
+          .demo-14-21 .list-card .info strong { display: block; margin-block-end: 0.25rem; }
+          .demo-14-21 .detail {
+            flex: 1;
+            border-radius: 0;
+            overflow: hidden;
+            background: oklch(99% 0.003 264);
+            border: 1px solid oklch(90% 0.01 264);
+          }
+          .demo-14-21 .detail .hero {
+            height: 100px;
+            background: linear-gradient(135deg, oklch(60% 0.18 275), oklch(45% 0.20 300));
+          }
+          .demo-14-21 .detail .content {
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: oklch(30% 0.03 264);
+          }
+          .demo-14-21 .arrow {
+            align-self: center;
+            font-size: 1.25rem;
+            color: oklch(55% 0.08 275);
+          }
+        </style>
+        <div class="demo-14-21">
+          <div class="list-card">
+            <div class="thumb"></div>
+            <div class="info"><strong>Mountain Trail</strong>A scenic path through alpine meadows.</div>
+          </div>
+          <div class="arrow">-&gt;</div>
+          <div class="detail">
+            <div class="hero"></div>
+            <div class="content"><strong>Mountain Trail</strong><br>The card morphs into this detail view. The surface stretches, corners flatten, and content crossfades with a 150ms delay.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div id="app"&gt;
+  &lt;!-- List view --&gt;
+  &lt;div id="list-view" class="view active"&gt;
+    &lt;h2&gt;Destinations&lt;/h2&gt;
+    &lt;div class="card" onclick="showDetail()"&gt;
+      &lt;div class="card-img"&gt;&lt;/div&gt;
+      &lt;div class="card-text"&gt;
+        &lt;strong&gt;Alpine Meadow&lt;/strong&gt;
+        &lt;span&gt;Tap to expand&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Detail view --&gt;
+  &lt;div id="detail-view" class="view"&gt;
+    &lt;div class="detail-hero"&gt;&lt;/div&gt;
+    &lt;div class="detail-body"&gt;
+      &lt;h2&gt;Alpine Meadow&lt;/h2&gt;
+      &lt;p&gt;The card surface morphed into this header. The border-radius interpolated from 12px to 0. Content faded in with a 150ms delay so the container moved first.&lt;/p&gt;
+      &lt;button onclick="showList()"&gt;Back&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+function showDetail() {
+  if (!document.startViewTransition) {
+    toggle(); return;
+  }
+  document.startViewTransition(() =&gt; toggle());
+}
+function showList() {
+  if (!document.startViewTransition) {
+    toggle(); return;
+  }
+  document.startViewTransition(() =&gt; toggle());
+}
+function toggle() {
+  document.getElementById('list-view').classList.toggle('active');
+  document.getElementById('detail-view').classList.toggle('active');
+}
+&lt;/script&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; background: oklch(98% 0.003 264); }
+#app { min-height: 100vh; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* --- List view --- */
+#list-view { padding: 1.5rem; }
+#list-view h2 { font-size: 1.25rem; color: oklch(20% 0.05 275); margin: 0 0 1rem; }
+
+.card {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: oklch(96% 0.03 275);
+  cursor: pointer;
+  view-transition-name: card-hero;
+}
+.card-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, oklch(60% 0.18 275), oklch(45% 0.20 310));
+  flex-shrink: 0;
+}
+.card-text { display: flex; flex-direction: column; justify-content: center; }
+.card-text strong { font-size: 0.95rem; color: oklch(20% 0.05 275); }
+.card-text span { font-size: 0.8rem; color: oklch(50% 0.04 275); }
+
+/* --- Detail view --- */
+.detail-hero {
+  height: 200px;
+  background: linear-gradient(135deg, oklch(60% 0.18 275), oklch(45% 0.20 310));
+  view-transition-name: card-hero;
+}
+.detail-body {
+  padding: 1.5rem;
+}
+.detail-body h2 { margin: 0 0 0.5rem; color: oklch(20% 0.05 275); }
+.detail-body p { font-size: 0.9rem; color: oklch(35% 0.03 264); line-height: 1.5; }
+.detail-body button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 20px;
+  background: oklch(48% 0.22 275);
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* --- View transition styles --- */
+::view-transition-group(card-hero) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-new(card-hero) {
+  animation: vt-fade-in 200ms cubic-bezier(0.2, 0, 0, 1) 150ms both;
+}
+::view-transition-old(card-hero) {
+  animation: vt-fade-out 100ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes vt-fade-in { from { opacity: 0; } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the <code>animation-duration</code> on <code>::view-transition-group(card-hero)</code> to <code>800ms</code> to see the morph in slow motion. Watch how the border-radius interpolates and the content crossfades midway. Then remove the <code>150ms</code> delay on <code>::view-transition-new</code> — the content appears immediately, making the transition feel rushed. The delay is what gives the container time to establish spatial context.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.20-md3-dynamic-color.html">&larr; Lesson 14.20</a>
+      <a href="./lesson-14.22-fluent-acrylic.html">Lesson 14.22 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

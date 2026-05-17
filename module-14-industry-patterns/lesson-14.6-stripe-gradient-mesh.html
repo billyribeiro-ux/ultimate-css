@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.6 — Stripe: The Gradient Mesh Background · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.6</p>
+      <h1>Stripe: The Gradient Mesh Background</h1>
+      <p class="lead">Stripe's landing pages use a colorful animated gradient mesh — multiple radial gradients layered at different positions, slowly rotating and pulsing. The colors are in OKLCH for smooth interpolation, and <code>@property</code> enables animating the hue values directly.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Stripe does</h2>
+      <p>Stripe's homepage features a large background with multiple colorful gradients that overlap, blend, and slowly shift. The effect resembles a gradient mesh from a design tool like Figma — smooth color transitions between multiple focal points. The motion is extremely slow, making it feel alive without being distracting.</p>
+
+      <h2>The multi-layer technique</h2>
+      <p>The mesh is built from 3-5 <code>radial-gradient()</code> layers stacked in the <code>background</code> shorthand. Each gradient is positioned at a different point (e.g., <code>30% 20%</code>, <code>70% 80%</code>) and uses different colors. Because radial gradients fade to transparent by default, they naturally blend where they overlap.</p>
+
+      <h2>Animating hue with @property</h2>
+      <p>CSS cannot natively animate gradient color stops. But you can register a custom property with <code>@property --hue-shift { syntax: "&lt;number&gt;"; ... }</code> and use it inside the gradient: <code>oklch(65% 0.2 calc(275 + var(--hue-shift)))</code>. Then animate <code>--hue-shift</code> from <code>0</code> to <code>360</code> over 20-30 seconds. The browser smoothly interpolates the registered property, and the gradient colors cycle smoothly.</p>
+
+      <h2>OKLCH advantage</h2>
+      <p>Stripe's gradients look vibrant because OKLCH interpolation avoids the "muddy middle" problem of sRGB. When you transition between two OKLCH colors, the intermediate values maintain perceptual chroma. In sRGB, a transition from blue to green passes through a desaturated gray zone. In OKLCH, it passes through vivid cyan.</p>
+
+      <h2>Performance</h2>
+      <p>Animated gradients via <code>@property</code> are GPU-composited in Chromium and WebKit. The browser does not repaint the gradient on every frame — it interpolates the registered property value and recomposites. This is fundamentally different from animating <code>background-position</code>, which triggers a repaint per frame.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — animated gradient mesh</h2>
+      <div class="demo-frame">
+        <style>
+          @property --mesh-hue {
+            syntax: "<number>";
+            inherits: false;
+            initial-value: 0;
+          }
+          .demo-14-6 {
+            block-size: 18rem;
+            border-radius: 0.75rem;
+            animation: mesh-cycle 20s linear infinite;
+            background:
+              radial-gradient(ellipse at 20% 20%, oklch(65% 0.22 calc(275 + var(--mesh-hue))) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 30%, oklch(60% 0.2 calc(200 + var(--mesh-hue))) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 80%, oklch(70% 0.18 calc(330 + var(--mesh-hue))) 0%, transparent 50%),
+              radial-gradient(ellipse at 30% 60%, oklch(55% 0.15 calc(150 + var(--mesh-hue))) 0%, transparent 50%),
+              oklch(22% 0.04 275);
+            display: grid;
+            place-items: center;
+            color: oklch(98% 0.005 275);
+            font-family: system-ui, sans-serif;
+            text-align: center;
+          }
+          .demo-14-6 h3 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+          .demo-14-6 p { font-size: 0.8125rem; opacity: 0.7; margin: 0; }
+          @keyframes mesh-cycle {
+            to { --mesh-hue: 360; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-14-6 { animation: none; }
+          }
+        </style>
+        <div class="demo-14-6">
+          <div>
+            <h3>Payments infrastructure</h3>
+            <p>Watch the gradient hues slowly cycle through the spectrum.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="mesh"&gt;
+  &lt;h1&gt;Payments infrastructure&lt;/h1&gt;
+  &lt;p&gt;for the internet&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Register the animated hue property */
+@property --hue {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 0;
+}
+
+.mesh {
+  min-block-size: 80vh;
+  display: grid;
+  place-items: center;
+  place-content: center;
+  text-align: center;
+  font-family: system-ui, sans-serif;
+  color: oklch(98% 0 0);
+  padding: 2rem;
+
+  /* 4 radial gradient layers */
+  background:
+    radial-gradient(ellipse at 20% 20%,
+      oklch(65% 0.22 calc(275 + var(--hue)))
+      0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%,
+      oklch(60% 0.2 calc(200 + var(--hue)))
+      0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%,
+      oklch(70% 0.18 calc(330 + var(--hue)))
+      0%, transparent 50%),
+    radial-gradient(ellipse at 30% 60%,
+      oklch(55% 0.15 calc(150 + var(--hue)))
+      0%, transparent 50%),
+    oklch(18% 0.04 275);
+
+  animation: hue-cycle 25s linear infinite;
+}
+
+@keyframes hue-cycle {
+  to { --hue: 360; }
+}
+
+.mesh h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.03em;
+}
+
+.mesh p {
+  font-size: 1.25rem;
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* Try changing gradient positions,
+   colors, or animation duration.
+   Faster = more energetic.
+   Slower = more ambient. */
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a fifth <code>radial-gradient</code> layer at position <code>60% 40%</code> with a warm hue like <code>oklch(70% 0.2 calc(50 + var(--hue)))</code>. Then change the animation duration from <code>25s</code> to <code>8s</code>. Notice how the faster cycle makes the page feel energetic rather than ambient. Stripe keeps it slow — 20-30 seconds — because the gradient is background ambiance, not the main event.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.5-netflix-text-reveal.html">&larr; Lesson 14.5</a>
+      <a href="./lesson-14.7-stripe-tabbed-showcase.html">Lesson 14.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

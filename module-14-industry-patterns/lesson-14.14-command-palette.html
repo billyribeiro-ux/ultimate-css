@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.14 — Notion/Linear: The Command Palette Modal · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.14</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.14</p>
+      <h1>Notion/Linear: The Command Palette Modal</h1>
+      <p class="lead">The command-K palette slides down from the top with backdrop blur, smooth enter/exit via <code>@starting-style</code>, and zero JavaScript for open/close. This uses the <code>popover</code> attribute with animated transitions on <code>display</code> and <code>overlay</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What these products do</h2>
+      <p>Notion, Linear, Vercel, and many developer tools feature a command palette — triggered by pressing Cmd+K. A modal appears near the top of the viewport with a search input, a list of recent actions, and keyboard navigation. The modal slides down from above with a slight blur on the backdrop. Pressing Escape or clicking outside dismisses it with a reverse animation.</p>
+
+      <h2>The popover foundation</h2>
+      <p>The HTML <code>popover</code> attribute handles open/close state, light-dismiss (clicking outside to close), and Escape key behavior — all without JavaScript. A button with <code>popovertarget</code> toggles the popover. This replaces hundreds of lines of modal management JS.</p>
+
+      <h2>Enter animation with @starting-style</h2>
+      <p><code>@starting-style</code> defines the state the element transitions from when it first appears. For the command palette:</p>
+      <ul>
+        <li><code>@starting-style { opacity: 0; translate: 0 -1rem; }</code> — starts invisible and offset upward.</li>
+        <li>The element transitions to <code>opacity: 1; translate: 0 0;</code> — its normal position.</li>
+      </ul>
+
+      <h2>Exit animation</h2>
+      <p>The exit uses <code>:not(:popover-open)</code> or the <code>[popover]:not(:popover-open)</code> selector to define the leaving state. Combined with <code>transition-behavior: allow-discrete</code> and <code>transition-property: display, overlay, opacity, translate</code>, the browser smoothly transitions the element out before removing it from the top layer.</p>
+
+      <h2>Backdrop blur</h2>
+      <p>The <code>::backdrop</code> pseudo-element receives <code>backdrop-filter: blur(4px)</code> and a semi-transparent background. This blurs the content behind the modal, focusing attention on the palette. The backdrop also transitions its opacity for a smooth appear/disappear.</p>
+
+      <h2>Positioning</h2>
+      <p><code>position: fixed; inset-block-start: 15vh; margin-inline: auto;</code> places the palette near the top of the viewport, centered horizontally. The 15vh offset mirrors where users expect the command palette to appear — above center, leaving room for results below.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — command palette with popover</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-14 {
+            display: grid;
+            place-items: center;
+            min-block-size: 14rem;
+            padding: 2rem;
+            background: oklch(15% 0.015 264);
+            border-radius: 0.75rem;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-14-14 .trigger-btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            background: oklch(22% 0.02 264);
+            border: 1px solid oklch(30% 0.02 264);
+            color: oklch(80% 0.01 264);
+            font-family: system-ui, sans-serif;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .demo-14-14 .trigger-btn kbd {
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            background: oklch(18% 0.015 264);
+            border: 1px solid oklch(30% 0.02 264);
+            font-size: 0.6875rem;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-14-14 [popover] {
+            position: fixed;
+            inset-block-start: 15vh;
+            margin-inline: auto;
+            max-inline-size: 28rem;
+            inline-size: 90%;
+            padding: 0;
+            border: 1px solid oklch(28% 0.02 264);
+            border-radius: 0.75rem;
+            background: oklch(16% 0.015 264);
+            color: oklch(85% 0.01 264);
+            box-shadow: 0 20px 60px oklch(0% 0 0 / 0.5);
+            overflow: hidden;
+
+            opacity: 1;
+            translate: 0 0;
+            transition: opacity 200ms, translate 200ms, display 200ms allow-discrete, overlay 200ms allow-discrete;
+          }
+          .demo-14-14 [popover]:not(:popover-open) {
+            opacity: 0;
+            translate: 0 -0.75rem;
+          }
+          @starting-style {
+            .demo-14-14 [popover]:popover-open {
+              opacity: 0;
+              translate: 0 -0.75rem;
+            }
+          }
+          .demo-14-14 [popover]::backdrop {
+            background: oklch(0% 0 0 / 0.4);
+            backdrop-filter: blur(4px);
+          }
+          .demo-14-14 .cmd-input {
+            inline-size: 100%;
+            padding: 0.875rem 1rem;
+            border: none;
+            border-block-end: 1px solid oklch(25% 0.02 264);
+            background: transparent;
+            color: oklch(90% 0.01 264);
+            font-size: 0.9375rem;
+            font-family: system-ui, sans-serif;
+            outline: none;
+          }
+          .demo-14-14 .cmd-input::placeholder { color: oklch(45% 0.01 264); }
+          .demo-14-14 .cmd-list {
+            list-style: none;
+            margin: 0;
+            padding: 0.5rem;
+          }
+          .demo-14-14 .cmd-list li {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            color: oklch(70% 0.01 264);
+            cursor: default;
+          }
+          .demo-14-14 .cmd-list li:first-child {
+            background: oklch(22% 0.02 264);
+            color: oklch(90% 0.01 264);
+          }
+        </style>
+        <div class="demo-14-14">
+          <button class="trigger-btn" popovertarget="cmd-demo">Search commands <kbd>Cmd K</kbd></button>
+          <div id="cmd-demo" popover>
+            <input class="cmd-input" placeholder="Type a command..." type="text">
+            <ul class="cmd-list">
+              <li>Create new issue</li>
+              <li>Go to project</li>
+              <li>Switch team</li>
+              <li>Open settings</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="app"&gt;
+  &lt;button class="open-btn"
+    popovertarget="palette"&gt;
+    Search commands &lt;kbd&gt;Cmd K&lt;/kbd&gt;
+  &lt;/button&gt;
+
+  &lt;div id="palette" popover&gt;
+    &lt;input class="search"
+      placeholder="Type a command..."
+      type="text"&gt;
+    &lt;ul class="results"&gt;
+      &lt;li class="active"&gt;Create new issue&lt;/li&gt;
+      &lt;li&gt;Go to project&lt;/li&gt;
+      &lt;li&gt;Switch team&lt;/li&gt;
+      &lt;li&gt;Open settings&lt;/li&gt;
+      &lt;li&gt;Toggle dark mode&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+
+  &lt;p class="hint"&gt;Click the button to open.
+     Click outside or press Escape
+     to dismiss.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Command palette modal */
+.app {
+  display: grid;
+  place-items: center;
+  min-block-size: 80vh;
+  background: oklch(12% 0.015 264);
+  font-family: system-ui, sans-serif;
+  padding: 2rem;
+}
+
+.open-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  background: oklch(20% 0.02 264);
+  border: 1px solid oklch(30% 0.02 264);
+  color: oklch(80% 0.01 264);
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: inherit;
+}
+
+.open-btn kbd {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  background: oklch(15% 0.01 264);
+  border: 1px solid oklch(30% 0.02 264);
+  font-size: 0.75rem;
+}
+
+/* Popover: the command palette */
+[popover] {
+  position: fixed;
+  inset-block-start: 15vh;
+  margin-inline: auto;
+  max-inline-size: 30rem;
+  inline-size: 90%;
+  padding: 0;
+  border: 1px solid oklch(26% 0.02 264);
+  border-radius: 0.75rem;
+  background: oklch(14% 0.015 264);
+  color: oklch(88% 0.01 264);
+  box-shadow: 0 20px 60px oklch(0% 0 0 / 0.6);
+  overflow: hidden;
+
+  /* Smooth open/close */
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 200ms ease-out,
+    translate 200ms ease-out,
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+
+/* Exit state */
+[popover]:not(:popover-open) {
+  opacity: 0;
+  translate: 0 -1rem;
+}
+
+/* Enter state */
+@starting-style {
+  [popover]:popover-open {
+    opacity: 0;
+    translate: 0 -1rem;
+  }
+}
+
+/* Backdrop blur */
+[popover]::backdrop {
+  background: oklch(0% 0 0 / 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.search {
+  inline-size: 100%;
+  padding: 1rem;
+  border: none;
+  border-block-end: 1px solid
+    oklch(24% 0.02 264);
+  background: transparent;
+  color: oklch(92% 0.01 264);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+}
+.search::placeholder {
+  color: oklch(42% 0.01 264);
+}
+
+.results {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.results li {
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: oklch(65% 0.01 264);
+  cursor: default;
+}
+
+.results .active {
+  background: oklch(22% 0.02 275);
+  color: oklch(92% 0.01 264);
+}
+
+.hint {
+  margin-block-start: 2rem;
+  font-size: 0.75rem;
+  color: oklch(40% 0.01 264);
+  text-align: center;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open the palette in the preview, then click outside to dismiss it. Watch the exit animation. Change the <code>translate</code> in the exit state from <code>0 -1rem</code> to <code>0 2rem</code> — now the palette slides down when dismissed instead of up. The direction of the exit animation communicates spatial meaning: up = "going back where it came from," down = "falling away."</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.13-apple-tv-carousel.html">&larr; Lesson 14.13</a>
+      <a href="./lesson-14.15-spotify-adaptive-header.html">Lesson 14.15 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

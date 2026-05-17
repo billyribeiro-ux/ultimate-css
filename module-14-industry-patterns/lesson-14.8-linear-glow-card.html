@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.8 — Linear: The Glow Card · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.8</p>
+      <h1>Linear: The Glow Card</h1>
+      <p class="lead">Linear's UI features cards with a subtle glow that follows the mouse cursor — a spotlight effect from the pointer position. The glow is a <code>radial-gradient</code> positioned at CSS custom properties. This is one of the few patterns where minimal JS is necessary — to feed the mouse coordinates into CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Linear does</h2>
+      <p>On Linear's marketing pages and feature cards, hovering over a card reveals a subtle radial glow centered on the cursor position. The glow follows the mouse as it moves, creating a spotlight effect that illuminates the card surface and border from the pointer. It is understated but unmistakable — it makes the cards feel interactive and premium.</p>
+
+      <h2>The CSS-JS boundary</h2>
+      <p>This pattern requires understanding where CSS ends and JS begins. CSS handles the entire visual effect: the radial gradient, its color, opacity, and blending. JS handles one thing: setting two custom properties (<code>--x</code> and <code>--y</code>) from the mouse position. The JS is 6 lines. The CSS is everything else.</p>
+      <p>The JS event listener:</p>
+      <ul>
+        <li><code>card.addEventListener('mousemove', e =&gt; { ... })</code></li>
+        <li>Calculate position relative to card: <code>e.offsetX</code> and <code>e.offsetY</code> converted to percentages.</li>
+        <li>Set <code>style.setProperty('--x', x + '%')</code> and <code>style.setProperty('--y', y + '%')</code>.</li>
+      </ul>
+
+      <h2>The CSS glow</h2>
+      <p>The glow itself is a <code>radial-gradient</code> on a <code>::before</code> overlay or directly on the card background: <code>radial-gradient(circle at var(--x) var(--y), oklch(75% 0.15 275 / 0.15), transparent 50%)</code>. The gradient is centered at the custom property coordinates and fades to transparent. The glow color matches the brand — Linear uses their signature purple/blue.</p>
+
+      <h2>The border glow</h2>
+      <p>The card border also responds to the cursor. A <code>::before</code> pseudo-element with the same radial gradient, masked to only show the border area, creates the effect of light reflecting off the card edge near the cursor.</p>
+
+      <h2>Static fallback for the editor</h2>
+      <p>In the live editor below, the glow is positioned at a static center point (<code>--x: 50%; --y: 50%</code>) since the editor does not run JavaScript. In production, the 6-line mousemove handler updates these values in real time.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — glow card with static center position</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-8 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+            background: oklch(10% 0.015 264);
+            border-radius: 0.75rem;
+          }
+          .demo-14-8 .glow-card {
+            --x: 50%;
+            --y: 50%;
+            position: relative;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid oklch(25% 0.02 264);
+            background: oklch(14% 0.015 264);
+            color: oklch(85% 0.01 264);
+            font-family: system-ui, sans-serif;
+            overflow: hidden;
+          }
+          .demo-14-8 .glow-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+              circle at var(--x) var(--y),
+              oklch(70% 0.15 275 / 0.12),
+              transparent 50%
+            );
+            pointer-events: none;
+          }
+          .demo-14-8 .glow-card h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            margin: 0 0 0.5rem;
+            position: relative;
+          }
+          .demo-14-8 .glow-card p {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin: 0;
+            line-height: 1.5;
+            position: relative;
+          }
+        </style>
+        <div class="demo-14-8">
+          <div class="glow-card">
+            <h3>Issue Tracking</h3>
+            <p>Plan, track, and ship your product with the tool built for speed.</p>
+          </div>
+          <div class="glow-card" style="--x: 30%; --y: 70%">
+            <h3>Project Roadmaps</h3>
+            <p>Visualize your product direction with powerful roadmap views.</p>
+          </div>
+          <div class="glow-card" style="--x: 80%; --y: 30%">
+            <h3>Cycles</h3>
+            <p>Ship consistently with time-boxed development sprints.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- In production, 6 lines of JS set --x
+     and --y from mousemove. Here we use
+     static positions for the demo. --&gt;
+&lt;div class="cards"&gt;
+  &lt;div class="glow-card"
+       style="--x: 50%; --y: 50%"&gt;
+    &lt;h3&gt;Issue Tracking&lt;/h3&gt;
+    &lt;p&gt;Plan, track, and ship your product
+       with speed and precision.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="glow-card"
+       style="--x: 25%; --y: 75%"&gt;
+    &lt;h3&gt;Project Roadmaps&lt;/h3&gt;
+    &lt;p&gt;Visualize direction with powerful
+       roadmap views.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="glow-card"
+       style="--x: 80%; --y: 20%"&gt;
+    &lt;h3&gt;Cycles&lt;/h3&gt;
+    &lt;p&gt;Ship consistently with time-boxed
+       development sprints.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Linear glow card */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  padding: 2rem;
+  background: oklch(8% 0.015 264);
+}
+
+.glow-card {
+  --x: 50%;
+  --y: 50%;
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid oklch(22% 0.02 264);
+  background: oklch(12% 0.015 264);
+  color: oklch(88% 0.01 264);
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* The glow: a radial gradient overlay */
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--x) var(--y),
+    oklch(70% 0.15 275 / 0.15),
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+.glow-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  position: relative;
+}
+
+.glow-card p {
+  font-size: 0.8125rem;
+  opacity: 0.6;
+  line-height: 1.5;
+  margin: 0;
+  position: relative;
+}
+
+/* Change --x and --y inline to move
+   the glow. Try oklch(70% 0.2 150 / 0.2)
+   for a green glow, or increase 0.15
+   to 0.3 for a more intense effect. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the glow color from <code>oklch(70% 0.15 275 / 0.15)</code> to <code>oklch(70% 0.2 150 / 0.2)</code> — a brighter green glow. Then change <code>transparent 50%</code> to <code>transparent 30%</code> for a tighter spotlight. The balance between glow intensity and radius is what makes this effect feel subtle (Linear) vs. dramatic (gaming sites).</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.7-stripe-tabbed-showcase.html">&larr; Lesson 14.7</a>
+      <a href="./lesson-14.9-linear-spotlight-border.html">Lesson 14.9 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

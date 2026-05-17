@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.1 — Apple: The Parallax Hero Scroll · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.1</p>
+      <h1>Apple: The Parallax Hero Scroll</h1>
+      <p class="lead">Apple.com product pages create cinematic depth by scrolling the background image at a different rate than the foreground text. The old way was <code>background-attachment: fixed</code>. The modern way uses scroll-driven animations with different speed multipliers per layer.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Apple does</h2>
+      <p>Visit any Apple product page — iPhone, MacBook, Vision Pro. The hero section features a large product image that moves slower than the headline text as you scroll. This parallax creates a sense of depth: the background feels farther away, the text feels closer. It is a cinematic trick borrowed from film, where layers at different distances move at different apparent speeds.</p>
+
+      <h2>The old way: background-attachment fixed</h2>
+      <p><code>background-attachment: fixed</code> pins a background image to the viewport rather than the element. It creates a crude parallax but causes severe performance problems — the browser must repaint the background on every scroll frame, and it fails entirely on iOS Safari. This approach is deprecated in practice.</p>
+
+      <h2>The modern way: scroll-driven animations</h2>
+      <p>The modern technique uses <code>animation-timeline: scroll()</code> to bind CSS animations to the scroll position of the nearest scroll container. By giving the background layer a smaller range of motion (say, 0 to -20%) and the foreground text a larger range (0 to -40%), the background appears to move slower. The depth differential between those two rates is what creates the parallax illusion.</p>
+      <p>The key properties are:</p>
+      <ul>
+        <li><code>animation-timeline: scroll()</code> — binds the animation to scroll position instead of time.</li>
+        <li><code>animation-range: entry 0% exit 100%</code> — defines which portion of the scroll drives the animation.</li>
+        <li>Different <code>translateY</code> distances per layer — the speed multiplier that creates depth.</li>
+      </ul>
+
+      <h2>The @supports fallback</h2>
+      <p>Browsers without <code>animation-timeline</code> support see a static hero — no parallax, but fully functional. The <code>@supports (animation-timeline: scroll())</code> block ensures the scroll-driven styles only apply when the browser can handle them. This is progressive enhancement at its best: the baseline is solid, the upgrade is cinematic.</p>
+
+      <h2>Why this matters at the PE7 level</h2>
+      <p>A junior developer copies a parallax library. A senior developer uses <code>background-attachment: fixed</code>. A principal engineer understands that parallax is a depth differential between layer speeds, implements it with scroll-driven animations for 60fps GPU-composited performance, and wraps it in <code>@supports</code> with a reduced-motion fallback. That is the difference.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — parallax hero with scroll-driven animation</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-1 {
+            position: relative;
+            block-size: 20rem;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            background: oklch(15% 0.02 275);
+          }
+          .demo-14-1 .bg-layer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, oklch(35% 0.15 275), oklch(25% 0.12 300), oklch(20% 0.10 330));
+            background-size: 200% 200%;
+          }
+          .demo-14-1 .fg-layer {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            place-items: center;
+            block-size: 100%;
+            color: oklch(98% 0.005 275);
+            text-align: center;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-14-1 .fg-layer h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.5rem;
+          }
+          .demo-14-1 .fg-layer p {
+            font-size: 0.875rem;
+            opacity: 0.7;
+            margin: 0;
+          }
+        </style>
+        <div class="demo-14-1">
+          <div class="bg-layer"></div>
+          <div class="fg-layer">
+            <div>
+              <h3>MacBook Pro</h3>
+              <p>The background and foreground scroll at different rates in the live editor below.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="parallax-hero"&gt;
+  &lt;div class="hero-bg"&gt;&lt;/div&gt;
+  &lt;div class="hero-fg"&gt;
+    &lt;h1&gt;MacBook Pro&lt;/h1&gt;
+    &lt;p&gt;Mind-blowing. Head-turning.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="spacer"&gt;
+  &lt;p&gt;Scroll up and down to see the parallax depth effect.
+     The background moves slower than the foreground.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Parallax hero with scroll-driven animations */
+.parallax-hero {
+  position: relative;
+  block-size: 80vh;
+  overflow: hidden;
+  background: oklch(10% 0.01 275);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: -20% 0;
+  background: linear-gradient(
+    160deg,
+    oklch(30% 0.18 275) 0%,
+    oklch(22% 0.14 300) 50%,
+    oklch(18% 0.10 330) 100%
+  );
+  background-size: 100% 100%;
+}
+
+.hero-fg {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  text-align: center;
+  color: oklch(98% 0 0);
+  font-family: system-ui, sans-serif;
+}
+
+.hero-fg h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+}
+
+.hero-fg p {
+  font-size: 1.25rem;
+  opacity: 0.7;
+  margin: 0;
+}
+
+/* Scroll-driven parallax:
+   bg moves 20%, fg moves 40% — the
+   differential creates depth perception. */
+@supports (animation-timeline: scroll()) {
+  .hero-bg {
+    animation: parallax-bg linear both;
+    animation-timeline: scroll();
+    animation-range: entry 0% exit 100%;
+  }
+  .hero-fg {
+    animation: parallax-fg linear both;
+    animation-timeline: scroll();
+    animation-range: entry 0% exit 100%;
+  }
+
+  @keyframes parallax-bg {
+    from { translate: 0 0; }
+    to   { translate: 0 -20%; }
+  }
+  @keyframes parallax-fg {
+    from { translate: 0 0; }
+    to   { translate: 0 -40%; }
+  }
+}
+
+/* Reduced motion: static hero */
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg, .hero-fg {
+    animation: none;
+  }
+}
+
+.spacer {
+  min-block-size: 60vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  color: oklch(40% 0.02 264);
+  text-align: center;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the background <code>translateY</code> from <code>-20%</code> to <code>-5%</code> and the foreground from <code>-40%</code> to <code>-60%</code>. Notice how the depth illusion intensifies. Then try making them equal — the parallax vanishes. The effect is entirely about the differential between layer speeds, not the absolute speed of either layer.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 14</a>
+      <a href="./lesson-14.2-apple-sticky-sections.html">Lesson 14.2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

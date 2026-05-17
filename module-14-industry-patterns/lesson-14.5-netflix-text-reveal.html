@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.5 — Netflix: The Cinematic Text Reveal · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.5</p>
+      <h1>Netflix: The Cinematic Text Reveal</h1>
+      <p class="lead">Netflix title cards animate in word-by-word with a staggered fade-up and blur clear. Each word enters slightly after the previous one, creating a cascading reveal that feels cinematic. The stagger uses <code>animation-delay</code> calculated per word, and the blur clears from <code>4px</code> to <code>0</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Netflix does</h2>
+      <p>When a Netflix title card or hero headline appears, the text does not simply pop in. Each word fades up from below with a slight vertical offset, a gentle blur that clears as the word settles, and a stagger delay that makes each successive word arrive slightly later. The overall effect takes less than a second but feels deliberate and polished.</p>
+
+      <h2>The stagger mechanism</h2>
+      <p>Each word is wrapped in a <code>&lt;span&gt;</code>. The stagger delay is calculated using CSS: <code>animation-delay: calc(var(--i) * 80ms)</code> where <code>--i</code> is set inline or via <code>sibling-index()</code> in supporting browsers. The 80ms interval is the sweet spot — fast enough to feel like a single motion, slow enough for the eye to perceive the cascade.</p>
+      <p>In browsers supporting <code>sibling-index()</code>, the stagger is fully automatic: <code>animation-delay: calc((sibling-index() - 1) * 80ms)</code>. No inline styles needed.</p>
+
+      <h2>The blur-to-clear effect</h2>
+      <p>Each word starts with <code>filter: blur(4px)</code> and transitions to <code>filter: blur(0)</code>. This creates a "focusing" effect — the word appears to come into focus as it arrives. Combined with the upward motion (<code>translateY(1rem)</code> to <code>translateY(0)</code>), it suggests the text is emerging from a cinematic depth of field.</p>
+
+      <h2>The @starting-style approach</h2>
+      <p>For elements entering the DOM dynamically (like a title card that appears after navigation), <code>@starting-style</code> defines the initial hidden state. The browser transitions from <code>@starting-style</code> to the element's actual computed styles, creating a smooth entry without keyframe animations.</p>
+
+      <h2>Fallback strategy</h2>
+      <p>In browsers without <code>sibling-index()</code> support, the words simply appear instantly — fully visible, no animation. This is the correct progressive enhancement: the content is never hidden in an unsupported browser.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — staggered word reveal with blur</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-5 {
+            padding: 3rem 2rem;
+            background: oklch(8% 0.01 264);
+            border-radius: 0.75rem;
+            text-align: center;
+          }
+          .demo-14-5 .headline {
+            font-family: system-ui, sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: oklch(98% 0.005 264);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0 0.4em;
+          }
+          .demo-14-5 .headline span {
+            animation: word-reveal 600ms cubic-bezier(0, 0, 0.2, 1) both;
+          }
+          .demo-14-5 .headline span:nth-child(1) { animation-delay: 0ms; }
+          .demo-14-5 .headline span:nth-child(2) { animation-delay: 80ms; }
+          .demo-14-5 .headline span:nth-child(3) { animation-delay: 160ms; }
+          .demo-14-5 .headline span:nth-child(4) { animation-delay: 240ms; }
+          .demo-14-5 .headline span:nth-child(5) { animation-delay: 320ms; }
+          .demo-14-5 .headline span:nth-child(6) { animation-delay: 400ms; }
+          @keyframes word-reveal {
+            from {
+              opacity: 0;
+              filter: blur(4px);
+              translate: 0 1rem;
+            }
+            to {
+              opacity: 1;
+              filter: blur(0);
+              translate: 0 0;
+            }
+          }
+        </style>
+        <div class="demo-14-5">
+          <div class="headline">
+            <span>Stranger</span>
+            <span>Things:</span>
+            <span>The</span>
+            <span>Final</span>
+            <span>Chapter</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="reveal-hero"&gt;
+  &lt;h1 class="title"&gt;
+    &lt;span style="--i: 0"&gt;Stranger&lt;/span&gt;
+    &lt;span style="--i: 1"&gt;Things:&lt;/span&gt;
+    &lt;span style="--i: 2"&gt;The&lt;/span&gt;
+    &lt;span style="--i: 3"&gt;Final&lt;/span&gt;
+    &lt;span style="--i: 4"&gt;Chapter&lt;/span&gt;
+  &lt;/h1&gt;
+  &lt;p class="tagline"&gt;
+    &lt;span style="--i: 5"&gt;Every&lt;/span&gt;
+    &lt;span style="--i: 6"&gt;ending&lt;/span&gt;
+    &lt;span style="--i: 7"&gt;has&lt;/span&gt;
+    &lt;span style="--i: 8"&gt;a&lt;/span&gt;
+    &lt;span style="--i: 9"&gt;beginning.&lt;/span&gt;
+  &lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Cinematic text reveal */
+.reveal-hero {
+  min-block-size: 60vh;
+  display: grid;
+  place-items: center;
+  place-content: center;
+  gap: 1rem;
+  background: oklch(6% 0.01 264);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  padding: 2rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: oklch(98% 0.005 264);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.35em;
+  margin: 0;
+}
+
+.tagline {
+  font-size: 1.125rem;
+  color: oklch(70% 0.01 264);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.3em;
+  margin: 0;
+}
+
+/* Each word gets a staggered reveal */
+.title span,
+.tagline span {
+  animation: word-in 600ms
+    cubic-bezier(0, 0, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+@keyframes word-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    translate: 0 1rem;
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    translate: 0 0;
+  }
+}
+
+/* Adjust: try 40ms for faster cascade,
+   120ms for more dramatic stagger.
+   Change blur(4px) to blur(8px) for
+   a more pronounced focus effect. */
+
+@media (prefers-reduced-motion: reduce) {
+  .title span,
+  .tagline span {
+    animation: none;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the stagger interval from <code>80ms</code> to <code>200ms</code>. The reveal now feels like a typewriter — too slow, too deliberate. Change it to <code>30ms</code> and the words all appear nearly simultaneously, losing the cascade feel. Find the interval that feels "cinematic" to your eye. Netflix lands around 60-100ms depending on the headline length.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.4-netflix-hover-card.html">&larr; Lesson 14.4</a>
+      <a href="./lesson-14.6-stripe-gradient-mesh.html">Lesson 14.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

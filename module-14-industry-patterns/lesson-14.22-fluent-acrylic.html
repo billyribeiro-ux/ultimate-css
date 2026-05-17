@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.22 — Fluent: The Acrylic Material · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.22</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.22 · Microsoft Fluent Design</p>
+      <h1>Fluent: The Acrylic Material</h1>
+      <p class="lead">Acrylic is a translucent material with blur, noise, and saturation boost. It creates depth by revealing the content behind it while the noise texture prevents the "smeared watercolor" look of pure blur. This is how Microsoft signals "floating layer."</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What makes acrylic work</h2>
+      <p>Pure <code>backdrop-filter: blur()</code> produces a soft, undefined haze. Acrylic adds two corrections: a noise overlay that re-introduces high-frequency detail the blur removed, and a saturation boost that keeps the blurred content vivid rather than washed out. Together they create a material that feels like frosted glass rather than Vaseline on a lens.</p>
+
+      <h2>The three layers</h2>
+      <ul>
+        <li><strong>Blur layer</strong> — <code>backdrop-filter: blur(30px) saturate(125%)</code>. The 30px blur radius matches the apparent density of Windows 11 acrylic. The saturation boost compensates for chroma loss during Gaussian blur.</li>
+        <li><strong>Tint layer</strong> — A semi-transparent background color. Light mode: <code>oklch(98% 0.003 264 / 0.72)</code>. Dark mode: <code>oklch(12% 0.010 264 / 0.72)</code>. The 72% opacity lets enough background through to feel layered without losing readability.</li>
+        <li><strong>Noise layer</strong> — A tiny repeating pattern at very low opacity (2-4%). Microsoft uses a 256x256 noise PNG, but we can approximate it with a CSS gradient pattern or an inline SVG data URI.</li>
+      </ul>
+
+      <h3>Why saturate(125%)?</h3>
+      <p>Gaussian blur averages neighboring pixels, and averaging reduces variance — which in color terms means reduced saturation. A bright red next to a white averages to a desaturated pink. The <code>saturate(125%)</code> counteracts this, pushing the blurred result back toward the original vibrancy. Without it, the acrylic feels dull and lifeless.</p>
+
+      <h3>The noise texture</h3>
+      <p>The noise overlay serves a perceptual purpose: it adds texture that the blur removed. The human visual system is uncomfortable with perfectly smooth gradients at mid-frequencies — they trigger "uncanny valley" responses because natural materials always have texture. Even at 2% opacity, the noise makes acrylic feel like a physical surface rather than a rendering artifact.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The acrylic material is a <strong>component</strong> pattern (it defines a reusable surface treatment). The blur radius and tint opacity are <strong>tokens</strong>. The noise is a texture utility.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fluent acrylic sidebar</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-22 {
+            position: relative;
+            min-height: 220px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            font-family: system-ui;
+            background:
+              linear-gradient(135deg, oklch(70% 0.20 30) 0%, oklch(65% 0.22 275) 50%, oklch(70% 0.18 180) 100%),
+              repeating-conic-gradient(oklch(80% 0.10 60) 0% 25%, oklch(75% 0.15 200) 0% 50%) 0 0 / 60px 60px;
+          }
+          .demo-14-22 .acrylic-panel {
+            position: absolute;
+            inset-block: 0;
+            inset-inline-start: 0;
+            inline-size: 200px;
+            backdrop-filter: blur(30px) saturate(125%);
+            background: oklch(98% 0.003 264 / 0.72);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.5rem;
+          }
+          .demo-14-22 .acrylic-panel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            background-size: 128px 128px;
+            pointer-events: none;
+          }
+          .demo-14-22 .nav-item {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: oklch(20% 0.02 264);
+            cursor: default;
+          }
+          .demo-14-22 .nav-item.active {
+            background: oklch(48% 0.18 275 / 0.12);
+            color: oklch(35% 0.15 275);
+          }
+        </style>
+        <div class="demo-14-22">
+          <div class="acrylic-panel">
+            <div class="nav-item active">Home</div>
+            <div class="nav-item">Files</div>
+            <div class="nav-item">Settings</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;!-- Colorful background content --&gt;
+  &lt;div class="bg-art"&gt;&lt;/div&gt;
+
+  &lt;!-- Acrylic sidebar --&gt;
+  &lt;nav class="sidebar"&gt;
+    &lt;h3&gt;Navigation&lt;/h3&gt;
+    &lt;a class="nav-item active"&gt;Home&lt;/a&gt;
+    &lt;a class="nav-item"&gt;Documents&lt;/a&gt;
+    &lt;a class="nav-item"&gt;Photos&lt;/a&gt;
+    &lt;a class="nav-item"&gt;Settings&lt;/a&gt;
+  &lt;/nav&gt;
+
+  &lt;!-- Content area --&gt;
+  &lt;main class="content"&gt;
+    &lt;h2&gt;Acrylic Material&lt;/h2&gt;
+    &lt;p&gt;The sidebar uses backdrop-filter blur, a semi-transparent tint, a saturation boost, and a noise overlay. Adjust the values below.&lt;/p&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Adjust these to see how each affects the acrylic feel */
+:root {
+  --blur: 30px;
+  --saturation: 125%;
+  --tint-opacity: 0.72;
+  --noise-opacity: 0.03;
+  --tint-light: oklch(98% 0.003 264 / var(--tint-opacity));
+  --tint-dark:  oklch(12% 0.010 264 / var(--tint-opacity));
+}
+body { font-family: system-ui; margin: 0; }
+
+.scene {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Colorful background */
+.bg-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(135deg, oklch(70% 0.22 30) 0%, oklch(60% 0.24 275) 50%, oklch(70% 0.20 180) 100%),
+    repeating-conic-gradient(oklch(80% 0.12 60) 0% 25%, oklch(75% 0.16 200) 0% 50%) 0 0 / 80px 80px;
+}
+
+/* Acrylic sidebar */
+.sidebar {
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(var(--blur)) saturate(var(--saturation));
+  background: var(--tint-light);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-inline-end: 1px solid oklch(0% 0 0 / 0.06);
+}
+
+/* Noise overlay */
+.sidebar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+}
+
+.sidebar h3 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: oklch(40% 0.02 264);
+  margin: 0 0 0.75rem;
+}
+
+.nav-item {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: oklch(20% 0.02 264);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 150ms;
+}
+.nav-item:hover { background: oklch(0% 0 0 / 0.04); }
+.nav-item.active {
+  background: oklch(48% 0.18 275 / 0.1);
+  color: oklch(35% 0.15 275);
+}
+
+/* Content panel */
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+  background: oklch(99% 0.003 264 / 0.85);
+}
+.content h2 { margin: 0 0 0.5rem; color: oklch(15% 0.02 264); }
+.content p { font-size: 0.9rem; color: oklch(35% 0.02 264); line-height: 1.5; max-width: 45ch; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Set <code>--saturation</code> to <code>100%</code> (no boost) — the sidebar looks washed out. Then set it to <code>175%</code> — oversaturated and garish. The sweet spot is 120-130%. Next, set <code>--noise-opacity</code> to <code>0</code> — the acrylic feels "slippery." Even 2-3% noise is enough to anchor the surface perceptually. Finally, change the tint to <code>var(--tint-dark)</code> for an instant dark-mode acrylic.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.21-md3-container-transform.html">&larr; Lesson 14.21</a>
+      <a href="./lesson-14.23-fluent-reveal-highlight.html">Lesson 14.23 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

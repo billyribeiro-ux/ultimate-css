@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.12 — Apple Music: The Vinyl Spin · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.12</p>
+      <h1>Apple Music: The Vinyl Spin</h1>
+      <p class="lead">Apple Music's album view shows a vinyl record spinning continuously. Pausing the music pauses the spin. This is <code>animation-play-state</code> toggled by a checkbox and <code>:has()</code> — zero JavaScript.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Apple Music does</h2>
+      <p>In Apple Music's Now Playing view, the album artwork sits on a spinning vinyl record. The record rotates continuously at a constant speed. When the music is paused, the record decelerates and stops. When playback resumes, it accelerates back to speed. The vinyl grooves shimmer as they rotate.</p>
+
+      <h2>The infinite rotation</h2>
+      <p><code>animation: spin 4s linear infinite</code> creates a continuous rotation. The <code>linear</code> timing function is critical — any easing would cause the record to accelerate and decelerate on each revolution, which looks unnatural for a spinning disc. The duration controls the RPM: 4s is approximately 15 RPM, which visually reads as a gentle spin.</p>
+      <p>The keyframes are as simple as CSS gets: <code>@keyframes spin { to { rotate: 1turn; } }</code>. The <code>from</code> state defaults to <code>rotate: 0</code>.</p>
+
+      <h2>Play/pause with :has()</h2>
+      <p>A hidden checkbox acts as the play/pause toggle. The label is styled as a play/pause button. When the checkbox is checked (playing), the vinyl spins. When unchecked (paused), <code>animation-play-state: paused</code> freezes the animation at its current position.</p>
+      <p>The selector: <code>.player:has(input:checked) .vinyl { animation-play-state: running; }</code>. The default state is paused, and checking the box switches to running. No JavaScript needed.</p>
+
+      <h2>The vinyl grooves</h2>
+      <p>The grooves are concentric circles created with <code>repeating-radial-gradient</code>. Alternating transparent and semi-transparent rings at tight intervals (1-2px) create the groove texture. As the disc rotates, these rings create a subtle shimmer effect.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — spinning vinyl with play/pause</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-12 {
+            display: grid;
+            place-items: center;
+            padding: 2rem;
+            background: oklch(10% 0.015 264);
+            border-radius: 0.75rem;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-14-12 .player { text-align: center; }
+          .demo-14-12 .player input { display: none; }
+          .demo-14-12 .vinyl {
+            inline-size: 10rem;
+            block-size: 10rem;
+            border-radius: 50%;
+            background:
+              radial-gradient(circle, oklch(15% 0.01 264) 18%, transparent 18.5%),
+              radial-gradient(circle, oklch(50% 0.01 264) 19%, transparent 19.5%),
+              repeating-radial-gradient(circle, oklch(18% 0.01 264) 0px, oklch(18% 0.01 264) 2px, oklch(12% 0.01 264) 2px, oklch(12% 0.01 264) 4px),
+              oklch(15% 0.01 264);
+            box-shadow: 0 4px 20px oklch(0% 0 0 / 0.4);
+            animation: spin 4s linear infinite;
+            animation-play-state: paused;
+            margin-block-end: 1rem;
+          }
+          .demo-14-12 .player:has(input:checked) .vinyl {
+            animation-play-state: running;
+          }
+          .demo-14-12 .play-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+            background: oklch(50% 0.2 25);
+            color: white;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+          }
+          .demo-14-12 .player:has(input:checked) .play-btn { background: oklch(45% 0.02 264); }
+          .demo-14-12 .play-btn .icon-play,
+          .demo-14-12 .play-btn .icon-pause { font-size: 0.75rem; }
+          .demo-14-12 .player:has(input:checked) .icon-play { display: none; }
+          .demo-14-12 .player:not(:has(input:checked)) .icon-pause { display: none; }
+          @keyframes spin { to { rotate: 1turn; } }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-14-12 .vinyl { animation: none; }
+          }
+        </style>
+        <div class="demo-14-12">
+          <div class="player">
+            <div class="vinyl"></div>
+            <input type="checkbox" id="demo-play">
+            <label class="play-btn" for="demo-play">
+              <span class="icon-play">&#9654;</span>
+              <span class="icon-pause">&#9646;&#9646;</span>
+              Play / Pause
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="player"&gt;
+  &lt;div class="vinyl"&gt;
+    &lt;div class="label-center"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;input type="checkbox" id="play-toggle"&gt;
+  &lt;label class="play-btn" for="play-toggle"&gt;
+    Play / Pause
+  &lt;/label&gt;
+  &lt;p class="now-playing"&gt;
+    Now Playing: CSS Animations
+  &lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Spinning vinyl record */
+.player {
+  display: grid;
+  place-items: center;
+  gap: 1.5rem;
+  padding: 3rem;
+  background: oklch(8% 0.015 264);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+.player input { display: none; }
+
+.vinyl {
+  inline-size: 14rem;
+  block-size: 14rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    repeating-radial-gradient(
+      circle,
+      oklch(16% 0.01 264) 0px,
+      oklch(16% 0.01 264) 2px,
+      oklch(11% 0.01 264) 2px,
+      oklch(11% 0.01 264) 4px
+    ),
+    oklch(14% 0.01 264);
+  box-shadow: 0 6px 30px oklch(0% 0 0 / 0.5);
+  animation: spin 4s linear infinite;
+  animation-play-state: paused;
+}
+
+.label-center {
+  inline-size: 4rem;
+  block-size: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    oklch(50% 0.2 25),
+    oklch(45% 0.18 350)
+  );
+  box-shadow: inset 0 0 0 0.5rem
+    oklch(20% 0.02 264);
+}
+
+/* :has() toggles play state */
+.player:has(input:checked) .vinyl {
+  animation-play-state: running;
+}
+
+.play-btn {
+  padding: 0.625rem 1.5rem;
+  border-radius: 2rem;
+  background: oklch(50% 0.22 25);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.play-btn:hover {
+  background: oklch(55% 0.22 25);
+}
+
+.now-playing {
+  font-size: 0.75rem;
+  color: oklch(50% 0.01 264);
+}
+
+@keyframes spin {
+  to { rotate: 1turn; }
+}
+
+/* Try changing 4s to 2s for 33 RPM,
+   or 8s for a lazy 7.5 RPM. */
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Click the play/pause button and watch the vinyl start and stop. Change the animation duration from <code>4s</code> to <code>1.5s</code> for a frantic spin, then to <code>10s</code> for a lazy turntable. Notice that the record pauses at whatever angle it has reached — it does not snap back to 0. That is the beauty of <code>animation-play-state: paused</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.11-scroll-counter.html">&larr; Lesson 14.11</a>
+      <a href="./lesson-14.13-apple-tv-carousel.html">Lesson 14.13 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

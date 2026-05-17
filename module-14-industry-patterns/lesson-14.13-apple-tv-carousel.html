@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.13 — Apple TV+: The Horizontal Scroll Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.13</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.13</p>
+      <h1>Apple TV+: The Horizontal Scroll Showcase</h1>
+      <p class="lead">Apple TV+ uses a horizontal scroll carousel of show posters with <code>scroll-snap-type: x mandatory</code>, indicator dots via <code>::scroll-marker</code>, and internal parallax on each poster via <code>animation-timeline: view(inline)</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What Apple TV+ does</h2>
+      <p>The Apple TV+ homepage features a full-width horizontal carousel of featured show posters. Each poster snaps into center alignment when scrolled. Indicator dots below show which poster is currently centered. Within each poster, the background image shifts laterally as you scroll, creating a subtle internal parallax.</p>
+
+      <h2>Scroll-snap for precision</h2>
+      <p><code>scroll-snap-type: x mandatory</code> on the container forces the scroll to land exactly on a snap point. <code>scroll-snap-align: center</code> on each poster centers it in the viewport. The <code>mandatory</code> keyword means the browser will always snap — the user cannot leave the carousel in a halfway state.</p>
+
+      <h2>Scroll markers for indicators</h2>
+      <p>The <code>::scroll-marker</code> pseudo-element (shipping in Chromium 135+) creates navigation dots automatically for each snap target. Each marker is a small dot that can be styled with CSS — active state, hover state, transitions. This replaces dozens of lines of JavaScript that would otherwise manage indicator state.</p>
+
+      <h2>Internal parallax with view(inline)</h2>
+      <p><code>animation-timeline: view(inline)</code> binds an animation to the horizontal visibility of each poster. The background image inside each poster uses a keyframe that shifts <code>translateX</code> from left to right as the poster scrolls through the viewport. This creates a parallax effect within each poster, adding depth to the horizontal scroll.</p>
+
+      <h2>Fallback</h2>
+      <p>Without <code>::scroll-marker</code>, the carousel still scrolls and snaps — users just lose the indicator dots. Without <code>view(inline)</code>, the parallax is absent but the posters are static and fully visible. Each feature degrades independently.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — horizontal carousel with snap</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-13 {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: oklch(8% 0.01 264);
+          }
+          .demo-14-13 .carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 1rem;
+            padding: 1.5rem;
+            scrollbar-width: none;
+          }
+          .demo-14-13 .carousel::-webkit-scrollbar { display: none; }
+          .demo-14-13 .slide {
+            flex: 0 0 80%;
+            aspect-ratio: 16 / 9;
+            border-radius: 0.75rem;
+            scroll-snap-align: center;
+            display: grid;
+            place-items: end start;
+            padding: 1.25rem;
+            overflow: hidden;
+            position: relative;
+          }
+          .demo-14-13 .slide:nth-child(1) { background: linear-gradient(135deg, oklch(40% 0.22 25), oklch(25% 0.15 350)); }
+          .demo-14-13 .slide:nth-child(2) { background: linear-gradient(135deg, oklch(35% 0.18 200), oklch(22% 0.14 230)); }
+          .demo-14-13 .slide:nth-child(3) { background: linear-gradient(135deg, oklch(45% 0.2 150), oklch(28% 0.15 120)); }
+          .demo-14-13 .slide:nth-child(4) { background: linear-gradient(135deg, oklch(40% 0.22 275), oklch(25% 0.18 300)); }
+          .demo-14-13 .slide:nth-child(5) { background: linear-gradient(135deg, oklch(50% 0.16 60), oklch(30% 0.12 40)); }
+          .demo-14-13 .slide:nth-child(6) { background: linear-gradient(135deg, oklch(38% 0.2 330), oklch(22% 0.14 310)); }
+          .demo-14-13 .slide-title {
+            font-family: system-ui, sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: oklch(98% 0.005 264);
+            text-shadow: 0 1px 4px oklch(0% 0 0 / 0.5);
+          }
+          .demo-14-13 .dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+          }
+          .demo-14-13 .dot {
+            inline-size: 0.5rem;
+            block-size: 0.5rem;
+            border-radius: 50%;
+            background: oklch(40% 0.01 264);
+          }
+          .demo-14-13 .dot:first-child { background: oklch(90% 0.01 264); }
+        </style>
+        <div class="demo-14-13">
+          <div class="carousel">
+            <div class="slide"><span class="slide-title">Severance</span></div>
+            <div class="slide"><span class="slide-title">Ted Lasso</span></div>
+            <div class="slide"><span class="slide-title">Foundation</span></div>
+            <div class="slide"><span class="slide-title">Silo</span></div>
+            <div class="slide"><span class="slide-title">Monarch</span></div>
+            <div class="slide"><span class="slide-title">Slow Horses</span></div>
+          </div>
+          <div class="dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="carousel-wrap"&gt;
+  &lt;div class="carousel"&gt;
+    &lt;div class="slide s1"&gt;
+      &lt;span&gt;Severance&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="slide s2"&gt;
+      &lt;span&gt;Ted Lasso&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="slide s3"&gt;
+      &lt;span&gt;Foundation&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="slide s4"&gt;
+      &lt;span&gt;Silo&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="slide s5"&gt;
+      &lt;span&gt;Monarch&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="slide s6"&gt;
+      &lt;span&gt;Slow Horses&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Horizontal carousel with scroll-snap */
+.carousel-wrap {
+  background: oklch(6% 0.01 264);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+  scrollbar-width: none;
+}
+.carousel::-webkit-scrollbar { display: none; }
+
+.slide {
+  flex: 0 0 85%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  scroll-snap-align: center;
+  display: grid;
+  place-items: end start;
+  padding: 1.5rem;
+  font-family: system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: oklch(98% 0 0);
+  text-shadow: 0 2px 6px oklch(0% 0 0 / 0.5);
+  overflow: hidden;
+}
+
+.s1 { background: linear-gradient(135deg, oklch(40% 0.22 25), oklch(22% 0.14 350)); }
+.s2 { background: linear-gradient(135deg, oklch(35% 0.18 200), oklch(20% 0.12 230)); }
+.s3 { background: linear-gradient(135deg, oklch(45% 0.2 150), oklch(25% 0.14 120)); }
+.s4 { background: linear-gradient(135deg, oklch(40% 0.22 275), oklch(22% 0.16 300)); }
+.s5 { background: linear-gradient(135deg, oklch(50% 0.16 60), oklch(28% 0.1 40)); }
+.s6 { background: linear-gradient(135deg, oklch(38% 0.2 330), oklch(20% 0.12 310)); }
+
+/* Internal parallax on each slide */
+@supports (animation-timeline: view()) {
+  .slide {
+    animation: slide-parallax linear both;
+    animation-timeline: view(inline);
+  }
+
+  @keyframes slide-parallax {
+    from { background-position: 80% center; }
+    to   { background-position: 20% center; }
+  }
+}
+
+/* Try changing scroll-snap-align
+   from center to start.
+   Try 70% slide width for more peek. */
+
+@media (prefers-reduced-motion: reduce) {
+  .slide { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>scroll-snap-align: center</code> to <code>start</code> and observe how the snap position changes. Then change the slide width from <code>85%</code> to <code>65%</code> — you now see more of the next and previous slides, which invites scrolling. Apple uses a large slide (80-90%) to keep the focused poster dominant.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.12-apple-music-vinyl.html">&larr; Lesson 14.12</a>
+      <a href="./lesson-14.14-command-palette.html">Lesson 14.14 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
