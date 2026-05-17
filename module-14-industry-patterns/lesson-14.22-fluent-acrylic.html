@@ -58,6 +58,10 @@
 
       <h2>PE7 placement</h2>
       <p>The acrylic material is a <strong>component</strong> pattern (it defines a reusable surface treatment). The blur radius and tint opacity are <strong>tokens</strong>. The noise is a texture utility.</p>
+
+      <h2>Accessibility considerations</h2>
+      <p>Translucent surfaces reduce text contrast. The background content bleeding through the acrylic tint can create unpredictable contrast ratios — a dark photo behind the panel might pass WCAG AA, but a bright photo in the same spot might not. Always test contrast with the <code>backdrop-filter</code> effect active and with it disabled (fallback). The tint opacity must be high enough to guarantee minimum contrast regardless of what appears behind the surface.</p>
+      <p>In forced-colors mode (Windows High Contrast), acrylic must fall back to a solid opaque surface. The <code>backdrop-filter</code> effect is meaningless when the OS overrides all colors, and the translucency can make text invisible. Use <code>@media (forced-colors: active)</code> to disable the blur and apply a solid <code>Canvas</code> background, ensuring the content remains legible under all system color schemes.</p>
     </section>
 
     <section class="demo">
@@ -105,6 +109,12 @@
           .demo-14-22 .nav-item.active {
             background: oklch(48% 0.18 275 / 0.12);
             color: oklch(35% 0.15 275);
+          }
+          @media (forced-colors: active) {
+            .demo-14-22 .acrylic-panel {
+              backdrop-filter: none;
+              background: Canvas;
+            }
           }
         </style>
         <div class="demo-14-22">

@@ -74,6 +74,12 @@
 }</code></pre>
       <p>Change the brand color to anything — the text color adapts. This is the production-ready version of the <code>--contrast-safe()</code> function we imagined in Module 10.</p>
 
+      <h2>Fallback pattern</h2>
+      <p>Not every user is on the latest browser. Always provide a safe static color before the <code>contrast-color()</code> declaration. Browsers that do not understand <code>contrast-color()</code> will ignore the second line and use the fallback.</p>
+      <pre><code>/* Fallback for browsers without contrast-color() */
+color: oklch(98% 0 0);
+color: contrast-color(var(--bg));</code></pre>
+
       <h2>Browser support</h2>
       <p>Baseline across all modern browsers as of April 2026 (Chrome 147+, Firefox, Safari). An Interop 2026 focus area. Ship today.</p>
     </section>
@@ -131,6 +137,8 @@
 
 .badge {
   background-color: var(--bg);
+  /* Fallback for browsers without contrast-color() */
+  color: oklch(98% 0 0);
   color: contrast-color(var(--bg));
   padding: .375rem .75rem;
   border-radius: 9999px;

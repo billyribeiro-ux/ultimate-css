@@ -54,6 +54,10 @@
 
       <h2>Performance</h2>
       <p>Animated gradients via <code>@property</code> are GPU-composited in Chromium and WebKit. The browser does not repaint the gradient on every frame — it interpolates the registered property value and recomposites. This is fundamentally different from animating <code>background-position</code>, which triggers a repaint per frame.</p>
+
+      <h2>Accessibility considerations</h2>
+      <p>Animated gradients can trigger vestibular disorders such as motion sickness or vertigo in users with vestibular sensitivities. Always wrap gradient animations in a <code>@media (prefers-reduced-motion: reduce)</code> query that stops the animation entirely. Users who have enabled "reduce motion" in their OS settings will see a static gradient instead.</p>
+      <p>Text placed over animated backgrounds must maintain sufficient contrast at all points in the animation cycle. As hues shift, some color combinations will momentarily dip below WCAG contrast thresholds. Use a solid fallback background behind text areas, or apply <code>backdrop-filter: blur() brightness()</code> to create a stable contrast surface that the gradient shows through without compromising readability.</p>
     </section>
 
     <section class="demo" aria-label="Live demo">

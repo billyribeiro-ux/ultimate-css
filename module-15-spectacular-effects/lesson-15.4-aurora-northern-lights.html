@@ -51,6 +51,30 @@
 
       <h3>The frosted glass overlay</h3>
       <p>Text over the aurora uses <code>backdrop-filter: blur(40px)</code> to create a frosted glass panel. This ensures readability while letting the aurora glow through — the panel becomes part of the composition rather than hiding it.</p>
+
+      <h2>Fallback pattern</h2>
+      <p>The <code>@property</code> rule is required for smooth hue animation. Without it, custom properties are strings and cannot interpolate. Wrap the animated behavior in <code>@supports (background: oklch(50% 0.1 0))</code> and provide a static gradient as a baseline. Browsers without <code>@property</code> still get a beautiful aurora — it just does not animate its hues.</p>
+      <pre><code>/* Fallback: static aurora gradient for browsers without @property */
+.l1 {
+  background:
+    radial-gradient(ellipse 80% 50% at 30% 20%,
+      oklch(50% 0.12 150), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 60%,
+      oklch(40% 0.10 260), transparent 60%);
+}
+
+/* Enhanced: animated hue shift when @property is supported */
+@supports (font-tech(color-COLRv1)) {
+  .l1 {
+    background:
+      radial-gradient(ellipse 80% 50% at 30% 20%,
+        oklch(50% 0.12 var(--hue1)), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 70% 60%,
+        oklch(40% 0.10 var(--hue2)), transparent 60%);
+    animation: drift1 18s ease-in-out infinite,
+               hueShift 20s linear infinite;
+  }
+}</code></pre>
     </section>
 
     <section class="demo">
@@ -242,6 +266,13 @@ body { margin: 0; font-family: system-ui; }
 }
 
 .l1 {
+  /* Fallback: static gradient for browsers without @property */
+  background:
+    radial-gradient(ellipse 80% 50% at 30% 20%,
+      oklch(50% 0.12 150), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 60%,
+      oklch(40% 0.10 260), transparent 60%);
+  /* Enhanced: animated hue via @property custom properties */
   background:
     radial-gradient(ellipse 80% 50% at 30% 20%,
       oklch(50% 0.12 var(--hue1)), transparent 70%),

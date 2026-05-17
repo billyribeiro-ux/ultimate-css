@@ -80,6 +80,9 @@
 
       <h2>PE7 placement</h2>
       <p>The ripple animation belongs in the <strong>animations layer</strong>. The state layer overlay belongs in <strong>components</strong> (it's a visual property of the button, not motion). The duration and easing reference <strong>tokens</strong>.</p>
+
+      <h2>Accessibility note</h2>
+      <p>The ripple is purely decorative feedback — it must not be the only indicator of activation. The button's <code>:active</code> state (background color change) provides the accessible feedback that works regardless of animation support. The ripple enhances the interaction but does not replace it. Users with <code>prefers-reduced-motion: reduce</code> enabled should not see the ripple animation at all; the state layer color change (the <code>::before</code> overlay) still provides visual confirmation without motion. Always include a <code>@media (prefers-reduced-motion: reduce)</code> block that disables the ripple expansion while keeping the static state layer feedback intact.</p>
     </section>
 
     <section class="demo">
@@ -133,6 +136,17 @@
             color: oklch(30% 0.15 275);
           }
           .demo-14-17 .tonal::after { background: oklch(30% 0.15 275 / 0.15); }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-14-17 .md3-btn::after {
+              transition: none;
+              animation: none;
+            }
+            .demo-14-17 .md3-btn:active::after {
+              transform: scale(0);
+              opacity: 0;
+              transition: none;
+            }
+          }
         </style>
         <div class="demo-14-17">
           <button class="md3-btn">Filled Button</button>

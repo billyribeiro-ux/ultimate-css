@@ -54,6 +54,11 @@
 
       <h2>The info reveal</h2>
       <p>Below the scaled thumbnail, a description panel slides down. This uses a combination of <code>opacity</code> and <code>translate</code> transitions with a slight delay — the scale starts first, the info appears 100ms later. This staggered timing prevents the animation from feeling like everything happens at once.</p>
+
+      <h2>Accessibility considerations</h2>
+      <p>Hover effects must have keyboard equivalents. A keyboard user tabbing through the cards should see the same expansion and info reveal that a mouse user gets. Add <code>:focus-visible</code> alongside every <code>:hover</code> rule so that focusing a card with the keyboard triggers the same <code>scale()</code>, <code>z-index</code>, and info panel transitions.</p>
+      <p>The expanded info panel must be accessible to screen readers. Decorative overlays (poster gradients, shadows) should use <code>aria-hidden="true"</code> so assistive technology skips them and reads only the meaningful content inside the info panel.</p>
+      <p>On touch devices, <code>:hover</code> does not exist in any reliable way. The info should either be visible by default (no hover gate), or the card should be wrapped in a <code>&lt;button&gt;</code> or <code>&lt;a&gt;</code> so a tap triggers <code>:focus</code> and reveals the content. Hiding essential information behind hover alone makes it unreachable on mobile.</p>
     </section>
 
     <section class="demo" aria-label="Live demo">
@@ -90,7 +95,8 @@
           .demo-14-4 .card:nth-child(4) .poster { background: linear-gradient(135deg, oklch(45% 0.22 275), oklch(30% 0.18 290)); }
           .demo-14-4 .card:nth-child(5) .poster { background: linear-gradient(135deg, oklch(55% 0.15 60), oklch(40% 0.12 45)); }
           .demo-14-4 .card:nth-child(6) .poster { background: linear-gradient(135deg, oklch(40% 0.2 330), oklch(30% 0.15 350)); }
-          .demo-14-4 .card:hover {
+          .demo-14-4 .card:hover,
+          .demo-14-4 .card:focus-visible {
             transform: scale(1.4);
             z-index: 10;
             box-shadow: 0 8px 30px oklch(0% 0 0 / 0.6);
@@ -108,7 +114,8 @@
             translate: 0 0.25rem;
             transition: opacity 200ms 100ms, translate 200ms 100ms;
           }
-          .demo-14-4 .card:hover .info {
+          .demo-14-4 .card:hover .info,
+          .demo-14-4 .card:focus-visible .info {
             opacity: 1;
             translate: 0 0;
           }
