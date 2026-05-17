@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.16 — The PE7 Motion Principles · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.16</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.16</p>
+      <h1>The PE7 Motion Principles</h1>
+      <p class="lead">Seven principles that separate principal-engineer-level motion from amateur animation. These are synthesized from every industry pattern in this module — the rules that Apple, Netflix, Stripe, Linear, and Vercel follow consistently, whether they write them down or not.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Principle 1: Motion has a job</h2>
+      <p>Every animation must serve one of three purposes: guide attention to a change, confirm that a user action was received, or create spatial continuity between states. If the animation does not do one of these things, remove it. Decorative motion is technical debt — it adds complexity, consumes performance budget, and erodes trust with users who are sensitive to unnecessary movement.</p>
+      <p>Apple's parallax hero guides attention to the product. Netflix's hover-expand confirms the user's focus target. Stripe's tab indicator creates spatial continuity between panels. Every pattern in this module passes this test.</p>
+
+      <h2>Principle 2: Enter is ease-out, exit is ease-in</h2>
+      <p>Elements entering the viewport should decelerate into their final position — <code>ease-out</code> or <code>cubic-bezier(0, 0, 0.2, 1)</code>. Elements leaving should accelerate away — <code>ease-in</code> or <code>cubic-bezier(0.4, 0, 1, 1)</code>. State changes between two visible states use <code>ease-in-out</code>.</p>
+      <p>The physics are intuitive: an object arriving "slows down and lands." An object leaving "picks up speed and disappears." Reversing these feels wrong even if the user cannot articulate why. This principle is universal across Apple, Google Material, and every polished design system.</p>
+
+      <h2>Principle 3: Stagger follows reading order</h2>
+      <p>When multiple elements reveal in sequence, the stagger should follow the natural reading direction: top-left to bottom-right in LTR layouts. The stagger interval should be 40-100ms per element. Below 40ms and the stagger is imperceptible — the elements appear simultaneously. Above 100ms and the sequence feels sluggish — users wait instead of scanning.</p>
+      <p>Netflix's text reveal uses 80ms per word. The total animation for a 5-word headline is under 500ms. Fast enough to feel instant, slow enough to register as a cascade.</p>
+
+      <h2>Principle 4: Scroll-driven animations must complete</h2>
+      <p>If an animation is tied to scroll position, the user must be able to scroll far enough to complete it. A counter that counts up to 10,000 but only reaches 7,000 before the section scrolls past is broken. Use <code>animation-range</code> to ensure the animation completes within the available scroll distance. Test with short viewports.</p>
+
+      <h2>Principle 5: Reduced motion eliminates decorative motion</h2>
+      <p><code>prefers-reduced-motion: reduce</code> eliminates all decorative motion — parallax, gradient cycling, shimmer, stagger reveals, spinning vinyl. Essential motion — a modal appearing, a tab panel switching, a popover opening — should still transition, but with opacity-only changes and no spatial movement. The content must remain accessible.</p>
+      <p>The test: does the page function identically with all motion removed? If yes, your reduced motion implementation is correct. If removing motion breaks functionality, you have a structural problem.</p>
+
+      <h2>Principle 6: Animate only compositable properties</h2>
+      <p>The browser can animate four categories of properties on the GPU compositor thread without triggering layout or paint: <code>transform</code> (including <code>translate</code>, <code>rotate</code>, <code>scale</code>), <code>opacity</code>, <code>filter</code>, and registered <code>@property</code> custom properties. Animating anything else — <code>width</code>, <code>height</code>, <code>top</code>, <code>left</code>, <code>padding</code>, <code>margin</code>, <code>border-width</code> — triggers layout recalculation on every frame and will drop frames.</p>
+
+      <h3>Animatable property cheat sheet</h3>
+      <div class="demo-frame" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-family: system-ui, sans-serif; font-size: 0.8125rem;">
+          <thead>
+            <tr style="border-block-end: 2px solid oklch(85% 0.01 264); text-align: left;">
+              <th style="padding: 0.5rem 0.75rem;">Property</th>
+              <th style="padding: 0.5rem 0.75rem;">Animatable?</th>
+              <th style="padding: 0.5rem 0.75rem;">Performance</th>
+              <th style="padding: 0.5rem 0.75rem;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>transform</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.17 150);">Compositor</td>
+              <td style="padding: 0.5rem 0.75rem;">Excellent</td>
+              <td style="padding: 0.5rem 0.75rem;">GPU-accelerated. Use for all spatial motion.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>opacity</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.17 150);">Compositor</td>
+              <td style="padding: 0.5rem 0.75rem;">Excellent</td>
+              <td style="padding: 0.5rem 0.75rem;">GPU-accelerated. Pair with transform for enter/exit.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>filter</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.17 150);">Compositor</td>
+              <td style="padding: 0.5rem 0.75rem;">Good</td>
+              <td style="padding: 0.5rem 0.75rem;">GPU-accelerated. blur() and brightness() are common.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>@property custom</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.17 150);">Compositor</td>
+              <td style="padding: 0.5rem 0.75rem;">Good</td>
+              <td style="padding: 0.5rem 0.75rem;">Registered types only. Enables gradient animation.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>background-color</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(70% 0.16 85);">Paint</td>
+              <td style="padding: 0.5rem 0.75rem;">Moderate</td>
+              <td style="padding: 0.5rem 0.75rem;">Triggers repaint. Acceptable for small elements.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>box-shadow</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(70% 0.16 85);">Paint</td>
+              <td style="padding: 0.5rem 0.75rem;">Moderate</td>
+              <td style="padding: 0.5rem 0.75rem;">Repaint on each frame. Use sparingly.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>width / height</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.22 25);">Layout</td>
+              <td style="padding: 0.5rem 0.75rem;">Poor</td>
+              <td style="padding: 0.5rem 0.75rem;">Triggers full layout. Avoid. Use scale() instead.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>top / left</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.22 25);">Layout</td>
+              <td style="padding: 0.5rem 0.75rem;">Poor</td>
+              <td style="padding: 0.5rem 0.75rem;">Triggers full layout. Use translate() instead.</td>
+            </tr>
+            <tr style="border-block-end: 1px solid oklch(92% 0.005 264);">
+              <td style="padding: 0.5rem 0.75rem;"><code>padding / margin</code></td>
+              <td style="padding: 0.5rem 0.75rem; color: oklch(55% 0.22 25);">Layout</td>
+              <td style="padding: 0.5rem 0.75rem;">Poor</td>
+              <td style="padding: 0.5rem 0.75rem;">Triggers full layout. Never animate.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Principle 7: 60fps or nothing</h2>
+      <p>If a CSS animation drops frames, simplify it. A smooth animation at 30fps looks worse than an instant state change. The human eye perceives dropped frames as janky, broken, or untrustworthy. An instant transition at least looks intentional.</p>
+      <p>Test with DevTools performance panel. Enable paint flashing. If you see flashing on every scroll frame, you are doing it wrong. The goal is zero layout triggers and minimal paint triggers during any animation.</p>
+      <p>If you cannot achieve 60fps with a particular effect, replace the animation with an instant transition. A clean cut is always better than a stuttering dissolve.</p>
+
+      <h2>Synthesis</h2>
+      <p>These seven principles are not rules imposed from outside — they are patterns extracted from the best work in the industry. Apple follows them. Netflix follows them. Stripe, Linear, and Vercel follow them. They are the natural consequence of taking motion seriously as an engineering discipline rather than a cosmetic afterthought.</p>
+      <p>A principal engineer does not memorize animation recipes. They internalize these principles and derive the right animation for any situation. That is the PE7 level — the level where you stop copying patterns and start understanding the system that generates them.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Go back through Lessons 14.1-14.15 and identify which of the seven principles each lesson demonstrates. Every lesson should demonstrate at least two. If you find a pattern in the lessons that violates one of these principles, that is worth investigating — it may be a deliberate exception or a genuine mistake. Write down your findings.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.15-spotify-adaptive-header.html">&larr; Lesson 14.15</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
