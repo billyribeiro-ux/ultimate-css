@@ -54,6 +54,15 @@
 
       <h2>Limitations</h2>
       <p>Without JavaScript there is no AI opponent, no draw detection beyond visual inspection, and resetting requires a page reload. But as a proof of concept, it demonstrates the remarkable logic CSS can express.</p>
+
+      <h2>Accessibility limitations</h2>
+      <p>This CSS-only game is a technical experiment, not a production pattern. It has significant accessibility gaps that cannot be fully resolved without JavaScript:</p>
+      <ul>
+        <li><strong>Missing input labels:</strong> The radio inputs have no visible text or <code>aria-label</code> attributes. A screen reader user cannot tell which cell they are activating. Each input needs a descriptive label such as "Place X in top-left cell" or "Place O in center cell" so the board position is communicated.</li>
+        <li><strong>No state announcements:</strong> When a mark is placed or a winner is declared, sighted users see the visual change, but screen reader users receive no notification. Proper game state updates require <code>aria-live</code> regions that announce moves and outcomes — which requires JavaScript to update dynamically.</li>
+        <li><strong>No semantic game structure:</strong> The board is a collection of <code>div</code> elements with no table or grid semantics. A screen reader cannot convey the spatial layout (row, column) that is essential to playing tic-tac-toe.</li>
+      </ul>
+      <p>If you build a game for real users, use JavaScript to manage state, ARIA live regions for announcements, and proper labeling on all interactive elements. Treat this lesson as a demonstration of CSS selector power, not as a UI pattern to ship.</p>
     </section>
 
     <section class="demo">
@@ -293,56 +302,56 @@
           <p class="turn-indicator">Take turns clicking cells (X goes first)</p>
           <div class="board">
             <div class="cell c1">
-              <input type="radio" name="c1" class="x-input" id="c1x">
-              <input type="radio" name="c1" class="o-input" id="c1o">
+              <input type="radio" name="c1" class="x-input" id="c1x" aria-label="Place X in top-left cell">
+              <input type="radio" name="c1" class="o-input" id="c1o" aria-label="Place O in top-left cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c2">
-              <input type="radio" name="c2" class="x-input" id="c2x">
-              <input type="radio" name="c2" class="o-input" id="c2o">
+              <input type="radio" name="c2" class="x-input" id="c2x" aria-label="Place X in top-center cell">
+              <input type="radio" name="c2" class="o-input" id="c2o" aria-label="Place O in top-center cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c3">
-              <input type="radio" name="c3" class="x-input" id="c3x">
-              <input type="radio" name="c3" class="o-input" id="c3o">
+              <input type="radio" name="c3" class="x-input" id="c3x" aria-label="Place X in top-right cell">
+              <input type="radio" name="c3" class="o-input" id="c3o" aria-label="Place O in top-right cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c4">
-              <input type="radio" name="c4" class="x-input" id="c4x">
-              <input type="radio" name="c4" class="o-input" id="c4o">
+              <input type="radio" name="c4" class="x-input" id="c4x" aria-label="Place X in middle-left cell">
+              <input type="radio" name="c4" class="o-input" id="c4o" aria-label="Place O in middle-left cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c5">
-              <input type="radio" name="c5" class="x-input" id="c5x">
-              <input type="radio" name="c5" class="o-input" id="c5o">
+              <input type="radio" name="c5" class="x-input" id="c5x" aria-label="Place X in center cell">
+              <input type="radio" name="c5" class="o-input" id="c5o" aria-label="Place O in center cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c6">
-              <input type="radio" name="c6" class="x-input" id="c6x">
-              <input type="radio" name="c6" class="o-input" id="c6o">
+              <input type="radio" name="c6" class="x-input" id="c6x" aria-label="Place X in middle-right cell">
+              <input type="radio" name="c6" class="o-input" id="c6o" aria-label="Place O in middle-right cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c7">
-              <input type="radio" name="c7" class="x-input" id="c7x">
-              <input type="radio" name="c7" class="o-input" id="c7o">
+              <input type="radio" name="c7" class="x-input" id="c7x" aria-label="Place X in bottom-left cell">
+              <input type="radio" name="c7" class="o-input" id="c7o" aria-label="Place O in bottom-left cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c8">
-              <input type="radio" name="c8" class="x-input" id="c8x">
-              <input type="radio" name="c8" class="o-input" id="c8o">
+              <input type="radio" name="c8" class="x-input" id="c8x" aria-label="Place X in bottom-center cell">
+              <input type="radio" name="c8" class="o-input" id="c8o" aria-label="Place O in bottom-center cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
             <div class="cell c9">
-              <input type="radio" name="c9" class="x-input" id="c9x">
-              <input type="radio" name="c9" class="o-input" id="c9o">
+              <input type="radio" name="c9" class="x-input" id="c9x" aria-label="Place X in bottom-right cell">
+              <input type="radio" name="c9" class="o-input" id="c9o" aria-label="Place O in bottom-right cell">
               <span class="mark-x"></span>
               <span class="mark-o"></span>
             </div>
