@@ -235,6 +235,18 @@ p { margin: 0.75rem 0; line-height: 1.6; }
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Extend the full-bleed grid to include a "popout" level: <code>grid-template-columns: 1fr 1fr min(50ch, 100%) 1fr 1fr</code>. Add a <code>.popout</code> class with <code>grid-column: 2 / -2</code> — it breaks out partially but not to full width. This "wide" content pattern is common in articles with wider images.</p>
+      <p>Then create a pancake stack layout: <code>grid-template-rows: auto 1fr auto</code> with <code>min-height: 100vh</code>. Add a header, main, and footer. Notice the footer stays at the bottom regardless of content length. Try removing the min-height and observe the difference.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li>Full-bleed: <code>1fr min(65ch, 100%) 1fr</code> with children in column 2, bleed items at <code>1 / -1</code></li>
+        <li>Pancake stack: <code>grid-template-rows: auto 1fr auto</code> pins header/footer</li>
+        <li>Overlap: same <code>grid-area</code> stacks items without absolute positioning</li>
+        <li>Equal-height sidebar: grid items stretch to fill rows by default</li>
+        <li>These patterns are impossible or extremely complex without grid</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

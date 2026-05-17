@@ -206,6 +206,19 @@
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Remove the word <code>dense</code> from <code>grid-auto-flow</code> and observe the gaps that appear. Then add it back. Try changing to <code>grid-auto-flow: column dense</code> — items now fill column-first. Make item 7 span 2 columns and watch dense packing rearrange the grid to fill the hole.</p>
+      <p>Add <code>order: -1</code> to items 6 and 7. With dense packing, they fill earlier gaps. Without dense, they just appear first in flow but gaps remain. This demonstrates how order affects the auto-placement algorithm.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>grid-auto-flow: row</code> (default) fills left-to-right, top-to-bottom</li>
+        <li><code>grid-auto-flow: column</code> fills top-to-bottom, left-to-right</li>
+        <li><code>dense</code> backtracks to fill gaps left by larger items</li>
+        <li><code>grid-auto-rows</code> and <code>grid-auto-columns</code> size implicit tracks</li>
+        <li>Use dense only for decorative/independent content (not sequential reading order)</li>
+        <li>The <code>order</code> property affects which items are placed first</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

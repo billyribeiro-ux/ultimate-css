@@ -227,6 +227,19 @@ grid-template-areas:
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Add a container query at <code>max-width: 35rem</code> that stacks the layout into a single column in this order: header, nav, main, aside, footer. Then try using <code>.</code> to leave an empty cell — for instance <code>"nav . side"</code> creates a gap between nav and side.</p>
+      <p>Next, create a 4-column layout with areas: <code>"logo nav nav nav" "side main main aside" "ftr ftr ftr ftr"</code>. Assign each area to an element and observe how the header splits into logo and nav sections. This shows how areas can represent unequal column spans without line math.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>grid-template-areas</code> defines layout as ASCII art — most readable layout tool</li>
+        <li>Areas must form rectangles; <code>.</code> represents empty cells</li>
+        <li>Children use <code>grid-area: name</code> for simple placement</li>
+        <li>Change areas in media/container queries for responsive restructuring</li>
+        <li>Areas auto-create named lines: <code>name-start</code> and <code>name-end</code></li>
+        <li>Combine with explicit column/row sizing for full control</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

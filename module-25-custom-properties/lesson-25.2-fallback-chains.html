@@ -208,11 +208,15 @@
   --on-surface: oklch(15% 0.08 150);
 }
 
-/* Set direct property */
+/* Set direct property — highest priority */
 .override {
   --box-bg: oklch(50% 0.22 275);
   --box-color: oklch(98% 0 0);
-}</textarea>
+}
+
+/* Experiment: try --box-bg: not-a-color
+   to see IACVT in action */
+/* .broken { --box-bg: not-a-color; } */</textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
       </div>

@@ -159,13 +159,16 @@
           <div class="node" data-label=":root  --color: purple">
             <p><span class="swatch"></span>I inherit purple from the root</p>
             <div class="node level-2" data-label=".level-2  --color: green">
-              <p><span class="swatch"></span>I override to green</p>
+              <p><span class="swatch"></span>I override to green — new scope starts here</p>
               <div class="node" data-label="child of .level-2">
-                <p><span class="swatch"></span>I inherit green from my parent</p>
+                <p><span class="swatch"></span>I inherit green from my parent (not root)</p>
+              </div>
+              <div class="node" data-label="another child of .level-2">
+                <p><span class="swatch"></span>I also inherit green — siblings share scope</p>
               </div>
             </div>
             <div class="node level-3" data-label=".level-3  --color: red">
-              <p><span class="swatch"></span>I override to red</p>
+              <p><span class="swatch"></span>I override to red — independent scope</p>
             </div>
             <div class="node" data-label="sibling — no override">
               <p><span class="swatch"></span>I still inherit purple from root</p>
