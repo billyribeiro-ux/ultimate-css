@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.17 — MD3: The Ripple Effect · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.17</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.17 · Google Material Design 3</p>
+      <h1>MD3: The Ripple Effect</h1>
+      <p class="lead">The ripple is Material Design's signature interaction feedback — a radial wave emanating from the touch point that confirms "yes, you pressed this." Google's implementation uses JS for the coordinate, but the visual is pure CSS. Here's how to build it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What the user sees</h2>
+      <p>A button is clicked. From the exact click point, a translucent circle expands outward, fading as it grows, then dissipates. The entire animation takes roughly 300–500ms. On touch devices, it starts at the touch coordinate; on keyboard activation, it emanates from center.</p>
+
+      <h2>The CSS science</h2>
+      <p>The ripple is a <code>::after</code> pseudo-element with <code>position: absolute</code>, <code>border-radius: 50%</code>, and a <code>background: radial-gradient(circle, oklch(0% 0 0 / 0.12) 0%, transparent 70%)</code>. The expansion uses <code>transform: scale(0)</code> → <code>transform: scale(4)</code> with <code>opacity: 1</code> → <code>opacity: 0</code>.</p>
+
+      <h3>The pure-CSS version (center-emanating)</h3>
+      <p>Without JS, the ripple always emanates from center on <code>:active</code>. This is how MD3's web components work for keyboard users:</p>
+      <pre><code>.md3-btn {
+  position: relative;
+  overflow: hidden;
+}
+.md3-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: oklch(0% 0 0 / 0.12);
+  transform: scale(0);
+  opacity: 1;
+  transition: transform 0ms, opacity 0ms;
+}
+.md3-btn:active::after {
+  transform: scale(4);
+  opacity: 0;
+  transition: transform 400ms cubic-bezier(0, 0, 0.2, 1),
+              opacity 400ms cubic-bezier(0, 0, 0.2, 1);
+}</code></pre>
+
+      <h3>Why scale(4) not scale(1)?</h3>
+      <p>The pseudo-element is sized to the button's width. A circle of that diameter, scaled 4x, guarantees it covers the entire button surface regardless of aspect ratio. Google's actual implementation calculates the hypotenuse of the button and sizes the ripple to that — <code>scale(4)</code> is a simpler approximation that works for all but the most extreme aspect ratios.</p>
+
+      <h3>The state layer</h3>
+      <p>MD3 also uses a "state layer" — a persistent semi-transparent overlay that appears on hover (<code>oklch(0% 0 0 / 0.08)</code>) and focus (<code>oklch(0% 0 0 / 0.12)</code>). This is separate from the ripple and is simpler: a <code>::before</code> with <code>transition: opacity</code>.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The ripple animation belongs in the <strong>animations layer</strong>. The state layer overlay belongs in <strong>components</strong> (it's a visual property of the button, not motion). The duration and easing reference <strong>tokens</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — MD3 ripple button</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-17 { display: flex; gap: 1rem; padding: 1rem; font-family: system-ui; }
+          .demo-14-17 .md3-btn {
+            position: relative;
+            overflow: hidden;
+            padding: 0.75rem 1.5rem;
+            background: oklch(48% 0.22 275);
+            color: white;
+            border: none;
+            border-radius: 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+          }
+          .demo-14-17 .md3-btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: oklch(100% 0 0 / 0);
+            transition: background 200ms;
+          }
+          .demo-14-17 .md3-btn:hover::before { background: oklch(100% 0 0 / 0.08); }
+          .demo-14-17 .md3-btn:focus-visible::before { background: oklch(100% 0 0 / 0.12); }
+          .demo-14-17 .md3-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            inline-size: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: oklch(100% 0 0 / 0.2);
+            transform: scale(0);
+            opacity: 1;
+            transition: transform 0ms, opacity 0ms;
+          }
+          .demo-14-17 .md3-btn:active::after {
+            transform: scale(4);
+            opacity: 0;
+            transition: transform 450ms cubic-bezier(0, 0, 0.2, 1),
+                        opacity 450ms cubic-bezier(0, 0, 0.2, 1);
+          }
+          .demo-14-17 .tonal {
+            background: oklch(90% 0.06 275);
+            color: oklch(30% 0.15 275);
+          }
+          .demo-14-17 .tonal::after { background: oklch(30% 0.15 275 / 0.15); }
+        </style>
+        <div class="demo-14-17">
+          <button class="md3-btn">Filled Button</button>
+          <button class="md3-btn tonal">Tonal Button</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="buttons"&gt;
+  &lt;button class="md3-btn filled"&gt;Filled&lt;/button&gt;
+  &lt;button class="md3-btn tonal"&gt;Tonal&lt;/button&gt;
+  &lt;button class="md3-btn outlined"&gt;Outlined&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: grid; place-items: center; min-height: 50vh; }
+.buttons { display: flex; gap: 1rem; }
+
+/* --- Base button --- */
+.md3-btn {
+  position: relative;
+  overflow: hidden;
+  padding: .75rem 1.5rem;
+  border: none;
+  border-radius: 1.25rem;
+  font-size: .9rem;
+  font-weight: 500;
+  letter-spacing: .02em;
+  cursor: pointer;
+}
+
+/* State layer (::before) — hover and focus feedback */
+.md3-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: oklch(0% 0 0 / 0);
+  transition: background 200ms;
+}
+.md3-btn:hover::before { background: oklch(0% 0 0 / 0.08); }
+.md3-btn:focus-visible::before { background: oklch(0% 0 0 / 0.12); }
+
+/* Ripple (::after) — click/tap feedback */
+.md3-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: oklch(100% 0 0 / 0.2);
+  transform: scale(0);
+  opacity: 1;
+  transition: transform 0ms, opacity 0ms;
+}
+.md3-btn:active::after {
+  transform: scale(4);
+  opacity: 0;
+  transition: transform 450ms cubic-bezier(0,0,.2,1),
+              opacity 450ms cubic-bezier(0,0,.2,1);
+}
+
+/* --- Variants --- */
+.filled { background: oklch(48% 0.22 275); color: white; }
+.tonal  { background: oklch(90% 0.06 275); color: oklch(30% 0.15 275); }
+.tonal::after { background: oklch(30% 0.15 275 / 0.15); }
+.outlined {
+  background: transparent;
+  border: 1px solid oklch(80% 0.05 275);
+  color: oklch(48% 0.22 275);
+}
+.outlined::after { background: oklch(48% 0.22 275 / 0.12); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Click and hold each button. Watch the ripple expand while you hold, then fade when you release. Now try tabbing to a button and pressing Enter — the ripple emanates from center. Add a fourth button variant with a red ripple (<code>oklch(60% 0.22 25 / 0.15)</code>) for a destructive action. The architecture: only the <code>::after</code> background color changes per variant.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.16-pe7-motion-principles.html">← Lesson 14.16</a>
+      <a href="./lesson-14.18-md3-elevation-surface-tint.html">Lesson 14.18 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
