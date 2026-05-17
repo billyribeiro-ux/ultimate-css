@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.14 — text-box-trim: Precision Typography · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.14</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement · Chrome 133+ · Safari 18.2+</p>
+      <p class="badge">Lesson 13.14</p>
+      <h1>text-box-trim: Precision Typography</h1>
+      <p class="lead"><code>text-box-trim</code> and <code>text-box-edge</code> remove the invisible extra space above and below text — the "half-leading" that makes vertical alignment of text next to icons, images, and other elements an exercise in pixel nudging.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem</h2>
+      <p>Every font has built-in vertical space above the tallest ascender and below the deepest descender. This space is invisible, but it affects layout. A heading inside a card with <code>padding: 1rem</code> does not sit exactly <code>1rem</code> from the top — there is extra invisible space. Designers notice. Developers compensate with <code>margin-top: -4px</code> hacks that break when the font changes.</p>
+
+      <h2>The fix</h2>
+      <pre><code>h1 {
+  text-box-trim: both;
+  text-box-edge: cap alphabetic;
+}</code></pre>
+      <p><code>text-box-trim: both</code> trims the extra space from both the block-start and block-end of the text box. <code>text-box-edge: cap alphabetic</code> defines the trim boundaries — the cap height (top of capital letters) and the alphabetic baseline (bottom of lowercase letters without descenders).</p>
+
+      <h2>Real-world: centering text next to an icon</h2>
+      <pre><code>.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  text-box-trim: both;
+  text-box-edge: cap alphabetic;
+}</code></pre>
+      <p>Without <code>text-box-trim</code>, the text sits slightly higher than the icon because of the invisible half-leading. With it, the text and icon are perfectly centered on the cap height.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 133+, Safari 18.2+, Edge 133+. Firefox has it implemented behind a flag. Use <code>@supports (text-box-trim: both)</code>. Unsupported browsers show the normal spacing — a visual refinement, not a layout break.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — with and without text-box-trim</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-14 { font-family: system-ui; display: flex; gap: 2rem; }
+          .demo-13-14 .card {
+            padding: 1rem;
+            border: 1px solid oklch(85% 0.012 264);
+            border-radius: .5rem;
+            background: white;
+          }
+          .demo-13-14 .card h3 { margin: 0; font-size: 1.5rem; background: oklch(95% 0.04 275); }
+          .demo-13-14 .trimmed h3 {
+            text-box-trim: both;
+            text-box-edge: cap alphabetic;
+          }
+          .demo-13-14 small { color: oklch(55% 0.018 264); }
+        </style>
+        <div class="demo-13-14">
+          <div class="card"><h3>Default</h3><small>Invisible space above/below</small></div>
+          <div class="card trimmed"><h3>Trimmed</h3><small>Cap-height to alphabetic</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;h3&gt;Heading text&lt;/h3&gt;
+  &lt;p&gt;The heading should sit exactly at the padding edge.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.card {
+  padding: 1rem;
+  border: 2px solid oklch(48% 0.22 275);
+  border-radius: .5rem;
+}
+.card h3 {
+  margin: 0;
+  font-size: 2rem;
+  background: oklch(95% 0.04 275);
+
+  /* Uncomment to see the difference: */
+  /* text-box-trim: both; */
+  /* text-box-edge: cap alphabetic; */
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Uncomment the <code>text-box-trim</code> lines. Watch the purple background on the heading shrink — that removed space was always there, pushing the text away from the padding edge. Now try changing <code>text-box-edge</code> to <code>ex alphabetic</code> — the trim changes to x-height instead of cap-height.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.13-contrast-color.html">← Lesson 13.13</a>
+      <a href="./lesson-13.15-subgrid.html">Lesson 13.15 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

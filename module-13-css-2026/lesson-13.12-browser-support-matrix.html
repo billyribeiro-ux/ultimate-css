@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.12 — The May 2026 Browser Support Matrix · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 13.12 · Reference</p>
+      <h1>The May 2026 Browser Support Matrix</h1>
+      <p class="lead">A complete decision matrix for every CSS feature covered in this course. Ship it, wrap it in @supports, or wait — the answer depends on your audience and risk tolerance.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The support table</h2>
+      <p>Updated May 17, 2026. "Ship it" means all modern browsers (Chrome, Firefox, Safari latest two versions) support the feature with no flags.</p>
+
+      <div class="support-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Chrome</th>
+              <th>Firefox</th>
+              <th>Safari</th>
+              <th>Decision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CSS Nesting</td>
+              <td>120+</td>
+              <td>117+</td>
+              <td>17.2+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>Relative Color Syntax</td>
+              <td>125+</td>
+              <td>128+</td>
+              <td>18+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>color-mix()</td>
+              <td>111+</td>
+              <td>113+</td>
+              <td>16.2+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>round(), mod(), rem()</td>
+              <td>125+</td>
+              <td>118+</td>
+              <td>15.4+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>sign(), abs()</td>
+              <td>125+</td>
+              <td>118+</td>
+              <td>15.4+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>interpolate-size</td>
+              <td>129+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>field-sizing: content</td>
+              <td>123+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>::details-content</td>
+              <td>131+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>Cross-doc view transitions</td>
+              <td>126+</td>
+              <td>135+</td>
+              <td>18+</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>:open pseudo-class</td>
+              <td>114+</td>
+              <td>133+</td>
+              <td>17.2+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>popover="hint"</td>
+              <td>133+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>closedby attribute</td>
+              <td>133+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>reading-flow</td>
+              <td>137+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>@supports</strong></td>
+            </tr>
+            <tr>
+              <td>scroll-state() queries</td>
+              <td>144+</td>
+              <td>Not yet</td>
+              <td>Not yet</td>
+              <td><strong>Wait / @supports</strong></td>
+            </tr>
+            <tr>
+              <td>@layer</td>
+              <td>99+</td>
+              <td>97+</td>
+              <td>15.4+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>Container queries (size)</td>
+              <td>105+</td>
+              <td>110+</td>
+              <td>16+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>@scope</td>
+              <td>118+</td>
+              <td>128+</td>
+              <td>17.4+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>light-dark()</td>
+              <td>123+</td>
+              <td>120+</td>
+              <td>17.5+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>OKLCH colors</td>
+              <td>111+</td>
+              <td>113+</td>
+              <td>15.4+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+            <tr>
+              <td>Subgrid</td>
+              <td>117+</td>
+              <td>71+</td>
+              <td>16+</td>
+              <td><strong>Ship it</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>The decision framework</h2>
+      <p>Three tiers of deployment readiness:</p>
+      <ol>
+        <li><strong>Ship it.</strong> All three engines support the feature in their last two stable releases. No wrapper needed. Use freely in production. Examples: nesting, color-mix(), @layer, OKLCH.</li>
+        <li><strong>Wrap in @supports.</strong> One or two engines support it; the feature enhances UX but is not critical to functionality. Provide a fallback path. The non-supporting browser gets a simpler but complete experience. Examples: interpolate-size, field-sizing, ::details-content.</li>
+        <li><strong>Wait.</strong> Only one engine supports it and the feature's absence would create a significantly broken or confusing UX if relied upon without a fallback. Use only if you can afford to provide a JavaScript fallback for non-supporting browsers, or if your audience is exclusively Chrome-based. Example: scroll-state queries in production-critical UI.</li>
+      </ol>
+
+      <h2>Interop 2026 focus areas</h2>
+      <p>The Interop 2026 initiative prioritizes cross-browser alignment on:</p>
+      <ul>
+        <li><strong>Popover and dialog features</strong> — including <code>popover="hint"</code>, <code>closedby</code>, and the <code>::backdrop</code> transitions. Expect Firefox and Safari implementations in 2026-2027.</li>
+        <li><strong>View transitions</strong> — cross-document transitions are a focus for full interop. Safari 18 shipped basic support; full feature parity is in progress.</li>
+        <li><strong>Scroll-driven animations and state queries</strong> — Firefox has scroll-driven animations but not yet scroll-state container queries. Alignment is tracked.</li>
+        <li><strong>Anchor positioning</strong> — Chrome shipped in 124. Firefox prototyping underway. Expect broad support by late 2026.</li>
+      </ul>
+
+      <h2>What is coming next (behind flags or early prototype)</h2>
+      <ul>
+        <li><strong>CSS Mixins (@function)</strong> — author-defined CSS functions. Chrome has an intent to prototype. This will be the largest addition to CSS since custom properties.</li>
+        <li><strong>Masonry layout</strong> — a native CSS grid mode for Pinterest-style layouts. Both Chrome and Safari have experimental implementations with different syntaxes. Spec discussion ongoing.</li>
+        <li><strong>Sibling functions (sibling-count(), sibling-index())</strong> — query position in a parent without custom properties. Chrome 133+ ships these; Firefox and Safari prototyping.</li>
+        <li><strong>if() function</strong> — conditional values in CSS without @supports or media queries. Very early proposal stage.</li>
+      </ul>
+
+      <h2>Practical guidance for your production codebase</h2>
+      <p>If a feature is in the "Ship it" column, use it today without hesitation. Every feature in the PE7 architecture (layers, container queries, scope, light-dark, OKLCH) is production-safe across all modern browsers. The new Module 13 features in the "Ship it" tier (nesting, relative colors, color-mix, math functions, :open) can be adopted immediately.</p>
+      <p>For "@supports" features: adopt them as progressive enhancements that improve the experience in Chrome. Your fallback is the feature not existing — the UI works, just without the enhancement. Never make these features load-bearing in your architecture.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Audit your current project's CSS against this table. For each feature you use: confirm it is in the "Ship it" tier. For each feature you want to adopt: check the decision column and write an <code>@supports</code> wrapper if needed. Document your support baseline (e.g., "last 2 versions of Chrome, Firefox, Safari") and use it as the gate for all CSS decisions going forward.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.11-scroll-state.html">&larr; Lesson 13.11</a>
+      <a href="./lesson-13.13-contrast-color.html">Lesson 13.13 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

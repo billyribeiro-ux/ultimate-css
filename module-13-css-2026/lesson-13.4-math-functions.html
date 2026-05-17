@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.4 — CSS Math Functions · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.4</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · all modern browsers</p>
+      <p class="badge">Lesson 13.4</p>
+      <h1>CSS Math Functions: round(), mod(), rem(), sign(), abs()</h1>
+      <p class="lead">Chrome 125+, Firefox 118+, Safari 15.4+ (varies per function). Pure math in CSS — snap values to grids, cycle through patterns, detect direction, and compute absolute differences without JavaScript.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>round() — snap to a grid</h2>
+      <p><code>round(nearest, 1.7rem, 0.25rem)</code> snaps 1.7rem to the nearest multiple of 0.25rem (returns 1.75rem). Use this to enforce a spacing grid — any computed value gets rounded to your base unit.</p>
+      <p>Rounding strategies: <code>nearest</code> (default), <code>up</code>, <code>down</code>, <code>to-zero</code>.</p>
+
+      <h2>mod() and rem() — cyclic patterns</h2>
+      <p><code>mod(7, 3)</code> returns 1 — the modulo (always non-negative for positive divisors). <code>rem(7, 3)</code> returns 1 too in this case, but they differ for negative values. For layout patterns, <code>mod()</code> is what you want.</p>
+      <p>Combined with custom properties or <code>sibling-index()</code>, <code>mod()</code> enables cyclic patterns: alternating row colors, rotating animation delays, column assignments in a masonry-like layout.</p>
+
+      <h2>sign() — directional logic</h2>
+      <p><code>sign(--value)</code> returns <code>-1</code>, <code>0</code>, or <code>1</code> depending on the sign of the value. Use it for scroll direction indicators, caret rotation, or conditional transforms that flip based on a computed property.</p>
+
+      <h2>abs() — magnitude without direction</h2>
+      <p><code>abs(--delta)</code> returns the absolute value. Useful for computing distances, ensuring a minimum gap regardless of direction, or normalizing animation ranges.</p>
+
+      <h2>Real-world: spacing grid + cyclic tints</h2>
+      <p><code>round()</code> keeps your spacing on a 4px grid even when using fluid values. <code>mod()</code> with a counter or index cycles through 3 accent colors without writing separate <code>:nth-child</code> rules.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — cyclic backgrounds via mod()</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-4 {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+          }
+          .demo-13-4 .row {
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            counter-increment: row-counter;
+          }
+          .demo-13-4 .row:nth-child(3n + 1) {
+            background: oklch(92% 0.04 275);
+            color: oklch(35% 0.12 275);
+          }
+          .demo-13-4 .row:nth-child(3n + 2) {
+            background: oklch(92% 0.04 150);
+            color: oklch(35% 0.12 150);
+          }
+          .demo-13-4 .row:nth-child(3n + 3) {
+            background: oklch(92% 0.04 50);
+            color: oklch(35% 0.12 50);
+          }
+        </style>
+        <div class="demo-13-4">
+          <div class="row">Item 1 — indigo tint (index mod 3 = 1)</div>
+          <div class="row">Item 2 — green tint (index mod 3 = 2)</div>
+          <div class="row">Item 3 — amber tint (index mod 3 = 0)</div>
+          <div class="row">Item 4 — indigo tint (cycle repeats)</div>
+          <div class="row">Item 5 — green tint</div>
+          <div class="row">Item 6 — amber tint</div>
+          <div class="row">Item 7 — indigo tint</div>
+          <div class="row">Item 8 — green tint</div>
+          <div class="row">Item 9 — amber tint</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;ul class="task-list"&gt;
+  &lt;li style="--i: 0"&gt;Design token audit&lt;/li&gt;
+  &lt;li style="--i: 1"&gt;Layer boundary check&lt;/li&gt;
+  &lt;li style="--i: 2"&gt;Component inventory&lt;/li&gt;
+  &lt;li style="--i: 3"&gt;Accessibility pass&lt;/li&gt;
+  &lt;li style="--i: 4"&gt;Performance review&lt;/li&gt;
+  &lt;li style="--i: 5"&gt;Dark mode validation&lt;/li&gt;
+  &lt;li style="--i: 6"&gt;Cross-browser testing&lt;/li&gt;
+  &lt;li style="--i: 7"&gt;Documentation update&lt;/li&gt;
+&lt;/ul&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Use round() to snap spacing to a 4px (0.25rem) grid.
+   Use mod() with --i to cycle through 3 accent hues. */
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: round(nearest, 0.6rem, 0.25rem); /* snaps to 0.5rem */
+  font-family: system-ui, sans-serif;
+}
+
+.task-list li {
+  --hue-offset: calc(mod(var(--i), 3) * 120);
+  --accent: oklch(55% 0.15 calc(275 + var(--hue-offset)));
+
+  padding: round(nearest, 0.8rem, 0.25rem) 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-inline-start: 3px solid var(--accent);
+  background: oklch(from var(--accent) calc(l + 0.38) calc(c * 0.4) h);
+  color: oklch(from var(--accent) calc(l - 0.2) c h);
+
+  /* Staggered animation delay using the index */
+  animation: fade-in 0.3s ease-out both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateX(-0.5rem); }
+  to   { opacity: 1; transform: translateX(0); }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Modify the CSS above to cycle through 4 hues instead of 3 (change the modulus to 4 and the offset multiplier to 90). Then use <code>round(up, ...)</code> instead of <code>nearest</code> for the padding to see how rounding strategy affects the visual density. Try adding <code>abs()</code> to compute a symmetrical translate for odd/even items.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.3-color-mix.html">&larr; Lesson 13.3</a>
+      <a href="./lesson-13.5-interpolate-size.html">Lesson 13.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

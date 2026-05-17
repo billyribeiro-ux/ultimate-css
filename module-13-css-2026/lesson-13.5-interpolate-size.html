@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.5 — interpolate-size: Animate to auto · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.5</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement</p>
+      <p class="badge">Lesson 13.5</p>
+      <h1>interpolate-size: Animate to auto</h1>
+      <p class="lead">Chrome 129+. Firefox and Safari not yet. The single most requested CSS feature for decades: smoothly transition an element's height from 0 to its natural content height — no JavaScript measurement required.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem it solves</h2>
+      <p>CSS has never been able to animate to <code>height: auto</code>. You could transition from <code>0</code> to a fixed pixel value, but if the content changes length you get clipping or empty space. Every accordion, collapsible panel, and disclosure widget needed JavaScript to measure the content and set an explicit target height.</p>
+
+      <h2>interpolate-size: allow-keywords</h2>
+      <p>Set <code>interpolate-size: allow-keywords</code> on <code>:root</code> or any container. This opts the element (and its descendants) into treating keyword sizes like <code>auto</code>, <code>min-content</code>, <code>max-content</code> as interpolable — meaning CSS transitions and animations can target them.</p>
+
+      <h2>calc-size() for explicit calculations</h2>
+      <p><code>calc-size(auto, size)</code> lets you reference the auto size in a calculation. For example, <code>calc-size(auto, size - 2rem)</code> subtracts 2rem from whatever the natural height would be. In most cases you just need the opt-in property and a simple transition.</p>
+
+      <h2>The pattern</h2>
+      <p>Enable the opt-in globally, then transition height from <code>0</code> to <code>auto</code> with a standard <code>transition</code> property. The browser interpolates between the two values smoothly.</p>
+
+      <h2>Fallback strategy</h2>
+      <p>Wrap in <code>@supports (interpolate-size: allow-keywords)</code>. Without support, the element snaps open/closed instantly — still functional, just not animated. This is textbook progressive enhancement.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — animated accordion panel</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-5 {
+            font-family: system-ui, sans-serif;
+            interpolate-size: allow-keywords;
+          }
+          .demo-13-5 details {
+            border: 1px solid oklch(88% 0.01 264);
+            border-radius: 0.5rem;
+            margin-block-end: 0.5rem;
+            overflow: hidden;
+          }
+          .demo-13-5 summary {
+            padding: 0.875rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            background: oklch(97% 0.005 264);
+            color: oklch(25% 0.02 264);
+            list-style: none;
+          }
+          .demo-13-5 summary::marker { content: ""; }
+          .demo-13-5 summary::before {
+            content: "+";
+            display: inline-block;
+            margin-inline-end: 0.75rem;
+            font-weight: 700;
+            color: oklch(58% 0.22 275);
+            transition: transform 0.2s ease-out;
+          }
+          .demo-13-5 details[open] summary::before {
+            content: "-";
+          }
+          .demo-13-5 .panel {
+            height: 0;
+            overflow: hidden;
+            transition: height 0.3s ease-out;
+          }
+          .demo-13-5 details[open] .panel {
+            height: auto;
+          }
+          .demo-13-5 .panel-inner {
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: oklch(35% 0.015 264);
+          }
+        </style>
+        <div class="demo-13-5">
+          <details>
+            <summary>What is interpolate-size?</summary>
+            <div class="panel">
+              <div class="panel-inner">A CSS property that enables smooth transitions to keyword sizes like <code>auto</code>, <code>min-content</code>, and <code>max-content</code>. It eliminates the need for JavaScript-based height measurement in accordions and collapsible panels.</div>
+            </div>
+          </details>
+          <details>
+            <summary>Which browsers support it?</summary>
+            <div class="panel">
+              <div class="panel-inner">Chrome 129+ (shipped September 2024). Firefox and Safari are actively implementing it. Use <code>@supports</code> for progressive enhancement — the content remains accessible without the animation.</div>
+            </div>
+          </details>
+          <details open>
+            <summary>Do I need JavaScript?</summary>
+            <div class="panel">
+              <div class="panel-inner">No. That is the entire point. Previously, animating to an unknown height required measuring the element with JavaScript and setting a pixel value. With <code>interpolate-size: allow-keywords</code>, the browser handles interpolation natively. Zero JavaScript, zero layout thrashing.</div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="faq"&gt;
+  &lt;details&gt;
+    &lt;summary&gt;How do I enable animate-to-auto?&lt;/summary&gt;
+    &lt;div class="content"&gt;
+      &lt;p&gt;Add &lt;code&gt;interpolate-size: allow-keywords&lt;/code&gt; to the root or the nearest container. Then use a standard CSS transition on the height property.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/details&gt;
+  &lt;details&gt;
+    &lt;summary&gt;What about width animations?&lt;/summary&gt;
+    &lt;div class="content"&gt;
+      &lt;p&gt;It works for any size property — height, width, inline-size, block-size. The opt-in applies to all keyword-to-length interpolations within the container.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/details&gt;
+  &lt;details&gt;
+    &lt;summary&gt;Is there a performance cost?&lt;/summary&gt;
+    &lt;div class="content"&gt;
+      &lt;p&gt;The browser must compute the intrinsic size on each animation frame, which is similar to what JavaScript solutions already do. In practice, performance is excellent for typical disclosure widgets.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/details&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Enable animate-to-auto */
+.faq {
+  interpolate-size: allow-keywords;
+  font-family: system-ui, sans-serif;
+  max-width: 36rem;
+}
+
+details {
+  border: 1px solid oklch(88% 0.01 264);
+  border-radius: 0.5rem;
+  margin-block-end: 0.5rem;
+  overflow: hidden;
+}
+
+summary {
+  padding: 0.875rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  background: oklch(97% 0.005 264);
+}
+
+.content {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease-out;
+}
+
+details[open] .content {
+  height: auto;
+}
+
+.content p {
+  padding: 1rem 1.25rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: oklch(35% 0.015 264);
+}
+
+/* Progressive enhancement wrapper */
+@supports not (interpolate-size: allow-keywords) {
+  .content {
+    height: auto;
+    transition: none;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Modify the transition timing from <code>0.3s ease-out</code> to <code>0.5s cubic-bezier(0.4, 0, 0.2, 1)</code> and observe how the easing curve affects the perceived speed. Then try adding <code>transition: height 0.3s, opacity 0.3s 0.1s;</code> with opacity going from 0 to 1 — a content fade-in that starts slightly after the height animation begins.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.4-math-functions.html">&larr; Lesson 13.4</a>
+      <a href="./lesson-13.6-field-sizing.html">Lesson 13.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

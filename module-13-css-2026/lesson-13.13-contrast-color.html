@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.13 — contrast-color(): Automatic Accessible Text · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.13</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · Baseline April 2026 · all modern browsers</p>
+      <p class="badge">Lesson 13.13</p>
+      <h1>contrast-color(): Automatic Accessible Text</h1>
+      <p class="lead"><code>contrast-color()</code> takes any background color and returns either black or white — whichever meets WCAG AA contrast. The single most impactful accessibility function CSS has ever shipped.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem it solves</h2>
+      <p>Design systems generate dozens of background colors from a single brand hue — 100 through 900 scale stops, semantic surfaces, component variants. For every background, a developer must manually choose a text color that passes contrast. Light backgrounds get dark text. Dark backgrounds get light text. Middle-value backgrounds are a judgment call that someone inevitably gets wrong.</p>
+      <p><code>contrast-color()</code> eliminates this entire category of work. The browser does the WCAG math for you.</p>
+
+      <h2>The syntax</h2>
+      <pre><code>color: contrast-color(var(--bg-color));</code></pre>
+      <p>That is the entire API. Pass it a color. It returns black or white — whichever has higher contrast against the input. The browser evaluates against WCAG AA (4.5:1 for normal text).</p>
+
+      <h2>Real-world: badge component with any background</h2>
+      <pre><code>@layer components {
+  .badge {
+    --badge-bg: var(--color-primary);
+    background-color: var(--badge-bg);
+    color: contrast-color(var(--badge-bg));
+    padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    font-size: var(--size-xs);
+    font-weight: var(--weight-semibold);
+  }
+  .badge-success { --badge-bg: var(--color-success); }
+  .badge-warning { --badge-bg: var(--color-warning); }
+  .badge-danger  { --badge-bg: var(--color-danger); }
+}</code></pre>
+      <p>Every variant gets correct text color automatically. Add a new <code>.badge-ocean</code> with any background — the text color is always readable. Zero manual contrast checking.</p>
+
+      <h2>Why this matters for token systems</h2>
+      <p>In Module 4, we manually defined <code>--color-text-on-primary</code> as a separate token. With <code>contrast-color()</code>, the "on" tokens can be derived:</p>
+      <pre><code>:root {
+  --color-primary: oklch(48% 0.22 275);
+  --color-on-primary: contrast-color(var(--color-primary));
+}</code></pre>
+      <p>Change the brand color to anything — the text color adapts. This is the production-ready version of the <code>--contrast-safe()</code> function we imagined in Module 10.</p>
+
+      <h2>Browser support</h2>
+      <p>Baseline across all modern browsers as of April 2026 (Chrome 147+, Firefox, Safari). An Interop 2026 focus area. Ship today.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — automatic text color on any background</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-13 { display: flex; flex-wrap: wrap; gap: .5rem; font-family: system-ui; }
+          .demo-13-13 > div {
+            padding: .5rem 1rem;
+            border-radius: .375rem;
+            font-weight: 600;
+            font-size: .875rem;
+          }
+          .demo-13-13 .s1 { background: oklch(95% 0.04 275); color: contrast-color(oklch(95% 0.04 275)); }
+          .demo-13-13 .s2 { background: oklch(78% 0.13 275); color: contrast-color(oklch(78% 0.13 275)); }
+          .demo-13-13 .s3 { background: oklch(58% 0.22 275); color: contrast-color(oklch(58% 0.22 275)); }
+          .demo-13-13 .s4 { background: oklch(40% 0.19 275); color: contrast-color(oklch(40% 0.19 275)); }
+          .demo-13-13 .s5 { background: oklch(20% 0.09 275); color: contrast-color(oklch(20% 0.09 275)); }
+          .demo-13-13 .s6 { background: oklch(78% 0.16 85);  color: contrast-color(oklch(78% 0.16 85)); }
+          .demo-13-13 .s7 { background: oklch(60% 0.22 25);  color: contrast-color(oklch(60% 0.22 25)); }
+          .demo-13-13 .s8 { background: oklch(65% 0.17 150); color: contrast-color(oklch(65% 0.17 150)); }
+        </style>
+        <div class="demo-13-13">
+          <div class="s1">indigo-100</div>
+          <div class="s2">indigo-300</div>
+          <div class="s3">indigo-500</div>
+          <div class="s4">indigo-700</div>
+          <div class="s5">indigo-900</div>
+          <div class="s6">amber</div>
+          <div class="s7">red</div>
+          <div class="s8">teal</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="badges"&gt;
+  &lt;span class="badge" style="--bg: oklch(48% 0.22 275)"&gt;Primary&lt;/span&gt;
+  &lt;span class="badge" style="--bg: oklch(78% 0.16 85)"&gt;Warning&lt;/span&gt;
+  &lt;span class="badge" style="--bg: oklch(60% 0.22 25)"&gt;Danger&lt;/span&gt;
+  &lt;span class="badge" style="--bg: oklch(65% 0.17 150)"&gt;Success&lt;/span&gt;
+  &lt;span class="badge" style="--bg: oklch(95% 0.04 275)"&gt;Subtle&lt;/span&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.badges { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.badge {
+  background-color: var(--bg);
+  color: contrast-color(var(--bg));
+  padding: .375rem .75rem;
+  border-radius: 9999px;
+  font-size: .875rem;
+  font-weight: 600;
+}
+
+/* Change any --bg value to any OKLCH color.
+   The text color is always readable. Always. */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add three more badges with wildly different OKLCH backgrounds — a near-white, a mid-gray, and a vivid pink. Verify that <code>contrast-color()</code> picks the correct text color for each without you thinking about it. Then consider: how many lines of Sass or JavaScript did your last project use to solve this same problem?</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.12-browser-support-matrix.html">← Lesson 13.12</a>
+      <a href="./lesson-13.14-text-box-trim.html">Lesson 13.14 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

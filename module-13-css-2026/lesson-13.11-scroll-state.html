@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.11 — scroll-state(scrolled): Directional Scroll Detection · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.11</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement</p>
+      <p class="badge">Lesson 13.11</p>
+      <h1>scroll-state(scrolled): Directional Scroll Detection</h1>
+      <p class="lead">Chrome 144+. Others not yet. Detect scroll position and direction in CSS using container scroll-state queries. No JavaScript scroll listeners, no IntersectionObserver, no requestAnimationFrame hacks.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What scroll-state queries are</h2>
+      <p>Scroll-state container queries let you style elements based on the scroll state of their container. The syntax mirrors container queries: <code>@container scroll-state(...)</code>. The container must be a scroll container (has overflow that can scroll).</p>
+
+      <h2>scroll-state(scrolled: top)</h2>
+      <p><code>@container scroll-state(scrolled: top)</code> matches when the container has been scrolled away from the top — meaning the user has scrolled down. <code>scrolled: bottom</code> matches when scrolled away from the bottom. <code>scrolled: left</code> and <code>scrolled: right</code> work for horizontal scroll.</p>
+      <p>This enables pure-CSS "back to top" buttons, headers that shrink on scroll, and shadow indicators that appear when content is scrollable.</p>
+
+      <h2>Related scroll-state queries</h2>
+      <p>Chrome 133+ also shipped <code>scroll-state(stuck: top)</code> for sticky elements that are currently stuck, <code>scroll-state(snapped: x)</code> for snap-scrolled items, and <code>scroll-state(scrollable: top)</code> to detect if more content exists in a direction. Together these replace almost all JavaScript scroll-detection patterns.</p>
+
+      <h2>Real-world: shrinking header on scroll</h2>
+      <p>A sticky header that starts tall (logo + navigation) and shrinks to a compact bar once the user scrolls past a threshold. Previously required a scroll listener + class toggle. Now it is pure CSS: the page is the scroll container, the header checks <code>scroll-state(scrolled: top)</code> and applies compact styles.</p>
+
+      <h2>Fallback</h2>
+      <p>Wrap in <code>@supports (container-type: scroll-state)</code>. Without support, the header stays in its default state — still functional, just not responsive to scroll position. The enhancement is non-critical: it improves space efficiency but is not required for usability.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — header that responds to scroll</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-11 {
+            font-family: system-ui, sans-serif;
+            border: 1px solid oklch(88% 0.01 264);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            height: 18rem;
+            container-type: scroll-state;
+            overflow-y: auto;
+          }
+          .demo-13-11 .header {
+            position: sticky;
+            top: 0;
+            padding: 1rem 1.25rem;
+            background: oklch(98% 0.003 264);
+            border-block-end: 1px solid oklch(90% 0.01 264);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: padding 0.2s ease;
+            z-index: 10;
+          }
+          .demo-13-11 .header .title {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: oklch(25% 0.02 264);
+          }
+          .demo-13-11 .header .subtitle {
+            font-size: 0.75rem;
+            color: oklch(55% 0.015 264);
+            transition: opacity 0.2s ease, height 0.2s ease;
+          }
+          @container scroll-state(scrolled: top) {
+            .demo-13-11 .header {
+              padding: 0.5rem 1.25rem;
+              box-shadow: 0 2px 8px oklch(0% 0 0 / 0.06);
+            }
+            .demo-13-11 .header .subtitle {
+              opacity: 0;
+              height: 0;
+              overflow: hidden;
+            }
+          }
+          .demo-13-11 .content {
+            padding: 1.25rem;
+          }
+          .demo-13-11 .content p {
+            margin: 0 0 1rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: oklch(35% 0.015 264);
+          }
+        </style>
+        <div class="demo-13-11">
+          <div class="header">
+            <div>
+              <div class="title">Documentation</div>
+              <div class="subtitle">CSS Architecture Guide v2.0</div>
+            </div>
+          </div>
+          <div class="content">
+            <p>Scroll this panel down to see the header shrink. The subtitle fades out and padding decreases — all driven by a scroll-state container query with zero JavaScript.</p>
+            <p>The sticky header detects when its scroll container has scrolled away from the top. This is the signal to switch to "compact" mode, reclaiming vertical space for content.</p>
+            <p>Previously, this pattern required an IntersectionObserver or a scroll event listener with throttling, a class toggle, and careful cleanup to avoid memory leaks. Now it is a CSS container query.</p>
+            <p>The transition properties ensure the size change is smooth rather than jarring. Combined with the box-shadow that appears on scroll, the user gets clear visual feedback about their position in the document.</p>
+            <p>This pattern works for any scrollable container — not just the viewport. Dashboard panels, chat windows, documentation sidebars, and modal dialogs can all benefit from scroll-aware headers.</p>
+            <p>Keep scrolling to see the effect in action. The header stays compact as long as you are scrolled down, and returns to full size when you scroll back to the top.</p>
+            <p>End of content. Scroll back to the top to see the header expand again.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scroll-demo"&gt;
+  &lt;header class="app-header"&gt;
+    &lt;span class="brand"&gt;TaskFlow&lt;/span&gt;
+    &lt;span class="tagline"&gt;Project management made simple&lt;/span&gt;
+  &lt;/header&gt;
+
+  &lt;main class="app-body"&gt;
+    &lt;p&gt;Scroll down to see the header compact itself. The tagline disappears and the padding shrinks — pure CSS, no scroll listener.&lt;/p&gt;
+    &lt;p&gt;The container-type: scroll-state declaration makes this element a scroll-state container. The @container scroll-state(scrolled: top) query activates when you scroll away from the top.&lt;/p&gt;
+    &lt;p&gt;This replaces the common pattern of adding a "scrolled" class via JavaScript. Less code, better performance, no event listener cleanup needed.&lt;/p&gt;
+    &lt;p&gt;Try removing the @container rule to see the header stay full-size regardless of scroll position.&lt;/p&gt;
+    &lt;p&gt;Notice the box-shadow that appears — a subtle depth cue indicating the header is now floating above scrolled content.&lt;/p&gt;
+    &lt;p&gt;Scroll back to the top and watch it expand again. The transitions make the state change feel natural.&lt;/p&gt;
+  &lt;/main&gt;
+
+  &lt;a href="#" class="back-to-top"&gt;Top&lt;/a&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.scroll-demo {
+  container-type: scroll-state;
+  overflow-y: auto;
+  height: 16rem;
+  border: 1px solid oklch(88% 0.01 264);
+  border-radius: 0.5rem;
+  font-family: system-ui, sans-serif;
+  position: relative;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  padding: 1rem 1.25rem;
+  background: oklch(98% 0.003 264);
+  border-block-end: 1px solid oklch(90% 0.01 264);
+  transition: padding 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: oklch(25% 0.02 264);
+}
+
+.tagline {
+  display: block;
+  font-size: 0.75rem;
+  color: oklch(55% 0.015 264);
+  margin-top: 0.125rem;
+  transition: opacity 0.2s ease;
+}
+
+/* Compact header when scrolled */
+@container scroll-state(scrolled: top) {
+  .app-header {
+    padding: 0.5rem 1.25rem;
+    box-shadow: 0 2px 8px oklch(0% 0 0 / 0.06);
+  }
+  .tagline {
+    opacity: 0;
+    font-size: 0;
+    margin: 0;
+  }
+}
+
+/* Back-to-top button: hidden at top, visible when scrolled */
+.back-to-top {
+  position: sticky;
+  bottom: 1rem;
+  float: inline-end;
+  margin-inline-end: 1rem;
+  padding: 0.375rem 0.75rem;
+  background: oklch(58% 0.22 275);
+  color: #fff;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+@container scroll-state(scrolled: top) {
+  .back-to-top { opacity: 1; }
+}
+
+.app-body {
+  padding: 1.25rem;
+}
+
+.app-body p {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: oklch(38% 0.015 264);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a "back to top" button that only appears when the user has scrolled down (use the same <code>@container scroll-state(scrolled: top)</code> query to toggle its opacity or display). Then add a second query: <code>scroll-state(scrolled: bottom)</code> that shows a "more below" indicator when the user has not yet scrolled to the end.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.10-reading-flow.html">&larr; Lesson 13.10</a>
+      <a href="./lesson-13.12-browser-support-matrix.html">Lesson 13.12 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

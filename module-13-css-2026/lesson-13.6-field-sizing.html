@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.6 — field-sizing: content · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.6</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement</p>
+      <p class="badge">Lesson 13.6</p>
+      <h1>field-sizing: content (Auto-Sizing Form Fields)</h1>
+      <p class="lead">Chrome 123+, Edge 123+. Firefox and Safari not yet. A single CSS property makes textareas, inputs, and selects grow to fit their content — replacing every JavaScript autosize library ever written.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The property</h2>
+      <p><code>field-sizing: content</code> tells a form field to size itself based on its content rather than a fixed number of rows/columns. As the user types, the field grows. When content is deleted, it shrinks. No JavaScript event listeners, no hidden measurement elements, no layout thrashing.</p>
+
+      <h2>Where it works</h2>
+      <p>Apply it to <code>&lt;textarea&gt;</code> (the primary use case), <code>&lt;input&gt;</code> (text, number, email — the width adjusts to content length), and <code>&lt;select&gt;</code> (width adjusts to the selected option text). The most impactful use is textarea height auto-sizing.</p>
+
+      <h2>Respecting bounds</h2>
+      <p><code>min-height</code> and <code>max-height</code> still work as expected. Set <code>min-height: 3rem</code> for a minimum visible area and <code>max-height: 20rem</code> to cap growth. The field auto-sizes within those bounds and scrolls if content exceeds the max.</p>
+
+      <h2>The chat input pattern</h2>
+      <p>The most common real-world use: a message composer that starts as a single line (like an input) and grows vertically as the user types a longer message. Previously this required an <code>input</code> event listener, a hidden clone element, and manual height assignment. Now it is one CSS declaration.</p>
+
+      <h2>Fallback</h2>
+      <p>Without support, the field uses its default fixed size. The form remains fully functional — just not auto-sized. No <code>@supports</code> wrapper needed unless you want to adjust other layout properties when the feature is absent.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — auto-sizing textarea vs fixed</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-6 {
+            font-family: system-ui, sans-serif;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+          }
+          .demo-13-6 label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: oklch(35% 0.015 264);
+          }
+          .demo-13-6 textarea {
+            font-family: system-ui, sans-serif;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            padding: 0.75rem 1rem;
+            border: 1px solid oklch(85% 0.01 264);
+            border-radius: 0.5rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.15s ease;
+          }
+          .demo-13-6 textarea:focus {
+            border-color: oklch(58% 0.22 275);
+            box-shadow: 0 0 0 3px oklch(58% 0.22 275 / 0.1);
+          }
+          .demo-13-6 .auto-size {
+            field-sizing: content;
+            min-height: 2.75rem;
+            max-height: 12rem;
+          }
+          .demo-13-6 .fixed-size {
+            height: 5rem;
+          }
+        </style>
+        <div class="demo-13-6">
+          <label>
+            field-sizing: content
+            <textarea class="auto-size" placeholder="Type here — I grow as you type..."></textarea>
+          </label>
+          <label>
+            Fixed height (traditional)
+            <textarea class="fixed-size" placeholder="I stay the same height regardless of content..."></textarea>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="chat-composer"&gt;
+  &lt;div class="avatar"&gt;You&lt;/div&gt;
+  &lt;textarea class="message-input" placeholder="Type a message..." rows="1"&gt;&lt;/textarea&gt;
+  &lt;button class="send-btn" type="button"&gt;Send&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div class="form-example"&gt;
+  &lt;label&gt;
+    Name
+    &lt;input type="text" class="auto-input" value="Jane" /&gt;
+  &lt;/label&gt;
+  &lt;label&gt;
+    Email
+    &lt;input type="email" class="auto-input" value="jane@example.com" /&gt;
+  &lt;/label&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Chat composer with auto-sizing textarea */
+.chat-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid oklch(88% 0.01 264);
+  border-radius: 0.75rem;
+  background: oklch(98% 0.005 264);
+  font-family: system-ui, sans-serif;
+  margin-block-end: 2rem;
+}
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: oklch(58% 0.22 275);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.message-input {
+  flex: 1;
+  field-sizing: content;
+  min-height: 2.25rem;
+  max-height: 10rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid oklch(85% 0.01 264);
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+}
+
+.message-input:focus {
+  border-color: oklch(58% 0.22 275);
+}
+
+.send-btn {
+  padding: 0.5rem 1rem;
+  background: oklch(58% 0.22 275);
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Auto-sizing inputs */
+.form-example {
+  display: flex;
+  gap: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.form-example label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: oklch(40% 0.015 264);
+}
+
+.auto-input {
+  field-sizing: content;
+  min-width: 4rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid oklch(85% 0.01 264);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove <code>field-sizing: content</code> from the message input and observe the difference — the textarea stays at one row regardless of content. Then add it back and set <code>max-height: 5rem</code> to see it cap at a reasonable size and start scrolling. This is the production pattern: always set bounds.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.5-interpolate-size.html">&larr; Lesson 13.5</a>
+      <a href="./lesson-13.7-details-content.html">Lesson 13.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

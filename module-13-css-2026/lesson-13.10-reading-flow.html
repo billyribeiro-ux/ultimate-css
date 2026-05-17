@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.10 — reading-flow: Accessible Visual Order · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.10</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement</p>
+      <p class="badge">Lesson 13.10</p>
+      <h1>reading-flow: Accessible Visual Order</h1>
+      <p class="lead">Chrome 137+. Others not yet. Finally solve the accessibility problem caused by CSS <code>order</code> — make keyboard tab order and screen reader order follow the visual layout, not the DOM source order.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem with CSS order</h2>
+      <p>When you use <code>order</code> on flex or grid items to rearrange them visually, the DOM order stays unchanged. Screen readers announce items in DOM order. Keyboard Tab follows DOM order. The visual layout and the accessible reading sequence diverge — a WCAG failure that has existed since Flexbox shipped.</p>
+
+      <h2>reading-flow fixes the disconnect</h2>
+      <p>Set <code>reading-flow: flex-visual</code> on a flex container, and the browser's focus navigation order follows the visual order created by <code>order</code> and <code>flex-direction</code>. For grid, use <code>reading-flow: grid-rows</code> (row by row), <code>grid-columns</code> (column by column), or <code>grid-order</code> (by the order property).</p>
+
+      <h2>Values for flex containers</h2>
+      <p><code>reading-flow: flex-visual</code> — follow the visual order that flex layout produces (accounting for <code>order</code>, <code>flex-direction</code>, and wrapping).</p>
+      <p><code>reading-flow: flex-flow</code> — follow the flow direction defined by <code>flex-flow</code>.</p>
+
+      <h2>Values for grid containers</h2>
+      <p><code>reading-flow: grid-rows</code> — read left to right, top to bottom, based on where items are placed in the grid.</p>
+      <p><code>reading-flow: grid-columns</code> — read top to bottom, left to right (column-major order).</p>
+      <p><code>reading-flow: grid-order</code> — follow the <code>order</code> property on grid items.</p>
+
+      <h2>Real-world: responsive nav with reordered logo</h2>
+      <p>A navigation bar where the logo is moved to the visual center using <code>order</code> on mobile but stays at the start on desktop. Without <code>reading-flow</code>, a keyboard user tabs to the logo first (DOM order) even though it appears in the middle. With <code>reading-flow: flex-visual</code>, tab order matches what the user sees.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — broken vs fixed tab order</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-10 {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-13-10 h4 {
+            margin: 0 0 0.5rem;
+            font-size: 0.8125rem;
+            color: oklch(50% 0.015 264);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+          .demo-13-10 .nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid oklch(88% 0.01 264);
+            border-radius: 0.5rem;
+            background: oklch(98% 0.003 264);
+          }
+          .demo-13-10 .nav-bar a {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: oklch(40% 0.015 264);
+          }
+          .demo-13-10 .nav-bar a:focus-visible {
+            outline: 2px solid oklch(58% 0.22 275);
+            outline-offset: 2px;
+          }
+          .demo-13-10 .nav-bar .logo {
+            font-weight: 700;
+            color: oklch(25% 0.02 264);
+            order: 2;
+          }
+          .demo-13-10 .nav-bar .link-1 { order: 1; }
+          .demo-13-10 .nav-bar .link-2 { order: 3; }
+          .demo-13-10 .nav-bar .link-3 { order: 4; }
+
+          .demo-13-10 .nav-fixed {
+            reading-flow: flex-visual;
+          }
+          .demo-13-10 .broken { border-color: oklch(70% 0.15 25); }
+          .demo-13-10 .fixed  { border-color: oklch(70% 0.15 150); }
+          .demo-13-10 .label-bad { color: oklch(60% 0.22 25); }
+          .demo-13-10 .label-good { color: oklch(55% 0.17 150); }
+        </style>
+        <div class="demo-13-10">
+          <div>
+            <h4 class="label-bad">Without reading-flow (tab order = DOM order)</h4>
+            <nav class="nav-bar broken">
+              <a href="#" class="logo">Acme</a>
+              <a href="#" class="link-1">Docs</a>
+              <a href="#" class="link-2">Blog</a>
+              <a href="#" class="link-3">Pricing</a>
+            </nav>
+          </div>
+          <div>
+            <h4 class="label-good">With reading-flow: flex-visual (tab order = visual order)</h4>
+            <nav class="nav-bar fixed nav-fixed">
+              <a href="#" class="logo">Acme</a>
+              <a href="#" class="link-1">Docs</a>
+              <a href="#" class="link-2">Blog</a>
+              <a href="#" class="link-3">Pricing</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="nav-reorder"&gt;
+  &lt;a href="#" class="logo"&gt;Brand&lt;/a&gt;
+  &lt;a href="#" class="link"&gt;Products&lt;/a&gt;
+  &lt;a href="#" class="link"&gt;Solutions&lt;/a&gt;
+  &lt;a href="#" class="link"&gt;Docs&lt;/a&gt;
+  &lt;a href="#" class="cta"&gt;Sign up&lt;/a&gt;
+&lt;/nav&gt;
+
+&lt;p class="hint"&gt;Press Tab to move focus through the links. Notice the order matches what you see, not the DOM source.&lt;/p&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Nav with visually reordered items */
+.nav-reorder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: oklch(97% 0.005 264);
+  border: 1px solid oklch(88% 0.01 264);
+  border-radius: 0.5rem;
+  font-family: system-ui, sans-serif;
+
+  /* Fix tab order to match visual order */
+  reading-flow: flex-visual;
+}
+
+.nav-reorder a {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  color: oklch(40% 0.015 264);
+}
+
+.nav-reorder a:focus-visible {
+  outline: 2px solid oklch(58% 0.22 275);
+  outline-offset: 2px;
+  background: oklch(95% 0.04 275);
+}
+
+/* Reorder: logo in center visually */
+.logo {
+  order: 3;
+  font-weight: 700;
+  font-size: 1rem;
+  color: oklch(25% 0.02 264);
+  margin-inline: auto;
+}
+
+.link:nth-of-type(2) { order: 1; }
+.link:nth-of-type(3) { order: 2; }
+.link:nth-of-type(4) { order: 4; }
+
+.cta {
+  order: 5;
+  background: oklch(58% 0.22 275);
+  color: #fff;
+  font-weight: 600;
+}
+
+.hint {
+  margin-top: 1rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.8125rem;
+  color: oklch(50% 0.015 264);
+}
+
+/* Fallback: without reading-flow, DOM order is used
+   which is still functional, just not ideal */
+@supports not (reading-flow: flex-visual) {
+  .hint::after {
+    content: " (reading-flow not supported in this browser — tab order follows DOM)";
+    color: oklch(60% 0.22 25);
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove <code>reading-flow: flex-visual</code> and Tab through the nav. Notice how focus jumps to the logo first (it is first in the DOM), then to links, even though the logo appears in the center. Add the property back and Tab again — focus now moves left to right through the visual layout. This is the accessibility fix CSS has needed since 2015.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.9-open-popover-closedby.html">&larr; Lesson 13.9</a>
+      <a href="./lesson-13.11-scroll-state.html">Lesson 13.11 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

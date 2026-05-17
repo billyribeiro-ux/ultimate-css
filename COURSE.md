@@ -23,7 +23,7 @@ Module 13 — CSS in 2026: Functions, Colors, and What Just Shipped (May 2026 up
 ```
 
 - **Total modules:** 13
-- **Total lessons:** 92
+- **Total lessons:** 96
 - **Total projects:** 12 (one per module) + 80 mini-exercises
 - **Open** `index.html` in the repo root to start.
 

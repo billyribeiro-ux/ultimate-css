@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 13 Project — 2026 Feature Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 13</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Module 13 · Project</p>
+      <h1>2026 Feature Showcase</h1>
+      <p class="lead">A single-page showcase demonstrating every major feature from Module 13 in a realistic production context. Each section uses a different 2026 CSS capability. Progressive-enhancement features are wrapped in <code>@supports</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The brief</h2>
+      <p>Build (or review) the showcase below. It integrates:</p>
+      <ol>
+        <li>A card component styled with <strong>CSS nesting</strong> internally</li>
+        <li>A color palette derived entirely from <strong>relative color syntax</strong> (one <code>--brand</code> token, all variants derived)</li>
+        <li><strong>color-mix()</strong> for overlay and disabled states</li>
+        <li>An auto-sizing chat textarea with <strong>field-sizing: content</strong></li>
+        <li>An animated FAQ accordion using <strong>::details-content</strong> + <strong>interpolate-size</strong></li>
+        <li>A tooltip using <strong>popover="hint"</strong></li>
+        <li>A flex nav with <strong>reading-flow: flex-visual</strong></li>
+        <li>Every progressive-enhancement feature wrapped in <code>@supports</code></li>
+      </ol>
+    </section>
+
+    <section class="demo">
+      <h2>Complete showcase</h2>
+      <div class="demo-frame">
+        <style>
+          /* ============================================
+             2026 Feature Showcase — Scoped Styles
+             ============================================ */
+
+          .showcase {
+            --brand: oklch(55% 0.22 275);
+            --brand-hover: oklch(from var(--brand) calc(l + 0.08) c h);
+            --brand-active: oklch(from var(--brand) calc(l - 0.08) c h);
+            --brand-subtle: oklch(from var(--brand) calc(l + 0.38) calc(c * 0.3) h);
+            --brand-on-text: oklch(from var(--brand) calc(l - 0.25) c h);
+            --brand-complement: oklch(from var(--brand) l c calc(h + 180));
+            --brand-muted: oklch(from var(--brand) l calc(c * 0.4) h);
+            --brand-analogous: oklch(from var(--brand) l c calc(h + 40));
+            --brand-warm: oklch(from var(--brand) l c calc(h - 80));
+
+            --surface: oklch(98% 0.005 264);
+            --surface-raised: #fff;
+            --text: oklch(25% 0.02 264);
+            --text-secondary: oklch(45% 0.015 264);
+            --border: oklch(90% 0.01 264);
+
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+
+            interpolate-size: allow-keywords;
+          }
+
+          /* --- Section 1: Nested Card Component --- */
+          .showcase .feature-card {
+            padding: 1.5rem;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+
+            & h3 {
+              margin: 0 0 0.5rem;
+              font-size: 1.125rem;
+              color: var(--text);
+            }
+
+            & p {
+              margin: 0 0 1rem;
+              font-size: 0.875rem;
+              line-height: 1.6;
+              color: var(--text-secondary);
+            }
+
+            & .card-actions {
+              display: flex;
+              gap: 0.5rem;
+            }
+
+            & .card-btn {
+              padding: 0.5rem 1rem;
+              border-radius: 0.375rem;
+              font-size: 0.8125rem;
+              font-weight: 600;
+              cursor: pointer;
+              border: none;
+              background: var(--brand);
+              color: #fff;
+
+              &:hover {
+                background: var(--brand-hover);
+              }
+            }
+
+            & .card-btn-ghost {
+              background: transparent;
+              color: var(--brand);
+              border: 1px solid var(--border);
+
+              &:hover {
+                background: var(--brand-subtle);
+              }
+            }
+          }
+
+          /* --- Section 2: Derived Color Palette --- */
+          .showcase .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+            gap: 0.5rem;
+          }
+          .showcase .palette-swatch {
+            aspect-ratio: 1.2;
+            border-radius: 0.5rem;
+            display: grid;
+            place-items: center;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 0.25rem;
+          }
+          .showcase .s-brand { background: var(--brand); color: #fff; }
+          .showcase .s-hover { background: var(--brand-hover); color: #fff; }
+          .showcase .s-active { background: var(--brand-active); color: #fff; }
+          .showcase .s-subtle { background: var(--brand-subtle); color: var(--brand-on-text); }
+          .showcase .s-muted { background: var(--brand-muted); color: #fff; }
+          .showcase .s-comp { background: var(--brand-complement); color: #fff; }
+          .showcase .s-analog { background: var(--brand-analogous); color: #fff; }
+          .showcase .s-warm { background: var(--brand-warm); color: #fff; }
+
+          /* --- Section 3: color-mix() states --- */
+          .showcase .mix-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+          }
+          .showcase .mix-btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+          }
+          .showcase .mix-normal {
+            background: var(--brand);
+            color: #fff;
+          }
+          .showcase .mix-disabled {
+            background: color-mix(in oklch, var(--brand) 35%, var(--surface));
+            color: color-mix(in oklch, var(--text) 50%, var(--surface));
+            cursor: not-allowed;
+          }
+          .showcase .mix-overlay {
+            background: color-mix(in oklch, var(--brand) 12%, var(--surface-raised));
+            color: var(--brand-on-text);
+            border: 1px solid color-mix(in oklch, var(--brand) 25%, var(--border));
+          }
+
+          /* --- Section 4: field-sizing textarea --- */
+          .showcase .chat-box {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+          }
+          .showcase .chat-input {
+            flex: 1;
+            field-sizing: content;
+            min-height: 2.25rem;
+            max-height: 8rem;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+          }
+          .showcase .chat-input:focus {
+            border-color: var(--brand);
+          }
+          .showcase .chat-send {
+            padding: 0.5rem 1rem;
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
+          }
+
+          /* --- Section 5: Animated accordion --- */
+          .showcase .faq details {
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            margin-block-end: 0.5rem;
+          }
+          .showcase .faq summary {
+            padding: 0.875rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            color: var(--text);
+            background: oklch(97% 0.005 264);
+            border-radius: 0.5rem;
+            list-style: none;
+          }
+          .showcase .faq details[open] summary {
+            border-radius: 0.5rem 0.5rem 0 0;
+          }
+          .showcase .faq ::details-content {
+            block-size: 0;
+            overflow: hidden;
+            transition: block-size 0.3s ease-out, content-visibility 0.3s allow-discrete;
+          }
+          .showcase .faq details[open]::details-content {
+            block-size: auto;
+          }
+          .showcase .faq .answer {
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+          }
+
+          /* --- Section 6: Tooltip with popover="hint" --- */
+          .showcase .tooltip-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+          }
+          .showcase .tooltip-trigger {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            background: var(--surface-raised);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text);
+          }
+          .showcase [popover="hint"] {
+            padding: 0.5rem 0.75rem;
+            background: oklch(20% 0.015 264);
+            color: oklch(92% 0.005 264);
+            font-size: 0.75rem;
+            border-radius: 0.375rem;
+            border: none;
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.2);
+          }
+
+          /* --- Section 7: reading-flow nav --- */
+          .showcase .rf-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: oklch(97% 0.005 264);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            reading-flow: flex-visual;
+          }
+          .showcase .rf-nav a {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+          }
+          .showcase .rf-nav a:focus-visible {
+            outline: 2px solid var(--brand);
+            outline-offset: 2px;
+          }
+          .showcase .rf-nav .rf-logo {
+            order: 3;
+            font-weight: 700;
+            color: var(--text);
+            margin-inline: auto;
+          }
+          .showcase .rf-nav .rf-1 { order: 1; }
+          .showcase .rf-nav .rf-2 { order: 2; }
+          .showcase .rf-nav .rf-4 { order: 4; }
+          .showcase .rf-nav .rf-5 {
+            order: 5;
+            background: var(--brand);
+            color: #fff;
+            font-weight: 600;
+          }
+
+          /* --- Section labels --- */
+          .showcase .section-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--brand);
+            margin: 0 0 0.5rem;
+          }
+
+          /* --- @supports fallbacks --- */
+          @supports not (field-sizing: content) {
+            .showcase .chat-input {
+              min-height: 4rem;
+            }
+          }
+          @supports not selector(::details-content) {
+            .showcase .faq ::details-content {
+              block-size: auto;
+              overflow: visible;
+              transition: none;
+            }
+          }
+          @supports not (reading-flow: flex-visual) {
+            .showcase .rf-nav::after {
+              content: "(reading-flow not supported)";
+              font-size: 0.625rem;
+              color: oklch(60% 0.015 264);
+              margin-inline-start: auto;
+            }
+          }
+          @supports not (interpolate-size: allow-keywords) {
+            .showcase .faq ::details-content {
+              block-size: auto;
+              transition: none;
+            }
+          }
+        </style>
+
+        <div class="showcase">
+          <!-- Section 1: Nested Card -->
+          <div>
+            <p class="section-label">CSS Nesting</p>
+            <div class="feature-card">
+              <h3>Nested Component Styles</h3>
+              <p>This card's CSS is written with native nesting — child selectors, hover states, and responsive adjustments all grouped inside one parent rule block. Zero build step required.</p>
+              <div class="card-actions">
+                <button class="card-btn">Primary action</button>
+                <button class="card-btn card-btn-ghost">Secondary</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Relative Color Palette -->
+          <div>
+            <p class="section-label">Relative Color Syntax — all derived from --brand</p>
+            <div class="palette-grid">
+              <div class="palette-swatch s-brand">Brand</div>
+              <div class="palette-swatch s-hover">Hover</div>
+              <div class="palette-swatch s-active">Active</div>
+              <div class="palette-swatch s-subtle">Subtle</div>
+              <div class="palette-swatch s-muted">Muted</div>
+              <div class="palette-swatch s-comp">Complement</div>
+              <div class="palette-swatch s-analog">Analogous</div>
+              <div class="palette-swatch s-warm">Warm</div>
+            </div>
+          </div>
+
+          <!-- Section 3: color-mix() states -->
+          <div>
+            <p class="section-label">color-mix() — disabled and overlay states</p>
+            <div class="mix-row">
+              <button class="mix-btn mix-normal">Active</button>
+              <button class="mix-btn mix-disabled" disabled>Disabled (35% mix)</button>
+              <button class="mix-btn mix-overlay">Tinted overlay (12% mix)</button>
+            </div>
+          </div>
+
+          <!-- Section 4: field-sizing textarea -->
+          <div>
+            <p class="section-label">field-sizing: content</p>
+            <div class="chat-box">
+              <textarea class="chat-input" placeholder="Type a message — this textarea grows as you type..." rows="1"></textarea>
+              <button class="chat-send">Send</button>
+            </div>
+          </div>
+
+          <!-- Section 5: Animated accordion -->
+          <div>
+            <p class="section-label">::details-content + interpolate-size</p>
+            <div class="faq">
+              <details>
+                <summary>How does the animated accordion work?</summary>
+                <div class="answer">It combines <code>interpolate-size: allow-keywords</code> with the <code>::details-content</code> pseudo-element. The content area transitions from <code>block-size: 0</code> to <code>block-size: auto</code> smoothly.</div>
+              </details>
+              <details>
+                <summary>What happens in unsupported browsers?</summary>
+                <div class="answer">The details element still opens and closes — it just snaps instead of animating. The <code>@supports</code> fallback removes the transition so there is no broken half-state.</div>
+              </details>
+              <details open>
+                <summary>Is this production-ready?</summary>
+                <div class="answer">As a progressive enhancement, yes. The core functionality (disclosure) works everywhere. The animation is a bonus in Chrome 131+. Never make animation a requirement for usability.</div>
+              </details>
+            </div>
+          </div>
+
+          <!-- Section 6: popover="hint" tooltip -->
+          <div>
+            <p class="section-label">popover="hint" tooltip</p>
+            <div class="tooltip-row">
+              <button class="tooltip-trigger" popovertarget="showcase-tip-1">Hover: Save</button>
+              <div id="showcase-tip-1" popover="hint">Save your changes (Ctrl+S)</div>
+
+              <button class="tooltip-trigger" popovertarget="showcase-tip-2">Hover: Export</button>
+              <div id="showcase-tip-2" popover="hint">Export as PDF or image</div>
+
+              <button class="tooltip-trigger" popovertarget="showcase-tip-3">Hover: Share</button>
+              <div id="showcase-tip-3" popover="hint">Copy shareable link to clipboard</div>
+            </div>
+          </div>
+
+          <!-- Section 7: reading-flow nav -->
+          <div>
+            <p class="section-label">reading-flow: flex-visual</p>
+            <nav class="rf-nav">
+              <a href="#" class="rf-logo">Acme</a>
+              <a href="#" class="rf-1">Docs</a>
+              <a href="#" class="rf-2">Blog</a>
+              <a href="#" class="rf-4">Pricing</a>
+              <a href="#" class="rf-5">Sign up</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — modify the brand token</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="showcase-mini"&gt;
+  &lt;div class="palette"&gt;
+    &lt;div class="sw sw-brand"&gt;Brand&lt;/div&gt;
+    &lt;div class="sw sw-hover"&gt;Hover&lt;/div&gt;
+    &lt;div class="sw sw-subtle"&gt;Subtle&lt;/div&gt;
+    &lt;div class="sw sw-comp"&gt;Complement&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Feature card&lt;/h3&gt;
+    &lt;p&gt;Styled with nesting. Colors derived from one token.&lt;/p&gt;
+    &lt;button class="btn-active"&gt;Active&lt;/button&gt;
+    &lt;button class="btn-disabled" disabled&gt;Disabled&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Change --brand and watch everything update */
+.showcase-mini {
+  --brand: oklch(55% 0.22 275);
+  --brand-hover: oklch(from var(--brand) calc(l + 0.1) c h);
+  --brand-subtle: oklch(from var(--brand) calc(l + 0.38) calc(c * 0.3) h);
+  --brand-comp: oklch(from var(--brand) l c calc(h + 180));
+  --surface: oklch(98% 0.005 264);
+
+  font-family: system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+.sw {
+  padding: 1.25rem 0.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+}
+.sw-brand { background: var(--brand); }
+.sw-hover { background: var(--brand-hover); }
+.sw-subtle { background: var(--brand-subtle); color: oklch(30% 0.02 264); }
+.sw-comp { background: var(--brand-comp); }
+
+.card {
+  padding: 1.25rem;
+  border: 1px solid oklch(90% 0.01 264);
+  border-radius: 0.5rem;
+  background: #fff;
+
+  & h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    color: oklch(25% 0.02 264);
+  }
+  & p {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    color: oklch(45% 0.015 264);
+  }
+}
+
+.btn-active {
+  padding: 0.5rem 1rem;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.btn-disabled {
+  padding: 0.5rem 1rem;
+  background: color-mix(in oklch, var(--brand) 35%, var(--surface));
+  color: oklch(60% 0.01 264);
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: not-allowed;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Project deliverable</h2>
+      <p>Change <code>--brand</code> to three different colors (a teal, a red, an amber) and confirm every derived color, every disabled state, every overlay tint updates correctly without manual adjustment. That is the power of token-driven architecture combined with relative color syntax and color-mix().</p>
+      <p>Then open the showcase in a non-Chrome browser and verify all <code>@supports</code> fallbacks activate correctly — no broken layouts, no missing content, just gracefully degraded enhancements.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-13.16-content-visibility.html">&larr; Lesson 13.16</a>
+      <a href="../../index.html">Course home &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

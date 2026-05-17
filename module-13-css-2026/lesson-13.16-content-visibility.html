@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.16 — content-visibility: Rendering Performance · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.16</span>
+    </nav>
+
+    <header>
+      <p class="badge success">Production-ready · Baseline September 2025 · all modern browsers</p>
+      <p class="badge">Lesson 13.16</p>
+      <h1>content-visibility: Rendering Performance</h1>
+      <p class="lead"><code>content-visibility: auto</code> tells the browser to skip layout and paint for off-screen content. On long pages, this can reduce initial rendering time by up to 7x — with one line of CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem</h2>
+      <p>A documentation page with 50 sections. The browser renders all 50 sections before showing anything — even though only 3 are visible in the viewport. Every section's layout, paint, and composite must complete before the first frame. On a mid-range phone, this can take several hundred milliseconds.</p>
+
+      <h2>The fix</h2>
+      <pre><code>section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}</code></pre>
+      <p><code>content-visibility: auto</code> tells the browser: if this element is off-screen, skip its layout and paint entirely. Render it only when it is about to scroll into view.</p>
+      <p><code>contain-intrinsic-size: auto 500px</code> provides an estimated height for the off-screen element so the scrollbar is correctly sized. The <code>auto</code> keyword means the browser remembers the real height after the element is first rendered and uses it on subsequent relayouts.</p>
+
+      <h2>Where it fits in the PE7 stack</h2>
+      <p><code>content-visibility</code> is a layout-layer concern. It affects rendering, not visual styling. In a PE7 project, it lives in the layout layer alongside your structural primitives:</p>
+      <pre><code>@layer layout {
+  .section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+}</code></pre>
+
+      <h2>What not to do</h2>
+      <ul>
+        <li>Do not apply to elements that are always visible (nav, hero). It adds overhead for elements the browser would render anyway.</li>
+        <li>Do not use on elements that need to be found by in-page search (<code>Ctrl+F</code>) — <code>content-visibility: auto</code> can prevent text from being searchable until rendered. This is a known limitation being addressed by browsers.</li>
+        <li>Do not use without <code>contain-intrinsic-size</code> — the scrollbar will jump as off-screen sections get heights of zero.</li>
+      </ul>
+
+      <h2>Browser support</h2>
+      <p>Baseline since September 2025. Chrome 85+, Firefox 125+, Safari 18+. Ship without <code>@supports</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — the one-line performance win</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-16 { font-family: system-ui; max-height: 12rem; overflow-y: auto; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; }
+          .demo-13-16 section { padding: 1.5rem; border-block-end: 1px solid oklch(92% 0.008 264); content-visibility: auto; contain-intrinsic-size: auto 120px; }
+          .demo-13-16 h3 { margin: 0 0 .5rem; color: oklch(14% 0.015 264); }
+          .demo-13-16 p { margin: 0; color: oklch(44% 0.020 264); font-size: .875rem; }
+        </style>
+        <div class="demo-13-16">
+          <section><h3>Section 1</h3><p>This section is visible and fully rendered.</p></section>
+          <section><h3>Section 2</h3><p>This section is visible and fully rendered.</p></section>
+          <section><h3>Section 3</h3><p>Off-screen sections skip layout until you scroll here.</p></section>
+          <section><h3>Section 4</h3><p>The browser renders this only when it is about to enter the viewport.</p></section>
+          <section><h3>Section 5</h3><p>On a page with 50 sections, this is the difference between 200ms and 30ms initial load.</p></section>
+          <section><h3>Section 6</h3><p>One line of CSS. Up to 7x rendering performance improvement.</p></section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;section&gt;&lt;h2&gt;Section 1&lt;/h2&gt;&lt;p&gt;Visible on load.&lt;/p&gt;&lt;/section&gt;
+  &lt;section&gt;&lt;h2&gt;Section 2&lt;/h2&gt;&lt;p&gt;Visible on load.&lt;/p&gt;&lt;/section&gt;
+  &lt;section&gt;&lt;h2&gt;Section 3&lt;/h2&gt;&lt;p&gt;Off-screen — rendering deferred.&lt;/p&gt;&lt;/section&gt;
+  &lt;section&gt;&lt;h2&gt;Section 4&lt;/h2&gt;&lt;p&gt;Off-screen — rendering deferred.&lt;/p&gt;&lt;/section&gt;
+  &lt;section&gt;&lt;h2&gt;Section 5&lt;/h2&gt;&lt;p&gt;Scroll down to render me.&lt;/p&gt;&lt;/section&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; }
+.page { max-height: 200px; overflow-y: auto; }
+
+section {
+  padding: 1.5rem;
+  border-bottom: 1px solid oklch(92% 0.008 264);
+
+  /* The performance line: */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+h2 { margin: 0 0 .5rem; }
+p { margin: 0; color: oklch(44% 0.020 264); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove the <code>content-visibility</code> and <code>contain-intrinsic-size</code> lines. In a real page with hundreds of sections, the difference is measurable in DevTools Performance panel. For this small demo, the key lesson is conceptual: every section below the fold is free until the user needs it.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.15-subgrid.html">← Lesson 13.15</a>
+      <a href="./project/index.html">Module 13 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

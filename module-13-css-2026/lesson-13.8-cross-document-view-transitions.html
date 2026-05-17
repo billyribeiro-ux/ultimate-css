@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.8 — Cross-Document View Transitions · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.8</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement</p>
+      <p class="badge">Lesson 13.8</p>
+      <h1>Cross-Document View Transitions</h1>
+      <p class="lead">Chrome 126+, Firefox 135+, Safari 18+. Animate between full page navigations with a single CSS at-rule. No JavaScript router, no SPA framework, no client-side rendering required.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The opt-in: @view-transition</h2>
+      <p><code>@view-transition { navigation: auto; }</code> in your CSS enables cross-document view transitions for same-origin navigations. When the user clicks a link to another page on the same site, the browser captures a snapshot of the old page, loads the new page, and cross-fades between them.</p>
+
+      <h2>view-transition-name: morph specific elements</h2>
+      <p>By default, the entire page cross-fades. To morph a specific element (e.g., a card expanding into a detail page), give it a <code>view-transition-name</code> on both pages. The browser will animate that element's position, size, and appearance between its old and new states.</p>
+      <p>Each <code>view-transition-name</code> must be unique on a page. Two elements with the same name will break the transition.</p>
+
+      <h2>view-transition-class: group animations</h2>
+      <p>When multiple elements share the same animation style (e.g., all nav links slide in together), use <code>view-transition-class</code> to group them. You can then style all elements in that class with a single <code>::view-transition-group(.classname)</code> rule.</p>
+
+      <h2>Pseudo-elements for custom animations</h2>
+      <p>The view transition API creates pseudo-elements you can style:</p>
+      <ul>
+        <li><code>::view-transition-group(name)</code> — the container for old and new snapshots</li>
+        <li><code>::view-transition-old(name)</code> — the outgoing snapshot (fades out)</li>
+        <li><code>::view-transition-new(name)</code> — the incoming snapshot (fades in)</li>
+      </ul>
+      <p>Override their default animations with custom keyframes for slides, zooms, or any effect you want.</p>
+
+      <h2>Real-world: multi-page documentation site</h2>
+      <p>A documentation site with a persistent sidebar: the sidebar has <code>view-transition-name: sidebar</code> on every page. During navigation, the sidebar stays put while the main content area cross-fades. The user perceives app-like continuity without any JavaScript framework.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — view transition CSS (static reference)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-8 {
+            font-family: var(--font-mono, monospace);
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            background: oklch(14% 0.015 264);
+            color: oklch(85% 0.01 264);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+          }
+          .demo-13-8 .comment { color: oklch(55% 0.01 264); }
+          .demo-13-8 .at-rule { color: oklch(75% 0.15 275); }
+          .demo-13-8 .prop { color: oklch(78% 0.12 190); }
+          .demo-13-8 .value { color: oklch(80% 0.14 85); }
+          .demo-13-8 .selector { color: oklch(75% 0.15 330); }
+        </style>
+        <pre class="demo-13-8"><span class="comment">/* Enable cross-document transitions site-wide */</span>
+<span class="at-rule">@view-transition</span> {
+  <span class="prop">navigation</span>: <span class="value">auto</span>;
+}
+
+<span class="comment">/* Persistent sidebar morphs between pages */</span>
+<span class="selector">.sidebar</span> {
+  <span class="prop">view-transition-name</span>: <span class="value">sidebar</span>;
+}
+
+<span class="comment">/* Main content area */</span>
+<span class="selector">.main-content</span> {
+  <span class="prop">view-transition-name</span>: <span class="value">main</span>;
+}
+
+<span class="comment">/* Custom animation: slide in from right */</span>
+<span class="selector">::view-transition-new(main)</span> {
+  <span class="prop">animation</span>: <span class="value">slide-in 0.3s ease-out</span>;
+}
+<span class="selector">::view-transition-old(main)</span> {
+  <span class="prop">animation</span>: <span class="value">slide-out 0.3s ease-in</span>;
+}
+
+<span class="at-rule">@keyframes</span> slide-in {
+  <span class="selector">from</span> { <span class="prop">transform</span>: <span class="value">translateX(2rem)</span>; <span class="prop">opacity</span>: <span class="value">0</span>; }
+}
+<span class="at-rule">@keyframes</span> slide-out {
+  <span class="selector">to</span> { <span class="prop">transform</span>: <span class="value">translateX(-2rem)</span>; <span class="prop">opacity</span>: <span class="value">0</span>; }
+}</pre>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Cross-document view transitions require multi-page
+     navigation. This editor shows the CSS pattern.
+     To test live, create two HTML files on the same origin
+     with the stylesheet below linked in both. --&gt;
+
+&lt;div class="page-layout"&gt;
+  &lt;aside class="sidebar"&gt;
+    &lt;nav&gt;
+      &lt;a href="#" class="active"&gt;Dashboard&lt;/a&gt;
+      &lt;a href="#"&gt;Projects&lt;/a&gt;
+      &lt;a href="#"&gt;Settings&lt;/a&gt;
+    &lt;/nav&gt;
+  &lt;/aside&gt;
+  &lt;main class="main-content"&gt;
+    &lt;h1&gt;Dashboard&lt;/h1&gt;
+    &lt;p&gt;This main content area would cross-fade on navigation while the sidebar stays fixed in place.&lt;/p&gt;
+    &lt;div class="card-row"&gt;
+      &lt;div class="stat-card"&gt;42 projects&lt;/div&gt;
+      &lt;div class="stat-card"&gt;128 commits&lt;/div&gt;
+      &lt;div class="stat-card"&gt;99.7% uptime&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Cross-document view transition opt-in */
+@view-transition {
+  navigation: auto;
+}
+
+/* Named elements that persist or morph */
+.sidebar {
+  view-transition-name: sidebar;
+}
+.main-content {
+  view-transition-name: main;
+}
+
+/* Custom transition for main content */
+::view-transition-new(main) {
+  animation: fade-slide-in 0.25s ease-out;
+}
+::view-transition-old(main) {
+  animation: fade-slide-out 0.25s ease-in;
+}
+
+@keyframes fade-slide-in {
+  from { opacity: 0; transform: translateY(1rem); }
+}
+@keyframes fade-slide-out {
+  to { opacity: 0; transform: translateY(-1rem); }
+}
+
+/* Layout styles */
+.page-layout {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 0;
+  min-height: 16rem;
+  font-family: system-ui, sans-serif;
+  border: 1px solid oklch(88% 0.01 264);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.sidebar {
+  background: oklch(96% 0.005 264);
+  padding: 1rem;
+  border-inline-end: 1px solid oklch(88% 0.01 264);
+}
+.sidebar nav { display: flex; flex-direction: column; gap: 0.25rem; }
+.sidebar a {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  color: oklch(40% 0.015 264);
+}
+.sidebar a.active {
+  background: oklch(58% 0.22 275);
+  color: #fff;
+  font-weight: 600;
+}
+
+.main-content { padding: 1.5rem; }
+.main-content h1 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+.main-content p { margin: 0 0 1rem; font-size: 0.875rem; color: oklch(40% 0.015 264); }
+
+.card-row { display: flex; gap: 0.75rem; }
+.stat-card {
+  flex: 1;
+  padding: 1rem;
+  background: oklch(97% 0.005 264);
+  border: 1px solid oklch(90% 0.01 264);
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  color: oklch(35% 0.015 264);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>To test cross-document view transitions live: create two HTML files (page-a.html and page-b.html) in the same directory, both linking the same CSS with <code>@view-transition { navigation: auto; }</code>. Give the shared header <code>view-transition-name: header</code> on both pages. Serve them on localhost and click between pages — the header will stay fixed while content cross-fades.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.7-details-content.html">&larr; Lesson 13.7</a>
+      <a href="./lesson-13.9-open-popover-closedby.html">Lesson 13.9 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

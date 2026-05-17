@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.7 — ::details-content: Animatable Disclosure · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.7</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement</p>
+      <p class="badge">Lesson 13.7</p>
+      <h1>::details-content: Animatable Disclosure</h1>
+      <p class="lead">Chrome 131+. Firefox and Safari not yet. The <code>::details-content</code> pseudo-element targets the content area of <code>&lt;details&gt;</code>, enabling fully animated accordion panels when combined with <code>interpolate-size</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What ::details-content targets</h2>
+      <p>The <code>::details-content</code> pseudo-element represents everything inside a <code>&lt;details&gt;</code> element except the <code>&lt;summary&gt;</code>. Previously there was no way to target this anonymous box — you had to wrap content in a <code>&lt;div&gt;</code> and style that instead. The pseudo-element makes the wrapper unnecessary.</p>
+
+      <h2>The animated accordion pattern</h2>
+      <p>Combine <code>::details-content</code> with <code>interpolate-size: allow-keywords</code> from Lesson 13.5. Set the closed state to <code>block-size: 0; overflow: hidden;</code> and the open state to <code>block-size: auto;</code>. Add a transition on <code>block-size</code>. The browser handles the rest.</p>
+
+      <h2>The complete pattern</h2>
+      <p>The key declarations: on <code>::details-content</code>, set <code>block-size: 0; overflow: hidden; transition: block-size 0.3s ease, content-visibility 0.3s allow-discrete;</code>. On <code>details[open]::details-content</code>, set <code>block-size: auto;</code>. The <code>content-visibility</code> transition with <code>allow-discrete</code> handles the display toggling smoothly.</p>
+
+      <h2>Why this matters</h2>
+      <p>Native <code>&lt;details&gt;</code> is accessible by default — keyboard operable, announced correctly by screen readers, no ARIA needed. But the jarring snap open/close made teams reach for custom JavaScript accordions. This pseudo-element brings smooth animation to native HTML, keeping all the accessibility benefits of the built-in element.</p>
+
+      <h2>Fallback</h2>
+      <p>Without support, <code>&lt;details&gt;</code> works exactly as it always has — instant open/close. The semantic structure and accessibility remain intact. This is the ideal progressive enhancement: enhanced experience in supporting browsers, full functionality everywhere else.</p>
+    </section>
+
+    <section class="demo" aria-label="Live demo">
+      <h2>Demo — animated FAQ with ::details-content</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-13-7 {
+            font-family: system-ui, sans-serif;
+            interpolate-size: allow-keywords;
+            max-width: 36rem;
+          }
+          .demo-13-7 details {
+            border: 1px solid oklch(88% 0.01 264);
+            border-radius: 0.5rem;
+            margin-block-end: 0.5rem;
+          }
+          .demo-13-7 summary {
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            color: oklch(25% 0.02 264);
+            background: oklch(98% 0.003 264);
+            border-radius: 0.5rem;
+            list-style: none;
+          }
+          .demo-13-7 details[open] summary {
+            border-radius: 0.5rem 0.5rem 0 0;
+            border-block-end: 1px solid oklch(92% 0.008 264);
+          }
+          .demo-13-7 ::details-content {
+            block-size: 0;
+            overflow: hidden;
+            transition: block-size 0.3s ease-out, content-visibility 0.3s allow-discrete;
+          }
+          .demo-13-7 details[open]::details-content {
+            block-size: auto;
+          }
+          .demo-13-7 .answer {
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: oklch(38% 0.015 264);
+          }
+        </style>
+        <div class="demo-13-7">
+          <details>
+            <summary>What is the ::details-content pseudo-element?</summary>
+            <div class="answer">It targets the content area of a details element — everything except the summary. It enables direct styling and animation of the disclosure content without wrapper elements.</div>
+          </details>
+          <details>
+            <summary>Does it replace wrapper divs in accordions?</summary>
+            <div class="answer">Yes. Previously you needed a wrapper div around the content to set overflow, height, and transitions. The pseudo-element targets that anonymous box directly, making the wrapper optional.</div>
+          </details>
+          <details open>
+            <summary>How does it work with interpolate-size?</summary>
+            <div class="answer">Set <code>interpolate-size: allow-keywords</code> on a parent, then transition <code>block-size</code> from 0 to auto on the pseudo-element. The browser smoothly interpolates between the values. Without interpolate-size, you cannot transition to auto — the pseudo-element alone is not enough.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline" aria-label="Try it yourself">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="accordion"&gt;
+  &lt;details&gt;
+    &lt;summary&gt;Getting started&lt;/summary&gt;
+    &lt;p&gt;Install the package with npm, import the CSS into your main stylesheet, and add the layer declaration to your cascade order. You are up and running in under a minute.&lt;/p&gt;
+  &lt;/details&gt;
+  &lt;details&gt;
+    &lt;summary&gt;Configuration options&lt;/summary&gt;
+    &lt;p&gt;Override any design token by redeclaring it in your own tokens layer. The component layer reads from token custom properties, so changes propagate automatically. No class overrides needed.&lt;/p&gt;
+  &lt;/details&gt;
+  &lt;details&gt;
+    &lt;summary&gt;Browser support&lt;/summary&gt;
+    &lt;p&gt;The animated accordion works in Chrome 131+. In other browsers the details element still functions correctly — it opens and closes instantly. The animation is a pure progressive enhancement.&lt;/p&gt;
+  &lt;/details&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Animated accordion using ::details-content */
+.accordion {
+  interpolate-size: allow-keywords;
+  font-family: system-ui, sans-serif;
+  max-width: 32rem;
+}
+
+details {
+  border: 1px solid oklch(88% 0.01 264);
+  border-radius: 0.5rem;
+  margin-block-end: 0.5rem;
+}
+
+summary {
+  padding: 0.875rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  color: oklch(25% 0.02 264);
+  background: oklch(97% 0.005 264);
+  border-radius: 0.5rem;
+  list-style: none;
+}
+
+details[open] summary {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition: block-size 0.35s ease-out,
+              content-visibility 0.35s allow-discrete;
+}
+
+details[open]::details-content {
+  block-size: auto;
+}
+
+details p {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: oklch(38% 0.015 264);
+}
+
+/* Fallback for browsers without support */
+@supports not selector(::details-content) {
+  ::details-content {
+    block-size: auto;
+    overflow: visible;
+    transition: none;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add an opacity transition alongside the block-size transition: start at <code>opacity: 0</code> on the closed state and transition to <code>opacity: 1</code> when open. The content should fade in as it expands. Then add a subtle background color to the open summary using <code>details[open] summary</code> to give visual feedback about which panel is active.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.6-field-sizing.html">&larr; Lesson 13.6</a>
+      <a href="./lesson-13.8-cross-document-view-transitions.html">Lesson 13.8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
