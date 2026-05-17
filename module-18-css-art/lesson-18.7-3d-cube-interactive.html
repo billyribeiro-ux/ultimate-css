@@ -51,6 +51,21 @@
 
       <h2>Explode and wireframe modes</h2>
       <p>Explode view increases <code>translateZ</code> on each face via a transition. Wireframe mode sets <code>background: transparent</code> and adds a visible <code>border</code>. Both are toggled with CSS-only checkboxes.</p>
+
+      <h2>Perspective distance</h2>
+      <p>The <code>perspective</code> value controls how dramatic the 3D effect appears. Lower values (300-500px) create strong foreshortening — faces closer to the viewer appear much larger. Higher values (1000-2000px) produce a flatter, more isometric look. 800px is a good middle ground for a cube this size.</p>
+
+      <h2>Backface visibility</h2>
+      <p>By default, <code>backface-visibility: visible</code> means you see the back of each face when it rotates away. Setting it to <code>hidden</code> makes faces disappear when facing away, which is useful for card-flip effects but looks odd on cubes where you expect to see through to inner faces.</p>
+
+      <h2>Face content and styling</h2>
+      <p>Each face can contain any HTML content — text, images, nested layouts. The content rotates with the face naturally. Using different OKLCH hues for each face (spaced 60 degrees apart on the hue wheel) creates a harmonious palette that helps distinguish faces during rotation.</p>
+
+      <h2>CSS-only controls with :has()</h2>
+      <p>The <code>:has()</code> selector lets us place checkboxes anywhere in the DOM and still affect the cube. The pattern <code>.demo:has(#checkbox:checked) .cube</code> selects the cube when the checkbox is checked, regardless of their DOM relationship. This is more flexible than the older sibling combinator approach.</p>
+
+      <h2>Performance considerations</h2>
+      <p>3D transforms are GPU-accelerated in all modern browsers. However, <code>preserve-3d</code> contexts create new stacking contexts and can interfere with <code>overflow: hidden</code> on parent elements. Test 3D effects on mobile where GPU memory may be more constrained.</p>
     </section>
 
     <section class="demo">
