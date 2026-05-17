@@ -113,6 +113,16 @@
         <li><code>grid-template-areas</code> cannot be animated — only the track sizes change</li>
         <li>Performance is good for small grids; avoid animating grids with 50+ items</li>
       </ul>
+
+      <h2>The interpolate-size property</h2>
+      <p>For animating between <code>auto</code> and a fixed size, use <code>interpolate-size: allow-keywords</code> on the container. This enables transitions like <code>grid-template-rows: auto</code> to <code>grid-template-rows: 0</code> that would otherwise snap:</p>
+      <pre><code>.grid {
+  interpolate-size: allow-keywords;
+  transition: grid-template-rows 300ms;
+}</code></pre>
+
+      <h2>Combining with view transitions</h2>
+      <p>Grid animations pair well with the View Transitions API for page-level layout morphs. The grid handles the structural change; view transitions handle the cross-fade and element continuity.</p>
     </section>
 
     <section class="demo">
