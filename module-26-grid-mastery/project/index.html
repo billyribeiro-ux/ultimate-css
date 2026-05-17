@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project — Grid Layout Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+  <style>
+    /* ===== Page-level grid layout ===== */
+    .demo-26-project {
+      --color-primary: oklch(55% 0.2 275);
+      --color-surface: oklch(97% 0.01 275);
+      --color-surface-alt: oklch(93% 0.02 275);
+      --color-text: oklch(20% 0.02 275);
+      --color-muted: oklch(55% 0 0);
+      --radius: 0.75rem;
+
+      font-family: system-ui, sans-serif;
+      color: var(--color-text);
+      min-height: 100vh;
+
+      display: grid;
+      grid-template-columns: [full-start] 1fr [content-start] min(72rem, 100%) [content-end] 1fr [full-end];
+      grid-template-rows: auto 1fr auto;
+    }
+
+    .demo-26-project > * {
+      grid-column: content;
+    }
+
+    /* ===== Header (full bleed) ===== */
+    .project-header {
+      grid-column: full;
+      background: var(--color-primary);
+      color: white;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: subgrid;
+    }
+    .project-header .inner {
+      grid-column: content;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .project-header h1 { font-size: 1.25rem; margin: 0; }
+    .project-header nav { display: flex; gap: 1.5rem; font-size: 0.85rem; }
+    .project-header nav a { color: oklch(92% 0.05 275); text-decoration: none; }
+    .project-header nav a:hover { color: white; }
+
+    /* ===== Main content: named areas ===== */
+    .project-main {
+      display: grid;
+      grid-template-columns: 14rem 1fr;
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        "sidebar hero"
+        "sidebar cards"
+        "sidebar gallery";
+      gap: 1.5rem;
+      padding: 2rem 0;
+    }
+
+    @media (max-width: 52rem) {
+      .project-main {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "hero"
+          "cards"
+          "gallery"
+          "sidebar";
+      }
+    }
+
+    /* ===== Sidebar ===== */
+    .project-sidebar {
+      grid-area: sidebar;
+      display: grid;
+      gap: 0.75rem;
+      align-content: start;
+    }
+    .project-sidebar .nav-item {
+      padding: 0.6rem 1rem;
+      background: var(--color-surface-alt);
+      border-radius: 0.375rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .project-sidebar .nav-item.active {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    /* ===== Hero (overlap pattern) ===== */
+    .project-hero {
+      grid-area: hero;
+      display: grid;
+      border-radius: var(--radius);
+      overflow: hidden;
+      min-height: 10rem;
+    }
+    .project-hero > * { grid-area: 1 / 1; }
+    .project-hero .hero-bg {
+      background: linear-gradient(135deg, oklch(60% 0.2 275), oklch(50% 0.18 220));
+    }
+    .project-hero .hero-content {
+      align-self: end;
+      padding: 1.5rem;
+      background: linear-gradient(to top, oklch(0% 0 0 / 0.5), transparent);
+      color: white;
+    }
+    .project-hero .hero-content h2 { margin: 0 0 0.25rem; font-size: 1.1rem; }
+    .project-hero .hero-content p { margin: 0; font-size: 0.8rem; opacity: 0.85; }
+
+    /* ===== Card section (auto-fit + subgrid) ===== */
+    .project-cards {
+      grid-area: cards;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+      grid-template-rows: auto 1fr auto;
+      gap: 1rem;
+    }
+    .project-card {
+      grid-row: span 3;
+      display: grid;
+      grid-template-rows: subgrid;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: var(--color-surface);
+      border: 1px solid oklch(90% 0.02 275);
+      border-radius: var(--radius);
+    }
+    .project-card h3 { margin: 0; font-size: 0.9rem; }
+    .project-card p { margin: 0; font-size: 0.78rem; color: var(--color-muted); }
+    .project-card .card-cta {
+      align-self: end;
+      display: inline-block;
+      padding: 0.4rem 0.75rem;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 0.375rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    /* ===== Gallery (dense packing) ===== */
+    .project-gallery {
+      grid-area: gallery;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 4rem;
+      grid-auto-flow: dense;
+      gap: 0.5rem;
+    }
+    .project-gallery .tile {
+      border-radius: 0.5rem;
+      display: grid;
+      place-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: white;
+    }
+    .project-gallery .tile:nth-child(1) { background: oklch(62% 0.15 275); grid-column: span 2; grid-row: span 2; }
+    .project-gallery .tile:nth-child(2) { background: oklch(62% 0.15 160); }
+    .project-gallery .tile:nth-child(3) { background: oklch(62% 0.15 30); grid-row: span 2; }
+    .project-gallery .tile:nth-child(4) { background: oklch(62% 0.15 200); }
+    .project-gallery .tile:nth-child(5) { background: oklch(62% 0.15 60); grid-column: span 2; }
+    .project-gallery .tile:nth-child(6) { background: oklch(62% 0.12 310); }
+    .project-gallery .tile:nth-child(7) { background: oklch(62% 0.12 120); }
+    .project-gallery .tile:nth-child(8) { background: oklch(62% 0.15 250); grid-column: span 2; }
+
+    @media (max-width: 52rem) {
+      .project-gallery { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ===== Footer (full bleed, animated tracks) ===== */
+    .project-footer {
+      grid-column: full;
+      background: oklch(15% 0.05 275);
+      color: oklch(80% 0.03 275);
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: subgrid;
+    }
+    .project-footer .inner {
+      grid-column: content;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+      gap: 1.5rem;
+      font-size: 0.8rem;
+    }
+    .project-footer h4 { margin: 0 0 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: oklch(60% 0.05 275); }
+    .project-footer ul { list-style: none; padding: 0; margin: 0; }
+    .project-footer li { padding: 0.2rem 0; }
+    .project-footer a { color: oklch(80% 0.03 275); text-decoration: none; }
+    .project-footer a:hover { color: white; }
+
+    /* ===== Sidebar collapse animation ===== */
+    .project-main {
+      transition: grid-template-columns 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .project-main.sidebar-collapsed {
+      grid-template-columns: 0fr 1fr;
+    }
+    .project-sidebar {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .toggle-sidebar {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      z-index: 10;
+      box-shadow: 0 0.25rem 1rem oklch(0% 0 0 / 0.2);
+    }
+    .toggle-sidebar:hover {
+      background: oklch(48% 0.22 275);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 26</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 26 · Project</p>
+      <h1>Grid Layout Showcase</h1>
+      <p class="lead">A complete page built entirely with CSS Grid at every level: the page layout uses full-bleed columns, the main section uses named areas, cards use subgrid, and the gallery uses dense auto-placement. The sidebar collapses with an animated grid track transition.</p>
+    </header>
+
+    <section class="demo">
+      <h2>Complete Grid Showcase</h2>
+      <div class="demo-frame" style="padding:0">
+        <div class="demo-26-project">
+          <!-- Header: full-bleed with subgrid -->
+          <header class="project-header">
+            <div class="inner">
+              <h1>GridShowcase</h1>
+              <nav>
+                <a href="#">Dashboard</a>
+                <a href="#">Projects</a>
+                <a href="#">Settings</a>
+              </nav>
+            </div>
+          </header>
+
+          <!-- Main: named areas layout -->
+          <section class="project-main" id="project-main">
+            <!-- Sidebar -->
+            <aside class="project-sidebar">
+              <div class="nav-item active">Overview</div>
+              <div class="nav-item">Analytics</div>
+              <div class="nav-item">Reports</div>
+              <div class="nav-item">Team</div>
+              <div class="nav-item">Billing</div>
+            </aside>
+
+            <!-- Hero: overlap pattern -->
+            <div class="project-hero">
+              <div class="hero-bg"></div>
+              <div class="hero-content">
+                <h2>Welcome to Grid Mastery</h2>
+                <p>Every technique from Module 26, composed into a single page layout.</p>
+              </div>
+            </div>
+
+            <!-- Cards: auto-fit + subgrid -->
+            <div class="project-cards">
+              <div class="project-card">
+                <h3>Named Areas</h3>
+                <p>This page layout uses grid-template-areas for the main section structure.</p>
+                <a href="#" class="card-cta">Lesson 26.3</a>
+              </div>
+              <div class="project-card">
+                <h3>Subgrid Alignment</h3>
+                <p>These cards use subgrid so headings, descriptions, and CTAs all align horizontally across cards.</p>
+                <a href="#" class="card-cta">Lesson 26.7</a>
+              </div>
+              <div class="project-card">
+                <h3>Dense Packing</h3>
+                <p>The gallery below uses grid-auto-flow: dense for a mosaic layout with no gaps.</p>
+                <a href="#" class="card-cta">Lesson 26.6</a>
+              </div>
+            </div>
+
+            <!-- Gallery: dense packing -->
+            <div class="project-gallery">
+              <div class="tile">Featured</div>
+              <div class="tile">Photo</div>
+              <div class="tile">Tall</div>
+              <div class="tile">Square</div>
+              <div class="tile">Wide</div>
+              <div class="tile">Small</div>
+              <div class="tile">Small</div>
+              <div class="tile">Banner</div>
+            </div>
+          </section>
+
+          <!-- Footer: full-bleed with auto-fit -->
+          <footer class="project-footer">
+            <div class="inner">
+              <div>
+                <h4>Grid Techniques</h4>
+                <ul>
+                  <li>Full-bleed columns</li>
+                  <li>Named areas</li>
+                  <li>Subgrid</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Patterns Used</h4>
+                <ul>
+                  <li>Dense packing</li>
+                  <li>Overlap (no absolute)</li>
+                  <li>Auto-fit responsive</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Animations</h4>
+                <ul>
+                  <li>Sidebar collapse</li>
+                  <li>Track interpolation</li>
+                  <li>Gap transitions</li>
+                </ul>
+              </div>
+            </div>
+          </footer>
+        </div>
+
+        <!-- Toggle button for sidebar animation -->
+        <button class="toggle-sidebar" onclick="document.getElementById('project-main').classList.toggle('sidebar-collapsed')" aria-label="Toggle sidebar">&#9776;</button>
+      </div>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Techniques demonstrated</h2>
+      <ul>
+        <li><strong>Page grid</strong> — full-bleed columns pattern (<code>1fr min(72rem, 100%) 1fr</code>)</li>
+        <li><strong>Header/footer</strong> — span full width with subgrid for content alignment</li>
+        <li><strong>Named areas</strong> — sidebar/hero/cards/gallery structure</li>
+        <li><strong>Subgrid</strong> — card headings, descriptions, and CTAs align across siblings</li>
+        <li><strong>Auto-fit</strong> — cards and footer columns respond to available width</li>
+        <li><strong>Dense packing</strong> — gallery tiles fill all available space</li>
+        <li><strong>Overlap</strong> — hero image with text overlay, no position:absolute</li>
+        <li><strong>Animated tracks</strong> — sidebar collapses with grid-template-columns transition</li>
+      </ul>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-26.12-grid-recipes.html">← Lesson 26.12</a>
+      <a href="../index.html">Module 26 →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

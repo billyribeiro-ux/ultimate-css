@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25.10 — Custom Property Anti-Patterns · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 25</a>
+      <span>Lesson 25.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 25.10 · Custom Properties</p>
+      <h1>Custom Property Anti-Patterns</h1>
+      <p class="lead">Custom properties are powerful, but misuse creates maintenance nightmares. Here are the six most common mistakes — with before/after examples showing the fix for each one.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>1. Too many properties on :root</h2>
+      <p>Declaring 30+ custom properties on <code>:root</code> creates an unreadable wall of tokens with no organization or scoping.</p>
+      <h3>Before (bad)</h3>
+      <pre><code>:root {
+  --color-primary: oklch(55% 0.22 275);
+  --color-primary-light: oklch(70% 0.15 275);
+  --color-primary-dark: oklch(40% 0.18 275);
+  --color-secondary: oklch(55% 0.15 150);
+  --color-secondary-light: oklch(70% 0.1 150);
+  /* ...25 more lines... */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  /* ...and so on... */
+}</code></pre>
+      <h3>After (fixed)</h3>
+      <pre><code>/* Group by system, derive from base values */
+:root {
+  --hue-primary: 275;
+  --hue-secondary: 150;
+  --space-unit: 0.25rem;
+}
+/* Component-level derivation */
+.btn {
+  --btn-bg: oklch(55% 0.22 var(--hue-primary));
+  --btn-spacing: calc(var(--space-unit) * 3);
+}</code></pre>
+      <p>Keep <code>:root</code> to base inputs (hues, units, multipliers). Derive everything else at the component level.</p>
+
+      <h2>2. Using custom properties for everything</h2>
+      <p>Not every value needs to be a token. Static values that never change and are used once gain nothing from abstraction.</p>
+      <h3>Before (bad)</h3>
+      <pre><code>.tooltip {
+  --tooltip-z: 1000;
+  --tooltip-arrow-size: 6px;
+  --tooltip-max-width: 200px;
+  z-index: var(--tooltip-z);
+  max-width: var(--tooltip-max-width);
+}</code></pre>
+      <h3>After (fixed)</h3>
+      <pre><code>.tooltip {
+  z-index: 1000;          /* never changes */
+  max-width: 200px;       /* never overridden */
+  --tooltip-bg: oklch(20% 0.02 0); /* this one IS themeable */
+  background: var(--tooltip-bg);
+}</code></pre>
+      <p>Only create a custom property if the value is: themed, responsive, shared between elements, or overridden by variants.</p>
+
+      <h2>3. Deep fallback chains</h2>
+      <p>Three or more nested <code>var()</code> calls make debugging which value is active nearly impossible.</p>
+      <h3>Before (bad)</h3>
+      <pre><code>background: var(--card-bg,
+  var(--section-bg,
+    var(--page-bg,
+      var(--surface,
+        oklch(98% 0.01 275)))));</code></pre>
+      <h3>After (fixed)</h3>
+      <pre><code>/* Resolve at definition, not at usage */
+.card {
+  --_bg: var(--card-bg, var(--surface, oklch(98% 0.01 275)));
+  background: var(--_bg);
+}</code></pre>
+      <p>Limit to 2 levels. Use a private property (<code>--_</code> prefix) to pre-resolve the chain.</p>
+
+      <h2>4. Relying on IACVT behavior intentionally</h2>
+      <p>Some developers use "invalid at computed-value time" as a feature — setting a property to a wrong type to trigger the initial value. This is fragile and confusing.</p>
+      <h3>Before (bad)</h3>
+      <pre><code>/* "Trick" to reset to initial by setting wrong type */
+.hidden { --display: not-a-display-value; }
+.box { display: var(--display, flex); }
+/* When .hidden: IACVT → display inherits → unpredictable */</code></pre>
+      <h3>After (fixed)</h3>
+      <pre><code>/* Explicit state with clear values */
+.box { --show: 1; }
+.box.hidden { --show: 0; }
+.box { display: flex; opacity: var(--show); }</code></pre>
+      <p>Never rely on IACVT for logic. Use explicit values and the space toggle if you need binary state.</p>
+
+      <h2>5. Setting properties in keyframe animations</h2>
+      <p>Animating custom properties inside <code>@keyframes</code> without <code>@property</code> registration causes style recalculation on every frame for all consumers.</p>
+      <h3>Before (bad)</h3>
+      <pre><code>@keyframes pulse {
+  0%   { --scale: 1; }
+  50%  { --scale: 1.2; }
+  100% { --scale: 1; }
+}
+/* Browser can't interpolate — snaps between values */</code></pre>
+      <h3>After (fixed)</h3>
+      <pre><code>@property --scale {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 1;
+}
+@keyframes pulse {
+  50% { --scale: 1.2; }
+}
+/* Now the browser interpolates smoothly */</code></pre>
+
+      <h2>6. Forgetting @property for animated properties</h2>
+      <p>Without registration, the browser treats custom properties as strings. Transitions and animations on unregistered properties produce no interpolation — they snap instantly from one value to another.</p>
+      <h3>Before (bad)</h3>
+      <pre><code>.progress {
+  --value: 0;
+  width: calc(var(--value) * 100%);
+  transition: width 0.3s;
+  /* Transition works on width, but if you transition --value
+     directly, it snaps without @property */
+}</code></pre>
+      <h3>After (fixed)</h3>
+      <pre><code>@property --value {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 0;
+}
+.progress {
+  --value: 0;
+  width: calc(var(--value) * 100%);
+  transition: --value 0.3s;
+}
+.progress.full { --value: 1; }
+/* Smooth interpolation of the custom property itself */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Summary reference</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-25-10 {
+            padding: 1.5rem;
+            font-family: system-ui;
+          }
+          .demo-25-10 .anti-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 0.75rem;
+          }
+          .demo-25-10 .anti-item {
+            display: grid;
+            grid-template-columns: 2.5rem 1fr;
+            gap: 0.75rem;
+            align-items: start;
+            padding: 0.75rem;
+            background: oklch(97% 0.01 0);
+            border: 1px solid oklch(90% 0.02 0);
+            border-radius: 0.5rem;
+          }
+          .demo-25-10 .anti-num {
+            display: grid;
+            place-items: center;
+            inline-size: 2rem;
+            block-size: 2rem;
+            background: oklch(55% 0.2 25);
+            color: oklch(100% 0 0);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.85rem;
+          }
+          .demo-25-10 .anti-text strong {
+            display: block;
+            font-size: 0.85rem;
+            margin-block-end: 0.2rem;
+            color: oklch(25% 0.05 0);
+          }
+          .demo-25-10 .anti-text span {
+            font-size: 0.78rem;
+            color: oklch(45% 0 0);
+          }
+        </style>
+        <div class="demo-25-10">
+          <ul class="anti-list">
+            <li class="anti-item">
+              <span class="anti-num">1</span>
+              <div class="anti-text">
+                <strong>Too many :root properties</strong>
+                <span>Keep :root to base inputs. Derive at component level.</span>
+              </div>
+            </li>
+            <li class="anti-item">
+              <span class="anti-num">2</span>
+              <div class="anti-text">
+                <strong>Abstracting static values</strong>
+                <span>Only tokenize values that are themed, shared, or overridden.</span>
+              </div>
+            </li>
+            <li class="anti-item">
+              <span class="anti-num">3</span>
+              <div class="anti-text">
+                <strong>Deep fallback chains (3+ levels)</strong>
+                <span>Limit to 2 levels. Pre-resolve with a private property.</span>
+              </div>
+            </li>
+            <li class="anti-item">
+              <span class="anti-num">4</span>
+              <div class="anti-text">
+                <strong>Intentional IACVT abuse</strong>
+                <span>Use explicit values or the space toggle for binary state.</span>
+              </div>
+            </li>
+            <li class="anti-item">
+              <span class="anti-num">5</span>
+              <div class="anti-text">
+                <strong>Animating without @property</strong>
+                <span>Register properties for smooth interpolation in keyframes.</span>
+              </div>
+            </li>
+            <li class="anti-item">
+              <span class="anti-num">6</span>
+              <div class="anti-text">
+                <strong>Forgetting @property for transitions</strong>
+                <span>Unregistered properties snap; registered ones interpolate.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>Custom properties are a tool for communication and reactivity — not a replacement for every hardcoded value. Use them where they add flexibility (theming, state, responsive values) and leave static values as plain CSS. Register animated properties with <code>@property</code>. Keep fallback chains shallow. Your future self (and teammates) will thank you.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-25.9-cross-component-communication.html">← Lesson 25.9</a>
+      <a href="./project/index.html">Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

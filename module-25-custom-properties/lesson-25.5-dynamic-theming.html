@@ -77,6 +77,28 @@ body {
       <pre><code>&lt;input type="range" min="0" max="360" value="275"
   oninput="document.documentElement.style.setProperty('--hue', this.value)"&gt;</code></pre>
       <p>Everything recolors instantly because all colors reference <code>var(--hue)</code>.</p>
+
+      <h2>Beyond hue: multi-axis theming</h2>
+      <p>Add more axes for richer theme control:</p>
+      <pre><code>:root {
+  --hue: 275;        /* brand color axis */
+  --chroma: 0.22;    /* saturation axis */
+  --contrast: 1;     /* accessibility axis */
+}
+--primary: oklch(
+  calc(55% * var(--contrast))
+  var(--chroma)
+  var(--hue)
+);</code></pre>
+      <p>A "high contrast" mode increases <code>--contrast</code> to 1.2, making colors more vivid and lightness differences more pronounced. A "desaturated" mode drops <code>--chroma</code> to 0.05. All from CSS alone.</p>
+
+      <h2>Persisting user preferences</h2>
+      <p>Store the hue value in <code>localStorage</code>. On page load, read it back and set the property. This gives users persistent personalization with one line of JS and zero backend:</p>
+      <pre><code>// On input change
+localStorage.setItem('theme-hue', value);
+// On page load
+const hue = localStorage.getItem('theme-hue') || '275';
+document.documentElement.style.setProperty('--hue', hue);</code></pre>
     </section>
 
     <section class="demo">

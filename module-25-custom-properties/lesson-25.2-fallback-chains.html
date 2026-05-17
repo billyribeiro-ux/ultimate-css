@@ -68,12 +68,29 @@
       </ul>
       <p>This is why <code>@property</code> registration matters: it lets the browser validate the type at parse time rather than failing silently at computed-value time.</p>
 
-      <h2>Best practices</h2>
-      <p>Keep fallback chains to 2 levels maximum. Beyond that, debugging which value is active becomes impractical. If you need more specificity, define intermediate variables:</p>
+      <h2>The @property safety net</h2>
+      <p>Register your custom properties with <code>@property</code> to avoid IACVT surprises. Registered properties validate the value at parse time:</p>
+      <pre><code>@property --card-bg {
+  syntax: "&lt;color&gt;";
+  inherits: true;
+  initial-value: oklch(98% 0.01 275);
+}
+/* Now "not-a-color" is rejected at parse time,
+   and the initial-value kicks in instead of IACVT */</code></pre>
+
+      <h2>Fallback strategies by use case</h2>
+      <p><strong>Component tokens:</strong> Use a component-level fallback referencing a system token:</p>
+      <pre><code>.card { background: var(--card-bg, var(--surface)); }</code></pre>
+      <p><strong>System tokens:</strong> Provide a literal at the end of the chain:</p>
+      <pre><code>:root { --surface: var(--theme-surface, oklch(98% 0.01 275)); }</code></pre>
+      <p><strong>Derived values:</strong> Use private properties to pre-resolve complex chains:</p>
       <pre><code>.card {
   --_bg: var(--card-bg, var(--surface, oklch(98% 0.01 275)));
   background: var(--_bg);
 }</code></pre>
+
+      <h2>Best practices</h2>
+      <p>Keep fallback chains to 2 levels maximum. Beyond that, debugging which value is active becomes impractical. Use private properties (prefixed with <code>--_</code>) for intermediate resolution. Always end a chain with a concrete literal value. Document the fallback priority in comments for future maintainers.</p>
     </section>
 
     <section class="demo">
@@ -185,6 +202,17 @@
         <button class="btn" type="button" data-editor-action="run">Run</button>
         <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
       </div>
+    </section>
+
+    <section class="callout">
+      <h2>Quick reference: fallback resolution</h2>
+      <ul>
+        <li><code>var(--a)</code> — no fallback. If missing: IACVT.</li>
+        <li><code>var(--a, red)</code> — fallback to literal if <code>--a</code> is missing.</li>
+        <li><code>var(--a, var(--b, red))</code> — chain: try a, then b, then literal.</li>
+        <li>A property set to <code>initial</code> is "guaranteed invalid" — treated as missing.</li>
+        <li>A property set to any other value is "defined" — even if incompatible with usage site.</li>
+      </ul>
     </section>
 
     <section class="callout">

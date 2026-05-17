@@ -86,6 +86,18 @@
 .space-2 { padding: calc(var(--base) * var(--scale)); }
 .space-3 { padding: calc(var(--base) * var(--scale) * var(--scale)); }
 /* Geometric progression: 0.25, 0.5, 1, 2, 4... */</code></pre>
+
+      <h2>The min/max safety pattern</h2>
+      <p>When using density multipliers, prevent values from going too small or too large:</p>
+      <pre><code>.card {
+  padding: max(0.5rem, calc(var(--density) * 1.5rem));
+  font-size: clamp(0.75rem, calc(var(--density) * 1rem), 1.25rem);
+  border-radius: min(calc(var(--density) * 1rem), 1.5rem);
+}</code></pre>
+      <p>The <code>clamp()</code>, <code>min()</code>, and <code>max()</code> functions act as guardrails, ensuring computed values stay within usable ranges regardless of the input.</p>
+
+      <h2>Performance considerations</h2>
+      <p>Custom properties with <code>calc()</code> are resolved at computed-value time. For most layouts, this is instant. However, if a single property change triggers recalculation of hundreds of elements (e.g., <code>--density</code> on <code>:root</code> consumed by 200 elements), be aware of potential frame drops during rapid input changes. Consider using <code>will-change</code> or debouncing for extreme cases.</p>
     </section>
 
     <section class="demo">

@@ -79,6 +79,18 @@
 
       <h2>Transition-friendly</h2>
       <p>Because the visual properties read from custom properties, transitions on <code>background</code>, <code>color</code>, <code>transform</code>, and <code>opacity</code> animate between states smoothly. Register properties with <code>@property</code> for interpolation control.</p>
+
+      <h2>Composability</h2>
+      <p>State machines compose: a card component can have its own states (collapsed, expanded, highlighted) while living inside a section that has states (loading, error). Each manages its own properties independently:</p>
+      <pre><code>.section         { --section-state: default; }
+.section.loading { --section-state: loading; }
+
+.card            { --card-state: default; }
+.card.expanded   { --card-state: expanded; }</code></pre>
+      <p>No conflicts because each component reads only its own prefixed properties. The naming convention acts as a namespace.</p>
+
+      <h2>When to use this pattern</h2>
+      <p>Use state machines when a component has 3+ visual states that affect multiple properties simultaneously. For simple hover/active effects, direct pseudo-class rules are clearer. The state machine shines when states are toggled by JS, when multiple visual properties change together, and when you want DevTools inspection to reveal the current state at a glance.</p>
     </section>
 
     <section class="demo">

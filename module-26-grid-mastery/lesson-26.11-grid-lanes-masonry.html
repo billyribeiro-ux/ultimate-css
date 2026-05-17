@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.11 — Grid Lanes (Masonry) Layout · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.11 · Layout</p>
+      <h1>Grid Lanes (Masonry) Layout</h1>
+      <p class="lead">The masonry layout — where items pack into the shortest column like Pinterest — is coming to CSS Grid natively. Items of varying heights fill vertical space without gaps, creating the dense, organic layout previously only possible with JavaScript.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The native syntax</h2>
+      <pre><code>.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  grid-template-rows: masonry;
+}</code></pre>
+      <p>When <code>grid-template-rows: masonry</code> is set, items no longer align to row tracks. Instead, each item packs into the shortest column, creating a masonry effect.</p>
+
+      <h3>Browser support</h3>
+      <p>As of 2026, masonry is supported in Safari 26+ and behind flags in other browsers. The CSS Grid Level 3 specification defines this behavior. Always provide a fallback.</p>
+
+      <h2>The @supports fallback strategy</h2>
+      <pre><code>/* Fallback: standard grid (items align to rows) */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+/* Enhanced: masonry where supported */
+@supports (grid-template-rows: masonry) {
+  .gallery {
+    grid-template-rows: masonry;
+  }
+}</code></pre>
+
+      <h3>CSS columns fallback</h3>
+      <p>For browsers without grid masonry, CSS columns provide a similar visual result:</p>
+      <pre><code>/* Fallback with columns */
+.gallery {
+  columns: 14rem;
+  column-gap: 1rem;
+}
+.gallery > * {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+
+/* Upgrade to grid masonry */
+@supports (grid-template-rows: masonry) {
+  .gallery {
+    columns: unset;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    grid-template-rows: masonry;
+    gap: 1rem;
+  }
+  .gallery > * { margin-bottom: 0; }
+}</code></pre>
+
+      <h2>Key differences from JS masonry</h2>
+      <ul>
+        <li>No layout shift — browser calculates positions before paint</li>
+        <li>Works with all grid features (spans, alignment, auto-fit)</li>
+        <li>Respects <code>order</code> property</li>
+        <li>No resize observers or mutation observers needed</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Masonry gallery with @supports fallback</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-11 {
+            font-family: system-ui;
+            padding: 1rem;
+          }
+          .demo-26-11 .gallery {
+            columns: 8rem;
+            column-gap: 0.5rem;
+          }
+          .demo-26-11 .gallery .item {
+            break-inside: avoid;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+          }
+          .demo-26-11 .gallery .item:nth-child(1) { height: 6rem; background: oklch(60% 0.18 275); }
+          .demo-26-11 .gallery .item:nth-child(2) { height: 4rem; background: oklch(60% 0.15 200); }
+          .demo-26-11 .gallery .item:nth-child(3) { height: 8rem; background: oklch(60% 0.15 160); }
+          .demo-26-11 .gallery .item:nth-child(4) { height: 5rem; background: oklch(60% 0.18 30); }
+          .demo-26-11 .gallery .item:nth-child(5) { height: 7rem; background: oklch(60% 0.15 60); }
+          .demo-26-11 .gallery .item:nth-child(6) { height: 4rem; background: oklch(60% 0.18 310); }
+          .demo-26-11 .gallery .item:nth-child(7) { height: 6rem; background: oklch(60% 0.12 120); }
+          .demo-26-11 .gallery .item:nth-child(8) { height: 5rem; background: oklch(60% 0.15 250); }
+          .demo-26-11 .gallery .item:nth-child(9) { height: 7rem; background: oklch(60% 0.18 80); }
+
+          @supports (grid-template-rows: masonry) {
+            .demo-26-11 .gallery {
+              columns: unset;
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+              grid-template-rows: masonry;
+              gap: 0.5rem;
+            }
+            .demo-26-11 .gallery .item {
+              margin-bottom: 0;
+            }
+          }
+        </style>
+        <div class="demo-26-11">
+          <div class="gallery">
+            <div class="item">1</div>
+            <div class="item">2</div>
+            <div class="item">3</div>
+            <div class="item">4</div>
+            <div class="item">5</div>
+            <div class="item">6</div>
+            <div class="item">7</div>
+            <div class="item">8</div>
+            <div class="item">9</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="gallery"&gt;
+  &lt;div class="item" style="height:8rem"&gt;1&lt;/div&gt;
+  &lt;div class="item" style="height:5rem"&gt;2&lt;/div&gt;
+  &lt;div class="item" style="height:10rem"&gt;3&lt;/div&gt;
+  &lt;div class="item" style="height:6rem"&gt;4&lt;/div&gt;
+  &lt;div class="item" style="height:9rem"&gt;5&lt;/div&gt;
+  &lt;div class="item" style="height:4rem"&gt;6&lt;/div&gt;
+  &lt;div class="item" style="height:7rem"&gt;7&lt;/div&gt;
+  &lt;div class="item" style="height:5rem"&gt;8&lt;/div&gt;
+  &lt;div class="item" style="height:8rem"&gt;9&lt;/div&gt;
+  &lt;div class="item" style="height:6rem"&gt;10&lt;/div&gt;
+  &lt;div class="item" style="height:4rem"&gt;11&lt;/div&gt;
+  &lt;div class="item" style="height:9rem"&gt;12&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; margin: 0; }
+
+/* Fallback: CSS columns */
+.gallery {
+  columns: 12rem;
+  column-gap: 0.75rem;
+}
+
+.item {
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+  background: oklch(60% 0.18 275);
+}
+.item:nth-child(even) { background: oklch(60% 0.15 160); }
+.item:nth-child(3n) { background: oklch(60% 0.18 30); }
+
+/* Upgrade: native masonry */
+@supports (grid-template-rows: masonry) {
+  .gallery {
+    columns: unset;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    grid-template-rows: masonry;
+    gap: 0.75rem;
+  }
+  .item { margin-bottom: 0; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>The demo uses CSS columns as a fallback. Open the browser DevTools and force the <code>@supports</code> block to apply (if your browser supports it). Notice the items may reorder differently between columns and masonry. Try adding more items with varying heights to see how both approaches handle them.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.10-grid-animations.html">← Lesson 26.10</a>
+      <a href="./lesson-26.12-grid-recipes.html">Lesson 26.12 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

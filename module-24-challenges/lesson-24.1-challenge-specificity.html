@@ -43,6 +43,20 @@
       <h2>The scenario</h2>
       <p>A previous developer wrote CSS in no particular order. A card component has rules scattered across a utility file, a component file, and inline overrides. The result: the card looks nothing like the design. Your job is to wrap the existing rules in <code>@layer</code> declarations to establish the correct cascade order — without touching any selectors or adding <code>!important</code>.</p>
 
+      <h2>Why this matters</h2>
+      <p>Specificity wars are the number-one source of CSS frustration in large codebases. Before <code>@layer</code>, the only solutions were: increase specificity (leading to escalation), use <code>!important</code> (leading to <code>!important</code> wars), or restructure selectors (breaking other things). Cascade layers solve this architecturally — they let you control which origin wins regardless of specificity.</p>
+
+      <h2>The 6 conflicts</h2>
+      <p>In the starter code below, here's what's going wrong:</p>
+      <ol>
+        <li><strong>Background:</strong> <code>.page .card</code> (specificity 0,2,0) beats <code>.notification</code> (0,1,0) — the card shows grey instead of teal</li>
+        <li><strong>Text color:</strong> <code>.page .card</code> sets dark text, overriding <code>.notification</code>'s white</li>
+        <li><strong>Padding:</strong> <code>.card</code> (utility) sets small padding; <code>.notification</code> (component) wants larger padding, but source order gives <code>.card</code> precedence if specificity is tied</li>
+        <li><strong>Border-radius:</strong> Same issue — <code>.card</code> utility sets 0.25rem, component wants 1rem</li>
+        <li><strong>Font-size:</strong> The base layer's <code>.page .card</code> sets the correct font-size, but only if it isn't overridden by something else in a higher layer</li>
+        <li><strong>Box-shadow:</strong> The utility <code>.card</code> defines the shadow — it should survive the layering</li>
+      </ol>
+
       <h2>Constraints</h2>
       <ul>
         <li>You may ONLY add <code>@layer</code> declarations and the layer order statement</li>
@@ -53,15 +67,18 @@
         <li>All 6 conflicts must resolve to match the target</li>
       </ul>
 
+      <h2>Key concept: layer order vs. specificity</h2>
+      <p>When two declarations are in different layers, the layer order always wins — specificity is irrelevant. A selector with specificity 0,1,0 in a later layer beats 0,10,0 in an earlier layer. This is the fundamental insight: <code>@layer</code> adds a new dimension to the cascade that sits above specificity.</p>
+
       <h2>Target result</h2>
       <p>When correctly layered, the card should show:</p>
       <ul>
-        <li>Background: the teal color from the component layer</li>
+        <li>Background: the teal color (<code>oklch(55% 0.15 180)</code>) from the component layer</li>
         <li>Text color: white from the component layer</li>
-        <li>Padding: the larger padding from the component layer</li>
-        <li>Border-radius: the rounded corners from the component layer</li>
-        <li>Font-size: the size from the base layer</li>
-        <li>Box-shadow: the shadow from the utility layer</li>
+        <li>Padding: the larger padding (2rem 2.5rem) from the component layer</li>
+        <li>Border-radius: the rounded corners (1rem) from the component layer</li>
+        <li>Font-size: the 1rem size from the base layer (not overridden by components since components don't declare it)</li>
+        <li>Box-shadow: the shadow from the utility layer (not overridden by components since components don't declare it)</li>
       </ul>
     </section>
 
@@ -102,13 +119,36 @@
           }
         </style>
         <div class="demo-24-1">
-          <p class="label">Target rendering</p>
+          <p class="label">Target rendering (components layer wins)</p>
           <div class="target-card">
             <h3>Notification</h3>
             <p>Your changes have been saved successfully. The new settings will take effect immediately.</p>
           </div>
         </div>
       </div>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>How to approach this</h2>
+      <p>Look at the starter CSS below. There are three groups of rules, each labeled with a comment showing which "file" they originated from. Your task:</p>
+      <ol>
+        <li>First, add a layer order statement at the very top declaring the priority</li>
+        <li>Then wrap each group in its corresponding named layer</li>
+        <li>The page layout styles can go in any layer (base is logical)</li>
+      </ol>
+      <p>Remember: in the layer order, later layers have higher priority. So if you want components to win over utilities and base, declare: <code>@layer base, utilities, components;</code>. Properties that a higher layer doesn't declare simply fall through — lower layers still provide them.</p>
+
+      <h2>Testing your solution</h2>
+      <p>After layering correctly:</p>
+      <ul>
+        <li>The card should have a teal background (from components, which wins)</li>
+        <li>Text should be white (from components)</li>
+        <li>Padding should be generous — 2rem 2.5rem (from components)</li>
+        <li>Corners should be rounded — 1rem (from components)</li>
+        <li>Font size stays at 1rem (from base — components doesn't override it)</li>
+        <li>Shadow appears (from utilities — components doesn't override it)</li>
+      </ul>
+      <p>If any of these are wrong, check which layer each rule is in and whether the layer order gives priority to the right one.</p>
     </section>
 
     <section class="editor cq-inline">
@@ -177,6 +217,20 @@
     <section class="callout">
       <h2>Hint</h2>
       <p>The layer order statement goes at the very top: <code>@layer base, utilities, components;</code> — this establishes priority regardless of source order. Then wrap each group in its corresponding <code>@layer name { ... }</code> block. The component layer wins because it's declared last in the order.</p>
+
+      <h2>Step-by-step approach</h2>
+      <ol>
+        <li>Add the layer order statement at the top of the CSS: <code>@layer base, utilities, components;</code></li>
+        <li>Wrap the "utilities.css" rules in <code>@layer utilities { ... }</code></li>
+        <li>Wrap the "base.css" rules in <code>@layer base { ... }</code></li>
+        <li>Wrap the "components.css" rules in <code>@layer components { ... }</code></li>
+        <li>Decide where page layout styles go (they could be in base or layout)</li>
+        <li>Verify: components layer is last in the order, so <code>.notification</code> beats <code>.page .card</code> despite lower specificity</li>
+        <li>Verify: properties not declared in components (font-size, box-shadow) fall through to the layer that declares them</li>
+      </ol>
+
+      <h2>What to check</h2>
+      <p>After layering: the card background should be teal, text white, padding generous, corners rounded. The font-size comes from base (because components doesn't override it). The box-shadow comes from utilities (same reason). If you see grey background or dark text, your layer order is wrong or rules are in the wrong layer.</p>
     </section>
 
     <nav class="lesson-nav cluster">

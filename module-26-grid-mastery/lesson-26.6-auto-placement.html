@@ -69,6 +69,28 @@
   grid-row: span 2;
 }</code></pre>
       <p>One item takes a 2x2 area. The rest fill in around it automatically with dense packing.</p>
+
+      <h2>Row vs column flow</h2>
+      <p>Default <code>grid-auto-flow: row</code> places items left-to-right, then wraps to the next row. With <code>grid-auto-flow: column</code>, items fill top-to-bottom, then move to the next column. This is useful for newspaper-style layouts where content flows down columns.</p>
+      <pre><code>.newspaper {
+  display: grid;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}</code></pre>
+
+      <h2>Controlling placement with order</h2>
+      <p>The <code>order</code> property affects auto-placement order. Items with lower order values are placed first. Combined with <code>dense</code>, this gives you control over which items fill gaps:</p>
+      <pre><code>.priority-item { order: -1; }  /* placed before order:0 items */</code></pre>
+
+      <h2>When NOT to use dense</h2>
+      <ul>
+        <li>Navigation menus — visual order must match DOM order for accessibility</li>
+        <li>Form fields — users expect top-to-bottom/left-to-right order</li>
+        <li>Article content — paragraphs must stay in reading order</li>
+        <li>Any interactive content where tab order matters</li>
+      </ul>
+      <p>Dense is perfect for decorative grids: photo galleries, dashboards with independent widgets, product thumbnails, or any layout where items have no sequential relationship.</p>
     </section>
 
     <section class="demo">

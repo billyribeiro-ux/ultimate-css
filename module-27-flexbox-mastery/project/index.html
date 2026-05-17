@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project — Flexbox Pattern Library · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 27</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 27 · Project</p>
+      <h1>Flexbox Pattern Library</h1>
+      <p class="lead">Every flex pattern from this module on one scrolling page. A living reference you can copy from for real projects. Each pattern is self-contained, scoped, and uses OKLCH colors.</p>
+    </header>
+
+    <section class="demo">
+      <h2>1. Equal-width columns</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p1 {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            font-family: system-ui;
+          }
+          .demo-27-p1 .col {
+            flex: 1;
+            padding: 1.5rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+          }
+          .demo-27-p1 .col:nth-child(2) { background: oklch(60% 0.18 200); }
+          .demo-27-p1 .col:nth-child(3) { background: oklch(55% 0.2 150); }
+        </style>
+        <div class="demo-27-p1">
+          <div class="col">Column 1</div>
+          <div class="col">Column 2</div>
+          <div class="col">Column 3</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>2. Sidebar + fluid content</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p2 {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            font-family: system-ui;
+            min-height: 120px;
+          }
+          .demo-27-p2 .sidebar {
+            flex: 0 0 180px;
+            background: oklch(92% 0.04 275);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+          }
+          .demo-27-p2 .main {
+            flex: 1;
+            background: oklch(97% 0.01 275);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+          }
+        </style>
+        <div class="demo-27-p2">
+          <aside class="sidebar">Sidebar (180px fixed)</aside>
+          <main class="main">Main content (flex: 1, fills remaining space)</main>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>3. Centering (flex + margin:auto)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p3 {
+            display: flex;
+            min-height: 150px;
+            padding: 1rem;
+            background: oklch(95% 0.02 275);
+            font-family: system-ui;
+          }
+          .demo-27-p3 .centered {
+            margin: auto;
+            padding: 1.5rem 2.5rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border-radius: 0.75rem;
+            font-weight: 600;
+          }
+        </style>
+        <div class="demo-27-p3">
+          <div class="centered">Centered!</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>4. Navigation — split with margin-auto</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p4 {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: oklch(20% 0.05 275);
+            border-radius: 0.5rem;
+            font-family: system-ui;
+          }
+          .demo-27-p4 a {
+            color: oklch(85% 0.05 275);
+            text-decoration: none;
+            font-size: 0.85rem;
+          }
+          .demo-27-p4 .brand { font-weight: 700; color: white; font-size: 1rem; }
+          .demo-27-p4 .auth {
+            margin-inline-start: auto;
+            display: flex;
+            gap: 0.75rem;
+          }
+          .demo-27-p4 .btn-signup {
+            padding: 0.4rem 0.9rem;
+            background: oklch(65% 0.2 150);
+            color: white;
+            border-radius: 0.3rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+          }
+        </style>
+        <div class="demo-27-p4">
+          <a href="#" class="brand">Brand</a>
+          <a href="#">Products</a>
+          <a href="#">Pricing</a>
+          <a href="#">Blog</a>
+          <div class="auth">
+            <a href="#">Log in</a>
+            <a href="#" class="btn-signup">Sign up</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>5. Tag cloud (flex-wrap)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p5 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 1rem;
+            font-family: system-ui;
+          }
+          .demo-27-p5 .tag {
+            flex: none;
+            padding: 0.3rem 0.9rem;
+            background: oklch(92% 0.06 275);
+            color: oklch(35% 0.15 275);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+          }
+          .demo-27-p5 .tag:nth-child(even) { background: oklch(92% 0.06 200); color: oklch(35% 0.15 200); }
+        </style>
+        <div class="demo-27-p5">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Flexbox</span>
+          <span class="tag">Grid</span>
+          <span class="tag">Responsive Design</span>
+          <span class="tag">Accessibility</span>
+          <span class="tag">Performance</span>
+          <span class="tag">Animation</span>
+          <span class="tag">Custom Properties</span>
+          <span class="tag">OKLCH</span>
+          <span class="tag">Container Queries</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>6. Input + button group</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p6 {
+            padding: 1.5rem;
+            font-family: system-ui;
+            max-width: 400px;
+          }
+          .demo-27-p6 .input-group {
+            display: flex;
+          }
+          .demo-27-p6 input {
+            flex: 1;
+            min-width: 0;
+            padding: 0.7rem 1rem;
+            border: 2px solid oklch(80% 0.08 275);
+            border-right: none;
+            border-radius: 0.5rem 0 0 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+          }
+          .demo-27-p6 input:focus { border-color: oklch(55% 0.2 275); }
+          .demo-27-p6 button {
+            flex: none;
+            padding: 0.7rem 1.5rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border: 2px solid oklch(55% 0.2 275);
+            border-radius: 0 0.5rem 0.5rem 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+          }
+        </style>
+        <div class="demo-27-p6">
+          <div class="input-group">
+            <input type="email" placeholder="your@email.com">
+            <button>Subscribe</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>7. Card with sticky footer</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p7 {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            font-family: system-ui;
+          }
+          .demo-27-p7 .card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+            padding: 1.25rem;
+            border: 1px solid oklch(88% 0.04 275);
+            border-radius: 0.75rem;
+          }
+          .demo-27-p7 .card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+          .demo-27-p7 .card p { margin: 0; font-size: 0.85rem; color: oklch(45% 0 0); }
+          .demo-27-p7 .card-actions {
+            margin-block-start: auto;
+            padding-block-start: 1rem;
+            display: flex;
+            gap: 0.5rem;
+          }
+          .demo-27-p7 .card-actions button {
+            padding: 0.4rem 0.9rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+          }
+          .demo-27-p7 .btn-p { background: oklch(55% 0.2 275); color: white; }
+          .demo-27-p7 .btn-s { background: oklch(93% 0.03 275); color: oklch(35% 0.1 275); }
+        </style>
+        <div class="demo-27-p7">
+          <div class="card">
+            <h3>Short Card</h3>
+            <p>Brief content.</p>
+            <div class="card-actions">
+              <button class="btn-p">Action</button>
+              <button class="btn-s">Cancel</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Taller Card</h3>
+            <p>This card has more content. The buttons still align at the bottom thanks to margin-block-start: auto on the actions container.</p>
+            <div class="card-actions">
+              <button class="btn-p">Action</button>
+              <button class="btn-s">Cancel</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Medium</h3>
+            <p>Some text here.</p>
+            <div class="card-actions">
+              <button class="btn-p">Action</button>
+              <button class="btn-s">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>8. Mobile tab bar</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p8 {
+            display: flex;
+            padding: 0.5rem 0;
+            background: white;
+            border: 1px solid oklch(90% 0.03 275);
+            border-radius: 0.75rem;
+            font-family: system-ui;
+          }
+          .demo-27-p8 a {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+            text-decoration: none;
+            color: oklch(55% 0.05 275);
+            font-size: 0.65rem;
+            padding: 0.5rem 0;
+          }
+          .demo-27-p8 a.active { color: oklch(45% 0.2 275); }
+          .demo-27-p8 .icon {
+            width: 22px;
+            height: 22px;
+            background: currentColor;
+            opacity: 0.3;
+            border-radius: 5px;
+          }
+          .demo-27-p8 a.active .icon { opacity: 0.7; }
+        </style>
+        <div class="demo-27-p8">
+          <a href="#" class="active"><span class="icon"></span>Home</a>
+          <a href="#"><span class="icon"></span>Search</a>
+          <a href="#"><span class="icon"></span>Create</a>
+          <a href="#"><span class="icon"></span>Notifications</a>
+          <a href="#"><span class="icon"></span>Profile</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>9. Centered logo navigation</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p9 {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: oklch(98% 0.01 275);
+            border: 1px solid oklch(92% 0.03 275);
+            border-radius: 0.5rem;
+            font-family: system-ui;
+          }
+          .demo-27-p9 .left,
+          .demo-27-p9 .right {
+            flex: 1;
+            display: flex;
+            gap: 1rem;
+          }
+          .demo-27-p9 .right { justify-content: flex-end; }
+          .demo-27-p9 .logo {
+            flex: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: oklch(35% 0.2 275);
+          }
+          .demo-27-p9 a {
+            text-decoration: none;
+            font-size: 0.8rem;
+            color: oklch(45% 0.08 275);
+            font-weight: 500;
+          }
+        </style>
+        <div class="demo-27-p9">
+          <div class="left">
+            <a href="#">Products</a>
+            <a href="#">Solutions</a>
+            <a href="#">Pricing</a>
+          </div>
+          <span class="logo">BRAND</span>
+          <div class="right">
+            <a href="#">Blog</a>
+            <a href="#">Support</a>
+            <a href="#">Login</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>10. Responsive card grid (flex-wrap)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p10 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem;
+            font-family: system-ui;
+          }
+          .demo-27-p10 .card {
+            flex: 1 1 200px;
+            max-width: 300px;
+            padding: 1.25rem;
+            background: oklch(97% 0.02 275);
+            border: 1px solid oklch(90% 0.04 275);
+            border-radius: 0.75rem;
+          }
+          .demo-27-p10 .card h4 { margin: 0 0 0.5rem; font-size: 0.95rem; color: oklch(25% 0.1 275); }
+          .demo-27-p10 .card p { margin: 0; font-size: 0.8rem; color: oklch(45% 0.03 275); }
+        </style>
+        <div class="demo-27-p10">
+          <div class="card"><h4>Analytics</h4><p>Track visitor behavior and conversion rates in real time.</p></div>
+          <div class="card"><h4>Automation</h4><p>Set up workflows that trigger based on user actions.</p></div>
+          <div class="card"><h4>Integrations</h4><p>Connect with 200+ tools your team already uses.</p></div>
+          <div class="card"><h4>Security</h4><p>Enterprise-grade encryption and access controls.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>11. Search bar pattern</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p11 {
+            padding: 1.5rem;
+            font-family: system-ui;
+            max-width: 450px;
+          }
+          .demo-27-p11 .search {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1.25rem;
+            background: oklch(97% 0.01 275);
+            border: 2px solid oklch(88% 0.05 275);
+            border-radius: 9999px;
+            transition: border-color 200ms;
+          }
+          .demo-27-p11 .search:focus-within { border-color: oklch(55% 0.2 275); }
+          .demo-27-p11 .search-icon {
+            flex: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid oklch(60% 0.1 275);
+            border-radius: 50%;
+          }
+          .demo-27-p11 .search input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.9rem;
+          }
+          .demo-27-p11 .search kbd {
+            flex: none;
+            padding: 0.15rem 0.5rem;
+            background: oklch(92% 0.03 275);
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            color: oklch(50% 0 0);
+          }
+        </style>
+        <div class="demo-27-p11">
+          <div class="search">
+            <span class="search-icon"></span>
+            <input type="search" placeholder="Search documentation...">
+            <kbd>Ctrl+K</kbd>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <h2>12. Sticky footer page layout</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-p12 {
+            display: flex;
+            flex-direction: column;
+            min-height: 250px;
+            font-family: system-ui;
+            border: 2px dashed oklch(70% 0.1 275 / 0.4);
+            border-radius: 0.5rem;
+          }
+          .demo-27-p12 header {
+            padding: 0.75rem 1.5rem;
+            background: oklch(30% 0.1 275);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+          }
+          .demo-27-p12 main {
+            padding: 1rem 1.5rem;
+            font-size: 0.85rem;
+            color: oklch(35% 0 0);
+          }
+          .demo-27-p12 footer {
+            margin-block-start: auto;
+            padding: 0.75rem 1.5rem;
+            background: oklch(92% 0.03 275);
+            font-size: 0.8rem;
+            color: oklch(50% 0 0);
+            text-align: center;
+          }
+        </style>
+        <div class="demo-27-p12">
+          <header>Header</header>
+          <main>Content (short) — footer sticks to bottom via margin-block-start: auto</main>
+          <footer>Footer always at the bottom</footer>
+        </div>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-27.10-flexbox-vs-grid.html">← Lesson 27.10</a>
+      <a href="../../index.html">Course Home →</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

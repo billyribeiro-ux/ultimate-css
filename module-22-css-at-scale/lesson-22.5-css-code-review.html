@@ -40,6 +40,10 @@
     </header>
 
     <section class="lesson-body stack">
+      <h2>Why CSS needs code review</h2>
+      <p>CSS has no compiler to enforce correctness. A specificity conflict is not an error — it is a silently resolved cascade decision that may or may not be what the developer intended. Code review is the human verification layer that catches intent mismatches, accessibility failures, and architectural drift that no linter can detect.</p>
+      <p>Without review, CSS architectures erode. One developer adds an <code>!important</code>. Another copies a component instead of extending it. A third hard-codes a color that should be a token. Each individual decision is small, but the cumulative effect is a codebase that fights itself. Review prevents this entropy.</p>
+
       <h2>The checklist</h2>
 
       <h3>1. Layer boundary violations</h3>
@@ -69,8 +73,17 @@
       <h3>7. Naming and intent clarity</h3>
       <p>Even without strict BEM naming, CSS should communicate intent. A class called <code>.x</code> or <code>.wrapper2</code> tells future developers nothing. A class called <code>.product-grid</code> or <code>.auth-form</code> is self-documenting. Custom properties should describe what they control, not their current value: <code>--spacing-section</code> not <code>--24px</code>.</p>
 
+      <h3>8. Token consistency</h3>
+      <p>Are the correct tokens being used for the correct purpose? A spacing token used as a font-size, or a color token from the "danger" family used for a success state, suggests confusion about the token taxonomy. The token's name should match its usage context. A <code>--color-danger</code> used for a success badge is either a bug or a naming problem — either way, it needs to be addressed.</p>
+
+      <h3>9. Responsive considerations</h3>
+      <p>Does the component work at all target viewport sizes? Are breakpoints using the project's standard values (not arbitrary pixel values)? Is the responsive strategy consistent (mobile-first vs desktop-first)? Are container queries used where component-level responsiveness is needed vs media queries for page-level layout? Does content truncate gracefully or does it overflow its container?</p>
+
+      <h3>10. Future-proofing</h3>
+      <p>Will this CSS need to be rewritten for a known upcoming change? If a redesign is planned for next quarter, is the implementation structured to minimize rework? Are assumptions documented? Is there a hard dependency on a specific DOM structure that might change? Code that needs immediate rewriting is worse than slightly imperfect code that will last.</p>
+
       <h2>The PE7 audit automated with grep</h2>
-      <p>Automate the easy checks:</p>
+      <p>Automate the easy checks. These grep commands can run as pre-commit hooks or CI gates:</p>
       <pre><code># Find hard-coded colors outside tokens layer
 grep -rn "oklch\|#[0-9a-f]\{3,8\}" src/components/
 
@@ -81,11 +94,22 @@ grep -rn "!important" src/
 grep -rn "\.[a-z].*\.[a-z].*\.[a-z]" src/
 
 # Find missing prefers-reduced-motion
-grep -rL "prefers-reduced-motion" src/components/*animation*</code></pre>
+grep -rL "prefers-reduced-motion" src/components/*animation*
+
+# Find styles outside of @layer (potential specificity issues)
+grep -rn "^[^@/].*{" src/ | grep -v "@layer\|@scope\|@media\|@supports\|@keyframes\|@property\|@font-face"
+
+# Find z-index values not from the token scale
+grep -rn "z-index:" src/components/ | grep -v "var(--z-"</code></pre>
+      <p>Run these as pre-commit hooks or CI checks. They are not perfect — they produce false positives — but they catch the most common violations early and cheaply. Refine the grep patterns as your codebase evolves.</p>
 
       <h2>How to give constructive CSS review feedback</h2>
       <p>The "why" matters more than the "what." Instead of "Don't use !important here," write "This !important will make it impossible for consumers to override this style via the component API. Consider using a @layer instead, which gives you priority without blocking future overrides."</p>
-      <p>Categorize feedback: <strong>blocking</strong> (must fix — accessibility, architecture violation), <strong>suggestion</strong> (would improve — naming, organization), <strong>nit</strong> (take it or leave it — formatting, preference). Be explicit about which category each comment falls into.</p>
+      <p>Categorize feedback explicitly:</p>
+      <p><strong>Blocking</strong> (must fix before merge): accessibility violations, architecture violations that would set bad precedent, security issues (e.g., user content rendered without containment). These are non-negotiable.</p>
+      <p><strong>Suggestion</strong> (would improve, author decides): naming clarity, organization improvements, token extraction, performance optimizations that are not critical path. The author can push back with a valid reason.</p>
+      <p><strong>Nit</strong> (take it or leave it): formatting preferences, alternative approaches that are equally valid, minor style differences. These should never block a PR.</p>
+      <p>Be explicit about which category each comment falls into. Start review comments with the label: "[blocking]", "[suggestion]", or "[nit]". This removes ambiguity about whether a comment requires action.</p>
 
       <h2>Common review patterns</h2>
       <h3>The "works but wrong layer" pattern</h3>
@@ -137,9 +161,72 @@ body .sidebar .nav .link.active.current { color: navy; }
 }</code></pre>
       <p>Review comment (blocking): "This animation runs unconditionally. Users with vestibular disorders can experience nausea from unexpected motion. Wrap in a prefers-reduced-motion check or use the motion-safe utility pattern."</p>
 
+      <h3>Example 4: Layer boundary violation</h3>
+      <pre><code>/* Before — token defined inside a component file */
+@layer components {
+  .card {
+    --card-shadow: 0 2px 8px oklch(0% 0 0 / 0.1);
+    box-shadow: var(--card-shadow);
+  }
+}
+
+/* After — token in the token layer, consumed by component */
+@layer tokens {
+  :root { --shadow-md: 0 2px 8px oklch(0% 0 0 / 0.1); }
+}
+@layer components {
+  .card { box-shadow: var(--shadow-md); }
+}</code></pre>
+      <p>Review comment (suggestion): "This shadow value is a design token masquerading as a component variable. Moving it to the token layer makes it available to other components and ensures shadow values stay consistent across the system."</p>
+
+      <h3>Example 5: Missing component API</h3>
+      <pre><code>/* Before — hard-coded, no customization possible */
+@layer components {
+  .badge { background: oklch(92% 0.04 275); color: oklch(40% 0.15 275); padding: 0.2rem 0.6rem; border-radius: 1rem; }
+}
+
+/* After — API-driven, consumers can customize */
+@layer components {
+  .badge {
+    background: var(--badge-bg, oklch(92% 0.04 275));
+    color: var(--badge-color, oklch(40% 0.15 275));
+    padding: var(--badge-py, 0.2rem) var(--badge-px, 0.6rem);
+    border-radius: var(--badge-radius, 1rem);
+  }
+}</code></pre>
+      <p>Review comment (suggestion): "This component has no customization surface. Adding a custom property API (with sensible defaults via fallback values) lets consumers adapt it to their context without overriding internals."</p>
+
+      <h2>The review workflow</h2>
+      <p><strong>Before submitting</strong>: Run the automated checks yourself. Fix what the grep scripts catch. Self-review against the checklist. Your reviewer's time is valuable — do not waste it on issues you could have caught yourself.</p>
+      <p><strong>As reviewer</strong>: Start with architecture (correct layer, correct scope), then correctness (does it work), then quality (accessibility, performance, naming). Do not nitpick formatting if the architecture is wrong — fix the big things first.</p>
+      <p><strong>Resolving disagreements</strong>: When a review comment is disputed, escalate to the ADR. If the architecture decision document supports the reviewer's position, the code changes. If the ADR does not cover this case, update the ADR first, then apply the decision to the code.</p>
+
+      <h2>The self-review checklist</h2>
+      <p>Before requesting a review, run through this abbreviated checklist yourself:</p>
+      <pre><code>Self-Review Checklist:
+[ ] CSS is in the correct @layer
+[ ] No hard-coded colors/sizes outside tokens
+[ ] No !important usage
+[ ] Selectors are as simple as possible
+[ ] Focus styles are visible
+[ ] prefers-reduced-motion is respected (if animation exists)
+[ ] Component works at 375px, 768px, and 1280px
+[ ] Custom properties have fallback defaults
+[ ] No unintended z-index escalation
+[ ] Dark mode tokens are tested (if applicable)</code></pre>
+      <p>Catching issues yourself before review saves everyone time and builds trust. Reviewers learn to expect clean code, which makes the review process faster for the whole team.</p>
+
       <h2>Building a review culture</h2>
-      <p>CSS reviews work best when the team agrees on principles before the first review. Document the architecture in an ADR (Module 22 Project). Share the checklist. Run lunch-and-learn sessions on common patterns. When everyone understands the why, reviews become collaborative rather than adversarial.</p>
+      <p>CSS reviews work best when the team agrees on principles before the first review. Document the architecture in an ADR (Module 22 Project). Share the checklist in the repository's contributing guide. Run lunch-and-learn sessions on common patterns. When everyone understands the why, reviews become collaborative rather than adversarial.</p>
       <p>The goal is not zero review comments — it is reviewers catching things that automated tooling cannot: semantic correctness, user experience implications, and architectural intent. Automate what you can (see Lesson 22.8), review what requires human judgment.</p>
+      <p>Celebrate good CSS in reviews too. When a PR demonstrates excellent architecture — clean layer usage, well-documented component API, proper accessibility — call it out. Positive reinforcement is as important as correction for building a strong CSS culture on your team.</p>
+      <p>Rotate reviewers to spread architectural knowledge. If only one person reviews all CSS, they become a bottleneck and a single point of failure for architectural consistency. Every team member should understand the architecture well enough to review CSS changes competently.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Automating what you can</h2>
+      <p>The best review process catches only things that require human judgment. Everything else should be automated. If a reviewer is consistently commenting about the same issue (hard-coded colors, missing prefers-reduced-motion), that issue should become a lint rule or CI check. The review checklist should shrink over time as automation takes over the mechanical checks.</p>
+      <p>See Lesson 22.8 for detailed guidance on setting up automated CSS testing. The goal: reviewers focus on architectural intent, design quality, and user experience — the things that machines cannot evaluate.</p>
     </section>
 
     <section class="callout">

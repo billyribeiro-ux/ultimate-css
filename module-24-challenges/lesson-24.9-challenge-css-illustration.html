@@ -62,6 +62,33 @@
         <li><code>border-radius</code> — for rounded shapes</li>
         <li><code>clip-path</code> — for mountain peaks (polygon)</li>
       </ul>
+
+      <h2>The box-shadow trick</h2>
+      <p>Each <code>box-shadow</code> value creates a clone of the element's shape at an offset. A small circle (<code>border-radius: 50%</code>) with multiple <code>box-shadow</code> values becomes many circles — clouds, stars, or scattered shapes. The syntax for each clone: <code>offsetX offsetY blurRadius spreadRadius color</code>.</p>
+      <pre><code>/* One small circle becomes 3 clouds */
+.element::before {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: oklch(95% 0.01 260 / 0.8);
+  box-shadow:
+    1.5rem 0 0 0.5rem oklch(95% 0.01 260 / 0.6),
+    3rem -0.5rem 0 0.3rem oklch(95% 0.01 260 / 0.5),
+    -1rem 0.3rem 0 0.2rem oklch(95% 0.01 260 / 0.4);
+}</code></pre>
+
+      <h2>Multiple backgrounds</h2>
+      <p>A single element can have unlimited background layers. Each layer is a gradient that covers a specific portion of the element. The first gradient listed is on top, the last is on the bottom. Use <code>transparent</code> stops to let lower layers show through:</p>
+      <pre><code>background:
+  /* Top: sky gradient */
+  linear-gradient(180deg, skyblue 0%, lightyellow 40%, transparent 40%),
+  /* Bottom: water */
+  linear-gradient(180deg, transparent 60%, darkblue 60%, navy 100%),
+  /* Base: horizon glow */
+  radial-gradient(ellipse at 70% 40%, gold, transparent 30%);</code></pre>
+
+      <h2>Approach strategy</h2>
+      <p>Plan your three layers: (1) The <code>.scene</code> div itself handles sky + water via stacked gradients. (2) <code>::before</code> becomes the sun — a small positioned circle with box-shadow for glow and cloud clones. (3) <code>::after</code> becomes the mountains — a large shape using <code>clip-path: polygon()</code> with a dark gradient fill. Work from back to front.</p>
     </section>
 
     <section class="demo">

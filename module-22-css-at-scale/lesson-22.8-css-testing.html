@@ -40,11 +40,24 @@
     </header>
 
     <section class="lesson-body stack">
+      <h2>Why CSS needs testing</h2>
+      <p>CSS has no compiler. There is no type system to catch errors at authoring time. A missing semicolon silently drops a rule. A specificity conflict silently overrides your styles. A token typo silently falls through to the initial value. The only way to know your CSS works is to test it — either manually (slow, unreliable, expensive) or automatically (fast, consistent, cheap after setup).</p>
+      <p>At scale, manual testing is impossible. A design system with 50 components, each with 5 variants and 8 states, across 3 viewports and 2 themes, produces 12,000 visual permutations. No human can check all of these after every PR. Automation is not a luxury — it is the only viable approach.</p>
+
       <h2>The CSS testing pyramid</h2>
 
       <h3>Unit: Does this property compute correctly?</h3>
       <p>At the lowest level, test that custom properties resolve to expected values, that calc() expressions produce correct results, and that media queries trigger at the right breakpoints. Tools: getComputedStyle() assertions in unit tests. Fast, targeted, but does not catch visual issues.</p>
       <p>Example unit test: verify that <code>--spacing-md</code> computes to <code>1rem</code> (16px at default font size). Verify that <code>calc(var(--col-count) * var(--col-width))</code> produces the expected total. These are cheap to run (milliseconds) and catch token definition errors immediately.</p>
+      <pre><code>// Unit test: token values resolve correctly
+test('spacing tokens compute expected values', async ({ page }) => {
+  await page.goto('/test/tokens');
+  const root = page.locator(':root');
+  const spacing = await root.evaluate(el =>
+    getComputedStyle(el).getPropertyValue('--space-md').trim()
+  );
+  expect(spacing).toBe('1rem');
+});</code></pre>
 
       <h3>Integration: Do these layers compose correctly?</h3>
       <p>Test that layer order produces the expected cascade behavior. A component in the <code>components</code> layer should override <code>base</code> styles but yield to <code>utilities</code>. Test that @scope boundaries contain styles correctly — a scoped style should not leak to sibling components. Test that token overrides propagate through the inheritance chain.</p>
@@ -56,7 +69,11 @@
 
       <h2>Visual regression testing</h2>
       <p>The workflow: (1) Capture baseline screenshots for every component state. (2) After CSS changes, capture new screenshots. (3) Diff pixel-by-pixel. (4) Human reviews any differences — intentional changes update the baseline, unintentional changes are bugs.</p>
-      <p>Key decisions: viewport sizes to test (mobile, tablet, desktop), states to capture (default, hover, focus, active, disabled, error, loading), and threshold for pixel differences (sub-pixel rendering varies across platforms — allow a small tolerance).</p>
+      <p>Key decisions:</p>
+      <p><strong>Viewport sizes</strong>: Test at minimum three widths — 375px (mobile), 768px (tablet), 1280px (desktop). If your product has specific breakpoints, test at those exact values plus one pixel below and above each breakpoint to verify the transition.</p>
+      <p><strong>States to capture</strong>: default, hover, focus-visible, active, disabled, error, loading, empty (no content), and overflow (too much content). Each state is a separate screenshot. A component with 5 variants and 8 states produces 40 baseline images — this is normal and expected for critical components.</p>
+      <p><strong>Threshold</strong>: Sub-pixel rendering varies across platforms and even between OS updates. Allow a small tolerance (0.1% pixel difference) to avoid false positives from anti-aliasing. But keep the threshold tight — a 1% change might look subtle in a diff but can be very visible to users.</p>
+      <p><strong>Dark mode</strong>: If your product supports dark mode, capture every screenshot in both modes. Token changes often break one theme while fixing another — catching this requires testing both.</p>
 
       <h2>The PE7 audit as an automated test</h2>
       <p>Convert the code review checklist into automated CI checks:</p>
@@ -89,9 +106,26 @@ test "all animations respect reduced-motion" {
       <h2>Cross-browser testing strategy</h2>
       <p>Test the matrix that matters: Chrome (Blink), Firefox (Gecko), Safari (WebKit). Mobile: iOS Safari, Chrome Android. For each, identify which CSS features are at risk (usually the newest features). Use <code>@supports</code> to gate features and test that fallbacks work in older engines.</p>
       <p>Prioritize testing by risk: features with partial browser support get the most attention. Features that have been stable across all engines for years (flexbox, grid) need less testing. Focus on the boundaries — where your progressive enhancement kicks in.</p>
+      <p>The practical matrix for a modern project: run visual regression in Chrome (primary), Firefox, and Safari. If differences appear only in one engine, investigate whether it is a browser bug or an ambiguous spec interpretation. Use <code>@supports</code> to write engine-specific fallbacks only when necessary — never use user-agent sniffing.</p>
+
+      <h2>Testing token inheritance and overrides</h2>
+      <p>One of the most common regression sources in design systems is a token override that does not propagate correctly. Test the inheritance chain explicitly:</p>
+      <pre><code>test('token override propagates to nested components', async ({ page }) => {
+  await page.goto('/test/token-override');
+  // Parent sets --color-primary to red
+  const button = page.locator('.override-context .btn');
+  const color = await button.evaluate(
+    el => getComputedStyle(el).backgroundColor
+  );
+  expect(color).toBe('oklch(0.637 0.237 25.331)');
+});</code></pre>
+      <p>This catches the case where a component registers a property with <code>inherits: false</code> or where a @scope boundary inadvertently blocks inheritance.</p>
 
       <h2>Tools overview</h2>
-      <p><strong>Visual regression</strong>: Playwright (screenshot comparison built into the test runner), Chromatic (Storybook integration with hosted baselines), Percy (SaaS platform with GitHub integration). <strong>Accessibility</strong>: axe-core (programmatic checks), Lighthouse (comprehensive audits), WAVE (browser extension for manual checking). <strong>Architecture</strong>: Stylelint with custom rules for layer violations, grep-based CI scripts for quick audits. <strong>Performance</strong>: Lighthouse CSS coverage report, Chrome DevTools coverage tab for unused CSS detection.</p>
+      <p><strong>Visual regression</strong>: Playwright (screenshot comparison built into the test runner — zero additional dependencies), Chromatic (Storybook integration with hosted baselines and team collaboration), Percy (SaaS platform with GitHub integration and cross-browser rendering).</p>
+      <p><strong>Accessibility</strong>: axe-core (programmatic checks embeddable in any test runner), Lighthouse (comprehensive audits covering performance, accessibility, and best practices), WAVE (browser extension for manual developer checking during development).</p>
+      <p><strong>Architecture</strong>: Stylelint with custom rules for layer violations and token usage, grep-based CI scripts for quick boundary audits, custom ESLint rules for CSS-in-JS projects.</p>
+      <p><strong>Performance</strong>: Lighthouse CSS coverage report (identifies unused CSS per page), Chrome DevTools coverage tab for interactive exploration, bundlephobia-style size tracking in CI to prevent CSS bloat over time.</p>
 
       <h2>Setting up visual regression with Playwright</h2>
       <p>A minimal Playwright visual regression test for a component:</p>
@@ -124,17 +158,75 @@ for (const width of [375, 768, 1280]) {
 }</code></pre>
 
       <h2>The CI pipeline for CSS</h2>
-      <p>A complete CI pipeline for CSS quality includes: (1) Linting with Stylelint for syntax and convention errors. (2) Architecture audit scripts checking layer boundaries and token usage. (3) Accessibility checks with axe-core on rendered components. (4) Visual regression comparison against baselines. (5) Bundle size check to prevent CSS bloat.</p>
-      <p>Order matters: run fast checks (lint, grep) first, medium checks (accessibility) second, slow checks (visual regression) last. Fail fast on cheap checks to save CI minutes.</p>
+      <p>A complete CI pipeline for CSS quality includes five stages, ordered from fastest to slowest:</p>
+      <p><strong>Stage 1 — Lint (seconds)</strong>: Stylelint catches syntax errors, convention violations, and known anti-patterns. Configure custom rules for your architecture: disallow <code>!important</code>, require layer declarations, enforce token usage in component files.</p>
+      <p><strong>Stage 2 — Architecture audit (seconds)</strong>: Grep-based scripts check layer boundaries and token usage. These are the checks from Lesson 22.5 automated as CI gates. Fast, cheap, catch the most common architectural violations.</p>
+      <p><strong>Stage 3 — Accessibility (minutes)</strong>: Render components with axe-core and assert zero violations. Test each component in isolation and in composition. Check all interactive states (hover, focus, disabled) for contrast compliance.</p>
+      <p><strong>Stage 4 — Visual regression (minutes)</strong>: Playwright screenshot comparison against baselines. Run across Chrome, Firefox, and Safari. Capture at 375px, 768px, and 1280px viewports. Allow 0.1% pixel threshold for anti-aliasing differences.</p>
+      <p><strong>Stage 5 — Bundle size (seconds)</strong>: Assert that total CSS size stays within budget. Alert on unused CSS growth. Track CSS coverage over time to identify dead code accumulation.</p>
+      <p>Order matters: fail fast on cheap checks to save CI minutes. A lint failure in 3 seconds is better than waiting 4 minutes for visual regression to tell you the same thing.</p>
 
       <h2>Managing visual regression baselines</h2>
-      <p>Baselines need updating when intentional visual changes land. The workflow: (1) PR changes CSS. (2) Visual regression test fails (expected). (3) Reviewer inspects the diff screenshots. (4) If the change is intentional, update baselines with a single command. (5) Updated baselines commit alongside the CSS change. Never auto-accept baseline updates — a human must verify every pixel change.</p>
+      <p>Baselines need updating when intentional visual changes land. The workflow:</p>
+      <p>(1) PR changes CSS. (2) Visual regression test fails (expected for intentional changes). (3) Reviewer inspects the diff screenshots — the CI tool shows old, new, and highlighted differences side by side. (4) If the change is intentional and correct, reviewer approves and baselines are updated with a single command. (5) Updated baselines commit alongside the CSS change in the same PR.</p>
+      <p>Never auto-accept baseline updates — a human must verify every pixel change. This is the final quality gate: even if the code looks correct, does the rendered output look correct? This catches issues like: the property works but the value is wrong, the cascade resolved differently than expected, or a sibling component was unintentionally affected.</p>
+
+      <h2>Stylelint custom rules for PE7</h2>
+      <p>Configure Stylelint with custom rules that enforce your architecture:</p>
+      <pre><code>/* .stylelintrc.json */
+{
+  "rules": {
+    "declaration-no-important": true,
+    "selector-max-specificity": "0,3,0",
+    "selector-max-id": 0,
+    "custom-property-pattern": "^(color|space|radius|shadow|font)-",
+    "no-unknown-custom-properties": true
+  }
+}</code></pre>
+      <p>These rules catch: <code>!important</code> usage (always a red flag), over-specific selectors, ID selectors (forbidden in components), and custom properties that do not follow the naming convention. They run in seconds and catch violations before code is even committed.</p>
 
       <h2>What not to test</h2>
-      <p>Do not test browser-default behavior (you are testing the browser, not your code). Do not test pixel-perfect positioning across browsers (sub-pixel rendering differs — allow a tolerance threshold). Do not test third-party CSS (test your integration with it, not the library itself). Do not test styles that are overridden by consumer applications (that is their responsibility). Focus testing effort where your code can actually break.</p>
+      <p>Do not test browser-default behavior (you are testing the browser engine, not your code). Do not test pixel-perfect positioning across browsers (sub-pixel rendering and font rasterization differ — allow a tolerance threshold). Do not test third-party CSS (test your integration with it, not the library itself). Do not test styles that are overridden by consumer applications (that is their responsibility, not yours).</p>
+      <p>Also avoid: testing CSS that is generated by a build tool (test the source, not the output), testing responsive behavior at every possible viewport width (pick three representative sizes), and testing animation frames (test the start and end states, not intermediate frames). Focus testing effort where your code can actually break.</p>
+
+      <h2>Testing theme switching</h2>
+      <p>Multi-theme architectures (Lesson 22.3) need dedicated testing. For each theme, capture visual baselines for every component. Test the transition between themes — does the component render correctly during the switch, or does it flash incorrect colors? Test that theme tokens override correctly and that no component has hard-coded values that ignore the theme.</p>
+      <pre><code>// Theme-specific visual tests
+const themes = ['light', 'dark', 'ocean', 'contrast'];
+
+for (const theme of themes) {
+  test(`card renders correctly in ${theme} theme`, async ({ page }) => {
+    await page.goto('/components/card');
+    await page.evaluate(
+      t => document.documentElement.dataset.theme = t, theme
+    );
+    await expect(page.locator('.card'))
+      .toHaveScreenshot(`card-${theme}.png`);
+  });
+}</code></pre>
+
+      <h2>CSS coverage analysis</h2>
+      <p>Unused CSS is not just a performance issue — it is a maintenance burden. Every dead rule is a rule that new developers might read, misunderstand, and modify. Measure CSS coverage regularly using Chrome DevTools' coverage tab or Lighthouse's CSS coverage report.</p>
+      <p>Set a coverage budget: if less than 70% of your CSS is used on any page, investigate. Common causes of low coverage: importing an entire design system when only 3 components are used, legacy CSS that was never removed during refactoring, and responsive styles for breakpoints that are never triggered by the page's content.</p>
 
       <h2>The testing investment</h2>
-      <p>Setting up CSS testing has a front-loaded cost. Visual regression infrastructure takes 2-3 days to configure properly. Architecture audit scripts take a day. But the ongoing cost is minimal: tests run automatically, and they catch regressions that would otherwise reach production and require emergency hotfixes. The return on investment is measured in incidents prevented, not features shipped.</p>
+      <p>Setting up CSS testing has a front-loaded cost. Visual regression infrastructure takes 2-3 days to configure properly (Playwright setup, baseline capture, CI integration). Architecture audit scripts take a day. Stylelint configuration takes half a day. The total initial investment is roughly one sprint for a single developer.</p>
+      <p>But the ongoing cost is minimal: tests run automatically on every PR, they catch regressions that would otherwise reach production, and they free reviewers to focus on architectural decisions rather than mechanical checks. The maintenance burden is updating baselines when intentional changes land — a task that takes minutes per PR.</p>
+      <p>The return on investment is measured in incidents prevented, not features shipped. One caught regression — a theme token change that broke contrast on a high-traffic page — pays for the entire testing infrastructure. Teams that invest in CSS testing ship faster because they ship with confidence, not because they skip verification.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Getting started: the minimum viable test suite</h2>
+      <p>You do not need the full pyramid on day one. Start with the highest-value, lowest-cost tests and expand over time:</p>
+      <p><strong>Week 1</strong>: Add Stylelint with <code>declaration-no-important</code> and <code>selector-max-id</code> rules. This catches the most damaging anti-patterns with zero false positives and runs in under a second.</p>
+      <p><strong>Week 2</strong>: Add 3-5 grep-based architecture checks as a CI gate. Focus on hard-coded colors in component files and <code>!important</code> usage. These are simple shell scripts that take minutes to write.</p>
+      <p><strong>Week 3</strong>: Set up Playwright for your 5 most critical components. Capture baselines at 3 viewports. This is the steepest learning curve but provides the highest long-term value.</p>
+      <p><strong>Week 4</strong>: Add axe-core accessibility checks for all interactive components. Test default and focus states at minimum.</p>
+      <p>After this month of investment, you have a functional test suite that catches 80% of the issues that would previously ship to production. Expand coverage incrementally as new components are built — require visual baselines for all new components from this point forward.</p>
+
+      <h2>Testing and the PE7 architecture</h2>
+      <p>The PE7 architecture makes CSS more testable by design. Layers are declarative and predictable — you can assert layer order programmatically. Scoped styles have clear boundaries — you can verify containment. Custom property APIs have documented contracts — you can verify computed values against expectations. Token-based values have a single source of truth — you can audit usage automatically.</p>
+      <p>Architecture that is hard to test is usually architecture that is hard to maintain. If you cannot write a test for a CSS behavior, that is a signal that the behavior relies on implicit, fragile relationships. Refactor toward explicit, testable patterns.</p>
     </section>
 
     <section class="callout">

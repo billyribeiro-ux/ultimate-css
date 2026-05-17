@@ -49,6 +49,23 @@
         <li><strong>Step 5:</strong> Decorative element rotates in + fades in (500ms delay)</li>
       </ol>
 
+      <h2>How @starting-style works for entrance animations</h2>
+      <p>Before <code>@starting-style</code>, creating page-load animations required <code>@keyframes</code> with <code>animation-fill-mode: backwards</code>. The new approach is simpler: you define where the element ends up (its normal CSS), and <code>@starting-style</code> defines where it starts FROM. The browser automatically transitions between these states when the element first renders.</p>
+      <p>The syntax is either nested inside the element's rule or as a standalone block:</p>
+      <pre><code>.element {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms, transform 500ms;
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}</code></pre>
+
+      <h2>Staggering with transition-delay</h2>
+      <p>Each element in the sequence gets an increasing <code>transition-delay</code>. The first element has 0ms, the second 100ms, the third 200ms, and so on. The delay applies to the transition FROM the <code>@starting-style</code> state, so each element waits its turn before beginning its entrance.</p>
+
       <h2>Constraints</h2>
       <ul>
         <li>Pure CSS — zero JavaScript</li>
@@ -57,7 +74,11 @@
         <li>Each element transitions from hidden to visible on page load</li>
         <li>Must respect <code>prefers-reduced-motion</code> (instant reveal, no animation)</li>
         <li>Total sequence should complete in under 1.5 seconds</li>
+        <li>Use <code>cubic-bezier(0.16, 1, 0.3, 1)</code> for a natural ease-out feel</li>
       </ul>
+
+      <h2>Reduced motion</h2>
+      <p>Users who prefer reduced motion should see everything instantly — no animation, no stagger. Wrap your transitions in a check: <code>@media (prefers-reduced-motion: no-preference) { ... }</code> or set <code>transition-duration: 0s</code> inside a <code>prefers-reduced-motion: reduce</code> query.</p>
 
       <h2>Target</h2>
       <p>The demo shows the final state. In your solution, all elements start invisible and animate in sequentially on page load.</p>
@@ -192,6 +213,34 @@ body {
     <section class="callout">
       <h2>Hint</h2>
       <p>The pattern for each element: set its final state in normal CSS (opacity: 1, transform: none). Then in <code>@starting-style</code>, define the hidden state (opacity: 0, transform: translateY(1.5rem)). Add <code>transition: opacity 500ms, transform 500ms</code> with increasing <code>transition-delay</code> values. For the hero background, animate from <code>opacity: 0</code> on the whole section. The reduced-motion query should set <code>transition-duration: 0s</code> on everything.</p>
+
+      <h2>Example structure</h2>
+      <pre><code>.hero {
+  opacity: 1;
+  transition: opacity 600ms ease;
+  transition-delay: 0ms;
+  @starting-style { opacity: 0; }
+}
+
+.hero h1 {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms ease, transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 100ms;
+  @starting-style {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+/* Repeat for .subtitle (200ms), .cta-group (300ms), .deco (500ms) */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}</code></pre>
     </section>
 
     <nav class="lesson-nav cluster">

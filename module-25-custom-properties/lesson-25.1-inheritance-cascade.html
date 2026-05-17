@@ -79,6 +79,20 @@
 
       <h2>Inheritance vs. the universal selector</h2>
       <p>Setting a property on <code>*</code> is not the same as relying on inheritance. The universal selector sets the property directly on every element, while <code>:root</code> sets it once and lets inheritance distribute the value. The former prevents overriding at intermediate levels without higher specificity.</p>
+
+      <h2>Stopping inheritance with @property</h2>
+      <p>By default, custom properties always inherit. To create a property that does not inherit, register it:</p>
+      <pre><code>@property --card-elevation {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 0;
+}
+/* Children of a card with --card-elevation: 3
+   will NOT inherit that value — they get 0 */</code></pre>
+      <p>This is critical for component-scoped values that should not leak into children (e.g., elevation levels, internal state flags).</p>
+
+      <h2>Practical implications</h2>
+      <p>The inheritance model means custom properties are "opt-out" rather than "opt-in." Every descendant receives the value unless it explicitly overrides. This makes them ideal for theming (colors cascade to all children) but potentially surprising for tightly scoped values. The rule of thumb: use inheritance for tokens (colors, spacing scales, type sizes) and register with <code>inherits: false</code> for component internals.</p>
     </section>
 
     <section class="demo">
@@ -200,6 +214,17 @@ p { margin: 0 0 0.25rem; font-weight: 600; }</textarea>
         <button class="btn" type="button" data-editor-action="run">Run</button>
         <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
       </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key rules to remember</h2>
+      <ul>
+        <li>Custom properties inherit by default — unlike <code>padding</code>, <code>border</code>, <code>display</code>.</li>
+        <li>Overriding a property at any level creates a new scope from that point downward.</li>
+        <li>The cascade applies fully: specificity, source order, layers, <code>!important</code>.</li>
+        <li>Use <code>@property { inherits: false }</code> to prevent inheritance for component internals.</li>
+        <li><code>:root</code> is the canonical place for global tokens; component selectors for local ones.</li>
+      </ul>
     </section>
 
     <section class="callout">

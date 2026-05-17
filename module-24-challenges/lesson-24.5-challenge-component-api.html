@@ -43,6 +43,22 @@
       <h2>The scenario</h2>
       <p>You're building a design system's button component. The architecture must be maintainable: the base class declares every visual property once, using custom properties. Variant classes only swap token values. Size classes only swap sizing tokens. This means adding a 6th variant requires exactly 3-4 lines of custom-property overrides, not duplicating the entire button.</p>
 
+      <h2>Why this pattern matters</h2>
+      <p>In traditional CSS, each button variant redeclares all its properties. A 5-variant button might have 50+ lines of repeated <code>padding</code>, <code>border-radius</code>, <code>font-size</code>, <code>font-weight</code>, <code>cursor</code>, and <code>transition</code> declarations. With the custom property API pattern, the base class declares these once — variants are 3-4 lines each. Adding a 6th variant? Three lines. Changing the border-radius of all buttons? One line.</p>
+
+      <h2>The custom properties you'll need</h2>
+      <ul>
+        <li><code>--btn-bg</code> — background color</li>
+        <li><code>--btn-text</code> — text color</li>
+        <li><code>--btn-border-color</code> — border color (transparent for filled variants)</li>
+        <li><code>--btn-border-w</code> — border width</li>
+        <li><code>--btn-py</code> — vertical padding</li>
+        <li><code>--btn-px</code> — horizontal padding</li>
+        <li><code>--btn-font</code> — font size</li>
+        <li><code>--btn-radius</code> — border radius</li>
+        <li><code>--btn-hover-bg</code> — background on hover (optional: can use opacity instead)</li>
+      </ul>
+
       <h2>Constraints</h2>
       <ul>
         <li>5 variants: primary, secondary, ghost, danger, success</li>
@@ -52,6 +68,17 @@
         <li>Size classes (<code>.btn-sm</code>, etc.) can ONLY set sizing custom properties</li>
         <li>All 15 combinations (5 variants x 3 sizes) must work correctly</li>
         <li>Hover and focus states must also work through the custom property API</li>
+        <li>All colors must use OKLCH</li>
+      </ul>
+
+      <h2>Design spec</h2>
+      <p>Here are the exact values for each variant:</p>
+      <ul>
+        <li><strong>Primary:</strong> bg <code>oklch(50% 0.2 260)</code>, text white</li>
+        <li><strong>Secondary:</strong> bg <code>oklch(92% 0.04 260)</code>, text <code>oklch(35% 0.12 260)</code></li>
+        <li><strong>Ghost:</strong> bg transparent, text <code>oklch(50% 0.2 260)</code>, border <code>oklch(50% 0.2 260)</code></li>
+        <li><strong>Danger:</strong> bg <code>oklch(55% 0.2 25)</code>, text white</li>
+        <li><strong>Success:</strong> bg <code>oklch(55% 0.17 150)</code>, text white</li>
       </ul>
 
       <h2>Target — all 15 variations</h2>

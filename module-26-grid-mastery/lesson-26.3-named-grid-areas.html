@@ -78,6 +78,41 @@
 
       <h2>Implicit named lines</h2>
       <p>When you create an area named <code>content</code>, the browser automatically creates lines named <code>content-start</code> and <code>content-end</code> on both axes. You can reference these lines for placement too.</p>
+
+      <h2>Rules for valid areas</h2>
+      <ul>
+        <li>Areas must be rectangular — no L-shapes or T-shapes</li>
+        <li>Each row string must have the same number of cells</li>
+        <li>Area names must be valid CSS identifiers (no spaces, no starting with numbers)</li>
+        <li>The same name in non-rectangular positions is invalid and the entire declaration is ignored</li>
+      </ul>
+
+      <h3>Invalid example</h3>
+      <pre><code>/* INVALID — "nav" forms an L-shape */
+grid-template-areas:
+  "nav  header header"
+  "nav  content aside"
+  "nav  content nav";   /* nav can't be here AND in column 1 */</code></pre>
+
+      <h2>Why named areas are the best approach</h2>
+      <p>For page-level layouts, named areas win over line-based placement because:</p>
+      <ul>
+        <li>The layout is <em>visible</em> in the CSS — you can read the structure like a wireframe</li>
+        <li>Responsive restructuring requires changing only <code>grid-template-areas</code></li>
+        <li>Child elements use simple <code>grid-area: name</code> — no line math</li>
+        <li>Adding or removing columns doesn't break child placement</li>
+      </ul>
+
+      <h2>Combining areas with explicit sizing</h2>
+      <pre><code>.page {
+  grid-template-columns: 16rem 1fr 12rem;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header  header  header"
+    "sidebar content aside"
+    "footer  footer  footer";
+}</code></pre>
+      <p>The column and row definitions control sizing; the areas map names to the resulting cells.</p>
     </section>
 
     <section class="demo">

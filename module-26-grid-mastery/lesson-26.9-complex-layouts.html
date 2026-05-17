@@ -84,6 +84,36 @@
 }
 /* Sidebar and content automatically have equal height */</code></pre>
       <p>Grid items stretch to fill their row by default. The sidebar always matches the content height — no height: 100%, no flexbox column hacks.</p>
+
+      <h2>The responsive full-bleed with popout</h2>
+      <p>An extended version of the full-bleed pattern with multiple width levels:</p>
+      <pre><code>.content {
+  display: grid;
+  grid-template-columns:
+    [full-start] 1fr
+    [popout-start] 1fr
+    [content-start] min(60ch, 100%)
+    [content-end] 1fr
+    [popout-end] 1fr
+    [full-end];
+}
+.content > *        { grid-column: content; }
+.content > .popout  { grid-column: popout; }
+.content > .full    { grid-column: full; }</code></pre>
+      <p>Three width levels: normal content, popout (wider), and full bleed. Common in blog layouts where images should be wider than text.</p>
+
+      <h2>Overlapping for hero sections</h2>
+      <pre><code>.hero {
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+}
+.hero > * { grid-column: 1; }
+.hero .image { grid-row: 1 / -1; }
+.hero .text  { grid-row: 2; z-index: 1; }</code></pre>
+      <p>The image fills all rows, the text sits vertically centered (row 2 of 3) on top. Clean, no absolute positioning, no transform centering tricks.</p>
+
+      <h2>Why "only grid"?</h2>
+      <p>These layouts require simultaneous control of both axes, overlapping without removing elements from flow, or spanning items across tracks. Flexbox cannot overlap items in flow, cannot do full-bleed without negative margins, and cannot align items across both axes simultaneously.</p>
     </section>
 
     <section class="demo">

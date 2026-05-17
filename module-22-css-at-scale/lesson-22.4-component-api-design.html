@@ -223,6 +223,27 @@
       </div>
     </section>
 
+    <section class="lesson-body stack">
+      <h2>Real-world API documentation format</h2>
+      <p>Document your component API as a comment block at the top of the component file. This serves the same purpose as JSDoc or TypeScript interfaces — it tells consumers what they can control without reading the implementation:</p>
+      <pre><code>/*
+ * Button Component API
+ * ====================
+ * --btn-bg           : &lt;color&gt;   = oklch(48% 0.18 275)  | Background color
+ * --btn-color        : &lt;color&gt;   = oklch(100% 0 0)      | Text color
+ * --btn-radius       : &lt;length&gt;  = 0.5rem               | Corner radius
+ * --btn-padding-block  : &lt;length&gt; = 0.65rem             | Vertical padding
+ * --btn-padding-inline : &lt;length&gt; = 1.25rem             | Horizontal padding
+ * --btn-font-size    : &lt;length&gt;  = 0.875rem             | Font size
+ * --btn-font-weight  : &lt;number&gt;  = 500                  | Font weight
+ * --btn-border-width : &lt;length&gt;  = 0px                  | Border width
+ *
+ * Usage:
+ *   .my-context .btn { --btn-bg: var(--my-brand-color); }
+ */</code></pre>
+      <p>This format is scannable, grep-friendly, and provides everything a consumer needs: the property name, its expected type, its default value, and its purpose. No implementation details exposed.</p>
+    </section>
+
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Add <code>--btn-shadow</code> to the API with a default of <code>none</code>. Then create a variant called <code>.elevated</code> that sets a subtle box-shadow using the API property. Notice how you added a new capability without modifying the base component implementation — that is the power of a well-designed API.</p>

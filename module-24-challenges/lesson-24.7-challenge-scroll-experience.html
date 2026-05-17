@@ -224,6 +224,25 @@ body {
     <section class="callout">
       <h2>Hint</h2>
       <p>For the progress bar: <code>@keyframes fill { from { width: 0% } to { width: 100% } }</code> with <code>animation: fill linear; animation-timeline: scroll();</code>. For section reveals: define separate <code>@keyframes</code> for each animation type, then apply with <code>animation-timeline: view(); animation-range: entry 0% cover 40%;</code>. The <code>animation-range</code> controls when in the scroll the animation plays.</p>
+
+      <h2>Critical: the @supports fallback</h2>
+      <p>Without a fallback, your keyframes set <code>opacity: 0</code> as the starting state — meaning in browsers that don't support scroll-driven animations, the content is permanently invisible. The pattern:</p>
+      <pre><code>/* Default: content is visible */
+.chapter { opacity: 1; transform: none; }
+
+/* Only apply scroll animation if supported */
+@supports (animation-timeline: view()) {
+  .chapter.fade-up {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(2rem); }
+  to { opacity: 1; transform: translateY(0); }
+}</code></pre>
     </section>
 
     <nav class="lesson-nav cluster">

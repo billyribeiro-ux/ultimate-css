@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge Solutions &amp; Scoring · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 24</a>
+      <span>Solutions &amp; Scoring</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 24 · Reference</p>
+      <h1>Challenge Solutions &amp; Scoring</h1>
+      <p class="lead">Difficulty ratings, time estimates, key insights for each challenge, and the scoring rubric. Review only after you've attempted the challenge yourself.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Scoring rubric</h2>
+      <p>Grade each challenge on 5 dimensions. Each is worth 1-5 points for a maximum of 25 per challenge.</p>
+
+      <div class="demo-frame">
+        <style>
+          .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: system-ui;
+            font-size: 0.85rem;
+          }
+          .scoring-table th, .scoring-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-block-end: 1px solid oklch(90% 0.02 260);
+          }
+          .scoring-table th {
+            background: oklch(95% 0.02 260);
+            font-weight: 600;
+            color: oklch(35% 0.1 260);
+          }
+          .scoring-table td:first-child { font-weight: 600; }
+          .scoring-table tr:hover td { background: oklch(97% 0.01 260); }
+        </style>
+        <table class="scoring-table">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>5 (Excellent)</th>
+              <th>3 (Adequate)</th>
+              <th>1 (Needs work)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Architecture</td>
+              <td>Proper @layer order, tokens for all values, @scope where appropriate</td>
+              <td>Some layering, some tokens, mostly organized</td>
+              <td>No layers, hardcoded values, flat structure</td>
+            </tr>
+            <tr>
+              <td>Visual fidelity</td>
+              <td>Matches target exactly, polished details</td>
+              <td>Close to target, minor differences</td>
+              <td>Significant visual differences from target</td>
+            </tr>
+            <tr>
+              <td>Accessibility</td>
+              <td>Focus visible, reduced-motion, semantic HTML, proper contrast</td>
+              <td>Some a11y considerations, basic semantics</td>
+              <td>No accessibility considerations</td>
+            </tr>
+            <tr>
+              <td>Performance</td>
+              <td>No layout thrashing, efficient selectors, minimal repaints</td>
+              <td>Generally performant, minor issues</td>
+              <td>Expensive animations, complex selectors, bloated CSS</td>
+            </tr>
+            <tr>
+              <td>Code economy</td>
+              <td>Concise, no repetition, leverages cascade</td>
+              <td>Some repetition, mostly efficient</td>
+              <td>Verbose, lots of duplication, fighting the cascade</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Challenge reference</h2>
+
+      <h3>Challenge 1: Fix the Specificity War</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Beginner</li>
+        <li><strong>Time estimate:</strong> 10-15 minutes</li>
+        <li><strong>Key insight:</strong> The <code>@layer</code> order statement at the top (<code>@layer base, utilities, components;</code>) controls which layer wins regardless of selector specificity. Wrap each group in its named layer. The component layer is declared last, so it wins over the higher-specificity <code>.page .card</code> selector in the base layer.</li>
+        <li><strong>Common mistake:</strong> Forgetting that unlayered CSS always beats layered CSS. All rules must be inside a layer for the order to work.</li>
+      </ul>
+
+      <h3>Challenge 2: Build a Token System</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Intermediate</li>
+        <li><strong>Time estimate:</strong> 25-35 minutes</li>
+        <li><strong>Key insight:</strong> Separate primitive tokens (raw OKLCH values) from semantic tokens (contextual aliases). Semantic tokens use <code>light-dark()</code> to define both themes in one declaration. The naming convention (--color-primary-500 for primitives, --primary for semantic) creates a clear hierarchy.</li>
+        <li><strong>Common mistake:</strong> Putting dark mode values in a media query instead of using <code>light-dark()</code>. Or defining semantic tokens that reference other semantic tokens (creates circular dependencies).</li>
+      </ul>
+
+      <h3>Challenge 3: Responsive Layout, Zero Media Queries</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Intermediate</li>
+        <li><strong>Time estimate:</strong> 20-30 minutes</li>
+        <li><strong>Key insight:</strong> The <code>min(100%, Xrem)</code> pattern inside <code>minmax()</code> and <code>flex-basis</code> prevents overflow on narrow screens. <code>repeat(auto-fit, minmax(min(100%, 18rem), 1fr))</code> creates columns that exist only when there's room. <code>clamp()</code> for all fluid values (padding, font-size, gaps).</li>
+        <li><strong>Common mistake:</strong> Using fixed pixel values for min-width in <code>minmax()</code>, which causes overflow on mobile. Always use <code>min(100%, ...)</code> as the floor.</li>
+      </ul>
+
+      <h3>Challenge 4: Add Dark Mode in Under 20 Lines</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Intermediate</li>
+        <li><strong>Time estimate:</strong> 15-20 minutes</li>
+        <li><strong>Key insight:</strong> <code>light-dark()</code> is the game-changer — it eliminates the need for a separate media query block. Add <code>color-scheme: light dark</code> to <code>:root</code>, then replace each hardcoded color with <code>light-dark(lightValue, darkValue)</code>. You're modifying existing lines, not adding many new ones. Identify the 8-10 properties that actually need to change.</li>
+        <li><strong>Common mistake:</strong> Trying to add a full <code>@media (prefers-color-scheme: dark)</code> block that duplicates selectors. The constraint says no media queries — use <code>light-dark()</code> inline.</li>
+      </ul>
+
+      <h3>Challenge 5: Design a Button API</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Intermediate</li>
+        <li><strong>Time estimate:</strong> 25-35 minutes</li>
+        <li><strong>Key insight:</strong> The base <code>.btn</code> class references custom properties for EVERY visual value: <code>background: var(--btn-bg); color: var(--btn-text); padding: var(--btn-py) var(--btn-px);</code> etc. Variants only override those properties: <code>.btn-danger { --btn-bg: oklch(55% 0.2 25); --btn-text: white; }</code>. This is the Open/Closed principle applied to CSS.</li>
+        <li><strong>Common mistake:</strong> Declaring <code>background:</code> or <code>color:</code> directly in variant classes instead of only setting custom property values. The constraint is strict: variants set properties, not declarations.</li>
+      </ul>
+
+      <h3>Challenge 6: Orchestrate a 5-Step Animation</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Advanced</li>
+        <li><strong>Time estimate:</strong> 30-40 minutes</li>
+        <li><strong>Key insight:</strong> <code>@starting-style</code> defines where elements come FROM (the invisible state). The normal CSS defines where they end up. <code>transition-delay</code> creates the stagger. Each element gets: <code>opacity: 1; transform: none; transition: opacity 500ms ease, transform 500ms ease; transition-delay: Xms;</code> and in <code>@starting-style { opacity: 0; transform: translateY(1.5rem); }</code>.</li>
+        <li><strong>Common mistake:</strong> Putting <code>@starting-style</code> on the wrong element, or forgetting that it must be a nested rule inside the element's selector (or a standalone block that targets it).</li>
+      </ul>
+
+      <h3>Challenge 7: Build a Scroll-Driven Story</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Advanced</li>
+        <li><strong>Time estimate:</strong> 35-45 minutes</li>
+        <li><strong>Key insight:</strong> Two timeline types: <code>animation-timeline: scroll()</code> for the progress bar (tracks overall page scroll), and <code>animation-timeline: view()</code> for section reveals (tracks each element's visibility). <code>animation-range: entry 0% cover 40%</code> controls when in the scroll the animation plays. The <code>@supports</code> fallback ensures content is visible in unsupported browsers.</li>
+        <li><strong>Common mistake:</strong> Forgetting that without <code>@supports</code>, the keyframes set <code>opacity: 0</code> as initial state, making content invisible in browsers that don't support scroll-driven animations.</li>
+      </ul>
+
+      <h3>Challenge 8: Complete Form Validation</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Advanced</li>
+        <li><strong>Time estimate:</strong> 30-40 minutes</li>
+        <li><strong>Key insight:</strong> The <code>:not(:placeholder-shown)</code> trick — fields show validation styling only after the user has typed (the placeholder disappears). Combined with <code>:valid</code>/<code>:invalid</code>, you get: <code>input:not(:placeholder-shown):invalid</code>. The submit button uses <code>.form:has(input:invalid) .submit { pointer-events: none; opacity: 0.5; }</code>.</li>
+        <li><strong>Common mistake:</strong> Showing error states on page load (before the user has interacted). The <code>:not(:placeholder-shown)</code> guard is essential for good UX.</li>
+      </ul>
+
+      <h3>Challenge 9: Draw a Scene with One Element</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Expert</li>
+        <li><strong>Time estimate:</strong> 45-60 minutes</li>
+        <li><strong>Key insight:</strong> The main div's <code>background</code> property accepts multiple gradient layers — stack 3-4 gradients for sky sections. <code>::before</code> becomes the sun (small circle) with <code>box-shadow</code> creating its glow and cloud shapes. <code>::after</code> uses <code>clip-path: polygon()</code> for mountain silhouettes. The trick is treating <code>box-shadow</code> as a shape duplicator — each shadow is a copy of the element at an offset.</li>
+        <li><strong>Common mistake:</strong> Trying to create too much detail. Focus on recognizable shapes: clear sky gradient, a round sun with glow, jagged mountain silhouette, and a distinct water section at the bottom.</li>
+      </ul>
+
+      <h3>Challenge 10: Clone a Real UI</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Expert</li>
+        <li><strong>Time estimate:</strong> 50-70 minutes</li>
+        <li><strong>Key insight:</strong> The layout is a CSS Grid with two columns and two rows: <code>grid-template-columns: 14rem 1fr; grid-template-rows: 1fr auto;</code>. The sidebar spans both rows (<code>grid-row: 1 / -1</code>). The player bar spans both columns (<code>grid-column: 1 / -1</code>). The album grid inside uses <code>auto-fit</code>. Using <code>@scope(.player-bar)</code> keeps player styles encapsulated.</li>
+        <li><strong>Common mistake:</strong> Not using PE7 architecture as required — this isn't just about matching the visual, it's about the code structure. Tokens, layers, and scope must all be present.</li>
+      </ul>
+
+      <h3>Challenge 11: Build an Accessible Modal</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Expert</li>
+        <li><strong>Time estimate:</strong> 40-55 minutes</li>
+        <li><strong>Key insight:</strong> Exit animation is the hard part. You need: <code>transition: opacity 200ms, transform 200ms, display 200ms, overlay 200ms; transition-behavior: allow-discrete;</code>. The <code>overlay</code> property keeps the element in the top layer during exit. <code>@starting-style</code> inside <code>:popover-open</code> defines the entry state. The popover API gives you Escape-to-close and backdrop-click-to-close for free.</li>
+        <li><strong>Common mistake:</strong> Forgetting <code>transition-behavior: allow-discrete</code> — without it, <code>display</code> and <code>overlay</code> can't transition, and the exit is instant (no animation). Also forgetting to transition the <code>::backdrop</code> separately.</li>
+      </ul>
+
+      <h3>Challenge 12: The Final Boss</h3>
+      <ul>
+        <li><strong>Difficulty:</strong> Boss</li>
+        <li><strong>Time estimate:</strong> 90-120 minutes</li>
+        <li><strong>Key insight:</strong> Work in layers, literally. Start with your <code>@layer</code> order and tokens. Then reset+base. Then layout (the portfolio is a simple vertical stack). Then components one section at a time. Animations come last — they're enhancements, not structure. The 500-line constraint forces you to be economical: reuse tokens, leverage inheritance, avoid redundancy.</li>
+        <li><strong>Common mistake:</strong> Starting with animations or visual polish before the structure is solid. Also: writing verbose CSS that exceeds 500 lines. The constraint forces architectural thinking — every property must earn its place.</li>
+      </ul>
+
+      <h2>Score interpretation</h2>
+      <ul>
+        <li><strong>275-300 (all challenges):</strong> You've mastered modern CSS. Ship production code with confidence.</li>
+        <li><strong>220-274:</strong> Strong skills with some gaps. Review the challenges where you scored lowest.</li>
+        <li><strong>150-219:</strong> Good foundation. Revisit the module that corresponds to your weakest challenges.</li>
+        <li><strong>Below 150:</strong> More practice needed. Work through the earlier modules again, then retry.</li>
+      </ul>
+
+      <h2>What to do next</h2>
+      <p>If you completed all 12 challenges, you've demonstrated mastery of the techniques in this course. The next step is to apply these patterns in real projects. Every production stylesheet you write should use PE7 architecture, OKLCH colors, intrinsic sizing, and accessibility-first thinking.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-24.12-challenge-final-boss.html">&larr; Challenge 12</a>
+      <a href="../../index.html">Course Home &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

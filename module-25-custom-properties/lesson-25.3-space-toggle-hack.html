@@ -89,6 +89,18 @@ background: oklch(var(--lightness) 0.02 275);</code></pre>
 
 color: var(--if-dark, oklch(90% 0 0)) var(--if-light, oklch(20% 0 0));</code></pre>
       <p>This was the only pure-CSS conditional before the <code>if()</code> function. It remains useful for supporting older browsers.</p>
+
+      <h2>Limitations and gotchas</h2>
+      <p>The space toggle has real limitations to understand:</p>
+      <ul>
+        <li><strong>Not human-readable</strong> — the intent of <code>--flag: ;</code> is not obvious without comments.</li>
+        <li><strong>Only binary</strong> — unlike the numeric approach, the space toggle cannot represent intermediate states.</li>
+        <li><strong>DevTools confusion</strong> — some browser DevTools show the space value as empty, making debugging harder.</li>
+        <li><strong>Superseded by if()</strong> — when <code>if()</code> has full browser support, prefer it for new code.</li>
+      </ul>
+
+      <h2>When to use which approach</h2>
+      <p>Use the <strong>numeric toggle</strong> (<code>0/1</code>) when you need intermediate values, interpolation, or <code>calc()</code> math. Use the <strong>space toggle</strong> when you need to swap entire non-numeric values (like a font-family, a gradient, or a keyword). Use <strong>neither</strong> when you can simply override the property in a selector — the simplest solution is often the right one.</p>
     </section>
 
     <section class="demo">
@@ -213,6 +225,16 @@ color: var(--if-dark, oklch(90% 0 0)) var(--if-light, oklch(20% 0 0));</code></p
         <button class="btn" type="button" data-editor-action="run">Run</button>
         <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
       </div>
+    </section>
+
+    <section class="callout">
+      <h2>Quick reference: toggle patterns</h2>
+      <ul>
+        <li><strong>Numeric (0/1):</strong> <code>--is-dark: 1</code> — works with calc(), can interpolate.</li>
+        <li><strong>Fractional:</strong> <code>--is-dark: 0.5</code> — enables "halfway" states.</li>
+        <li><strong>Space toggle:</strong> <code>--flag: ;</code> (on) / <code>--flag: initial</code> (off) — swaps entire values.</li>
+        <li><strong>Future:</strong> <code>if(style(--dark: 1), dark-val, light-val)</code> — clean syntax when available.</li>
+      </ul>
     </section>
 
     <section class="callout">

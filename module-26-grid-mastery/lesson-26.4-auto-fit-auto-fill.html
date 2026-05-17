@@ -65,6 +65,29 @@
       <h2>Combining with min()</h2>
       <pre><code>grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));</code></pre>
       <p>The <code>min(18rem, 100%)</code> prevents overflow on containers narrower than 18rem — the minimum becomes 100% of the container instead.</p>
+
+      <h2>Common patterns</h2>
+      <h3>Card grid (most common)</h3>
+      <pre><code>.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: 1.5rem;
+}</code></pre>
+      <p>This single rule creates a fully responsive card grid. Cards are at least 18rem, stretch to fill, and wrap to new rows automatically.</p>
+
+      <h3>Fixed minimum, capped maximum</h3>
+      <pre><code>grid-template-columns: repeat(auto-fill, minmax(15rem, 25rem));</code></pre>
+      <p>Items stay between 15rem and 25rem. Extra space goes unused (items don't stretch to fill). Useful when you want a consistent card size.</p>
+
+      <h3>Combining with explicit tracks</h3>
+      <pre><code>grid-template-columns: 16rem repeat(auto-fit, minmax(12rem, 1fr));</code></pre>
+      <p>A fixed sidebar followed by auto-fitting content columns. The sidebar stays at 16rem; the content area adapts.</p>
+
+      <h2>The "1 column on mobile" problem</h2>
+      <p>Without <code>min()</code>, if the container is narrower than your minmax minimum, the grid overflows. Always use the <code>min(value, 100%)</code> pattern for production grids to prevent horizontal scroll on small screens.</p>
+
+      <h2>Performance note</h2>
+      <p><code>auto-fit</code> and <code>auto-fill</code> are calculated once per layout pass. They don't cause layout thrashing — the browser determines the column count from the container width and minmax values in a single calculation.</p>
     </section>
 
     <section class="demo">
@@ -179,6 +202,17 @@ h3 { color: oklch(50% 0 0); font-size: 0.9rem; }
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Add more items (6-8) to both grids and resize the preview. With many items, auto-fit and auto-fill behave identically. Remove items until only 2 remain to see the difference. Try changing <code>minmax(8rem, 1fr)</code> to <code>minmax(min(8rem, 100%), 1fr)</code> and make the preview very narrow.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>auto-fit</code> collapses empty tracks — items stretch to fill</li>
+        <li><code>auto-fill</code> keeps empty tracks — items stay at minmax size</li>
+        <li>The difference only matters when items don't fill all available columns</li>
+        <li>Always wrap the min value with <code>min(value, 100%)</code> for narrow containers</li>
+        <li>This is the single most useful responsive grid pattern — memorize it</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

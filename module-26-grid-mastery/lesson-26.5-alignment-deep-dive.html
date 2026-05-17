@@ -79,6 +79,34 @@ place-self: end center;        /* align-self: end; justify-self: center */</code
   min-height: 100vh;
 }</code></pre>
       <p>Two lines to center anything both horizontally and vertically.</p>
+
+      <h2>When -content matters</h2>
+      <p><code>justify-content</code> and <code>align-content</code> only have a visible effect when the grid is smaller than its container. This happens when:</p>
+      <ul>
+        <li>You use fixed track sizes (e.g., <code>repeat(3, 8rem)</code>) in a wider container</li>
+        <li>You use <code>max-content</code> or <code>fit-content()</code> tracks</li>
+        <li>The container has an explicit height larger than the grid's row tracks</li>
+      </ul>
+      <p>With <code>fr</code> tracks, the grid always fills its container — so <code>-content</code> properties have no effect.</p>
+
+      <h2>Alignment and writing modes</h2>
+      <p>In left-to-right languages, <code>justify-*</code> is horizontal and <code>align-*</code> is vertical. In vertical writing modes, they swap. The properties follow the logical axes: inline (justify) and block (align). This makes grid layouts automatically work in any writing direction.</p>
+
+      <h2>The normal value</h2>
+      <p><code>normal</code> behaves like <code>stretch</code> for grid items (they fill their cell). It's the initial value for <code>justify-items</code> and <code>align-items</code>. For <code>-content</code>, <code>normal</code> behaves like <code>start</code>.</p>
+
+      <h2>Practical patterns</h2>
+      <pre><code>/* Center everything in the grid */
+.grid { place-items: center; }
+
+/* Stretch horizontally, center vertically */
+.grid { justify-items: stretch; align-items: center; }
+
+/* Distribute tracks evenly, items fill cells */
+.grid { place-content: space-evenly; place-items: stretch; }
+
+/* One item overrides */
+.special { place-self: end center; }</code></pre>
     </section>
 
     <section class="demo">

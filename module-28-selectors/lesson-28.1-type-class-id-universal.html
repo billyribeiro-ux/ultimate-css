@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.1 — Type, Class, ID, Universal Selectors · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.1 · Reference</p>
+      <h1>Type, Class, ID, Universal Selectors</h1>
+      <p class="lead">These are the four fundamental selectors — the atoms from which all CSS targeting is built. Each has a different specificity weight, a different appropriate use case, and a clear place in the PE7 architecture.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Type selectors</h2>
+      <p>Target elements by their HTML tag name. Specificity: <strong>(0, 0, 1)</strong>.</p>
+      <pre><code>h1 { font-size: 2rem; }
+p  { line-height: 1.6; }
+a  { color: oklch(50% 0.2 275); }</code></pre>
+      <p><strong>PE7 placement:</strong> The <code>base</code> layer. Type selectors set foundational element styles — typography, spacing, link colors. They should never appear in component layers where classes dominate.</p>
+
+      <h2>Class selectors</h2>
+      <p>Target elements by their <code>class</code> attribute. Specificity: <strong>(0, 1, 0)</strong>.</p>
+      <pre><code>.card    { border-radius: 0.75rem; }
+.btn     { padding: 0.5rem 1rem; }
+.active  { background: oklch(55% 0.2 275); }</code></pre>
+      <p><strong>PE7 placement:</strong> The workhorse of <code>components</code> and <code>utilities</code> layers. Classes are the primary targeting mechanism in modern CSS. They're reusable, composable, and have predictable specificity.</p>
+
+      <h3>Multi-class patterns</h3>
+      <pre><code>/* Compound: element must have BOTH classes */
+.btn.primary { background: oklch(55% 0.2 275); }
+
+/* Two separate classes for composition */
+.btn { padding: 0.5rem 1rem; }
+.primary { background: oklch(55% 0.2 275); }</code></pre>
+
+      <h2>ID selectors</h2>
+      <p>Target a single element by its <code>id</code> attribute. Specificity: <strong>(1, 0, 0)</strong>.</p>
+      <pre><code>#hero    { min-height: 100vh; }
+#sidebar { grid-area: sidebar; }</code></pre>
+      <p><strong>PE7 placement:</strong> Avoid in stylesheets. IDs have extremely high specificity (1,0,0 = 256 classes in the old model), making them nearly impossible to override without <code>!important</code>. Use IDs for JavaScript hooks and fragment links only. In PE7, cascade layers eliminate any need for ID specificity.</p>
+
+      <h2>Universal selector</h2>
+      <p>Matches any element. Specificity: <strong>(0, 0, 0)</strong> — adds zero specificity.</p>
+      <pre><code>/* The classic box-sizing reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Lobotomized owl — spacing between adjacent siblings */
+* + * {
+  margin-block-start: 1rem;
+}</code></pre>
+      <p><strong>PE7 placement:</strong> The <code>reset</code> layer. The universal selector is perfect for global resets because it adds no specificity weight.</p>
+
+      <h2>Specificity comparison</h2>
+      <table>
+        <thead><tr><th>Selector</th><th>Specificity</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Universal *</td><td>(0, 0, 0)</td><td>* { margin: 0; }</td></tr>
+          <tr><td>Type</td><td>(0, 0, 1)</td><td>p { color: black; }</td></tr>
+          <tr><td>Class</td><td>(0, 1, 0)</td><td>.card { padding: 1rem; }</td></tr>
+          <tr><td>ID</td><td>(1, 0, 0)</td><td>#nav { display: flex; }</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Best practices</h2>
+      <ul>
+        <li>Use type selectors only in base/reset layers.</li>
+        <li>Use classes for all component and utility styling.</li>
+        <li>Avoid IDs in CSS — use cascade layers for specificity control instead.</li>
+        <li>Use the universal selector sparingly and only in resets.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — specificity in action</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-1 { padding: 1.5rem; font-family: system-ui; }
+          .demo-28-1 p { color: oklch(50% 0.1 150); margin: 0.5rem 0; font-size: 0.9rem; }
+          .demo-28-1 .highlight { color: oklch(50% 0.2 275); font-weight: 600; }
+          .demo-28-1 #unique { color: oklch(55% 0.22 25); font-weight: 700; }
+          .demo-28-1 .label { font-size: 0.7rem; color: oklch(60% 0 0); font-family: monospace; margin-inline-start: 0.5rem; }
+        </style>
+        <div class="demo-28-1">
+          <p>Styled by type selector <code>p</code> (0,0,1) <span class="label">green</span></p>
+          <p class="highlight">Styled by class <code>.highlight</code> (0,1,0) <span class="label">purple</span></p>
+          <p class="highlight" id="unique">Styled by ID <code>#unique</code> (1,0,0) wins over class <span class="label">red</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;p&gt;Default paragraph (type selector).&lt;/p&gt;
+&lt;p class="special"&gt;Has a class applied.&lt;/p&gt;
+&lt;p class="special" id="hero-text"&gt;Has both class and ID.&lt;/p&gt;
+&lt;div class="special"&gt;A div with the same class.&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+/* Type selector: (0,0,1) */
+p { color: oklch(50% 0.15 200); }
+
+/* Class selector: (0,1,0) — wins over type */
+.special { color: oklch(55% 0.2 275); font-weight: 600; }
+
+/* ID selector: (1,0,0) — wins over class */
+#hero-text { color: oklch(55% 0.22 25); }
+
+/* Universal: (0,0,0) */
+* { margin: 0; padding: 0; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Style a navigation: use a type selector for the <code>nav</code> element's base layout, class selectors for <code>.nav-link</code> styles, and demonstrate why an ID selector on one link makes it impossible to override with just classes. Then wrap everything in <code>@layer</code> and show how layers make specificity irrelevant.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 28</a>
+      <a href="./lesson-28.2-combinators.html">Lesson 28.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

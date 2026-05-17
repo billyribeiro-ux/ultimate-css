@@ -70,6 +70,39 @@
 
       <h2>repeat() notation</h2>
       <p><code>repeat(3, 1fr)</code> is shorthand for <code>1fr 1fr 1fr</code>. You can repeat patterns: <code>repeat(3, 1fr 2fr)</code> creates 6 columns alternating 1fr and 2fr.</p>
+
+      <h2>minmax() for flexible tracks</h2>
+      <p><code>minmax(min, max)</code> defines a track that is at least <code>min</code> and at most <code>max</code>. The most common pattern:</p>
+      <pre><code>grid-template-rows: minmax(8rem, auto);
+/* Row is at least 8rem, grows with content */
+
+grid-template-columns: minmax(200px, 1fr);
+/* Column is at least 200px, takes available space */</code></pre>
+
+      <h3>Track sizing keywords</h3>
+      <ul>
+        <li><code>auto</code> — sizes to content (as min: largest min-content, as max: largest max-content)</li>
+        <li><code>min-content</code> — the smallest the track can be without overflow</li>
+        <li><code>max-content</code> — the ideal size if space were unlimited</li>
+        <li><code>fit-content(value)</code> — clamps max-content at the given value</li>
+      </ul>
+
+      <h2>Grid terminology summary</h2>
+      <ul>
+        <li><strong>Grid container</strong> — the element with <code>display: grid</code></li>
+        <li><strong>Grid item</strong> — direct children of the container</li>
+        <li><strong>Track</strong> — a row or column</li>
+        <li><strong>Line</strong> — the boundary between tracks (numbered starting at 1)</li>
+        <li><strong>Cell</strong> — the intersection of one row track and one column track</li>
+        <li><strong>Area</strong> — a rectangular set of cells</li>
+      </ul>
+
+      <h2>Common mistakes</h2>
+      <p>Setting <code>display: grid</code> on an element does NOT make its grandchildren grid items. Only direct children participate in the grid layout. Nested elements need their own grid or flex context.</p>
+      <p>Using percentage-based gaps can cause overflow. Prefer <code>rem</code> or <code>em</code> for gap values. The <code>fr</code> unit accounts for gaps automatically — percentages don't.</p>
+
+      <h2>The grid inspector</h2>
+      <p>Every modern browser has a grid inspector in DevTools. It overlays line numbers, track sizes, and area names directly on the page. Always use it when debugging grid layouts — it makes invisible track boundaries visible.</p>
     </section>
 
     <section class="demo">
@@ -100,12 +133,15 @@
           .demo-26-1 .cell:nth-child(6) { background: oklch(75% 0.12 90); color: oklch(20% 0.05 90); }
         </style>
         <div class="demo-26-1">
-          <div class="cell">200px fixed</div>
+          <div class="cell">10rem fixed</div>
           <div class="cell">1fr flexible</div>
           <div class="cell">1fr flexible</div>
-          <div class="cell">Implicit row</div>
-          <div class="cell">Implicit row</div>
-          <div class="cell">Implicit row</div>
+          <div class="cell">Implicit row 1</div>
+          <div class="cell">Implicit row 2</div>
+          <div class="cell">Implicit row 3</div>
+          <div class="cell">Implicit row 4</div>
+          <div class="cell">Implicit row 5</div>
+          <div class="cell">Implicit row 6</div>
         </div>
       </div>
     </section>
@@ -159,6 +195,21 @@
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Change the grid to 4 columns using <code>repeat(4, 1fr)</code>. Add 8 items and observe how implicit rows form. Then set <code>grid-auto-rows: 10rem</code> to control their height. Finally, try <code>gap: 0.5rem 2rem</code> for different row and column gaps.</p>
+      <p>Next, define explicit rows with <code>grid-template-rows: 4rem 8rem</code>. Add 9 items — the first 8 fill the explicit 2 rows of 4 columns, and the 9th creates an implicit third row. Compare the implicit row height with and without <code>grid-auto-rows</code> set.</p>
+      <p>Try mixing units: <code>grid-template-columns: 200px 2fr 1fr</code>. The first column is fixed, the second gets twice the remaining space of the third. Resize the container and observe that only the fr columns resize.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>display: grid</code> turns an element into a grid container</li>
+        <li><code>grid-template-columns</code> and <code>grid-template-rows</code> define explicit tracks</li>
+        <li>The <code>fr</code> unit distributes remaining space proportionally</li>
+        <li><code>gap</code> adds gutters between (not around) tracks</li>
+        <li><code>grid-auto-rows</code> controls the size of implicitly created rows</li>
+        <li><code>repeat()</code> reduces repetition in track definitions</li>
+        <li><code>minmax()</code> creates tracks with minimum and maximum size constraints</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

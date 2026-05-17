@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.12 — 12 Grid Recipes You'll Use Every Week · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.12 · Layout</p>
+      <h1>12 Grid Recipes You'll Use Every Week</h1>
+      <p class="lead">A quick-reference collection of the most common CSS Grid patterns. No prose — just code and result for each recipe.</p>
+    </header>
+
+    <section class="demo">
+      <div class="demo-frame">
+        <style>
+          .demo-26-12 {
+            font-family: system-ui;
+            padding: 1rem;
+            display: grid;
+            gap: 2rem;
+            font-size: 0.75rem;
+          }
+          .demo-26-12 .recipe { border: 1px solid oklch(90% 0.02 275); border-radius: 0.5rem; overflow: hidden; }
+          .demo-26-12 .recipe-title { padding: 0.5rem 0.75rem; background: oklch(95% 0.02 275); font-weight: 700; font-size: 0.7rem; border-bottom: 1px solid oklch(90% 0.02 275); }
+          .demo-26-12 .recipe-body { padding: 0.75rem; }
+          .demo-26-12 .cell { background: oklch(75% 0.12 275); color: white; padding: 0.5rem; border-radius: 0.25rem; display: grid; place-items: center; font-weight: 600; min-height: 2rem; }
+
+          /* 1. Equal columns */
+          .demo-26-12 .r1 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+
+          /* 2. Sidebar + content */
+          .demo-26-12 .r2 { display: grid; grid-template-columns: 6rem 1fr; gap: 0.4rem; }
+          .demo-26-12 .r2 .cell:first-child { background: oklch(65% 0.15 160); }
+
+          /* 3. Holy grail */
+          .demo-26-12 .r3 {
+            display: grid;
+            grid-template-columns: 5rem 1fr 5rem;
+            grid-template-rows: auto 4rem auto;
+            grid-template-areas: "h h h" "s m a" "f f f";
+            gap: 0.3rem;
+          }
+          .demo-26-12 .r3 .h { grid-area: h; background: oklch(60% 0.18 275); }
+          .demo-26-12 .r3 .s { grid-area: s; background: oklch(70% 0.12 160); }
+          .demo-26-12 .r3 .m { grid-area: m; background: oklch(85% 0.05 220); color: oklch(30% 0 0); }
+          .demo-26-12 .r3 .a { grid-area: a; background: oklch(70% 0.12 50); }
+          .demo-26-12 .r3 .f { grid-area: f; background: oklch(50% 0.12 275); }
+
+          /* 4. Auto-responsive */
+          .demo-26-12 .r4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr)); gap: 0.4rem; }
+
+          /* 5. Full-bleed */
+          .demo-26-12 .r5 { display: grid; grid-template-columns: 1fr min(20ch, 100%) 1fr; gap: 0.3rem 0; }
+          .demo-26-12 .r5 > * { grid-column: 2; }
+          .demo-26-12 .r5 .bleed { grid-column: 1 / -1; background: oklch(60% 0.18 30); }
+
+          /* 6. Pancake stack */
+          .demo-26-12 .r6 { display: grid; grid-template-rows: auto 1fr auto; height: 8rem; gap: 0.3rem; }
+          .demo-26-12 .r6 .cell:nth-child(2) { background: oklch(90% 0.04 220); color: oklch(30% 0 0); }
+
+          /* 7. Centering */
+          .demo-26-12 .r7 { display: grid; place-items: center; height: 5rem; background: oklch(95% 0.02 275); border-radius: 0.25rem; }
+
+          /* 8. Overlap */
+          .demo-26-12 .r8 { display: grid; height: 5rem; }
+          .demo-26-12 .r8 > * { grid-area: 1 / 1; }
+          .demo-26-12 .r8 .bg { background: oklch(65% 0.12 200); border-radius: 0.25rem; }
+          .demo-26-12 .r8 .fg { align-self: end; justify-self: start; background: oklch(0% 0 0 / 0.6); color: white; padding: 0.3rem 0.6rem; border-radius: 0 0.25rem 0 0.25rem; }
+
+          /* 9. Dense photo grid */
+          .demo-26-12 .r9 { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 2.5rem; grid-auto-flow: dense; gap: 0.3rem; }
+          .demo-26-12 .r9 .wide { grid-column: span 2; background: oklch(60% 0.18 30); }
+          .demo-26-12 .r9 .tall { grid-row: span 2; background: oklch(60% 0.15 160); }
+
+          /* 10. Card grid subgrid */
+          .demo-26-12 .r10 { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto 1fr auto; gap: 0.4rem; }
+          .demo-26-12 .r10 .card { grid-row: span 3; display: grid; grid-template-rows: subgrid; gap: 0.2rem; background: oklch(95% 0.02 275); padding: 0.4rem; border-radius: 0.25rem; border: 1px solid oklch(88% 0.02 275); }
+          .demo-26-12 .r10 .card span { font-size: 0.65rem; }
+
+          /* 11. Dashboard widgets */
+          .demo-26-12 .r11 { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 3rem; gap: 0.3rem; }
+          .demo-26-12 .r11 .big { grid-column: span 2; grid-row: span 2; background: oklch(55% 0.2 275); }
+          .demo-26-12 .r11 .cell:nth-child(even):not(.big) { background: oklch(70% 0.12 160); }
+
+          /* 12. Magazine */
+          .demo-26-12 .r12 { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 2.5rem; grid-auto-flow: dense; gap: 0.3rem; }
+          .demo-26-12 .r12 .hero { grid-column: span 2; grid-row: span 2; background: oklch(50% 0.2 275); }
+          .demo-26-12 .r12 .cell:nth-child(3) { background: oklch(65% 0.15 30); }
+          .demo-26-12 .r12 .cell:nth-child(5) { background: oklch(65% 0.15 160); }
+        </style>
+        <div class="demo-26-12">
+          <!-- 1 -->
+          <div class="recipe">
+            <div class="recipe-title">1. Equal-width columns — repeat(3, 1fr)</div>
+            <div class="recipe-body r1">
+              <div class="cell">1fr</div><div class="cell">1fr</div><div class="cell">1fr</div>
+            </div>
+          </div>
+          <!-- 2 -->
+          <div class="recipe">
+            <div class="recipe-title">2. Sidebar + content — 20rem 1fr</div>
+            <div class="recipe-body r2">
+              <div class="cell">Sidebar</div><div class="cell">Content</div>
+            </div>
+          </div>
+          <!-- 3 -->
+          <div class="recipe">
+            <div class="recipe-title">3. Holy grail — named areas</div>
+            <div class="recipe-body r3">
+              <div class="cell h">Header</div>
+              <div class="cell s">Side</div>
+              <div class="cell m">Main</div>
+              <div class="cell a">Aside</div>
+              <div class="cell f">Footer</div>
+            </div>
+          </div>
+          <!-- 4 -->
+          <div class="recipe">
+            <div class="recipe-title">4. Auto-responsive — auto-fit minmax</div>
+            <div class="recipe-body r4">
+              <div class="cell">A</div><div class="cell">B</div><div class="cell">C</div><div class="cell">D</div><div class="cell">E</div>
+            </div>
+          </div>
+          <!-- 5 -->
+          <div class="recipe">
+            <div class="recipe-title">5. Full-bleed content</div>
+            <div class="recipe-body r5">
+              <div class="cell" style="background:oklch(90% 0.03 220);color:oklch(30% 0 0)">Constrained</div>
+              <div class="cell bleed">Full bleed</div>
+              <div class="cell" style="background:oklch(90% 0.03 220);color:oklch(30% 0 0)">Constrained</div>
+            </div>
+          </div>
+          <!-- 6 -->
+          <div class="recipe">
+            <div class="recipe-title">6. Pancake stack — auto 1fr auto</div>
+            <div class="recipe-body r6">
+              <div class="cell">Header</div><div class="cell">Stretchy main</div><div class="cell">Footer</div>
+            </div>
+          </div>
+          <!-- 7 -->
+          <div class="recipe">
+            <div class="recipe-title">7. Centering — place-items: center</div>
+            <div class="recipe-body r7">
+              <div class="cell" style="min-height:auto;padding:0.5rem 1rem">Centered</div>
+            </div>
+          </div>
+          <!-- 8 -->
+          <div class="recipe">
+            <div class="recipe-title">8. Overlap — same grid area</div>
+            <div class="recipe-body r8">
+              <div class="bg"></div>
+              <div class="fg">Overlay text</div>
+            </div>
+          </div>
+          <!-- 9 -->
+          <div class="recipe">
+            <div class="recipe-title">9. Dense photo grid</div>
+            <div class="recipe-body r9">
+              <div class="cell">1</div><div class="cell wide">2 wide</div><div class="cell">3</div>
+              <div class="cell tall">4 tall</div><div class="cell">5</div><div class="cell">6</div><div class="cell">7</div>
+            </div>
+          </div>
+          <!-- 10 -->
+          <div class="recipe">
+            <div class="recipe-title">10. Card grid with subgrid alignment</div>
+            <div class="recipe-body r10">
+              <div class="card"><strong>Title</strong><span>Description text here</span><span style="color:oklch(50% 0.15 275)">CTA</span></div>
+              <div class="card"><strong>Longer Title</strong><span>More desc</span><span style="color:oklch(50% 0.15 275)">CTA</span></div>
+              <div class="card"><strong>Short</strong><span>Desc</span><span style="color:oklch(50% 0.15 275)">CTA</span></div>
+            </div>
+          </div>
+          <!-- 11 -->
+          <div class="recipe">
+            <div class="recipe-title">11. Dashboard widgets</div>
+            <div class="recipe-body r11">
+              <div class="cell big">Big widget</div>
+              <div class="cell">Small</div><div class="cell">Small</div>
+              <div class="cell">Small</div><div class="cell">Small</div>
+            </div>
+          </div>
+          <!-- 12 -->
+          <div class="recipe">
+            <div class="recipe-title">12. Magazine layout — mixed spans</div>
+            <div class="recipe-body r12">
+              <div class="cell hero">Hero</div>
+              <div class="cell">Article</div><div class="cell">Article</div><div class="cell">Article</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
+  &lt;div class="cell"&gt;1&lt;/div&gt;
+  &lt;div class="cell"&gt;2&lt;/div&gt;
+  &lt;div class="cell"&gt;3&lt;/div&gt;
+  &lt;div class="cell"&gt;4&lt;/div&gt;
+  &lt;div class="cell"&gt;5&lt;/div&gt;
+  &lt;div class="cell"&gt;6&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+/* Swap between recipes! */
+.grid {
+  display: grid;
+
+  /* Recipe 1: Equal columns */
+  grid-template-columns: repeat(3, 1fr);
+
+  /* Recipe 4: Auto-responsive */
+  /* grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); */
+
+  /* Recipe 6: Pancake */
+  /* grid-template-rows: auto 1fr auto; height: 80vh; */
+
+  /* Recipe 7: Centering */
+  /* place-items: center; height: 80vh; */
+
+  gap: 0.75rem;
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: oklch(65% 0.18 275);
+  color: white;
+  font-weight: 700;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.11-grid-lanes-masonry.html">← Lesson 26.11</a>
+      <a href="./project/index.html">Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

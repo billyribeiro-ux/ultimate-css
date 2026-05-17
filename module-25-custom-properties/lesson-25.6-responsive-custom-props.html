@@ -90,6 +90,28 @@
 @container (min-width: 50rem) {
   .article { --heading-size: 2.5rem; }
 }</code></pre>
+
+      <h2>The "configuration" vs. "implementation" split</h2>
+      <p>This pattern creates a clear architectural boundary:</p>
+      <ul>
+        <li><strong>Configuration layer</strong> — container/media queries that set property values. Answers "when?" and "what value?"</li>
+        <li><strong>Implementation layer</strong> — component styles that consume properties. Answers "how is this value used?"</li>
+      </ul>
+      <p>This separation means you can change breakpoints without touching components, or restyle components without touching breakpoints. Each layer can be maintained independently.</p>
+
+      <h2>Combining with design tokens</h2>
+      <p>In a token-based system, responsive custom properties become the bridge between static tokens and dynamic context:</p>
+      <pre><code>/* Static tokens (never change) */
+:root { --space-sm: 0.5rem; --space-md: 1rem; --space-lg: 1.5rem; }
+
+/* Context-aware mapping */
+.panel { --panel-gap: var(--space-sm); }
+@container (min-width: 30rem) {
+  .panel { --panel-gap: var(--space-md); }
+}
+@container (min-width: 50rem) {
+  .panel { --panel-gap: var(--space-lg); }
+}</code></pre>
     </section>
 
     <section class="demo">
