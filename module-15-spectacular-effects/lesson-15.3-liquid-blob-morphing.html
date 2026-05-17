@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.3 — Liquid Blob Morphing · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.3 · Spectacular Effects</p>
+      <h1>Liquid Blob Morphing</h1>
+      <p class="lead">The classic "liquid" effect: blobs that merge and separate like a lava lamp. Uses the <code>filter: blur() contrast()</code> CSS trick — a parent with high contrast clips blurred children into hard-edged organic shapes that fuse on overlap.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The blur-contrast trick</h2>
+      <p>This is one of CSS's most satisfying visual hacks. The parent container gets <code>filter: contrast(20)</code> and a solid background (white or black). Children get <code>filter: blur(20px)</code> and solid-colored backgrounds. Here is why it works:</p>
+
+      <h3>The science</h3>
+      <p>A Gaussian blur spreads each pixel's color into its neighbors, creating soft, semi-transparent edges. When <code>contrast(20)</code> is applied to the parent, it crushes those soft edges into hard edges — pixels above 50% opacity become fully opaque, below become transparent. When two blurred shapes overlap, their combined opacity in the overlap zone crosses the threshold, and the contrast filter fuses them into one continuous organic shape.</p>
+
+      <h3>The lava lamp pattern</h3>
+      <p>Animate 4 blobs along different orbital paths using <code>@keyframes</code>. Each blob follows a different timing and path so they constantly merge and separate. The motion should be slow — 10-15 second cycles — to feel organic rather than frantic.</p>
+
+      <pre><code>.lava-container {
+  filter: contrast(20);
+  background: oklch(0% 0 0);  /* must match desired bg */
+}
+.blob {
+  filter: blur(20px);
+  background: oklch(65% 0.25 160);
+  border-radius: 50%;
+  animation: orbit-1 12s ease-in-out infinite;
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Lava lamp blobs</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-15-3 {
+            display: grid;
+            place-items: center;
+            padding: 1rem;
+            font-family: system-ui, sans-serif;
+          }
+          .demo-15-3 .lava-container {
+            position: relative;
+            inline-size: 100%;
+            max-inline-size: 600px;
+            block-size: 350px;
+            background: oklch(0% 0 0);
+            filter: contrast(20);
+            border-radius: 1rem;
+            overflow: hidden;
+          }
+          .demo-15-3 .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(20px);
+          }
+          .demo-15-3 .blob-1 {
+            inline-size: 120px;
+            block-size: 120px;
+            background: oklch(65% 0.25 160);
+            top: 40%;
+            left: 20%;
+            animation: blob-orbit-1 12s ease-in-out infinite;
+          }
+          .demo-15-3 .blob-2 {
+            inline-size: 100px;
+            block-size: 100px;
+            background: oklch(60% 0.25 190);
+            top: 30%;
+            left: 50%;
+            animation: blob-orbit-2 15s ease-in-out infinite;
+          }
+          .demo-15-3 .blob-3 {
+            inline-size: 140px;
+            block-size: 140px;
+            background: oklch(55% 0.22 275);
+            top: 50%;
+            left: 35%;
+            animation: blob-orbit-3 10s ease-in-out infinite;
+          }
+          .demo-15-3 .blob-4 {
+            inline-size: 90px;
+            block-size: 90px;
+            background: oklch(65% 0.20 330);
+            top: 25%;
+            left: 65%;
+            animation: blob-orbit-4 13s ease-in-out infinite;
+          }
+
+          @keyframes blob-orbit-1 {
+            0%, 100% { transform: translate(0, 0); }
+            25%      { transform: translate(120px, -40px); }
+            50%      { transform: translate(80px, 60px); }
+            75%      { transform: translate(-40px, 30px); }
+          }
+          @keyframes blob-orbit-2 {
+            0%, 100% { transform: translate(0, 0); }
+            25%      { transform: translate(-80px, 50px); }
+            50%      { transform: translate(-120px, -20px); }
+            75%      { transform: translate(30px, -60px); }
+          }
+          @keyframes blob-orbit-3 {
+            0%, 100% { transform: translate(0, 0); }
+            25%      { transform: translate(60px, -70px); }
+            50%      { transform: translate(-50px, -40px); }
+            75%      { transform: translate(90px, 20px); }
+          }
+          @keyframes blob-orbit-4 {
+            0%, 100% { transform: translate(0, 0); }
+            25%      { transform: translate(-100px, 30px); }
+            50%      { transform: translate(40px, 70px); }
+            75%      { transform: translate(-60px, -50px); }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-3 .blob {
+              animation: none;
+            }
+          }
+        </style>
+        <div class="demo-15-3">
+          <div class="lava-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+            <div class="blob blob-4"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="lava"&gt;
+  &lt;div class="blob b1"&gt;&lt;/div&gt;
+  &lt;div class="blob b2"&gt;&lt;/div&gt;
+  &lt;div class="blob b3"&gt;&lt;/div&gt;
+  &lt;div class="blob b4"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  background: oklch(15% 0.02 270);
+  font-family: system-ui;
+}
+
+/* The contrast filter on the parent
+   is the secret sauce */
+.lava {
+  position: relative;
+  width: 500px; height: 350px;
+  background: oklch(0% 0 0);
+  filter: contrast(20);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* Blurred children merge organically */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+.b1 {
+  width: 120px; height: 120px;
+  background: oklch(65% 0.25 160);
+  top: 40%; left: 20%;
+  animation: o1 12s ease-in-out infinite;
+}
+.b2 {
+  width: 100px; height: 100px;
+  background: oklch(60% 0.25 190);
+  top: 30%; left: 50%;
+  animation: o2 15s ease-in-out infinite;
+}
+.b3 {
+  width: 140px; height: 140px;
+  background: oklch(55% 0.22 275);
+  top: 50%; left: 35%;
+  animation: o3 10s ease-in-out infinite;
+}
+.b4 {
+  width: 90px; height: 90px;
+  background: oklch(65% 0.20 330);
+  top: 25%; left: 65%;
+  animation: o4 13s ease-in-out infinite;
+}
+
+@keyframes o1 {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(120px,-40px); }
+  50% { transform: translate(80px,60px); }
+  75% { transform: translate(-40px,30px); }
+}
+@keyframes o2 {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(-80px,50px); }
+  50% { transform: translate(-120px,-20px); }
+  75% { transform: translate(30px,-60px); }
+}
+@keyframes o3 {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(60px,-70px); }
+  50% { transform: translate(-50px,-40px); }
+  75% { transform: translate(90px,20px); }
+}
+@keyframes o4 {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(-100px,30px); }
+  50% { transform: translate(40px,70px); }
+  75% { transform: translate(-60px,-50px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change the container background to <code>oklch(100% 0 0)</code> (white) and the blob colors to darker values. The same merging effect works in reverse. Then try reducing <code>contrast()</code> from <code>20</code> to <code>5</code> — the edges become softer and more organic. Try adding a fifth blob with <code>oklch(70% 0.22 60)</code> (warm gold) for a richer palette.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.2-holographic-card.html">&larr; Lesson 15.2</a>
+      <a href="./lesson-15.4-aurora-northern-lights.html">Lesson 15.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

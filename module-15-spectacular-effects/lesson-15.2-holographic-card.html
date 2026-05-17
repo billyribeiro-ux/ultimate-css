@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.2 — The Holographic Card · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.2 · Spectacular Effects</p>
+      <h1>The Holographic Card</h1>
+      <p class="lead">An iridescent, rainbow-shifting card surface that looks like a holographic trading card. A conic-gradient of OKLCH rainbow hues layered with mix-blend-mode, animated with @property for a constant subtle shimmer — genuinely magical in pure CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The holographic illusion</h2>
+      <p>Holographic surfaces shift color based on viewing angle. We simulate this with a <code>conic-gradient</code> of rainbow hues layered over the card using <code>mix-blend-mode: color-dodge</code> at low opacity. The gradient's center position shifts on hover (via custom properties), creating the angle-reactive shimmer.</p>
+
+      <h3>The @property animation trick</h3>
+      <p>We register <code>--holo-angle</code> as an <code>&lt;angle&gt;</code> type with <code>@property</code>. This lets us animate it smoothly in a keyframe — something impossible with unregistered custom properties. The result: the rainbow pattern slowly rotates even at rest, creating that restless iridescence real holograms have.</p>
+
+      <h3>Layer stack</h3>
+      <pre><code>/* Base card gradient */
+background: linear-gradient(135deg, oklch(25% 0.08 280), oklch(15% 0.05 260));
+
+/* Holographic overlay via ::after */
+.card::after {
+  background: conic-gradient(from var(--holo-angle) at var(--x, 50%) var(--y, 50%),
+    oklch(70% 0.3 0), oklch(70% 0.3 60), oklch(70% 0.3 120),
+    oklch(70% 0.3 180), oklch(70% 0.3 240), oklch(70% 0.3 300), oklch(70% 0.3 360));
+  mix-blend-mode: color-dodge;
+  opacity: 0.3;
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Holographic card</h2>
+      <div class="demo-frame">
+        <style>
+          @property --holo-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+          }
+
+          .demo-15-2 {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+            justify-content: center;
+            align-items: center;
+            min-block-size: 400px;
+            background: oklch(10% 0.02 270);
+            border-radius: 0.5rem;
+            font-family: system-ui, sans-serif;
+          }
+
+          .demo-15-2 .holo-card {
+            position: relative;
+            inline-size: 300px;
+            block-size: 400px;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, oklch(25% 0.08 280), oklch(15% 0.05 260));
+            color: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 40px oklch(0% 0 0 / 0.5);
+            cursor: pointer;
+          }
+
+          .demo-15-2 .holo-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: conic-gradient(
+              from var(--holo-angle) at var(--x, 50%) var(--y, 50%),
+              oklch(70% 0.30 0),
+              oklch(70% 0.30 60),
+              oklch(70% 0.30 120),
+              oklch(70% 0.30 180),
+              oklch(70% 0.30 240),
+              oklch(70% 0.30 300),
+              oklch(70% 0.30 360)
+            );
+            mix-blend-mode: color-dodge;
+            opacity: 0.25;
+            animation: holo-rotate 8s linear infinite;
+            transition: opacity 300ms ease;
+            pointer-events: none;
+          }
+
+          .demo-15-2 .holo-card:hover::before {
+            opacity: 0.45;
+          }
+
+          .demo-15-2 .holo-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+              circle at var(--x, 50%) var(--y, 50%),
+              oklch(100% 0 0 / 0.15),
+              transparent 60%
+            );
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 300ms ease;
+          }
+
+          .demo-15-2 .holo-card:hover::after {
+            opacity: 1;
+          }
+
+          @keyframes holo-rotate {
+            to { --holo-angle: 360deg; }
+          }
+
+          .demo-15-2 .holo-card .card-rarity {
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-block-end: auto;
+          }
+
+          .demo-15-2 .holo-card .card-icon {
+            font-size: 4rem;
+            line-height: 1;
+            margin-block-end: 1rem;
+            text-shadow: 0 0 30px oklch(70% 0.2 275 / 0.5);
+          }
+
+          .demo-15-2 .holo-card h3 {
+            margin: 0 0 0.25rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+          }
+
+          .demo-15-2 .holo-card .card-type {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin: 0;
+          }
+
+          .demo-15-2 .holo-card .card-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-block-start: 1.5rem;
+            padding-block-start: 1rem;
+            border-block-start: 1px solid oklch(100% 0 0 / 0.15);
+          }
+
+          .demo-15-2 .holo-card .stat {
+            text-align: center;
+          }
+
+          .demo-15-2 .holo-card .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+          }
+
+          .demo-15-2 .holo-card .stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.6;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-2 .holo-card::before {
+              animation: none;
+            }
+          }
+        </style>
+        <div class="demo-15-2">
+          <div class="holo-card" style="--x: 30%; --y: 40%;">
+            <span class="card-rarity">Legendary</span>
+            <div class="card-icon">&#9830;</div>
+            <h3>Prismatic Shard</h3>
+            <p class="card-type">Artifact / Enchantment</p>
+            <div class="card-stats">
+              <div class="stat">
+                <span class="stat-value">99</span>
+                <span class="stat-label">Power</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">A+</span>
+                <span class="stat-label">Tier</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">1/1</span>
+                <span class="stat-label">Edition</span>
+              </div>
+            </div>
+          </div>
+          <div class="holo-card" style="--x: 70%; --y: 60%;">
+            <span class="card-rarity">Mythic</span>
+            <div class="card-icon">&#9733;</div>
+            <h3>Void Walker</h3>
+            <p class="card-type">Creature / Shadow</p>
+            <div class="card-stats">
+              <div class="stat">
+                <span class="stat-value">87</span>
+                <span class="stat-label">Power</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">S</span>
+                <span class="stat-label">Tier</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">3/50</span>
+                <span class="stat-label">Edition</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="holo-card"&gt;
+  &lt;span class="rarity"&gt;Legendary&lt;/span&gt;
+  &lt;div class="icon"&gt;&amp;#9830;&lt;/div&gt;
+  &lt;h3&gt;Prismatic Shard&lt;/h3&gt;
+  &lt;p class="type"&gt;Artifact / Enchantment&lt;/p&gt;
+  &lt;div class="stats"&gt;
+    &lt;div class="stat"&gt;
+      &lt;span class="val"&gt;99&lt;/span&gt;
+      &lt;span class="lbl"&gt;Power&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="stat"&gt;
+      &lt;span class="val"&gt;A+&lt;/span&gt;
+      &lt;span class="lbl"&gt;Tier&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@property --holo-angle {
+  syntax: "&lt;angle&gt;";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  background: oklch(10% 0.02 270);
+  font-family: system-ui;
+}
+
+.holo-card {
+  position: relative;
+  width: 300px; height: 400px;
+  border-radius: 1rem;
+  background: linear-gradient(135deg,
+    oklch(25% 0.08 280),
+    oklch(15% 0.05 260));
+  color: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 40px oklch(0% 0 0 / 0.5);
+}
+
+/* Rainbow conic overlay */
+.holo-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--holo-angle) at 50% 50%,
+    oklch(70% 0.3 0),
+    oklch(70% 0.3 60),
+    oklch(70% 0.3 120),
+    oklch(70% 0.3 180),
+    oklch(70% 0.3 240),
+    oklch(70% 0.3 300),
+    oklch(70% 0.3 360)
+  );
+  mix-blend-mode: color-dodge;
+  opacity: 0.25;
+  animation: spin 8s linear infinite;
+  pointer-events: none;
+}
+.holo-card:hover::before {
+  opacity: 0.45;
+}
+
+@keyframes spin {
+  to { --holo-angle: 360deg; }
+}
+
+.rarity {
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: .6;
+  margin-block-end: auto;
+}
+.icon {
+  font-size: 4rem; line-height: 1;
+  margin-block-end: 1rem;
+  text-shadow: 0 0 30px oklch(70% .2 275 / .5);
+}
+h3 { margin: 0 0 .25rem; font-size: 1.5rem; }
+.type { font-size: .85rem; opacity: .7; margin: 0; }
+.stats {
+  display: flex; gap: 1.5rem;
+  margin-block-start: 1.5rem;
+  padding-block-start: 1rem;
+  border-block-start: 1px solid oklch(100% 0 0 / .15);
+}
+.stat { text-align: center; }
+.val { display: block; font-size: 1.5rem; font-weight: 700; }
+.lbl { font-size: .65rem; text-transform: uppercase; letter-spacing: .08em; opacity: .6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-card::before { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Try changing <code>mix-blend-mode</code> from <code>color-dodge</code> to <code>overlay</code>, <code>hard-light</code>, or <code>screen</code> — each creates a different holographic feel. Then increase the opacity to <code>0.5</code> for a more aggressive rainbow. For the ultimate effect, add a second <code>::after</code> pseudo-element with a <code>radial-gradient</code> spotlight that follows hover position.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.1-3d-card-flip.html">&larr; Lesson 15.1</a>
+      <a href="./lesson-15.3-liquid-blob-morphing.html">Lesson 15.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

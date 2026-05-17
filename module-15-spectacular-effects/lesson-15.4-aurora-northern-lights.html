@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.4 — Aurora / Northern Lights · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.4 · Spectacular Effects</p>
+      <h1>Aurora / Northern Lights</h1>
+      <p class="lead">A flowing, ethereal gradient animation that resembles the aurora borealis. Multiple layered gradients animated at different speeds with <code>@property</code> hue rotation, creating slow organic motion over 15-20 second cycles. This should be the most beautiful demo in the entire course.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Building the aurora</h2>
+      <p>Real auroras are caused by charged particles exciting gas molecules at different altitudes — oxygen glows green and red, nitrogen glows blue and purple. We recreate this with multiple gradient layers, each moving independently.</p>
+
+      <h3>The gradient stack</h3>
+      <p>Three or four gradients layered with different blend modes and animation speeds. The key is <strong>low chroma</strong> — auroras glow, they do not saturate. OKLCH chroma values of 0.08-0.15 create that ethereal luminosity. Higher chroma looks artificial.</p>
+
+      <h3>Smooth hue rotation with @property</h3>
+      <p>By registering <code>--aurora-hue-1</code> and <code>--aurora-hue-2</code> as <code>&lt;number&gt;</code> types, we can animate them in keyframes. The gradient references these as <code>oklch(60% 0.12 var(--aurora-hue-1))</code>, creating a smooth, continuous hue shift that CSS cannot do with unregistered custom properties.</p>
+
+      <h3>The frosted glass overlay</h3>
+      <p>Text over the aurora uses <code>backdrop-filter: blur(40px)</code> to create a frosted glass panel. This ensures readability while letting the aurora glow through — the panel becomes part of the composition rather than hiding it.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Aurora borealis</h2>
+      <div class="demo-frame">
+        <style>
+          @property --aurora-hue-1 {
+            syntax: "<number>";
+            inherits: false;
+            initial-value: 150;
+          }
+          @property --aurora-hue-2 {
+            syntax: "<number>";
+            inherits: false;
+            initial-value: 260;
+          }
+          @property --aurora-pos {
+            syntax: "<percentage>";
+            inherits: false;
+            initial-value: 30%;
+          }
+
+          .demo-15-4 {
+            font-family: system-ui, sans-serif;
+          }
+          .demo-15-4 .aurora-scene {
+            position: relative;
+            inline-size: 100%;
+            block-size: 420px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: oklch(8% 0.03 270);
+          }
+          .demo-15-4 .aurora-layer {
+            position: absolute;
+            inset: 0;
+          }
+          .demo-15-4 .aurora-layer-1 {
+            background:
+              radial-gradient(ellipse 80% 50% at var(--aurora-pos) 20%,
+                oklch(50% 0.12 var(--aurora-hue-1)) 0%,
+                transparent 70%),
+              radial-gradient(ellipse 60% 40% at 70% 60%,
+                oklch(40% 0.10 var(--aurora-hue-2)) 0%,
+                transparent 60%);
+            opacity: 0.7;
+            animation: aurora-drift-1 18s ease-in-out infinite,
+                       aurora-hue-shift-1 20s linear infinite;
+          }
+          .demo-15-4 .aurora-layer-2 {
+            background:
+              radial-gradient(ellipse 70% 45% at 60% 30%,
+                oklch(45% 0.10 180) 0%,
+                transparent 65%),
+              radial-gradient(ellipse 50% 35% at 30% 50%,
+                oklch(35% 0.08 290) 0%,
+                transparent 55%);
+            opacity: 0.5;
+            mix-blend-mode: screen;
+            animation: aurora-drift-2 15s ease-in-out infinite;
+          }
+          .demo-15-4 .aurora-layer-3 {
+            background:
+              conic-gradient(from 180deg at 50% 0%,
+                transparent 30%,
+                oklch(50% 0.08 160 / 0.3) 40%,
+                oklch(45% 0.10 200 / 0.2) 50%,
+                transparent 65%);
+            opacity: 0.6;
+            animation: aurora-drift-3 22s ease-in-out infinite;
+          }
+          .demo-15-4 .stars {
+            position: absolute;
+            inset: 0;
+            background:
+              radial-gradient(1px 1px at 10% 15%, oklch(95% 0 0 / 0.8), transparent),
+              radial-gradient(1px 1px at 25% 40%, oklch(90% 0 0 / 0.6), transparent),
+              radial-gradient(1.5px 1.5px at 45% 10%, oklch(95% 0 0 / 0.9), transparent),
+              radial-gradient(1px 1px at 60% 55%, oklch(90% 0 0 / 0.5), transparent),
+              radial-gradient(1px 1px at 75% 25%, oklch(95% 0 0 / 0.7), transparent),
+              radial-gradient(1.5px 1.5px at 85% 45%, oklch(90% 0 0 / 0.6), transparent),
+              radial-gradient(1px 1px at 90% 80%, oklch(95% 0 0 / 0.8), transparent),
+              radial-gradient(1px 1px at 35% 70%, oklch(90% 0 0 / 0.5), transparent),
+              radial-gradient(1px 1px at 55% 85%, oklch(95% 0 0 / 0.6), transparent),
+              radial-gradient(1px 1px at 15% 90%, oklch(90% 0 0 / 0.4), transparent);
+          }
+          .demo-15-4 .glass-panel {
+            position: absolute;
+            inset: auto 2rem 2rem 2rem;
+            backdrop-filter: blur(40px) saturate(150%);
+            background: oklch(100% 0 0 / 0.08);
+            border: 1px solid oklch(100% 0 0 / 0.12);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            color: white;
+          }
+          .demo-15-4 .glass-panel h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+          }
+          .demo-15-4 .glass-panel p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.85;
+            line-height: 1.5;
+          }
+
+          @keyframes aurora-drift-1 {
+            0%, 100% { transform: translateX(0) scaleX(1); }
+            33%      { transform: translateX(5%) scaleX(1.1); }
+            66%      { transform: translateX(-5%) scaleX(0.95); }
+          }
+          @keyframes aurora-hue-shift-1 {
+            0%   { --aurora-hue-1: 150; --aurora-hue-2: 260; }
+            33%  { --aurora-hue-1: 170; --aurora-hue-2: 280; }
+            66%  { --aurora-hue-1: 140; --aurora-hue-2: 250; }
+            100% { --aurora-hue-1: 150; --aurora-hue-2: 260; }
+          }
+          @keyframes aurora-drift-2 {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            50%      { transform: translateX(-8%) translateY(-3%); }
+          }
+          @keyframes aurora-drift-3 {
+            0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.6; }
+            50%      { transform: translateX(3%) scaleY(1.2); opacity: 0.4; }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-4 .aurora-layer {
+              animation: none;
+            }
+          }
+        </style>
+        <div class="demo-15-4">
+          <div class="aurora-scene">
+            <div class="aurora-layer aurora-layer-1"></div>
+            <div class="aurora-layer aurora-layer-2"></div>
+            <div class="aurora-layer aurora-layer-3"></div>
+            <div class="stars"></div>
+            <div class="glass-panel">
+              <h3>The Northern Lights</h3>
+              <p>Charged particles from the solar wind collide with atmospheric gases, emitting photons at characteristic wavelengths. Oxygen produces green and red; nitrogen produces blue and purple. All recreated here in pure CSS.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="aurora"&gt;
+  &lt;div class="layer l1"&gt;&lt;/div&gt;
+  &lt;div class="layer l2"&gt;&lt;/div&gt;
+  &lt;div class="layer l3"&gt;&lt;/div&gt;
+  &lt;div class="stars"&gt;&lt;/div&gt;
+  &lt;div class="glass"&gt;
+    &lt;h3&gt;Aurora Borealis&lt;/h3&gt;
+    &lt;p&gt;Pure CSS northern lights with animated OKLCH gradients.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@property --hue1 {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 150;
+}
+@property --hue2 {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 260;
+}
+
+body { margin: 0; font-family: system-ui; }
+
+.aurora {
+  position: relative;
+  width: 100%; height: 100vh;
+  background: oklch(8% 0.03 270);
+  overflow: hidden;
+}
+.layer {
+  position: absolute; inset: 0;
+}
+
+.l1 {
+  background:
+    radial-gradient(ellipse 80% 50% at 30% 20%,
+      oklch(50% 0.12 var(--hue1)), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 70% 60%,
+      oklch(40% 0.10 var(--hue2)), transparent 60%);
+  opacity: .7;
+  animation: drift1 18s ease-in-out infinite,
+             hueShift 20s linear infinite;
+}
+.l2 {
+  background:
+    radial-gradient(ellipse 70% 45% at 60% 30%,
+      oklch(45% .10 180), transparent 65%);
+  opacity: .5;
+  mix-blend-mode: screen;
+  animation: drift2 15s ease-in-out infinite;
+}
+.l3 {
+  background: conic-gradient(from 180deg at 50% 0%,
+    transparent 30%,
+    oklch(50% .08 160 / .3) 40%,
+    oklch(45% .10 200 / .2) 50%,
+    transparent 65%);
+  opacity: .6;
+  animation: drift3 22s ease-in-out infinite;
+}
+
+.stars {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(1px 1px at 10% 15%, oklch(95% 0 0 / .8), transparent),
+    radial-gradient(1px 1px at 45% 10%, oklch(95% 0 0 / .9), transparent),
+    radial-gradient(1px 1px at 75% 25%, oklch(95% 0 0 / .7), transparent),
+    radial-gradient(1px 1px at 90% 80%, oklch(95% 0 0 / .8), transparent);
+}
+
+.glass {
+  position: absolute;
+  inset: auto 2rem 2rem 2rem;
+  backdrop-filter: blur(40px) saturate(150%);
+  background: oklch(100% 0 0 / .08);
+  border: 1px solid oklch(100% 0 0 / .12);
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  color: white;
+}
+.glass h3 { margin: 0 0 .5rem; }
+.glass p { margin: 0; opacity: .85; }
+
+@keyframes drift1 {
+  0%,100% { transform: translateX(0) scaleX(1); }
+  50%     { transform: translateX(5%) scaleX(1.1); }
+}
+@keyframes hueShift {
+  0%   { --hue1: 150; --hue2: 260; }
+  50%  { --hue1: 170; --hue2: 280; }
+  100% { --hue1: 150; --hue2: 260; }
+}
+@keyframes drift2 {
+  0%,100% { transform: translateX(0); }
+  50%     { transform: translateX(-8%); }
+}
+@keyframes drift3 {
+  0%,100% { transform: scaleY(1); opacity: .6; }
+  50%     { transform: scaleY(1.2); opacity: .4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer { animation: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Experiment with the hue values. Real auroras are predominantly green (hue ~150) and purple (hue ~290). Try shifting to warm hues (30-60) for a "sunset aurora" variant. Increase the chroma above 0.2 and notice how it loses the ethereal quality. Then try adding a fourth layer with a very slow 30-second animation for deep background movement.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.3-liquid-blob-morphing.html">&larr; Lesson 15.3</a>
+      <a href="./lesson-15.5-clip-path-morphing.html">Lesson 15.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

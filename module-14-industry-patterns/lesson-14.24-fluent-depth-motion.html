@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.24 — Fluent: Depth, Shadow &amp; Connected Motion · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.24</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.24 · Microsoft Fluent Design</p>
+      <h1>Fluent: Depth, Shadow &amp; Connected Motion</h1>
+      <p class="lead">Fluent uses a 3-tier depth model — on-surface, raised, and floating. Each level combines shadow, Y-translate, and subtle scale. Motion follows "connected animation" principles: elements moving between states maintain identity through continuous transform.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The three depth tiers</h2>
+      <p>Unlike MD3's 6-level tonal system, Fluent's depth model is deliberately simple:</p>
+      <ul>
+        <li><strong>On-surface (depth 0)</strong> — No shadow, no translate. Flat on the page. Used for most content.</li>
+        <li><strong>Raised (depth 1)</strong> — A subtle shadow and 1px upward translate with a barely perceptible scale increase (1.005x). Used for cards on hover, focused controls.</li>
+        <li><strong>Floating (depth 2)</strong> — A stronger shadow, 4px upward translate, and 1.01x scale. Used for menus, dialogs, tooltips.</li>
+      </ul>
+
+      <h3>Why translateY and scale together?</h3>
+      <p>In the physical world, an object that rises off a surface does two things: it casts a larger, softer shadow, and it appears slightly larger due to perspective (closer to the eye). The <code>translateY</code> moves the element upward to match the shadow's implied light source. The <code>scale</code> simulates the perspective magnification. Neither effect is large — the scale is sub-percent — but together they trigger the brain's depth perception circuits.</p>
+
+      <h2>The deceleration curve</h2>
+      <p>Fluent uses <code>cubic-bezier(0.1, 0.9, 0.2, 1)</code> for depth transitions. The second control point at <code>0.9</code> causes a slight overshoot — the element rises past its target and settles back. This simulates the physical behavior of a damped spring: the card "bounces" imperceptibly when it reaches its raised position, creating a natural settling feel.</p>
+
+      <h3>Compared to MD3's emphasized curve</h3>
+      <p>MD3 uses <code>cubic-bezier(0.2, 0, 0, 1)</code> — no overshoot, a delayed start, and a sharp deceleration. Fluent's curve starts immediately and overshoots slightly. The difference reflects design philosophy: MD3 wants "considered, deliberate" motion; Fluent wants "responsive, physical" motion. Neither is better — they serve different brand languages.</p>
+
+      <h2>Connected motion</h2>
+      <p>When an element transitions between states, Fluent preserves visual continuity by animating all visual properties simultaneously. A card elevating on hover transitions <code>transform</code>, <code>box-shadow</code>, and <code>background-color</code> in lockstep. No property should arrive early or late — synchronization is what makes the motion feel like a single physical change rather than multiple independent animations.</p>
+
+      <h2>PE7 placement</h2>
+      <p>Depth variables (<code>--depth-0</code> through <code>--depth-2</code>) are <strong>tokens</strong>. The card component that references them is <strong>components</strong>. The transition timing and easing are <strong>animations</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fluent depth levels on hover</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-24 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+            font-family: system-ui;
+            background: oklch(96% 0.004 264);
+            border-radius: 0.75rem;
+          }
+          .demo-14-24 .depth-card {
+            padding: 1.25rem;
+            background: oklch(100% 0 0);
+            border-radius: 8px;
+            border: 1px solid oklch(90% 0.005 264);
+            text-align: center;
+            cursor: default;
+            transition: transform 200ms cubic-bezier(0.1, 0.9, 0.2, 1),
+                        box-shadow 200ms cubic-bezier(0.1, 0.9, 0.2, 1);
+          }
+          .demo-14-24 .depth-card span { display: block; font-size: 0.7rem; color: oklch(50% 0.02 264); margin-block-start: 0.25rem; }
+          .demo-14-24 .depth-card strong { font-size: 0.9rem; color: oklch(20% 0.02 264); }
+          .demo-14-24 .d0 { transform: translateY(0) scale(1); box-shadow: none; }
+          .demo-14-24 .d1 { transform: translateY(-1px) scale(1.005); box-shadow: 0 2px 8px oklch(0% 0 0 / 0.08); }
+          .demo-14-24 .d2 { transform: translateY(-4px) scale(1.01); box-shadow: 0 8px 24px oklch(0% 0 0 / 0.14); }
+          .demo-14-24 .d0:hover { transform: translateY(-1px) scale(1.005); box-shadow: 0 2px 8px oklch(0% 0 0 / 0.08); }
+          .demo-14-24 .d1:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 8px 24px oklch(0% 0 0 / 0.14); }
+        </style>
+        <div class="demo-14-24">
+          <div class="depth-card d0"><strong>Depth 0</strong><span>On-surface (hover me)</span></div>
+          <div class="depth-card d1"><strong>Depth 1</strong><span>Raised (hover me)</span></div>
+          <div class="depth-card d2"><strong>Depth 2</strong><span>Floating</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h3 class="section-label"&gt;Fluent Depth Levels&lt;/h3&gt;
+&lt;div class="card-grid"&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-icon"&gt;&lt;/div&gt;
+    &lt;strong&gt;Documents&lt;/strong&gt;
+    &lt;span&gt;On-surface, elevates to raised on hover&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-icon"&gt;&lt;/div&gt;
+    &lt;strong&gt;Photos&lt;/strong&gt;
+    &lt;span&gt;Same depth transitions as above&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-icon"&gt;&lt;/div&gt;
+    &lt;strong&gt;Downloads&lt;/strong&gt;
+    &lt;span&gt;All cards use the same depth tokens&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-icon"&gt;&lt;/div&gt;
+    &lt;strong&gt;Settings&lt;/strong&gt;
+    &lt;span&gt;Consistent motion across the grid&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h3 class="section-label"&gt;Curve Comparison&lt;/h3&gt;
+&lt;div class="curves"&gt;
+  &lt;div class="track"&gt;
+    &lt;span class="dot fluent"&gt;&lt;/span&gt;
+    &lt;span class="label"&gt;Fluent decel: cubic-bezier(0.1, 0.9, 0.2, 1)&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="track"&gt;
+    &lt;span class="dot md3"&gt;&lt;/span&gt;
+    &lt;span class="label"&gt;MD3 emphasized: cubic-bezier(0.2, 0, 0, 1)&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  /* Fluent depth tokens */
+  --depth-0-transform: translateY(0) scale(1);
+  --depth-1-transform: translateY(-1px) scale(1.005);
+  --depth-2-transform: translateY(-4px) scale(1.01);
+
+  --depth-0-shadow: 0 0 0 oklch(0% 0 0 / 0);
+  --depth-1-shadow: 0 2px 8px oklch(0% 0 0 / 0.08);
+  --depth-2-shadow: 0 8px 24px oklch(0% 0 0 / 0.14);
+
+  /* Fluent deceleration curve (slight overshoot) */
+  --fluent-decel: cubic-bezier(0.1, 0.9, 0.2, 1);
+  /* MD3 emphasized curve (no overshoot, delayed start) */
+  --md3-emphasized: cubic-bezier(0.2, 0, 0, 1);
+}
+
+body { font-family: system-ui; margin: 0; padding: 1.5rem; background: oklch(96% 0.004 264); }
+
+.section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: oklch(45% 0.02 264);
+  margin: 0 0 0.75rem;
+}
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-block-end: 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem;
+  background: oklch(100% 0 0);
+  border: 1px solid oklch(92% 0.005 264);
+  border-radius: 8px;
+  cursor: default;
+  transform: var(--depth-0-transform);
+  box-shadow: var(--depth-0-shadow);
+  transition:
+    transform 200ms var(--fluent-decel),
+    box-shadow 200ms var(--fluent-decel);
+}
+.card:hover {
+  transform: var(--depth-1-transform);
+  box-shadow: var(--depth-1-shadow);
+}
+.card:active {
+  transform: var(--depth-2-transform);
+  box-shadow: var(--depth-2-shadow);
+}
+
+.card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, oklch(58% 0.18 220), oklch(50% 0.20 260));
+  margin-block-end: 0.5rem;
+}
+.card strong { font-size: 0.9rem; color: oklch(15% 0.02 264); }
+.card span { font-size: 0.75rem; color: oklch(50% 0.02 264); }
+
+/* Curve comparison animation */
+.curves { display: flex; flex-direction: column; gap: 0.5rem; }
+.track {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 32px;
+  background: oklch(92% 0.005 264);
+  border-radius: 16px;
+  padding-inline: 4px;
+  position: relative;
+}
+.dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot.fluent {
+  background: oklch(55% 0.18 220);
+  animation: slide 2s var(--fluent-decel) infinite alternate;
+}
+.dot.md3 {
+  background: oklch(48% 0.22 275);
+  animation: slide 2s var(--md3-emphasized) infinite alternate;
+}
+@keyframes slide { to { translate: calc(100cqi - 32px) 0; } }
+
+.label { font-size: 0.65rem; color: oklch(40% 0.02 264); white-space: nowrap; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Replace <code>var(--fluent-decel)</code> with <code>var(--md3-emphasized)</code> on the card hover transition and notice the different feel — the cards now pause before moving, which feels less responsive. Then try removing the <code>scale</code> from the depth transforms, keeping only <code>translateY</code> — the cards feel flatter because the perspective illusion is lost. Finally, increase <code>--depth-2-transform</code> to <code>translateY(-8px) scale(1.03)</code> — too much, and the card floats unnaturally.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.23-fluent-reveal-highlight.html">&larr; Lesson 14.23</a>
+      <a href="./lesson-14.25-fluent-mica.html">Lesson 14.25 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.25 — Fluent: The Mica Material · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.25</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.25 · Microsoft Fluent Design</p>
+      <h1>Fluent: The Mica Material</h1>
+      <p class="lead">Mica is the subtlest of Fluent's materials — no blur, no noise, just a gentle tint derived from the desktop wallpaper's dominant color. It makes every app feel like it belongs to the user's personal environment. In CSS, one hue variable tints the entire window.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Mica vs. Acrylic</h2>
+      <p>Acrylic is a per-element effect: blur, noise, and tint on a sidebar, a dialog, or a toolbar. Mica is an app-level effect: applied once at the root, tinting the entire window surface. Acrylic says "this layer floats above content." Mica says "this app belongs on your desktop." The two complement each other — Mica is the base, Acrylic is the elevation.</p>
+
+      <h2>How Mica works on Windows</h2>
+      <p>Windows extracts the dominant hue from the user's wallpaper and mixes a very low-chroma version into the app's base surface color. The result is imperceptible at a glance but creates a sense of personalization — an app with a warm wallpaper feels warmer, a cool wallpaper makes it feel cooler.</p>
+
+      <h3>The CSS simulation</h3>
+      <p>Since CSS cannot access the OS wallpaper, we simulate Mica with a <code>--mica-hue</code> custom property:</p>
+      <pre><code>:root {
+  --mica-hue: 220;
+  --mica-surface-light: oklch(98% 0.005 var(--mica-hue));
+  --mica-surface-dark:  oklch(12% 0.004 var(--mica-hue));
+  --color-surface: light-dark(
+    var(--mica-surface-light),
+    var(--mica-surface-dark)
+  );
+}</code></pre>
+
+      <h3>Why such low chroma?</h3>
+      <p>The chroma values (0.004-0.005 in OKLCH) are barely above zero. This is intentional — Mica's tint should be felt, not seen. At higher chroma, the surface would compete with content colors. At zero chroma, the surface would feel generic. The sweet spot is so subtle that users cannot name the tint when asked, but they notice its absence when it is removed.</p>
+
+      <h3>Applied once, inherited everywhere</h3>
+      <p>Unlike Acrylic (which needs <code>backdrop-filter</code> on each element), Mica sets a CSS custom property at the root and every surface inherits it. The titlebar, sidebar, content area, and footer all share the same tint. This is architecturally simple and performant — no compositing layers, no blur passes.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The <code>--mica-hue</code> and derived surface colors are <strong>tokens</strong>. The app layout structure is <strong>components</strong>. No animation layer is needed — Mica is static.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Mica-tinted app window</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-25 {
+            --mica-hue: 220;
+            font-family: system-ui;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid oklch(88% 0.008 var(--mica-hue));
+          }
+          .demo-14-25 .titlebar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: oklch(96% 0.006 var(--mica-hue));
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: oklch(30% 0.02 var(--mica-hue));
+          }
+          .demo-14-25 .dots { display: flex; gap: 4px; }
+          .demo-14-25 .dots span { width: 10px; height: 10px; border-radius: 50%; background: oklch(80% 0.01 var(--mica-hue)); }
+          .demo-14-25 .app-body {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            min-height: 150px;
+          }
+          .demo-14-25 .sidebar {
+            background: oklch(97% 0.005 var(--mica-hue));
+            padding: 0.75rem 0.5rem;
+            border-inline-end: 1px solid oklch(90% 0.006 var(--mica-hue));
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+          }
+          .demo-14-25 .sidebar a {
+            padding: 0.35rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: oklch(30% 0.02 var(--mica-hue));
+            cursor: default;
+          }
+          .demo-14-25 .sidebar a.active { background: oklch(48% 0.15 var(--mica-hue) / 0.08); }
+          .demo-14-25 .content {
+            background: oklch(98% 0.005 var(--mica-hue));
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: oklch(25% 0.02 var(--mica-hue));
+          }
+        </style>
+        <div class="demo-14-25">
+          <div class="titlebar">
+            <div class="dots"><span></span><span></span><span></span></div>
+            Mica App
+          </div>
+          <div class="app-body">
+            <nav class="sidebar">
+              <a class="active">Home</a>
+              <a>Files</a>
+              <a>Settings</a>
+            </nav>
+            <main class="content">
+              Every surface is tinted by a single hue. Change <code>--mica-hue</code> to see the shift.
+            </main>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="window"&gt;
+  &lt;!-- Titlebar --&gt;
+  &lt;header class="titlebar"&gt;
+    &lt;div class="window-controls"&gt;
+      &lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;span class="app-name"&gt;Mica Explorer&lt;/span&gt;
+  &lt;/header&gt;
+
+  &lt;div class="app-layout"&gt;
+    &lt;!-- Sidebar --&gt;
+    &lt;nav class="sidebar"&gt;
+      &lt;a class="nav-item active"&gt;Home&lt;/a&gt;
+      &lt;a class="nav-item"&gt;Gallery&lt;/a&gt;
+      &lt;a class="nav-item"&gt;Library&lt;/a&gt;
+      &lt;a class="nav-item"&gt;Settings&lt;/a&gt;
+    &lt;/nav&gt;
+
+    &lt;!-- Content --&gt;
+    &lt;main class="content"&gt;
+      &lt;h2&gt;Welcome&lt;/h2&gt;
+      &lt;p&gt;This entire window is tinted by a single &lt;code&gt;--mica-hue&lt;/code&gt; value. Change it to simulate different wallpaper colors.&lt;/p&gt;
+      &lt;div class="card-row"&gt;
+        &lt;div class="card"&gt;Recent files&lt;/div&gt;
+        &lt;div class="card"&gt;Pinned items&lt;/div&gt;
+        &lt;div class="card"&gt;Quick access&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Change --mica-hue to simulate different wallpaper colors:
+   30 = warm sunset, 150 = forest, 220 = blue sky, 300 = purple dusk */
+:root {
+  --mica-hue: 220;
+  --mica-c-light: 0.005;
+  --mica-c-dark: 0.004;
+
+  /* Mica-tinted surfaces */
+  --surface-base: oklch(98% var(--mica-c-light) var(--mica-hue));
+  --surface-alt:  oklch(96% var(--mica-c-light) var(--mica-hue));
+  --surface-card: oklch(99% calc(var(--mica-c-light) * 0.5) var(--mica-hue));
+  --border:       oklch(90% 0.008 var(--mica-hue));
+  --text:         oklch(20% 0.015 var(--mica-hue));
+  --text-sub:     oklch(45% 0.010 var(--mica-hue));
+  --accent:       oklch(50% 0.15 var(--mica-hue));
+}
+
+body {
+  font-family: system-ui;
+  margin: 0;
+  padding: 2rem;
+  background: oklch(88% 0.01 var(--mica-hue));
+}
+
+.window {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px oklch(0% 0 0 / 0.1);
+}
+
+/* Titlebar */
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--surface-alt);
+  border-block-end: 1px solid var(--border);
+}
+.window-controls { display: flex; gap: 5px; }
+.window-controls span {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: oklch(78% 0.01 var(--mica-hue));
+}
+.app-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+
+/* Layout */
+.app-layout {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  min-height: 300px;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface-alt);
+  padding: 0.75rem 0.5rem;
+  border-inline-end: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.nav-item {
+  padding: 0.45rem 0.65rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 120ms;
+}
+.nav-item:hover { background: oklch(0% 0 0 / 0.03); }
+.nav-item.active { background: oklch(var(--accent) / 0.08); color: var(--accent); }
+
+/* Content */
+.content {
+  background: var(--surface-base);
+  padding: 1.5rem;
+}
+.content h2 { margin: 0 0 0.5rem; font-size: 1.1rem; color: var(--text); }
+.content p { font-size: 0.85rem; color: var(--text-sub); line-height: 1.5; margin: 0 0 1rem; }
+.content code { font-size: 0.8rem; background: oklch(0% 0 0 / 0.04); padding: 0.1em 0.3em; border-radius: 3px; }
+
+/* Cards */
+.card-row { display: flex; gap: 0.75rem; }
+.card {
+  flex: 1;
+  padding: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Change <code>--mica-hue</code> to <code>30</code> (warm sunset wallpaper) — the entire app gains a warm, inviting tone. Then try <code>150</code> (forest green) and <code>300</code> (purple dusk). Notice how the app's personality shifts while remaining fully readable. Now increase <code>--mica-c-light</code> to <code>0.03</code> — suddenly the tint is visible and distracting. Mica's power is in its restraint: just enough chroma to personalize, never enough to interfere.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.24-fluent-depth-motion.html">&larr; Lesson 14.24</a>
+      <a href="./project/index.html">Module 14 Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
