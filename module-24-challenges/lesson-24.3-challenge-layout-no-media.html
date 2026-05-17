@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 3 — Responsive Layout, Zero Media Queries · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 3 · Intermediate</p>
+      <h1>Responsive Layout, Zero Media Queries</h1>
+      <p class="lead">Build a 4-section page that works beautifully from 320px to 2560px — without a single <code>@media</code> rule. Only intrinsic sizing: <code>auto-fit</code>, <code>min()</code>, <code>clamp()</code>, and <code>flex-wrap</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The scenario</h2>
+      <p>You're building a landing page with four distinct sections: a hero, a feature grid, a testimonial row, and a footer. Each must reflow naturally at any viewport width. The constraint is absolute: zero <code>@media</code> queries. The layout must be entirely intrinsic — it adapts because of how CSS calculates sizes, not because you told it to change at a breakpoint.</p>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>Zero <code>@media</code> queries — not even for font sizes</li>
+        <li>Must work from 320px to 2560px viewport width</li>
+        <li>Hero: centered text with fluid type, constrained max-width</li>
+        <li>Features: 3-column grid that collapses to 1 column on narrow screens</li>
+        <li>Testimonials: horizontal scroll or wrap depending on space</li>
+        <li>Footer: multi-column that stacks naturally</li>
+        <li>Allowed tools: <code>auto-fit</code>, <code>min()</code>, <code>max()</code>, <code>clamp()</code>, <code>flex-wrap</code>, <code>minmax()</code></li>
+      </ul>
+
+      <h2>Target behavior</h2>
+      <p>Resize the demo below to see how the layout should respond at every width.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Target — intrinsic responsive layout</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-3 {
+            font-family: system-ui;
+            overflow: hidden;
+            resize: horizontal;
+            min-width: 280px;
+            max-width: 100%;
+            border: 2px dashed oklch(70% 0.1 260);
+            padding: 0;
+          }
+          .demo-24-3 .hero {
+            padding: clamp(2rem, 8vi, 6rem) clamp(1rem, 4vi, 3rem);
+            text-align: center;
+            background: oklch(30% 0.15 260);
+            color: white;
+          }
+          .demo-24-3 .hero h2 {
+            font-size: clamp(1.5rem, 4vi + 1rem, 3.5rem);
+            margin-block-end: 0.5rem;
+          }
+          .demo-24-3 .hero p {
+            font-size: clamp(0.875rem, 1vi + 0.75rem, 1.25rem);
+            opacity: 0.85;
+            max-inline-size: min(60ch, 90%);
+            margin-inline: auto;
+          }
+          .demo-24-3 .features {
+            padding: clamp(1.5rem, 4vi, 4rem);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+            gap: clamp(1rem, 2vi, 2rem);
+          }
+          .demo-24-3 .feature-card {
+            background: oklch(96% 0.02 260);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+          }
+          .demo-24-3 .feature-card h3 {
+            font-size: 1rem;
+            color: oklch(45% 0.15 260);
+            margin-block-end: 0.5rem;
+          }
+          .demo-24-3 .feature-card p {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: oklch(40% 0.02 260);
+          }
+          .demo-24-3 .testimonials {
+            padding: clamp(1.5rem, 4vi, 4rem);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+          .demo-24-3 .testimonial {
+            flex: 1 1 min(100%, 20rem);
+            background: oklch(55% 0.12 180);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+          }
+          .demo-24-3 .footer {
+            padding: clamp(1.5rem, 4vi, 4rem);
+            background: oklch(20% 0.02 260);
+            color: oklch(80% 0.01 260);
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(1rem, 3vi, 3rem);
+          }
+          .demo-24-3 .footer-col {
+            flex: 1 1 min(100%, 12rem);
+          }
+          .demo-24-3 .footer-col h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-block-end: 0.5rem;
+            color: oklch(65% 0.1 260);
+          }
+          .demo-24-3 .footer-col p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+          }
+          .demo-24-3 .resize-hint {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 0.5rem;
+            color: oklch(55% 0.1 260);
+            background: oklch(95% 0.02 260);
+          }
+        </style>
+        <div class="demo-24-3">
+          <p class="resize-hint">Drag the right edge to resize</p>
+          <div class="hero">
+            <h2>Intrinsic Design</h2>
+            <p>A layout that responds to its container, not to arbitrary breakpoints.</p>
+          </div>
+          <div class="features">
+            <div class="feature-card"><h3>Fluid Type</h3><p>Font sizes scale smoothly between minimum and maximum values using clamp().</p></div>
+            <div class="feature-card"><h3>Auto Grid</h3><p>Grid columns appear and disappear based on available space, not breakpoints.</p></div>
+            <div class="feature-card"><h3>Smart Wrap</h3><p>Flexbox items wrap when they need to, creating natural layouts at every size.</p></div>
+          </div>
+          <div class="testimonials">
+            <div class="testimonial">"This approach eliminated 40 media queries from our codebase." — Developer A</div>
+            <div class="testimonial">"The layout just works at every width. No breakpoint debugging." — Developer B</div>
+          </div>
+          <div class="footer">
+            <div class="footer-col"><h4>Product</h4><p>Features, Pricing, Docs</p></div>
+            <div class="footer-col"><h4>Company</h4><p>About, Blog, Careers</p></div>
+            <div class="footer-col"><h4>Support</h4><p>Help, Contact, Status</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;section class="hero"&gt;
+    &lt;h1&gt;Intrinsic Design&lt;/h1&gt;
+    &lt;p&gt;A layout that responds to its container, not to arbitrary breakpoints. Built with zero media queries.&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class="features"&gt;
+    &lt;article class="feature-card"&gt;
+      &lt;h2&gt;Fluid Type&lt;/h2&gt;
+      &lt;p&gt;Font sizes scale smoothly between minimum and maximum values using clamp().&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;article class="feature-card"&gt;
+      &lt;h2&gt;Auto Grid&lt;/h2&gt;
+      &lt;p&gt;Grid columns appear and disappear based on available space, not breakpoints.&lt;/p&gt;
+    &lt;/article&gt;
+    &lt;article class="feature-card"&gt;
+      &lt;h2&gt;Smart Wrap&lt;/h2&gt;
+      &lt;p&gt;Flexbox items wrap when they need to, creating natural layouts at every size.&lt;/p&gt;
+    &lt;/article&gt;
+  &lt;/section&gt;
+
+  &lt;section class="testimonials"&gt;
+    &lt;blockquote&gt;"This approach eliminated 40 media queries from our codebase." — Developer A&lt;/blockquote&gt;
+    &lt;blockquote&gt;"The layout just works at every width. No breakpoint debugging." — Developer B&lt;/blockquote&gt;
+  &lt;/section&gt;
+
+  &lt;footer class="site-footer"&gt;
+    &lt;div class="footer-col"&gt;
+      &lt;h3&gt;Product&lt;/h3&gt;
+      &lt;p&gt;Features, Pricing, Documentation&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="footer-col"&gt;
+      &lt;h3&gt;Company&lt;/h3&gt;
+      &lt;p&gt;About, Blog, Careers&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="footer-col"&gt;
+      &lt;h3&gt;Support&lt;/h3&gt;
+      &lt;p&gt;Help Center, Contact, Status&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* ZERO @media queries allowed!
+   Use: auto-fit, min(), max(), clamp(), flex-wrap, minmax()
+
+   Write all your CSS below:
+*/
+
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Hint</h2>
+      <p>The key patterns: <code>grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr))</code> for the feature grid. <code>flex: 1 1 min(100%, 20rem)</code> for flex items that wrap. <code>clamp()</code> for all fluid values. The <code>min(100%, X)</code> pattern prevents overflow on narrow screens.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-24.2-challenge-token-system.html">&larr; Challenge 2</a>
+      <a href="./lesson-24.4-challenge-dark-mode.html">Challenge 4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

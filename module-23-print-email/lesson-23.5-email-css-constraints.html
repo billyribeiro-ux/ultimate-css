@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.5 — HTML Email CSS: The Constraint Universe · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.5 · HTML Email</p>
+      <h1>HTML Email CSS: The Constraint Universe</h1>
+      <p class="lead">Forget everything you know about modern CSS. HTML email is a parallel universe where Outlook renders with Microsoft Word's engine, Gmail strips your style tags, and the year is effectively 2007. Here's what actually works.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>What works everywhere</h2>
+      <p>These CSS properties are safe across all major email clients (Outlook, Gmail, Apple Mail, Yahoo):</p>
+      <pre><code>/* Safe in email */
+color: #333333;
+font-size: 16px;
+font-family: Arial, sans-serif;
+font-weight: bold;
+line-height: 1.5;
+text-align: center;
+text-decoration: underline;
+padding: 10px 20px;
+margin: 0;
+border: 1px solid #cccccc;
+background-color: #f5f5f5;
+width: 600px;
+max-width: 600px;</code></pre>
+
+      <h2>What does NOT work</h2>
+      <p>These modern CSS features will fail in one or more major clients:</p>
+      <table style="width:100%;border-collapse:collapse;margin:1rem 0;">
+        <thead><tr><th style="text-align:left;padding:0.5rem;border-bottom:2px solid #ccc;">Feature</th><th style="text-align:left;padding:0.5rem;border-bottom:2px solid #ccc;">Fails in</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>display: flex</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">Outlook (all versions)</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>display: grid</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">Outlook (all versions)</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>--custom-properties</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">Most clients</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>@layer, @scope</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">All email clients</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>:has(), :is()</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">Most clients</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>@supports</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">All email clients</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>position: sticky/fixed</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">All email clients</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>oklch(), color()</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">Most clients</td></tr>
+          <tr><td style="padding:0.5rem;border-bottom:1px solid #eee;"><code>:root {}</code></td><td style="padding:0.5rem;border-bottom:1px solid #eee;">Gmail (strips it)</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Why Outlook uses tables</h2>
+      <p>Outlook on Windows renders HTML using Microsoft Word's engine (since 2007). Word understands tables for layout but not flexbox, grid, or even floats properly. This is why every production email still uses <code>&lt;table&gt;</code> for structure:</p>
+      <pre><code>&lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600"&gt;
+  &lt;tr&gt;
+    &lt;td style="padding: 20px; font-family: Arial, sans-serif;"&gt;
+      Content here
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+      <p>The <code>role="presentation"</code> attribute tells screen readers this table is for layout, not data.</p>
+
+      <h2>Gmail strips &lt;style&gt; tags</h2>
+      <p>Gmail (non-AMP) strips <code>&lt;style&gt;</code> blocks from the <code>&lt;head&gt;</code>. Your CSS must be inlined on each element. Tools like Juice, MJML, and Maizzle handle this inlining automatically in your build process.</p>
+
+      <h2>The progressive enhancement strategy</h2>
+      <p>The production approach is layered:</p>
+      <ol>
+        <li><strong>Base layer</strong> — Table layout with inline styles. Works in Outlook and Gmail.</li>
+        <li><strong>Enhancement layer</strong> — <code>&lt;style&gt;</code> block in <code>&lt;head&gt;</code> with media queries for Apple Mail and modern clients.</li>
+        <li><strong>Dark mode layer</strong> — <code>@media (prefers-color-scheme: dark)</code> for clients that support it.</li>
+      </ol>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Email template with inline styles and table fallback</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-5 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(92% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-5 .email-preview {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid oklch(85% 0.02 270);
+            border-radius: 0.25rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
+          }
+          .demo-23-5 .email-header {
+            background: #2d2d6b;
+            padding: 24px 30px;
+            text-align: center;
+          }
+          .demo-23-5 .email-header h3 {
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 700;
+          }
+          .demo-23-5 .email-body {
+            padding: 30px;
+          }
+          .demo-23-5 .email-body p {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0 0 16px;
+          }
+          .demo-23-5 .email-btn {
+            display: inline-block;
+            background: #4a3fbf;
+            color: #ffffff;
+            padding: 12px 28px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+          }
+          .demo-23-5 .email-footer {
+            background: #f5f5f5;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #888888;
+          }
+          .demo-23-5 .client-note {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 0.75rem;
+            background: oklch(92% 0.08 60);
+            color: oklch(35% 0.1 60);
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+          }
+        </style>
+        <div class="demo-23-5">
+          <div class="email-preview">
+            <div class="email-header">
+              <h3>Welcome to Acme!</h3>
+            </div>
+            <div class="email-body">
+              <p>Hi there,</p>
+              <p>Thanks for signing up. Click below to verify your email address and get started.</p>
+              <p style="text-align:center;padding:8px 0;">
+                <a href="#" class="email-btn">Verify Email</a>
+              </p>
+              <p>If you didn't create this account, you can safely ignore this email.</p>
+            </div>
+            <div class="email-footer">
+              Acme Corp, 123 Business Lane, SF CA 94102<br>
+              <a href="#" style="color:#888888;">Unsubscribe</a>
+            </div>
+          </div>
+          <div class="client-note">All styles are inline. Layout uses tables (simplified here for clarity).</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Email-safe HTML: tables + inline styles --&gt;
+&lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="margin:0 auto;font-family:Arial,sans-serif;"&gt;
+  &lt;tr&gt;
+    &lt;td style="background-color:#2d2d6b;padding:24px 30px;text-align:center;"&gt;
+      &lt;h1 style="color:#ffffff;font-size:22px;margin:0;"&gt;Your Brand&lt;/h1&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td style="padding:30px;background-color:#ffffff;"&gt;
+      &lt;p style="font-size:16px;line-height:1.6;color:#333333;margin:0 0 16px;"&gt;
+        Hello! This is an email built with table-based layout and inline styles.
+      &lt;/p&gt;
+      &lt;p style="font-size:16px;line-height:1.6;color:#333333;margin:0 0 16px;"&gt;
+        It works in Outlook, Gmail, Apple Mail, and Yahoo.
+      &lt;/p&gt;
+      &lt;!-- Button: table-cell pattern --&gt;
+      &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"&gt;
+        &lt;tr&gt;
+          &lt;td style="background-color:#4a3fbf;border-radius:4px;padding:12px 28px;"&gt;
+            &lt;a href="#" style="color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;"&gt;Click Here&lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td style="background-color:#f5f5f5;padding:20px 30px;text-align:center;font-size:12px;color:#888888;"&gt;
+      &amp;copy; 2026 Your Brand | &lt;a href="#" style="color:#888888;"&gt;Unsubscribe&lt;/a&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* In email, CSS goes inline.
+   This &lt;style&gt; block only works
+   in Apple Mail and some clients.
+   Gmail strips it. */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Apple Mail / iOS enhancement */
+@media screen and (max-width: 600px) {
+  table[width="600"] {
+    width: 100% !important;
+  }
+  td {
+    padding: 16px !important;
+  }
+}
+
+/* These will NOT work in Outlook:
+   display: flex;
+   display: grid;
+   --custom-property: value;
+   position: sticky;
+*/</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a simple welcome email using only <code>&lt;table&gt;</code> layout and inline styles. Include a colored header, body text, a button (as a table cell with a link inside), and a footer. Verify that no CSS property relies on flexbox, grid, or custom properties. Try viewing it in different email preview tools to see what breaks.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-23.4-css-for-pdf.html">&larr; Lesson 23.4</a>
+      <a href="./lesson-23.6-email-responsive.html">Lesson 23.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

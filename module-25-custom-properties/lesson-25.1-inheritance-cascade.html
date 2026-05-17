@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25.1 — How Custom Properties Inherit and Cascade · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 25</a>
+      <span>Lesson 25.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 25.1 · Custom Properties</p>
+      <h1>How Custom Properties Inherit and Cascade</h1>
+      <p class="lead">Inheritance flows down the DOM tree. A property set on a parent is available to all descendants. Overriding at any level creates a new scope. Understanding this mechanism is the foundation for every advanced custom property pattern.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The inheritance model</h2>
+      <p>Custom properties inherit by default. When you set <code>--color: oklch(60% 0.2 275)</code> on a parent element, every descendant can read that value via <code>var(--color)</code>. This is unlike most CSS properties which do not inherit (like <code>padding</code> or <code>border</code>).</p>
+
+      <h3>Global vs. component-scoped</h3>
+      <p>Setting a custom property on <code>:root</code> makes it a global token available everywhere. Setting it on a component class creates a local scope:</p>
+      <pre><code>:root {
+  --color-primary: oklch(55% 0.22 275);
+}
+
+.card {
+  --card-padding: 1.5rem;
+  padding: var(--card-padding);
+}</code></pre>
+      <p>The <code>--color-primary</code> is available to every element in the document. The <code>--card-padding</code> is only available inside <code>.card</code> and its descendants.</p>
+
+      <h3>Overriding creates a new scope</h3>
+      <p>When a descendant redefines a custom property, it creates a new inheritance scope from that point downward. The parent's value is unaffected:</p>
+      <pre><code>.parent { --color: oklch(60% 0.2 275); }
+.child  { --color: oklch(60% 0.2 150); }
+/* Grandchild inherits from .child, not .parent */</code></pre>
+
+      <h2>The cascade</h2>
+      <p>Custom properties participate fully in the cascade. They respect specificity, source order, layers, and importance:</p>
+      <pre><code>@layer base {
+  .btn { --btn-bg: oklch(50% 0.2 275); }
+}
+@layer components {
+  .btn { --btn-bg: oklch(55% 0.22 275); }
+  /* Wins — higher layer */
+}</code></pre>
+
+      <h3>Specificity applies</h3>
+      <p>A more specific selector wins, just like any other property:</p>
+      <pre><code>.card { --accent: oklch(55% 0.2 275); }
+.card.featured { --accent: oklch(65% 0.25 50); }
+/* .card.featured has higher specificity */</code></pre>
+
+      <h2>Inheritance vs. the universal selector</h2>
+      <p>Setting a property on <code>*</code> is not the same as relying on inheritance. The universal selector sets the property directly on every element, while <code>:root</code> sets it once and lets inheritance distribute the value. The former prevents overriding at intermediate levels without higher specificity.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Inheritance tree</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-25-1 {
+            --color: oklch(55% 0.22 275);
+            padding: 1.5rem;
+            font-family: system-ui;
+          }
+          .demo-25-1 .node {
+            border: 2px solid var(--color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-block-start: 0.75rem;
+            position: relative;
+          }
+          .demo-25-1 .node::before {
+            content: attr(data-label);
+            position: absolute;
+            inset-block-start: -0.6rem;
+            inset-inline-start: 0.75rem;
+            background: var(--color);
+            color: oklch(100% 0 0);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.1rem 0.5rem;
+            border-radius: 0.25rem;
+          }
+          .demo-25-1 .level-2 { --color: oklch(60% 0.2 150); }
+          .demo-25-1 .level-3 { --color: oklch(55% 0.2 30); }
+          .demo-25-1 .swatch {
+            display: inline-block;
+            inline-size: 1rem;
+            block-size: 1rem;
+            background: var(--color);
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-inline-end: 0.5rem;
+          }
+          .demo-25-1 p {
+            margin: 0.5rem 0 0;
+            font-size: 0.85rem;
+            color: oklch(30% 0 0);
+          }
+        </style>
+        <div class="demo-25-1">
+          <div class="node" data-label=":root  --color: purple">
+            <p><span class="swatch"></span>I inherit purple from the root</p>
+            <div class="node level-2" data-label=".level-2  --color: green">
+              <p><span class="swatch"></span>I override to green</p>
+              <div class="node" data-label="child of .level-2">
+                <p><span class="swatch"></span>I inherit green from my parent</p>
+              </div>
+            </div>
+            <div class="node level-3" data-label=".level-3  --color: red">
+              <p><span class="swatch"></span>I override to red</p>
+            </div>
+            <div class="node" data-label="sibling — no override">
+              <p><span class="swatch"></span>I still inherit purple from root</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="tree"&gt;
+  &lt;div class="branch"&gt;
+    &lt;p&gt;Branch 1&lt;/p&gt;
+    &lt;div class="leaf"&gt;Leaf A&lt;/div&gt;
+    &lt;div class="leaf"&gt;Leaf B&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="branch alt"&gt;
+    &lt;p&gt;Branch 2 (override)&lt;/p&gt;
+    &lt;div class="leaf"&gt;Leaf C&lt;/div&gt;
+    &lt;div class="leaf"&gt;Leaf D&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.tree {
+  --accent: oklch(55% 0.22 275);
+  display: flex; gap: 1rem;
+}
+
+.branch {
+  border: 2px solid var(--accent);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.branch.alt {
+  --accent: oklch(60% 0.2 150);
+}
+
+.leaf {
+  background: var(--accent);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  margin-block-start: 0.5rem;
+  font-size: 0.85rem;
+}
+
+p { margin: 0 0 0.25rem; font-weight: 600; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third branch with <code>--accent: oklch(55% 0.2 30)</code> and observe how its leaves pick up the red accent automatically. Then try setting <code>--accent</code> on a single leaf to override just that one element while its siblings keep the branch color.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">← Module 25</a>
+      <a href="./lesson-25.2-fallback-chains.html">Lesson 25.2 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

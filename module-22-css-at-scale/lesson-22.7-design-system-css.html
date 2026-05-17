@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.7 — Building a Design System CSS Package · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.7 · Enterprise Architecture</p>
+      <h1>Building a Design System CSS Package</h1>
+      <p class="lead">A design system CSS package is infrastructure: consumed by multiple applications, versioned with semver, and integrated via @layer so it can never accidentally override application styles. Here is how to build one that scales.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>File structure for a distributable package</h2>
+      <pre><code>design-system/
+  main.css          (entry point with @layer declaration)
+  tokens/
+    colors.css
+    spacing.css
+    typography.css
+  reset/
+    reset.css
+  base/
+    base.css
+  components/
+    button.css
+    card.css
+    badge.css</code></pre>
+      <p>The entry point (<code>main.css</code>) declares layer order and imports everything. Consumers import only this file.</p>
+
+      <h2>The entry point</h2>
+      <pre><code>/* main.css */
+@layer system.tokens, system.reset, system.base, system.components;
+
+@import url("./tokens/colors.css") layer(system.tokens);
+@import url("./tokens/spacing.css") layer(system.tokens);
+@import url("./tokens/typography.css") layer(system.tokens);
+@import url("./reset/reset.css") layer(system.reset);
+@import url("./base/base.css") layer(system.base);
+@import url("./components/button.css") layer(system.components);
+@import url("./components/card.css") layer(system.components);
+@import url("./components/badge.css") layer(system.components);</code></pre>
+
+      <h2>What to include and exclude</h2>
+      <p><strong>Include</strong>: tokens (the design language), reset (consistent baseline), base (typography, link styles), components (reusable UI patterns). <strong>Exclude</strong>: layout (that is application-level), animations (application-specific motion), page-specific overrides (that is consumer territory).</p>
+
+      <h2>Consumer integration</h2>
+      <pre><code>/* app.css */
+@layer system, app.layouts, app.components, app.utilities;
+
+@import url("design-system/main.css") layer(system);</code></pre>
+      <p>By importing the entire design system into a single <code>system</code> layer, all application layers automatically have higher priority. The design system provides defaults; the application overrides freely. No <code>!important</code> needed, no specificity battles. This is why <code>@layer</code> makes design systems safe.</p>
+
+      <h2>Versioning with semver</h2>
+      <p><strong>Patch (1.0.x)</strong>: value adjustments within existing tokens. <strong>Minor (1.x.0)</strong>: new tokens, new components, new API properties. <strong>Major (x.0.0)</strong>: removed tokens, renamed APIs, breaking structural changes. Every major version bump requires a migration guide.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Mini design system package (3 components)</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-7 {
+            font-family: system-ui;
+            padding: 1.5rem;
+          }
+          /* System tokens */
+          .demo-22-7 {
+            --sys-primary: oklch(48% 0.18 275);
+            --sys-on-primary: oklch(100% 0 0);
+            --sys-surface: oklch(98% 0.005 275);
+            --sys-on-surface: oklch(20% 0.02 275);
+            --sys-border: oklch(88% 0.01 275);
+            --sys-muted: oklch(55% 0.02 275);
+            --sys-radius-sm: 0.375rem;
+            --sys-radius-md: 0.75rem;
+            --sys-space-xs: 0.25rem;
+            --sys-space-sm: 0.5rem;
+            --sys-space-md: 1rem;
+            --sys-space-lg: 1.5rem;
+          }
+          .demo-22-7 h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--sys-muted);
+            margin-block-end: 1rem;
+          }
+          .demo-22-7 .component-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--sys-space-md);
+            align-items: start;
+            margin-block-end: var(--sys-space-lg);
+          }
+          /* System button */
+          .demo-22-7 .sys-btn {
+            background: var(--btn-bg, var(--sys-primary));
+            color: var(--btn-color, var(--sys-on-primary));
+            border: var(--btn-border, none);
+            border-radius: var(--sys-radius-sm);
+            padding: var(--sys-space-sm) var(--sys-space-md);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+          }
+          .demo-22-7 .sys-btn.outline {
+            --btn-bg: transparent;
+            --btn-color: var(--sys-primary);
+            --btn-border: 1.5px solid var(--sys-primary);
+          }
+          .demo-22-7 .sys-btn.ghost {
+            --btn-bg: transparent;
+            --btn-color: var(--sys-primary);
+            --btn-border: none;
+          }
+          /* System card */
+          .demo-22-7 .sys-card {
+            background: var(--sys-surface);
+            border: 1px solid var(--sys-border);
+            border-radius: var(--sys-radius-md);
+            padding: var(--sys-space-lg);
+            max-inline-size: 240px;
+          }
+          .demo-22-7 .sys-card h4 {
+            font-size: 0.95rem;
+            color: var(--sys-on-surface);
+            margin-block-end: var(--sys-space-sm);
+          }
+          .demo-22-7 .sys-card p {
+            font-size: 0.8rem;
+            color: var(--sys-muted);
+            line-height: 1.5;
+          }
+          /* System badge */
+          .demo-22-7 .sys-badge {
+            display: inline-block;
+            background: var(--badge-bg, oklch(92% 0.04 275));
+            color: var(--badge-color, var(--sys-primary));
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: var(--sys-space-xs) var(--sys-space-sm);
+            border-radius: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+          }
+          .demo-22-7 .sys-badge.success {
+            --badge-bg: oklch(92% 0.05 145);
+            --badge-color: oklch(35% 0.12 145);
+          }
+          .demo-22-7 .sys-badge.warning {
+            --badge-bg: oklch(92% 0.05 80);
+            --badge-color: oklch(40% 0.12 80);
+          }
+          .demo-22-7 .sys-badge.danger {
+            --badge-bg: oklch(92% 0.05 25);
+            --badge-color: oklch(40% 0.15 25);
+          }
+        </style>
+        <div class="demo-22-7">
+          <h3>Button Component</h3>
+          <div class="component-row">
+            <button class="sys-btn">Primary</button>
+            <button class="sys-btn outline">Outline</button>
+            <button class="sys-btn ghost">Ghost</button>
+          </div>
+          <h3>Card Component</h3>
+          <div class="component-row">
+            <div class="sys-card">
+              <h4>System Card</h4>
+              <p>Built with system tokens. Consumers override via custom properties.</p>
+            </div>
+            <div class="sys-card">
+              <h4>Another Card</h4>
+              <p>Same component, same tokens, consistent design language.</p>
+            </div>
+          </div>
+          <h3>Badge Component</h3>
+          <div class="component-row">
+            <span class="sys-badge">Default</span>
+            <span class="sys-badge success">Success</span>
+            <span class="sys-badge warning">Warning</span>
+            <span class="sys-badge danger">Danger</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Simulating consumer app overriding design system --&gt;
+&lt;div class="app"&gt;
+  &lt;h2&gt;My App (overrides system defaults)&lt;/h2&gt;
+  &lt;button class="sys-btn"&gt;System Default&lt;/button&gt;
+  &lt;button class="sys-btn app-primary"&gt;App Override&lt;/button&gt;
+  &lt;div class="sys-card app-card"&gt;
+    &lt;h3&gt;App-Styled Card&lt;/h3&gt;
+    &lt;p&gt;System structure, app appearance.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Layer order: system below app */
+@layer system, app;
+
+/* Design system layer */
+@layer system {
+  :root {
+    --sys-primary: oklch(48% 0.18 275);
+    --sys-surface: oklch(98% 0.005 275);
+    --sys-radius: 0.5rem;
+  }
+  .sys-btn {
+    background: var(--btn-bg, var(--sys-primary));
+    color: var(--btn-color, white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--sys-radius);
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .sys-card {
+    background: var(--sys-surface);
+    border: 1px solid oklch(88% 0.01 275);
+    border-radius: var(--sys-radius);
+    padding: 1.25rem;
+    margin-block-start: 1rem;
+    max-inline-size: 280px;
+  }
+}
+
+/* App layer overrides freely */
+@layer app {
+  .app-primary {
+    --btn-bg: oklch(55% 0.2 320);
+    --btn-color: oklch(100% 0 0);
+  }
+  .app-card {
+    --sys-surface: oklch(20% 0.03 320);
+    color: oklch(90% 0.02 320);
+    border-color: oklch(35% 0.06 320);
+  }
+}
+
+body { font-family: system-ui; padding: 2rem; }
+h2 { margin-block-end: 1rem; font-size: 1.1rem; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a fourth component to the design system: an <code>.sys-input</code> text field with token-based styling. Expose <code>--input-border</code>, <code>--input-radius</code>, and <code>--input-bg</code> as its API. Then override those properties in the app layer to give the input a dark theme. The system component remains unchanged.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.6-migration-strategies.html">&larr; Lesson 22.6</a>
+      <a href="./lesson-22.8-css-testing.html">Lesson 22.8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

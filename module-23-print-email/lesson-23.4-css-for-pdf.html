@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.4 — CSS for PDF Generation · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.4 · Print & PDF</p>
+      <h1>CSS for PDF Generation</h1>
+      <p class="lead">Invoices, receipts, reports, contracts — the most common production use of CSS print is generating PDFs. Whether via the browser's print dialog, Puppeteer, or dedicated tools like WeasyPrint, CSS controls the output. Here's how to make it pixel-perfect.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The tools</h2>
+      <p>CSS-to-PDF generation happens through several paths:</p>
+      <ul>
+        <li><strong>Browser print dialog</strong> — Ctrl+P, "Save as PDF." Uses the browser's print engine.</li>
+        <li><strong>Puppeteer / Playwright</strong> — Headless Chrome, call <code>page.pdf()</code>. Same engine, automated.</li>
+        <li><strong>wkhtmltopdf</strong> — WebKit-based CLI tool. Older but still widely used.</li>
+        <li><strong>WeasyPrint / Prince</strong> — Dedicated CSS-to-PDF engines with better @page support.</li>
+      </ul>
+
+      <h2>Setting page size</h2>
+      <p>The <code>@page</code> rule accepts a <code>size</code> property for explicit paper dimensions:</p>
+      <pre><code>@page {
+  size: A4;            /* 210mm x 297mm */
+  margin: 20mm;
+}
+
+/* Or use US Letter */
+@page {
+  size: letter;        /* 8.5in x 11in */
+  margin: 0.75in;
+}
+
+/* Or explicit dimensions */
+@page {
+  size: 210mm 297mm;
+  margin: 15mm 20mm;
+}</code></pre>
+
+      <h2>Bleed and crop marks</h2>
+      <p>For professional printing (booklets, brochures), you need bleed area and crop marks:</p>
+      <pre><code>@page {
+  size: A4;
+  marks: crop cross;   /* Crop marks + registration crosses */
+  bleed: 3mm;          /* Content extends 3mm past trim */
+}</code></pre>
+      <p>Bleed ensures that full-bleed images extend past the cut line, preventing white edges after trimming.</p>
+
+      <h2>Color considerations</h2>
+      <p>CSS works in sRGB. Professional print uses CMYK. While CSS has no native CMYK mode, you can use the <code>color()</code> function with ICC profiles in some engines. For most web-to-PDF use cases (invoices, reports), sRGB is fine. For commercial printing, export to a design tool.</p>
+
+      <h2>The invoice pattern</h2>
+      <p>Invoices are the most common production CSS-to-PDF use case. The key patterns:</p>
+      <pre><code>@page {
+  size: A4;
+  margin: 20mm;
+}
+
+.invoice {
+  font-family: system-ui, sans-serif;
+  font-size: 10pt;
+  color: #333;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.invoice-table th {
+  background: #f5f5f5;
+  padding: 8pt 12pt;
+  text-align: left;
+  border-bottom: 2px solid #333;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.invoice-table td {
+  padding: 8pt 12pt;
+  border-bottom: 1px solid #ddd;
+}
+.invoice-total {
+  font-size: 14pt;
+  font-weight: 700;
+  text-align: right;
+  margin-top: 1rem;
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Styled invoice for PDF</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-4 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(92% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-4 .invoice-page {
+            background: #fff;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            border: 1px solid oklch(88% 0.02 270);
+            border-radius: 0.25rem;
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
+          }
+          .demo-23-4 .inv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid oklch(30% 0.08 270);
+          }
+          .demo-23-4 .inv-logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: oklch(35% 0.15 270);
+          }
+          .demo-23-4 .inv-meta {
+            text-align: right;
+            font-size: 0.8rem;
+            color: oklch(45% 0.03 270);
+          }
+          .demo-23-4 .inv-meta strong {
+            display: block;
+            font-size: 1.1rem;
+            color: oklch(30% 0.05 270);
+          }
+          .demo-23-4 .inv-addresses {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: oklch(40% 0.03 270);
+          }
+          .demo-23-4 .inv-addresses strong {
+            display: block;
+            color: oklch(25% 0.05 270);
+            margin-bottom: 0.25rem;
+          }
+          .demo-23-4 table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+          }
+          .demo-23-4 th {
+            background: oklch(95% 0.02 270);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: oklch(30% 0.05 270);
+            border-bottom: 2px solid oklch(75% 0.03 270);
+          }
+          .demo-23-4 td {
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid oklch(92% 0.01 270);
+            color: oklch(35% 0.03 270);
+          }
+          .demo-23-4 .text-right { text-align: right; }
+          .demo-23-4 .inv-total {
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: oklch(30% 0.12 270);
+            padding-top: 0.5rem;
+            border-top: 2px solid oklch(30% 0.08 270);
+          }
+          .demo-23-4 .inv-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid oklch(90% 0.01 270);
+            font-size: 0.7rem;
+            color: oklch(55% 0.03 270);
+            text-align: center;
+          }
+        </style>
+        <div class="demo-23-4">
+          <div class="invoice-page">
+            <div class="inv-header">
+              <div class="inv-logo">Acme Corp</div>
+              <div class="inv-meta">
+                <strong>INVOICE</strong>
+                #INV-2026-0042<br>
+                Date: May 15, 2026<br>
+                Due: June 14, 2026
+              </div>
+            </div>
+            <div class="inv-addresses">
+              <div>
+                <strong>From</strong>
+                Acme Corp<br>
+                123 Business Lane<br>
+                San Francisco, CA 94102
+              </div>
+              <div>
+                <strong>Bill To</strong>
+                Widget Industries<br>
+                456 Client Avenue<br>
+                New York, NY 10001
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Rate</th>
+                  <th class="text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Web Development</td>
+                  <td class="text-right">40 hrs</td>
+                  <td class="text-right">$150</td>
+                  <td class="text-right">$6,000</td>
+                </tr>
+                <tr>
+                  <td>UI Design</td>
+                  <td class="text-right">16 hrs</td>
+                  <td class="text-right">$175</td>
+                  <td class="text-right">$2,800</td>
+                </tr>
+                <tr>
+                  <td>Hosting (Annual)</td>
+                  <td class="text-right">1</td>
+                  <td class="text-right">$480</td>
+                  <td class="text-right">$480</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="inv-total">Total: $9,280.00</div>
+            <div class="inv-footer">
+              Payment terms: Net 30 | Bank: First National, Acct: XXXX-4567 | Thank you for your business!
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="invoice"&gt;
+  &lt;header class="inv-header"&gt;
+    &lt;div class="logo"&gt;Your Company&lt;/div&gt;
+    &lt;div class="inv-number"&gt;
+      &lt;strong&gt;INVOICE #001&lt;/strong&gt;&lt;br&gt;
+      Date: 2026-05-17
+    &lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Item&lt;/th&gt;
+        &lt;th&gt;Qty&lt;/th&gt;
+        &lt;th&gt;Price&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;&lt;td&gt;Service A&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;$500&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;Service B&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;$300&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+      &lt;tr&gt;&lt;td colspan="2"&gt;&lt;strong&gt;Total&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;&lt;strong&gt;$800&lt;/strong&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* PDF-ready invoice styles */
+@page {
+  size: A4;
+  margin: 20mm;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 10pt;
+  color: #333;
+  margin: 0;
+  padding: 2rem;
+}
+
+.invoice { max-width: 100%; }
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #222;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1a1a4a;
+}
+
+.inv-number {
+  text-align: right;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+th {
+  background: #f0f0f5;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid #999;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #ddd;
+}
+tfoot td {
+  border-top: 2px solid #333;
+  font-size: 1.1rem;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a receipt or invoice. Set <code>@page { size: A4; margin: 20mm; }</code>. Add a company logo area, line items in a table, and a total. Use <code>print-color-adjust: exact</code> on the table header background. Open print preview and verify it fits cleanly on one page. Bonus: add <code>marks: crop cross</code> and observe the marks (visible in some PDF viewers).</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-23.3-print-layout.html">&larr; Lesson 23.3</a>
+      <a href="./lesson-23.5-email-css-constraints.html">Lesson 23.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

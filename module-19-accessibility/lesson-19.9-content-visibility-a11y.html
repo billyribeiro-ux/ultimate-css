@@ -66,7 +66,28 @@
       <p>Use <code>content-visibility: auto</code> on below-fold sections that are supplementary: image galleries, comments sections, footer widgets, related-articles grids. The content is still accessible — it just does not render until the user scrolls to it.</p>
 
       <h2>The contentvisibilityautostatechange event</h2>
-      <p>This JavaScript event fires when the element transitions between visible and hidden states. For JS-dependent content (lazy-loaded images, interactive widgets), listen for this event to initialize when the section becomes visible.</p>
+      <p>This JavaScript event fires when the element transitions between visible and hidden states. For JS-dependent content (lazy-loaded images, interactive widgets), listen for this event to initialize when the section becomes visible:</p>
+      <pre><code>section.addEventListener('contentvisibilityautostatechange', (e) => {
+  if (e.skipped === false) {
+    // Element is now visible — initialize lazy content
+    loadImages(section);
+  }
+});</code></pre>
+
+      <h2>content-visibility: hidden vs display: none</h2>
+      <p><code>content-visibility: hidden</code> (not <code>auto</code>) behaves like <code>display: none</code> for rendering — the element is never painted and is removed from the accessibility tree. The difference: the browser preserves the element's render state, making re-showing it cheaper than toggling <code>display: none</code>. Use it for off-screen tabs or panels that will be shown later, when you want instant reveal without re-layout cost.</p>
+
+      <h2>Measuring the performance gain</h2>
+      <p>Use Chrome DevTools Performance panel to measure. Record a page load with and without <code>content-visibility: auto</code> on below-fold sections. Look at the "Rendering" time in the summary. For long pages with 20+ sections, you can see 50-80% reduction in initial render time. But always weigh this against the accessibility trade-offs — a faster page that users cannot search is not a net improvement.</p>
+
+      <h2>The decision framework</h2>
+      <ul>
+        <li>Is this content below the fold? If no, do not use content-visibility.</li>
+        <li>Would a user likely Ctrl+F for this content? If yes, do not use content-visibility.</li>
+        <li>Is this a landmark region? If yes, do not use content-visibility.</li>
+        <li>Is this supplementary content (comments, galleries, footers)? Safe to use.</li>
+        <li>Does the section contain interactive elements that need to be in the tab order? Test carefully — some browsers skip these when hidden.</li>
+      </ul>
     </section>
 
     <section class="demo">

@@ -180,6 +180,51 @@
         <li><strong>Hover-only interactions:</strong> Dropdown menus that only open on hover are inaccessible to keyboard and touch users. Fix: use <code>:focus-within</code> alongside <code>:hover</code>.</li>
         <li><strong>Color as the only indicator:</strong> Red text for errors without any other visual cue (border, icon) fails for color-blind users. Fix: add border changes and text labels.</li>
         <li><strong>Tiny close buttons:</strong> Modal close buttons at 16x16px are impossible to tap on mobile. Fix: minimum 44x44px with padding or <code>::after</code> stretch.</li>
+        <li><strong>overflow: hidden on text containers:</strong> Clips content when users increase font size. Fix: use <code>overflow: visible</code> or <code>overflow-wrap: break-word</code>.</li>
+        <li><strong>Animations without reduced-motion guard:</strong> Every <code>@keyframes</code> and <code>transition</code> should have a reduced-motion fallback. Fix: use the PE7 global override pattern.</li>
+        <li><strong>display:none on content meant for screen readers:</strong> Removes from the accessibility tree. Fix: use <code>.sr-only</code> pattern instead.</li>
+        <li><strong>Custom scrollbars that remove native focus indicators:</strong> Styling scrollbars can interfere with keyboard focus visibility in scroll containers. Fix: test keyboard scroll after customization.</li>
+      </ul>
+
+      <h2>Audit frequency</h2>
+      <p>Accessibility audits should happen at three points in the development cycle:</p>
+      <ul>
+        <li><strong>Design review:</strong> Check color contrast, touch target sizes, and motion plans before any code is written. Catching issues here costs minutes, not hours.</li>
+        <li><strong>Pull request:</strong> A 5-minute keyboard walkthrough of changed components. Run axe-core or Lighthouse on the affected pages. Check the CSS diff for <code>outline: none</code>, fixed pixel widths, or missing reduced-motion guards.</li>
+        <li><strong>Pre-release:</strong> Full manual audit covering all 10 checklist sections. Screen reader testing on at least one platform. Zoom testing at 200% and 400%. Forced-colors and reduced-motion emulation. This is the gatekeeper before users encounter the code.</li>
+      </ul>
+
+      <h2>The cost of retrofitting</h2>
+      <p>Fixing accessibility in an existing codebase is 5-10x more expensive than building it in from the start. Every <code>outline: none</code> that shipped without a replacement now requires finding every affected element and adding custom focus styles. Every pixel-based layout that fails reflow requires a significant refactor to logical properties and fluid values. Build accessibility into your CSS architecture from day one — it is a structural decision, not a cosmetic one.</p>
+
+      <h2>CSS properties to grep for in audits</h2>
+      <p>When auditing an existing codebase, search for these patterns that frequently indicate accessibility issues:</p>
+      <pre><code>/* Likely problems — search for these */
+outline: none       /* focus removal without replacement */
+outline: 0          /* same issue */
+:focus { ... }      /* without :focus-visible variant */
+font-size: ??px     /* pixel font sizes */
+width: ???px        /* fixed widths on text containers */
+height: ???px       /* fixed heights that clip at zoom */
+overflow: hidden    /* may clip zoomed content */
+user-select: none   /* prevents text copying */
+pointer-events: none /* without aria-disabled */
+
+/* Good patterns to look for */
+:focus-visible      /* keyboard-only focus */
+prefers-reduced-motion  /* motion respect */
+forced-colors       /* high contrast support */
+min-block-size      /* flexible sizing */
+clamp(             /* fluid typography */
+.sr-only           /* screen reader utility */</code></pre>
+
+      <h2>Integrating with CI/CD</h2>
+      <p>Automated accessibility testing in your CI pipeline catches regressions before they reach production:</p>
+      <ul>
+        <li><strong>axe-core + Playwright/Cypress:</strong> Run axe on every page in your end-to-end test suite. Fail the build on any new violations.</li>
+        <li><strong>Lighthouse CI:</strong> Set accessibility score thresholds. Alert when the score drops below 95.</li>
+        <li><strong>CSS linting:</strong> Configure stylelint rules to flag <code>outline: none</code> without an adjacent <code>:focus-visible</code> rule, or <code>font-size</code> in px.</li>
+        <li><strong>Visual regression:</strong> Capture screenshots in forced-colors mode and reduced-motion mode. Diff against baselines to catch visual regressions that affect accessibility.</li>
       </ul>
     </section>
 

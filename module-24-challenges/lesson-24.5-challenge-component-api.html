@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 5 — Design a Button API · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 5 · Intermediate</p>
+      <h1>Design a Button API</h1>
+      <p class="lead">Build a button component with 5 variants and 3 sizes. The catch: variant classes can ONLY override custom properties — zero new property declarations allowed. The base <code>.btn</code> class does all the work.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The scenario</h2>
+      <p>You're building a design system's button component. The architecture must be maintainable: the base class declares every visual property once, using custom properties. Variant classes only swap token values. Size classes only swap sizing tokens. This means adding a 6th variant requires exactly 3-4 lines of custom-property overrides, not duplicating the entire button.</p>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>5 variants: primary, secondary, ghost, danger, success</li>
+        <li>3 sizes: sm, md (default), lg</li>
+        <li>The <code>.btn</code> base class must declare ALL visual properties (background, color, border, padding, font-size, radius, etc.)</li>
+        <li>Variant classes (<code>.btn-primary</code>, etc.) can ONLY set custom property values — no <code>background:</code>, <code>color:</code>, or any other property declaration</li>
+        <li>Size classes (<code>.btn-sm</code>, etc.) can ONLY set sizing custom properties</li>
+        <li>All 15 combinations (5 variants x 3 sizes) must work correctly</li>
+        <li>Hover and focus states must also work through the custom property API</li>
+      </ul>
+
+      <h2>Target — all 15 variations</h2>
+    </section>
+
+    <section class="demo">
+      <h2>Target — button matrix</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-5 {
+            padding: 2rem;
+            font-family: system-ui;
+            display: grid;
+            gap: 1.5rem;
+          }
+          .demo-24-5 .row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+          }
+          .demo-24-5 .row-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: oklch(50% 0 0);
+            min-inline-size: 5rem;
+          }
+          .demo-24-5 button {
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+          }
+          .demo-24-5 button:hover { opacity: 0.85; }
+          .demo-24-5 .sm { padding: 0.3rem 0.75rem; font-size: 0.75rem; }
+          .demo-24-5 .md { padding: 0.5rem 1.25rem; font-size: 0.875rem; }
+          .demo-24-5 .lg { padding: 0.7rem 1.75rem; font-size: 1rem; }
+          .demo-24-5 .primary { background: oklch(50% 0.2 260); color: white; }
+          .demo-24-5 .secondary { background: oklch(92% 0.04 260); color: oklch(35% 0.12 260); }
+          .demo-24-5 .ghost { background: transparent; color: oklch(50% 0.2 260); border-color: oklch(50% 0.2 260); }
+          .demo-24-5 .danger { background: oklch(55% 0.2 25); color: white; }
+          .demo-24-5 .success { background: oklch(55% 0.17 150); color: white; }
+        </style>
+        <div class="demo-24-5">
+          <div class="row">
+            <span class="row-label">Primary</span>
+            <button class="primary sm">Small</button>
+            <button class="primary md">Medium</button>
+            <button class="primary lg">Large</button>
+          </div>
+          <div class="row">
+            <span class="row-label">Secondary</span>
+            <button class="secondary sm">Small</button>
+            <button class="secondary md">Medium</button>
+            <button class="secondary lg">Large</button>
+          </div>
+          <div class="row">
+            <span class="row-label">Ghost</span>
+            <button class="ghost sm">Small</button>
+            <button class="ghost md">Medium</button>
+            <button class="ghost lg">Large</button>
+          </div>
+          <div class="row">
+            <span class="row-label">Danger</span>
+            <button class="danger sm">Small</button>
+            <button class="danger md">Medium</button>
+            <button class="danger lg">Large</button>
+          </div>
+          <div class="row">
+            <span class="row-label">Success</span>
+            <button class="success sm">Small</button>
+            <button class="success md">Medium</button>
+            <button class="success lg">Large</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="button-grid"&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="label"&gt;Primary&lt;/span&gt;
+    &lt;button class="btn btn-primary btn-sm"&gt;Small&lt;/button&gt;
+    &lt;button class="btn btn-primary"&gt;Medium&lt;/button&gt;
+    &lt;button class="btn btn-primary btn-lg"&gt;Large&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="label"&gt;Secondary&lt;/span&gt;
+    &lt;button class="btn btn-secondary btn-sm"&gt;Small&lt;/button&gt;
+    &lt;button class="btn btn-secondary"&gt;Medium&lt;/button&gt;
+    &lt;button class="btn btn-secondary btn-lg"&gt;Large&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="label"&gt;Ghost&lt;/span&gt;
+    &lt;button class="btn btn-ghost btn-sm"&gt;Small&lt;/button&gt;
+    &lt;button class="btn btn-ghost"&gt;Medium&lt;/button&gt;
+    &lt;button class="btn btn-ghost btn-lg"&gt;Large&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="label"&gt;Danger&lt;/span&gt;
+    &lt;button class="btn btn-danger btn-sm"&gt;Small&lt;/button&gt;
+    &lt;button class="btn btn-danger"&gt;Medium&lt;/button&gt;
+    &lt;button class="btn btn-danger btn-lg"&gt;Large&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="label"&gt;Success&lt;/span&gt;
+    &lt;button class="btn btn-success btn-sm"&gt;Small&lt;/button&gt;
+    &lt;button class="btn btn-success"&gt;Medium&lt;/button&gt;
+    &lt;button class="btn btn-success btn-lg"&gt;Large&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+}
+
+.button-grid { display: grid; gap: 1.5rem; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+.label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: oklch(50% 0 0);
+  min-inline-size: 5rem;
+}
+
+/* === BASE BUTTON ===
+   Declare ALL visual properties here using custom properties.
+   Example: background: var(--btn-bg, oklch(50% 0.2 260));
+*/
+.btn {
+  /* Build your base button here */
+}
+
+/* === VARIANT CLASSES ===
+   ONLY custom property overrides allowed!
+   NO background:, color:, border:, etc.
+   Example: .btn-primary { --btn-bg: oklch(50% 0.2 260); }
+*/
+
+/* === SIZE CLASSES ===
+   ONLY sizing custom property overrides!
+*/
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Hint</h2>
+      <p>The base <code>.btn</code> class should reference custom properties for everything: <code>background: var(--btn-bg)</code>, <code>color: var(--btn-text)</code>, <code>padding: var(--btn-py) var(--btn-px)</code>, <code>font-size: var(--btn-font)</code>, <code>border: var(--btn-border-w) solid var(--btn-border-color)</code>. Set defaults for the "md" size and "primary" variant. Then each variant class just overrides <code>--btn-bg</code>, <code>--btn-text</code>, and <code>--btn-border-color</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-24.4-challenge-dark-mode.html">&larr; Challenge 4</a>
+      <a href="./lesson-24.6-challenge-animation-chain.html">Challenge 6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

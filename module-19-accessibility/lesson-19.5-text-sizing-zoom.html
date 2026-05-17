@@ -61,6 +61,31 @@ body {
 
       <h2>Testing at 200% and 400%</h2>
       <p>Browser zoom at 200% doubles everything — if your layout uses flexbox with <code>flex-wrap: wrap</code> or grid with <code>auto-fit</code>, it naturally reflows. Fixed-width sidebars, hardcoded pixel breakpoints, and <code>overflow: hidden</code> on text containers are the usual failure points.</p>
+
+      <h2>Common sizing mistakes</h2>
+      <ul>
+        <li><strong>px for font-size:</strong> <code>font-size: 14px</code> ignores user preferences. Use <code>font-size: 0.875rem</code> instead.</li>
+        <li><strong>Fixed height on text containers:</strong> <code>height: 200px</code> clips text at zoom. Use <code>min-height</code> or remove the constraint entirely.</li>
+        <li><strong>vw-only font sizes:</strong> <code>font-size: 2vw</code> ignores user font-size settings. Always include a rem component: <code>clamp(1rem, 0.5rem + 1.5vw, 2rem)</code>.</li>
+        <li><strong>Fixed-width media queries:</strong> <code>@media (max-width: 768px)</code> in px does not respond to zoom. Content breaks at 200% zoom on standard monitors. Prefer em-based breakpoints: <code>@media (max-width: 48em)</code>.</li>
+        <li><strong>Overflow hidden on body:</strong> Prevents scrolling to off-screen content that overflows at zoom. Never use <code>overflow: hidden</code> on the root unless absolutely necessary.</li>
+      </ul>
+
+      <h2>The ideal text sizing stack</h2>
+      <pre><code>:root {
+  /* Base: respects user settings */
+  font-size: 100%;
+}
+body {
+  /* Fluid body text */
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  line-height: 1.6;
+}
+h1 { font-size: clamp(1.75rem, 1.2rem + 2.5vw, 3rem); }
+h2 { font-size: clamp(1.25rem, 1rem + 1.25vw, 2rem); }
+h3 { font-size: clamp(1.1rem, 0.95rem + 0.75vw, 1.5rem); }
+small { font-size: 0.85rem; }</code></pre>
+      <p>Every value starts with rem, ensuring the user's browser setting is the foundation. The vw component adds fluidity. The clamp boundaries prevent extremes.</p>
     </section>
 
     <section class="demo">

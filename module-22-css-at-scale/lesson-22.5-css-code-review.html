@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.5 — CSS Code Review Checklist · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.5 · Enterprise Architecture</p>
+      <h1>CSS Code Review Checklist</h1>
+      <p class="lead">Code review is where architecture is enforced or eroded. A systematic checklist catches boundary violations, specificity escalation, and accessibility gaps before they reach production. Here is what to look for and how to communicate it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The checklist</h2>
+
+      <h3>1. Layer boundary violations</h3>
+      <p>Is the new CSS in the correct layer? A component style in the utilities layer, or a token definition inside a component file, signals an architectural boundary violation. The rule: each piece of CSS lives in exactly one layer, and that layer matches its purpose.</p>
+
+      <h3>2. Hard-coded values</h3>
+      <p>Any raw color, font-size, or spacing value that should reference a token is technical debt. Search for <code>oklch(</code>, <code>#</code>, <code>rgb(</code> outside the token layer. Search for pixel values that don't match the spacing scale. Each hard-coded value is a point where the system can drift.</p>
+
+      <h3>3. Specificity escalation</h3>
+      <p>Are selectors unnecessarily specific? A <code>.header .nav .link.active</code> when <code>.nav-link[aria-current]</code> would suffice signals specificity inflation. With <code>@layer</code>, specificity within a layer only matters against other rules in that same layer — but unnecessary specificity still makes code harder to override and reason about.</p>
+
+      <h3>4. Missing @supports</h3>
+      <p>Does the code use modern features without fallback consideration? If the project supports older browsers, progressive enhancement via <code>@supports</code> should wrap newer features. Even in modern-only projects, <code>@supports</code> documents which features are load-bearing.</p>
+
+      <h3>5. Accessibility gaps</h3>
+      <p>Focus styles present and visible? Color contrast sufficient? Motion respects <code>prefers-reduced-motion</code>? Interactive elements have sufficient touch targets (44x44px minimum)? Text remains readable at 200% zoom? These are not optional — they are requirements.</p>
+
+      <h3>6. Performance anti-patterns</h3>
+      <p>Expensive selectors (<code>*</code> with complex combinators), forced reflows from layout-triggering properties in transitions, excessive use of <code>filter</code> or <code>backdrop-filter</code> on large areas, and unused CSS that bloats the bundle. Each has a measurable cost at scale.</p>
+
+      <h2>The PE7 audit automated with grep</h2>
+      <p>Automate the easy checks:</p>
+      <pre><code># Find hard-coded colors outside tokens layer
+grep -rn "oklch\|#[0-9a-f]\{3,8\}" src/components/
+
+# Find !important usage (usually a red flag)
+grep -rn "!important" src/
+
+# Find high-specificity selectors (3+ classes)
+grep -rn "\.[a-z].*\.[a-z].*\.[a-z]" src/
+
+# Find missing prefers-reduced-motion
+grep -rL "prefers-reduced-motion" src/components/*animation*</code></pre>
+
+      <h2>How to give constructive CSS review feedback</h2>
+      <p>The "why" matters more than the "what." Instead of "Don't use !important here," write "This !important will make it impossible for consumers to override this style via the component API. Consider using a @layer instead, which gives you priority without blocking future overrides."</p>
+      <p>Categorize feedback: <strong>blocking</strong> (must fix — accessibility, architecture violation), <strong>suggestion</strong> (would improve — naming, organization), <strong>nit</strong> (take it or leave it — formatting, preference). Be explicit about which category each comment falls into.</p>
+
+      <h2>Common review patterns</h2>
+      <h3>The "works but wrong layer" pattern</h3>
+      <p>The CSS achieves its visual goal but lives in the wrong architectural layer. This is the most common PE7 violation: a token defined inline in a component, or a layout rule embedded in a utility class. The fix is always a move, never a rewrite.</p>
+
+      <h3>The "specificity arms race" pattern</h3>
+      <p>A rule overrides another by adding specificity. The override is then overridden by adding more specificity. The cascade becomes a battleground. The fix: identify which layer each rule belongs in and let layer order do the work.</p>
+
+      <h3>The "copy-paste component" pattern</h3>
+      <p>A new component is created by copying an existing one and modifying it. The result: duplicated tokens, duplicated structure, diverging implementations. The fix: extract the shared API into custom properties and create variants, not copies.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>A CSS code review is not about personal style preferences. It is about enforcing the architecture that keeps the system maintainable. Every review comment should reference a principle (layer boundaries, token governance, accessibility requirements) — not a personal preference. When the review is principle-based, it is impersonal and actionable.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.4-component-api-design.html">&larr; Lesson 22.4</a>
+      <a href="./lesson-22.6-migration-strategies.html">Lesson 22.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

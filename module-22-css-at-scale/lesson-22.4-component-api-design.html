@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.4 — Component API Design · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.4 · Enterprise Architecture</p>
+      <h1>Designing Component APIs with Custom Properties</h1>
+      <p class="lead">A well-designed component exposes a deliberate set of custom properties as its public API. Everything else is private implementation. This contract between component author and consumer enables infinite customization without breaking encapsulation.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The contract: exposed vs hidden</h2>
+      <p>A button component might expose <code>--btn-bg</code>, <code>--btn-color</code>, <code>--btn-radius</code>, and <code>--btn-padding-inline</code>. These are the public API. Internal calculations (how hover state darkens the background, how focus ring width relates to border-radius) remain private. Consumers can customize appearance without understanding implementation.</p>
+
+      <h2>Default values with var()</h2>
+      <p>The pattern <code>background: var(--btn-bg, oklch(48% 0.18 275))</code> means the component works out of the box but can be overridden. The fallback is the default. No custom property set? The component looks correct. Custom property set by a parent? The component adapts.</p>
+
+      <h2>The "open" vs "closed" philosophy</h2>
+      <p><strong>Open components</strong> expose many properties (10+), giving consumers maximum flexibility. Risk: breaking changes when internal structure changes. <strong>Closed components</strong> expose few properties (3-5), offering limited but stable customization. The right choice depends on your team's needs and change tolerance.</p>
+
+      <h2>When to expose vs when to create a variant</h2>
+      <p>Expose a property when the customization is continuous (any color, any size). Create a variant class when the customization is discrete (small/medium/large, primary/secondary/destructive). Mixing both gives consumers the right tool for each job.</p>
+
+      <h2>Documentation patterns</h2>
+      <p>Every component API needs documentation showing: the property name, its type (color, length, number), its default value, and an example of usage. This is the CSS equivalent of a TypeScript interface — it defines the shape of what consumers can control.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Component with documented 8-property API</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-4 {
+            font-family: system-ui;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-22-4 .api-docs {
+            background: oklch(97% 0.005 275);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.75rem;
+            font-family: monospace;
+            line-height: 1.8;
+            color: oklch(35% 0.02 275);
+          }
+          .demo-22-4 .api-docs strong { color: oklch(48% 0.18 275); }
+          .demo-22-4 .api-docs .comment { color: oklch(55% 0.1 145); }
+          .demo-22-4 .showcase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: start;
+          }
+          .demo-22-4 .api-btn {
+            --btn-bg: oklch(48% 0.18 275);
+            --btn-color: oklch(100% 0 0);
+            --btn-radius: 0.5rem;
+            --btn-padding-block: 0.65rem;
+            --btn-padding-inline: 1.25rem;
+            --btn-font-size: 0.875rem;
+            --btn-font-weight: 500;
+            --btn-border-width: 0px;
+            background: var(--btn-bg);
+            color: var(--btn-color);
+            border-radius: var(--btn-radius);
+            padding: var(--btn-padding-block) var(--btn-padding-inline);
+            font-size: var(--btn-font-size);
+            font-weight: var(--btn-font-weight);
+            border: var(--btn-border-width) solid var(--btn-color);
+            cursor: pointer;
+            transition: filter 150ms;
+          }
+          .demo-22-4 .api-btn:hover { filter: brightness(1.1); }
+          .demo-22-4 .custom-1 {
+            --btn-bg: oklch(55% 0.2 25);
+            --btn-radius: 2rem;
+            --btn-padding-inline: 2rem;
+          }
+          .demo-22-4 .custom-2 {
+            --btn-bg: transparent;
+            --btn-color: oklch(48% 0.18 275);
+            --btn-border-width: 2px;
+            --btn-radius: 0.25rem;
+          }
+          .demo-22-4 .custom-3 {
+            --btn-bg: oklch(90% 0.06 145);
+            --btn-color: oklch(25% 0.1 145);
+            --btn-radius: 0.75rem;
+            --btn-font-size: 1rem;
+            --btn-padding-block: 0.9rem;
+            --btn-padding-inline: 1.75rem;
+          }
+          .demo-22-4 .custom-4 {
+            --btn-bg: oklch(20% 0.02 275);
+            --btn-color: oklch(90% 0.01 275);
+            --btn-radius: 0;
+            --btn-font-weight: 700;
+            --btn-font-size: 0.7rem;
+            --btn-padding-block: 0.5rem;
+          }
+        </style>
+        <div class="demo-22-4">
+          <div class="api-docs">
+            <span class="comment">/* Button Component API */</span><br>
+            <strong>--btn-bg</strong>: &lt;color&gt; = oklch(48% 0.18 275)<br>
+            <strong>--btn-color</strong>: &lt;color&gt; = oklch(100% 0 0)<br>
+            <strong>--btn-radius</strong>: &lt;length&gt; = 0.5rem<br>
+            <strong>--btn-padding-block</strong>: &lt;length&gt; = 0.65rem<br>
+            <strong>--btn-padding-inline</strong>: &lt;length&gt; = 1.25rem<br>
+            <strong>--btn-font-size</strong>: &lt;length&gt; = 0.875rem<br>
+            <strong>--btn-font-weight</strong>: &lt;number&gt; = 500<br>
+            <strong>--btn-border-width</strong>: &lt;length&gt; = 0px
+          </div>
+          <div class="showcase">
+            <button class="api-btn">Default</button>
+            <button class="api-btn custom-1">Danger Pill</button>
+            <button class="api-btn custom-2">Outline</button>
+            <button class="api-btn custom-3">Soft Success</button>
+            <button class="api-btn custom-4">Sharp Mono</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="buttons"&gt;
+  &lt;button class="btn"&gt;Default&lt;/button&gt;
+  &lt;button class="btn brand"&gt;Brand&lt;/button&gt;
+  &lt;button class="btn ghost"&gt;Ghost&lt;/button&gt;
+  &lt;button class="btn mega"&gt;Mega&lt;/button&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: grid; place-items: center; min-height: 50vh; }
+.buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+/* The component — uses its own API */
+.btn {
+  background: var(--btn-bg, oklch(48% 0.18 275));
+  color: var(--btn-color, oklch(100% 0 0));
+  border-radius: var(--btn-radius, 0.5rem);
+  padding: var(--btn-py, 0.65rem) var(--btn-px, 1.25rem);
+  font-size: var(--btn-size, 0.875rem);
+  font-weight: var(--btn-weight, 500);
+  border: var(--btn-border, none);
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.15); }
+
+/* Consumer overrides — only touch the API */
+.brand {
+  --btn-bg: oklch(55% 0.2 320);
+  --btn-radius: 2rem;
+}
+.ghost {
+  --btn-bg: transparent;
+  --btn-color: oklch(48% 0.18 275);
+  --btn-border: 2px solid currentColor;
+}
+.mega {
+  --btn-bg: oklch(30% 0.15 275);
+  --btn-size: 1.1rem;
+  --btn-py: 1rem;
+  --btn-px: 2.5rem;
+  --btn-radius: 0.75rem;
+  --btn-weight: 700;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add <code>--btn-shadow</code> to the API with a default of <code>none</code>. Then create a variant called <code>.elevated</code> that sets a subtle box-shadow using the API property. Notice how you added a new capability without modifying the base component implementation — that is the power of a well-designed API.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.3-multi-theme-architecture.html">&larr; Lesson 22.3</a>
+      <a href="./lesson-22.5-css-code-review.html">Lesson 22.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

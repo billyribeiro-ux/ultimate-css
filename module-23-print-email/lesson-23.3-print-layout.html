@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.3 — Print-Optimized Layouts · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.3 · Print Stylesheets</p>
+      <h1>Print-Optimized Layouts</h1>
+      <p class="lead">Grid layouts, flex cards, collapsed accordions, and scroll containers all look wrong on paper. A print stylesheet must linearize multi-column layouts, expand hidden content, and add page-specific affordances like page numbers and running headers.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Linearizing grid and flex layouts</h2>
+      <p>A 3-column dashboard is great on screen. On paper, it produces cramped, unreadable columns. The fix: collapse to a single column:</p>
+      <pre><code>@media print {
+  .dashboard-grid {
+    display: block; /* Overrides grid/flex */
+  }
+  .dashboard-grid > * {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}</code></pre>
+
+      <h2>Expanding collapsed content</h2>
+      <p>Accordions, tabs, and <code>&lt;details&gt;</code> elements hide content that the reader might need on paper. Force them open:</p>
+      <pre><code>@media print {
+  details {
+    display: block !important;
+  }
+  details > summary {
+    display: list-item; /* Keep summary visible */
+  }
+  details[open] > * {
+    display: block;
+  }
+  /* Force all details open via attribute */
+  details:not([open]) > *:not(summary) {
+    display: block !important;
+  }
+}</code></pre>
+
+      <h2>Removing scroll containers</h2>
+      <p>Tables inside <code>overflow: auto</code> containers get clipped on paper. Remove the constraint:</p>
+      <pre><code>@media print {
+  .table-wrapper {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  table {
+    width: 100%;
+    font-size: 9pt;
+  }
+}</code></pre>
+
+      <h2>QR codes for links</h2>
+      <p>For important URLs, you can generate QR codes via CSS-referenced images or use a service URL in generated content. While CSS alone cannot render a QR code, you can show a pre-generated one:</p>
+      <pre><code>@media print {
+  .print-qr {
+    display: block; /* Hidden on screen */
+    width: 100px;
+    height: 100px;
+  }
+}
+@media screen {
+  .print-qr { display: none; }
+}</code></pre>
+
+      <h2>Page numbers with CSS counters</h2>
+      <p>The <code>@page</code> rule supports margin boxes for page numbers (note: browser support is limited, but works in print-focused tools like Prince and WeasyPrint):</p>
+      <pre><code>@page {
+  @bottom-center {
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 9pt;
+    color: #666;
+  }
+}</code></pre>
+
+      <h2>Running headers and footers</h2>
+      <p>The CSS Paged Media spec defines margin boxes for running content. While browser support is experimental, the concept is production-ready in PDF generators:</p>
+      <pre><code>@page {
+  @top-left {
+    content: "Company Report 2026";
+    font-size: 8pt;
+    color: #999;
+  }
+  @top-right {
+    content: string(chapter-title);
+  }
+}
+h2 { string-set: chapter-title content(); }</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Dashboard that linearizes for print</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-3 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(95% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-3 .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+          }
+          .demo-23-3 .toggle-btn {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid oklch(75% 0.05 270);
+            background: #fff;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 150ms;
+          }
+          .demo-23-3 .toggle-btn.active {
+            background: oklch(45% 0.2 270);
+            color: #fff;
+            border-color: oklch(45% 0.2 270);
+          }
+          .demo-23-3 .dash {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            transition: all 300ms;
+          }
+          .demo-23-3 .dash.linearized {
+            display: block;
+          }
+          .demo-23-3 .dash.linearized .card {
+            margin-bottom: 0.75rem;
+          }
+          .demo-23-3 .card {
+            background: #fff;
+            border: 1px solid oklch(88% 0.02 270);
+            border-radius: 0.35rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.04);
+          }
+          .demo-23-3 .card h4 {
+            font-size: 0.75rem;
+            color: oklch(55% 0.03 270);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 0.5rem;
+          }
+          .demo-23-3 .card .stat {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: oklch(30% 0.08 270);
+          }
+          .demo-23-3 .page-num {
+            display: none;
+            text-align: center;
+            font-size: 0.7rem;
+            color: oklch(60% 0.02 270);
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid oklch(88% 0.02 270);
+          }
+          .demo-23-3 .dash.linearized + .page-num {
+            display: block;
+          }
+        </style>
+        <div class="demo-23-3">
+          <div class="view-toggle">
+            <button class="toggle-btn active" onclick="this.parentElement.nextElementSibling.classList.remove('linearized');this.classList.add('active');this.nextElementSibling.classList.remove('active')">Screen View</button>
+            <button class="toggle-btn" onclick="this.parentElement.nextElementSibling.classList.add('linearized');this.classList.add('active');this.previousElementSibling.classList.remove('active')">Print View</button>
+          </div>
+          <div class="dash">
+            <div class="card">
+              <h4>Revenue</h4>
+              <div class="stat">$42.8k</div>
+            </div>
+            <div class="card">
+              <h4>Users</h4>
+              <div class="stat">12,847</div>
+            </div>
+            <div class="card">
+              <h4>Conversion</h4>
+              <div class="stat">3.2%</div>
+            </div>
+          </div>
+          <div class="page-num">Page 1 of 1</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="dashboard"&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Metric A&lt;/h3&gt;
+    &lt;p class="value"&gt;1,234&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Metric B&lt;/h3&gt;
+    &lt;p class="value"&gt;567&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Metric C&lt;/h3&gt;
+    &lt;p class="value"&gt;89.2%&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Show raw data&lt;/summary&gt;
+  &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Month&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Jan&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Feb&lt;/td&gt;&lt;td&gt;120&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Mar&lt;/td&gt;&lt;td&gt;145&lt;/td&gt;&lt;/tr&gt;
+  &lt;/table&gt;
+&lt;/details&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.card {
+  background: #f8f8fc;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e8e8f0;
+}
+.card h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; margin: 0 0 0.5rem; }
+.value { font-size: 2rem; font-weight: 700; margin: 0; }
+
+details { margin-top: 1rem; }
+summary { cursor: pointer; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+th, td { padding: 0.5rem; border: 1px solid #ddd; text-align: left; }
+
+/* Print: linearize and expand */
+@media print {
+  .dashboard {
+    display: block;
+  }
+  .card {
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+  }
+  details:not([open]) > *:not(summary) {
+    display: block !important;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take a multi-column layout (grid or flex) and write a print stylesheet that linearizes it to a single column. Add a <code>&lt;details&gt;</code> element with hidden data and force it open in print. Bonus: add a footer that simulates page numbers using <code>::after</code> content.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-23.2-page-breaks.html">&larr; Lesson 23.2</a>
+      <a href="./lesson-23.4-css-for-pdf.html">Lesson 23.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

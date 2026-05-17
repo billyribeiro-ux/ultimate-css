@@ -95,6 +95,30 @@
 .section-header {
   margin-block-end: var(--space-l);
 }</code></pre>
+
+      <h2>Fluid spacing and borders/radius</h2>
+      <p>Border-radius and border-width also benefit from fluid scaling. A card that has generous rounded corners on desktop but tighter corners on mobile looks more intentional:</p>
+      <pre><code>.card {
+  border-radius: calc(var(--space-unit) * 0.75);
+  /* At 320px: ~12px radius
+     At 1440px: ~18px radius */
+
+  border: calc(var(--space-unit) * 0.05) solid var(--border);
+  /* Subtle scaling — almost invisible but prevents
+     borders from feeling too thick on small screens */
+}</code></pre>
+
+      <h2>The cascade: one source of truth</h2>
+      <p>The single <code>--space-unit</code> pattern means changing responsive behavior is a one-line edit. Want tighter mobile spacing? Reduce the minimum. Want more generous desktop spacing? Increase the maximum. Every component automatically updates:</p>
+      <pre><code>/* Before: tight spacing */
+--space-unit: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+
+/* After: generous spacing */
+--space-unit: clamp(1rem, 0.7rem + 1.3vw, 1.5rem);
+
+/* Every component using derived tokens
+   (--space-xs through --space-3xl) updates automatically.
+   Zero find-and-replace needed. */</code></pre>
     </section>
 
     <section class="demo">

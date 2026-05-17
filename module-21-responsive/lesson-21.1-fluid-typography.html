@@ -93,6 +93,43 @@ font-size: clamp(1rem, 0.75rem + 1vw, 1.5rem);
 
    Result: clamp(1rem, 0.636rem + 1.818vw, 2rem)
 */</code></pre>
+
+      <h2>Line-height considerations</h2>
+      <p>As font-size scales, line-height should adapt too. Large display text needs tighter leading than body text. Use unitless values that scale with the font-size, or use clamp() for the line-height itself:</p>
+      <pre><code>/* Headings: tight leading that loosens on small screens */
+h1 {
+  font-size: var(--text-3xl);
+  line-height: clamp(1.05, 0.9 + 0.5vw, 1.2);
+}
+
+/* Body: comfortable reading line-height */
+p {
+  font-size: var(--text-base);
+  line-height: 1.6; /* unitless — scales with font-size */
+}
+
+/* Rule of thumb:
+   - Display text: 1.0–1.2
+   - Headings: 1.2–1.3
+   - Body text: 1.5–1.7
+   - Small/UI text: 1.3–1.5 */</code></pre>
+
+      <h2>Fluid type in practice: the cascade</h2>
+      <p>Define the scale once at the <code>:root</code> level, then reference tokens throughout. Components never hardcode sizes — they use the scale:</p>
+      <pre><code>/* tokens layer */
+:root {
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.4vw, 1rem);
+  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 0.95rem + 0.9vw, 1.5rem);
+  --text-xl: clamp(1.25rem, 0.9rem + 1.5vw, 2rem);
+}
+
+/* components layer — references only */
+.card-title { font-size: var(--text-lg); }
+.card-body  { font-size: var(--text-base); }
+.card-meta  { font-size: var(--text-xs); }
+/* No magic numbers, no breakpoints, fully maintainable */</code></pre>
     </section>
 
     <section class="demo">

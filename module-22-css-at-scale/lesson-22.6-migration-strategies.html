@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.6 — Migrating Legacy CSS to @layer · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.6 · Enterprise Architecture</p>
+      <h1>Migrating Legacy CSS to @layer</h1>
+      <p class="lead">You cannot rewrite 10,000 lines of CSS in a sprint. The incremental migration strategy wraps existing CSS in a compatibility layer, adds new CSS in proper layers, and refactors one component at a time. Six months, zero regressions.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The incremental approach</h2>
+      <p>Step 1: Declare your layer order at the top of your entry point. Step 2: Wrap all existing CSS in a single <code>@layer legacy</code>. This changes nothing visually — unlayered CSS beats layered CSS, but since everything is now layered, the existing specificity relationships are preserved within that layer. Step 3: Write all new CSS in the appropriate PE7 layer. Step 4: Migrate one component at a time from <code>legacy</code> to the correct layer.</p>
+
+      <h2>The @import layer() technique</h2>
+      <p>Third-party CSS can be wrapped in a layer at import time: <code>@import url("vendor.css") layer(vendor)</code>. This gives you architectural control over CSS you do not own. The vendor layer sits below your layers, so your overrides always win without <code>!important</code>.</p>
+
+      <h2>Handling !important during migration</h2>
+      <p>Legacy codebases often have <code>!important</code> scattered throughout. During migration, these become problematic because <code>!important</code> reverses layer order (lower layers win). The strategy: remove <code>!important</code> as you migrate each component. It is temporary — the goal is zero <code>!important</code> usage in the final architecture.</p>
+
+      <h2>The test strategy: visual regression</h2>
+      <p>Before migrating any component, capture screenshots of every state (default, hover, focus, active, disabled, error). After migration, compare screenshots pixel-by-pixel. Any visual difference is a regression that must be resolved before merging. Tools like Playwright's screenshot comparison make this automated.</p>
+
+      <h2>A realistic 6-month migration plan</h2>
+      <p><strong>Month 1</strong>: Declare layers, wrap all existing CSS in <code>@layer legacy</code>, set up visual regression testing. <strong>Month 2-3</strong>: Extract tokens from hard-coded values, build the token layer. <strong>Month 4-5</strong>: Migrate components one at a time (highest-traffic pages first). <strong>Month 6</strong>: Remove the legacy layer, delete <code>!important</code> usage, audit for completeness.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Before/after wrapping legacy CSS in layers</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-6 {
+            font-family: system-ui;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+          }
+          .demo-22-6 .panel {
+            background: oklch(97% 0.005 275);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+          }
+          .demo-22-6 h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: oklch(50% 0 0);
+            margin-block-end: 1rem;
+          }
+          .demo-22-6 pre {
+            background: oklch(15% 0.02 275);
+            color: oklch(85% 0.02 275);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+          }
+          .demo-22-6 .keyword { color: oklch(70% 0.15 320); }
+          .demo-22-6 .comment { color: oklch(55% 0.08 145); }
+          .demo-22-6 .string { color: oklch(70% 0.12 80); }
+          .demo-22-6 .arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: oklch(48% 0.18 275);
+            grid-column: 1 / -1;
+            padding: 0.5rem;
+          }
+          .demo-22-6 .result {
+            grid-column: 1 / -1;
+            background: oklch(95% 0.03 145);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: oklch(30% 0.08 145);
+          }
+        </style>
+        <div class="demo-22-6">
+          <div class="panel">
+            <h3>Before (legacy)</h3>
+            <pre><span class="comment">/* styles.css - 10,000 lines */</span>
+.header { ... }
+.header .nav { ... }
+.header .nav a { ... }
+.btn { ... }
+.btn<span class="keyword">!important</span> { color: red; }
+.card { ... }
+<span class="comment">/* specificity wars everywhere */</span></pre>
+          </div>
+          <div class="panel">
+            <h3>After (step 1)</h3>
+            <pre><span class="comment">/* main.css - entry point */</span>
+<span class="keyword">@layer</span> reset, tokens, base,
+       layouts, components, utilities;
+
+<span class="comment">/* Wrap everything in legacy */</span>
+<span class="keyword">@import</span> <span class="string">url("legacy.css")</span>
+  <span class="keyword">layer</span>(legacy);
+
+<span class="comment">/* New code in proper layers */</span>
+<span class="keyword">@layer</span> components {
+  .new-card { ... }
+}</pre>
+          </div>
+          <div class="result">
+            Result: Zero visual changes. Legacy CSS is now contained. New CSS goes in proper layers. Migration can proceed component by component with no deadline pressure.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;header class="header"&gt;
+    &lt;nav&gt;&lt;a href="#"&gt;Home&lt;/a&gt; &lt;a href="#"&gt;About&lt;/a&gt;&lt;/nav&gt;
+  &lt;/header&gt;
+  &lt;main&gt;
+    &lt;div class="card legacy-card"&gt;
+      &lt;h2&gt;Legacy Card&lt;/h2&gt;
+      &lt;p&gt;This card is styled by the legacy layer.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="card modern-card"&gt;
+      &lt;h2&gt;Modern Card&lt;/h2&gt;
+      &lt;p&gt;This card is in the components layer.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Declare layer order */
+@layer legacy, tokens, components;
+
+/* Legacy CSS wrapped in a layer */
+@layer legacy {
+  .header { background: #333; padding: 1rem; }
+  .header nav a { color: white; margin-right: 1rem; text-decoration: none; }
+  .card { border: 1px solid #ddd; padding: 1rem; margin: 1rem; border-radius: 4px; }
+  .card h2 { color: #333; }
+}
+
+/* Modern tokens */
+@layer tokens {
+  :root {
+    --surface: oklch(97% 0.005 275);
+    --border: oklch(85% 0.01 275);
+    --heading: oklch(25% 0.05 275);
+    --radius: 0.75rem;
+  }
+}
+
+/* Modern component — proper layer */
+@layer components {
+  .modern-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  .modern-card h2 { color: var(--heading); }
+}
+
+body { font-family: system-ui; margin: 0; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Migrate the legacy <code>.header</code> styles into the proper layers: its colors become tokens, its layout rules move to a layouts layer. Delete the original from <code>@layer legacy</code>. The visual result should be identical — that is the test. Migration preserves appearance while improving architecture.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.5-css-code-review.html">&larr; Lesson 22.5</a>
+      <a href="./lesson-22.7-design-system-css.html">Lesson 22.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
