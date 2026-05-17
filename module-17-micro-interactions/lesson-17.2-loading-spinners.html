@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.2 — Seven Loading Spinners, One System · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.2 · Micro-Interactions</p>
+      <h1>Seven Loading Spinners, One System</h1>
+      <p class="lead">Seven distinct spinner designs that all speak the same visual language. They share motion tokens for size and color, respect prefers-reduced-motion, and each demonstrates a different CSS animation technique — from simple rotation to SVG stroke manipulation to border-radius morphing.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The motion token system</h2>
+      <p>Every spinner references two custom properties: <code>--spinner-size</code> (default <code>2rem</code>) and <code>--spinner-color</code> (default <code>oklch(55% 0.2 260)</code>). This means any spinner can be dropped into any context and will adopt the local design tokens. Change the parent's custom property, all spinners in that scope update.</p>
+
+      <h2>The seven patterns</h2>
+      <h3>1. Rotating ring</h3>
+      <p>A border with only one side colored, spinning 360 degrees infinitely. The simplest spinner and the most universally recognized. Uses <code>border-top-color</code> for the visible arc and transparent for the rest.</p>
+
+      <h3>2. Pulsing dots</h3>
+      <p>Three circles that scale up and down in sequence with staggered <code>animation-delay</code>. The delay creates a wave effect. Each dot uses the same keyframe but offset by one-third of the duration.</p>
+
+      <h3>3. Bar equalizer</h3>
+      <p>Five vertical bars with staggered <code>scaleY</code> animations. Reminiscent of an audio equalizer. Each bar's delay is offset by <code>calc(var(--i) * -120ms)</code> where <code>--i</code> is the bar's index.</p>
+
+      <h3>4. Orbit</h3>
+      <p>Two dots rotating around a shared center point at 180-degree offset. Uses a single rotation keyframe on the container, with dots positioned at opposite ends.</p>
+
+      <h3>5. Skeleton shimmer</h3>
+      <p>The Vercel-style diagonal gradient sweep across a placeholder rectangle. A linear gradient at 105 degrees, animated via <code>background-position</code> from left to right. The background-size is 200% so the gradient can slide through.</p>
+
+      <h3>6. Progress ring (SVG)</h3>
+      <p>An SVG circle with <code>stroke-dasharray</code> set to the circumference and <code>stroke-dashoffset</code> animated. The circle also rotates, creating the effect of a partially-drawn arc chasing itself around the ring.</p>
+
+      <h3>7. Morphing shape</h3>
+      <p>A single element whose <code>border-radius</code> cycles between circle (50%), rounded square (25%), and diamond (50% with rotation). Combined with a slow hue rotation on the background color for visual interest.</p>
+
+      <h2>Reduced motion</h2>
+      <p>Every spinner wraps its animation in a <code>@media (prefers-reduced-motion: no-preference)</code> check. When motion is reduced, the spinners show a static pulsing opacity (0.4 to 1, 2s duration) instead — still indicating "loading" without disorienting movement.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — All seven spinners</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-2 {
+            --spinner-size: 2.5rem;
+            --spinner-color: oklch(55% 0.2 260);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            font-family: system-ui;
+            text-align: center;
+          }
+          .demo-17-2 .spinner-cell {
+            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+          }
+          .demo-17-2 .spinner-cell span { font-size: 0.75rem; color: oklch(50% 0 0); }
+
+          /* 1. Rotating ring */
+          .demo-17-2 .ring {
+            width: var(--spinner-size); height: var(--spinner-size);
+            border: 3px solid oklch(90% 0 0);
+            border-top-color: var(--spinner-color);
+            border-radius: 50%;
+            animation: spin-17 0.8s linear infinite;
+          }
+          @keyframes spin-17 { to { transform: rotate(360deg); } }
+
+          /* 2. Pulsing dots */
+          .demo-17-2 .dots { display: flex; gap: 0.35rem; align-items: center; height: var(--spinner-size); }
+          .demo-17-2 .dots i {
+            width: calc(var(--spinner-size) * 0.25);
+            height: calc(var(--spinner-size) * 0.25);
+            background: var(--spinner-color);
+            border-radius: 50%;
+            animation: pulse-17 0.9s ease-in-out infinite;
+          }
+          .demo-17-2 .dots i:nth-child(2) { animation-delay: 0.15s; }
+          .demo-17-2 .dots i:nth-child(3) { animation-delay: 0.3s; }
+          @keyframes pulse-17 { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+
+          /* 3. Bar equalizer */
+          .demo-17-2 .bars { display: flex; gap: 3px; align-items: end; height: var(--spinner-size); }
+          .demo-17-2 .bars i {
+            width: calc(var(--spinner-size) * 0.12);
+            height: 60%;
+            background: var(--spinner-color);
+            border-radius: 2px;
+            animation: bars-17 1s ease-in-out infinite;
+          }
+          .demo-17-2 .bars i:nth-child(1) { animation-delay: -0.48s; }
+          .demo-17-2 .bars i:nth-child(2) { animation-delay: -0.36s; }
+          .demo-17-2 .bars i:nth-child(3) { animation-delay: -0.24s; }
+          .demo-17-2 .bars i:nth-child(4) { animation-delay: -0.12s; }
+          .demo-17-2 .bars i:nth-child(5) { animation-delay: 0s; }
+          @keyframes bars-17 { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+
+          /* 4. Orbit */
+          .demo-17-2 .orbit {
+            position: relative;
+            width: var(--spinner-size); height: var(--spinner-size);
+            animation: spin-17 1.2s linear infinite;
+          }
+          .demo-17-2 .orbit::before, .demo-17-2 .orbit::after {
+            content: "";
+            position: absolute;
+            width: calc(var(--spinner-size) * 0.25);
+            height: calc(var(--spinner-size) * 0.25);
+            background: var(--spinner-color);
+            border-radius: 50%;
+          }
+          .demo-17-2 .orbit::before { top: 0; left: 50%; transform: translateX(-50%); }
+          .demo-17-2 .orbit::after { bottom: 0; left: 50%; transform: translateX(-50%); opacity: 0.4; }
+
+          /* 5. Skeleton shimmer */
+          .demo-17-2 .shimmer {
+            width: calc(var(--spinner-size) * 2.5);
+            height: var(--spinner-size);
+            background: linear-gradient(105deg, oklch(90% 0 0) 0%, oklch(96% 0 0) 40%, oklch(90% 0 0) 80%);
+            background-size: 200% 100%;
+            border-radius: 0.25rem;
+            animation: shimmer-17 1.5s ease-in-out infinite;
+          }
+          @keyframes shimmer-17 { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+          /* 6. Progress ring SVG */
+          .demo-17-2 .progress-ring svg { width: var(--spinner-size); height: var(--spinner-size); animation: spin-17 2s linear infinite; }
+          .demo-17-2 .progress-ring circle {
+            fill: none;
+            stroke: var(--spinner-color);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 80;
+            stroke-dashoffset: 60;
+            animation: ring-dash-17 1.5s ease-in-out infinite;
+          }
+          @keyframes ring-dash-17 { 0% { stroke-dashoffset: 80; } 50% { stroke-dashoffset: 20; } 100% { stroke-dashoffset: 80; } }
+
+          /* 7. Morphing shape */
+          .demo-17-2 .morph {
+            width: var(--spinner-size); height: var(--spinner-size);
+            background: var(--spinner-color);
+            animation: morph-17 2s ease-in-out infinite;
+          }
+          @keyframes morph-17 {
+            0%, 100% { border-radius: 50%; transform: rotate(0deg); }
+            33% { border-radius: 25%; transform: rotate(45deg); }
+            66% { border-radius: 50% 10%; transform: rotate(90deg); }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-17-2 .ring, .demo-17-2 .dots i, .demo-17-2 .bars i,
+            .demo-17-2 .orbit, .demo-17-2 .shimmer,
+            .demo-17-2 .progress-ring svg, .demo-17-2 .progress-ring circle,
+            .demo-17-2 .morph {
+              animation: reduced-pulse-17 2s ease-in-out infinite;
+            }
+            @keyframes reduced-pulse-17 { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+          }
+        </style>
+        <div class="demo-17-2">
+          <div class="spinner-cell"><div class="ring"></div><span>Ring</span></div>
+          <div class="spinner-cell"><div class="dots"><i></i><i></i><i></i></div><span>Dots</span></div>
+          <div class="spinner-cell"><div class="bars"><i></i><i></i><i></i><i></i><i></i></div><span>Bars</span></div>
+          <div class="spinner-cell"><div class="orbit"></div><span>Orbit</span></div>
+          <div class="spinner-cell"><div class="shimmer"></div><span>Shimmer</span></div>
+          <div class="spinner-cell">
+            <div class="progress-ring"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"></circle></svg></div>
+            <span>Ring (SVG)</span>
+          </div>
+          <div class="spinner-cell"><div class="morph"></div><span>Morph</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="spinners"&gt;
+  &lt;!-- 1. Rotating ring --&gt;
+  &lt;div class="ring" role="status" aria-label="Loading"&gt;&lt;/div&gt;
+
+  &lt;!-- 2. Pulsing dots --&gt;
+  &lt;div class="dots" role="status" aria-label="Loading"&gt;
+    &lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;
+  &lt;/div&gt;
+
+  &lt;!-- 3. Bar equalizer --&gt;
+  &lt;div class="bars" role="status" aria-label="Loading"&gt;
+    &lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;
+  &lt;/div&gt;
+
+  &lt;!-- 4. Orbit --&gt;
+  &lt;div class="orbit" role="status" aria-label="Loading"&gt;&lt;/div&gt;
+
+  &lt;!-- 5. Morphing shape --&gt;
+  &lt;div class="morph" role="status" aria-label="Loading"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --spinner-size: 2.5rem;
+  --spinner-color: oklch(55% 0.2 260);
+}
+body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: grid;
+  place-items: center;
+  min-height: 80vh;
+}
+.spinners {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+/* Ring */
+.ring {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border: 3px solid oklch(90% 0 0);
+  border-top-color: var(--spinner-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Dots */
+.dots { display: flex; gap: 0.3rem; align-items: center; }
+.dots i {
+  width: calc(var(--spinner-size) * 0.25);
+  height: calc(var(--spinner-size) * 0.25);
+  background: var(--spinner-color);
+  border-radius: 50%;
+  animation: pulse 0.9s ease-in-out infinite;
+}
+.dots i:nth-child(2) { animation-delay: 0.15s; }
+.dots i:nth-child(3) { animation-delay: 0.3s; }
+
+/* Bars */
+.bars { display: flex; gap: 3px; align-items: end; height: var(--spinner-size); }
+.bars i {
+  width: calc(var(--spinner-size) * 0.12);
+  height: 60%;
+  background: var(--spinner-color);
+  border-radius: 2px;
+  animation: bar 1s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -120ms);
+}
+.bars i:nth-child(1) { --i: 4; }
+.bars i:nth-child(2) { --i: 3; }
+.bars i:nth-child(3) { --i: 2; }
+.bars i:nth-child(4) { --i: 1; }
+.bars i:nth-child(5) { --i: 0; }
+
+/* Orbit */
+.orbit {
+  position: relative;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  animation: spin 1.2s linear infinite;
+}
+.orbit::before, .orbit::after {
+  content: "";
+  position: absolute;
+  width: 25%; height: 25%;
+  background: var(--spinner-color);
+  border-radius: 50%;
+}
+.orbit::before { top: 0; left: 50%; translate: -50% 0; }
+.orbit::after { bottom: 0; left: 50%; translate: -50% 0; opacity: 0.4; }
+
+/* Morph */
+.morph {
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  background: var(--spinner-color);
+  animation: morph 2s ease-in-out infinite;
+}
+
+@keyframes spin { to { rotate: 360deg; } }
+@keyframes pulse {
+  0%, 80%, 100% { scale: 0.6; opacity: 0.5; }
+  40% { scale: 1; opacity: 1; }
+}
+@keyframes bar {
+  0%, 100% { scale: 1 0.4; }
+  50% { scale: 1 1; }
+}
+@keyframes morph {
+  0%, 100% { border-radius: 50%; rotate: 0deg; }
+  33% { border-radius: 25%; rotate: 45deg; }
+  66% { border-radius: 50% 10%; rotate: 90deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring, .dots i, .bars i, .orbit, .morph {
+    animation: gentle-pulse 2s ease-in-out infinite;
+  }
+  @keyframes gentle-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create an eighth spinner: a "typing indicator" with three dots that bounce vertically in sequence (like iMessage). Use <code>translateY</code> and stagger each dot by 150ms. Then override <code>--spinner-color</code> on the parent to <code>oklch(65% 0.18 145)</code> and verify all spinners update to green simultaneously.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.1-toggle-switch.html">&larr; Lesson 17.1</a>
+      <a href="./lesson-17.3-notification-badges.html">Lesson 17.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

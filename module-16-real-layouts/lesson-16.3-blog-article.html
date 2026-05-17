@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.3 — The Long-Form Article · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.3 · Real-World Layout</p>
+      <h1>The Long-Form Article (Medium/Substack Style)</h1>
+      <p class="lead">A beautiful reading experience: centered prose at 65ch, drop caps, pull quotes, a sticky progress bar, and a table of contents sidebar that collapses on narrow viewports. Every detail serves readability.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The typographic system</h2>
+      <p>Long-form articles live and die by their typography. The optimal line length is 55-75 characters (65ch is the sweet spot). The font size is 1.125rem minimum on desktop, with line-height at 1.7-1.8 for comfortable scanning. Paragraph spacing uses <code>margin-block-start</code> instead of <code>margin-block-end</code> so the first paragraph naturally has no gap above it.</p>
+
+      <h2>The drop cap</h2>
+      <p>The first paragraph's <code>::first-letter</code> is styled with a large font size (3.5em), floated inline-start, and given a small margin. The key trick: <code>line-height: 0.8</code> prevents the drop cap from pushing down the second line excessively.</p>
+
+      <h2>The reading progress bar</h2>
+      <p>A fixed-position element at the top of the viewport uses <code>animation-timeline: scroll()</code> to grow its <code>inline-size</code> from 0% to 100% as the user scrolls the article. No JavaScript needed — the scroll position directly drives the progress.</p>
+
+      <h2>The table of contents sidebar</h2>
+      <p>On wide viewports (above 72rem), the layout becomes a two-column grid with the TOC in a sticky sidebar. On narrow viewports, the TOC collapses into a disclosure widget (<code>&lt;details&gt;</code>) above the article. This is the classic responsive sidebar pattern.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full article layout</h2>
+      <div class="demo-frame" style="padding:0; overflow-y:auto; max-block-size:80vh;">
+        <style>
+          .demo-16-3 { font-family: 'Georgia', serif; color: light-dark(oklch(20% 0.01 264), oklch(88% 0.005 264)); background: light-dark(oklch(99% 0.002 264), oklch(10% 0.01 264)); line-height: 1.8; position: relative; }
+          .demo-16-3 *, .demo-16-3 *::before, .demo-16-3 *::after { box-sizing: border-box; margin: 0; }
+
+          /* Progress bar */
+          .demo-16-3 .progress-bar { position: sticky; inset-block-start: 0; z-index: 50; block-size: 3px; background: oklch(55% 0.22 275); inline-size: 0%; }
+          @supports (animation-timeline: scroll()) {
+            .demo-16-3 .progress-bar { animation: progress-grow linear both; animation-timeline: scroll(nearest block); }
+            @keyframes progress-grow { from { inline-size: 0%; } to { inline-size: 100%; } }
+          }
+
+          /* Layout */
+          .demo-16-3 .article-layout { display: grid; grid-template-columns: 1fr min(65ch, 100%) 1fr; padding: 3rem 1.5rem; gap: 0 2rem; }
+          .demo-16-3 .article-layout > * { grid-column: 2; }
+
+          /* TOC sidebar */
+          .demo-16-3 .toc { grid-column: 3; grid-row: 1 / span 20; position: sticky; inset-block-start: 2rem; align-self: start; font-family: system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.5; padding-inline-start: 1rem; border-inline-start: 2px solid light-dark(oklch(90% 0.01 264), oklch(20% 0.01 264)); }
+          .demo-16-3 .toc h4 { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: light-dark(oklch(50% 0.01 264), oklch(50% 0.01 264)); margin-block-end: 0.75rem; }
+          .demo-16-3 .toc a { display: block; padding: 0.25rem 0; color: light-dark(oklch(45% 0.01 264), oklch(55% 0.01 264)); text-decoration: none; }
+          .demo-16-3 .toc a:hover { color: light-dark(oklch(25% 0.15 275), oklch(75% 0.12 275)); }
+          @media (max-width: 72rem) {
+            .demo-16-3 .toc { grid-column: 2; grid-row: auto; position: static; border-inline-start: none; padding: 1rem; background: light-dark(oklch(96% 0.005 264), oklch(14% 0.01 264)); border-radius: 0.5rem; margin-block-end: 2rem; }
+          }
+
+          /* Article header */
+          .demo-16-3 .article-header { margin-block-end: 2.5rem; }
+          .demo-16-3 .article-header h1 { font-size: clamp(1.75rem, 4vw + 0.5rem, 2.75rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-block-end: 1rem; }
+          .demo-16-3 .article-header .meta { font-family: system-ui, sans-serif; font-size: 0.875rem; color: light-dark(oklch(50% 0.01 264), oklch(50% 0.01 264)); display: flex; gap: 1rem; align-items: center; }
+          .demo-16-3 .article-header .author-avatar { inline-size: 2.5rem; block-size: 2.5rem; border-radius: 50%; background: linear-gradient(135deg, oklch(55% 0.2 275), oklch(50% 0.18 200)); }
+
+          /* Prose */
+          .demo-16-3 p { margin-block-start: 1.25rem; }
+          .demo-16-3 .first-para::first-letter { float: inline-start; font-size: 3.5em; line-height: 0.8; padding-inline-end: 0.1em; padding-block-start: 0.05em; color: light-dark(oklch(30% 0.15 275), oklch(70% 0.12 275)); font-weight: 700; }
+          .demo-16-3 h2 { font-size: 1.5rem; font-weight: 700; margin-block-start: 2.5rem; margin-block-end: 0.5rem; scroll-margin-block-start: 2rem; }
+          .demo-16-3 h3 { font-size: 1.25rem; font-weight: 600; margin-block-start: 2rem; margin-block-end: 0.5rem; scroll-margin-block-start: 2rem; }
+
+          /* Pull quote */
+          .demo-16-3 .pull-quote { margin-block: 2rem; padding: 1.5rem 2rem; border-inline-start: 4px solid oklch(55% 0.22 275); font-size: 1.25rem; font-style: italic; color: light-dark(oklch(35% 0.02 264), oklch(75% 0.02 264)); background: light-dark(oklch(97% 0.005 275 / 0.5), oklch(14% 0.02 275 / 0.5)); border-radius: 0 0.5rem 0.5rem 0; }
+
+          /* Inline code */
+          .demo-16-3 code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.875em; padding: 0.125rem 0.375rem; border-radius: 0.25rem; background: light-dark(oklch(94% 0.005 264), oklch(18% 0.01 264)); }
+
+          /* Figure */
+          .demo-16-3 figure { margin-block: 2rem; }
+          .demo-16-3 figure .img-placeholder { inline-size: 100%; aspect-ratio: 16 / 9; border-radius: 0.75rem; background: linear-gradient(135deg, light-dark(oklch(92% 0.02 200), oklch(18% 0.04 200)), light-dark(oklch(88% 0.03 275), oklch(14% 0.04 275))); }
+          .demo-16-3 figcaption { font-family: system-ui, sans-serif; font-size: 0.8125rem; color: light-dark(oklch(50% 0.01 264), oklch(50% 0.01 264)); text-align: center; margin-block-start: 0.75rem; }
+
+          /* Blockquote */
+          .demo-16-3 blockquote { margin-block: 1.5rem; margin-inline: 0; padding-inline-start: 1.5rem; border-inline-start: 3px solid light-dark(oklch(80% 0.05 264), oklch(30% 0.02 264)); color: light-dark(oklch(40% 0.01 264), oklch(65% 0.01 264)); font-style: italic; }
+        </style>
+        <div class="demo-16-3">
+          <div class="progress-bar"></div>
+          <div class="article-layout">
+            <nav class="toc">
+              <h4>Contents</h4>
+              <a href="#s1">The case for simplicity</a>
+              <a href="#s2">Complexity as debt</a>
+              <a href="#s3">The rewrite trap</a>
+              <a href="#s4">Principles of reduction</a>
+            </nav>
+
+            <header class="article-header">
+              <h1>On the Virtue of Removing Code</h1>
+              <div class="meta">
+                <div class="author-avatar"></div>
+                <div>
+                  <div style="font-weight:600; color: light-dark(oklch(20% 0.01 264), oklch(90% 0.01 264))">Sarah Chen</div>
+                  <div>12 min read · March 2026</div>
+                </div>
+              </div>
+            </header>
+
+            <p class="first-para">Every line of code is a liability. This is not a new observation, but it is one that most teams forget the moment they open a pull request. The urge to add is strong. The discipline to subtract is rare. And yet the most impactful engineering work I have witnessed in twenty years has been deletion.</p>
+
+            <h2 id="s1">The case for simplicity</h2>
+            <p>Simplicity is not the absence of features. It is the presence of clarity. When a system is simple, every part serves a purpose that a new team member can understand in minutes, not days. The code reads like prose because it was edited like prose — draft after draft, removing words until only the necessary ones remain.</p>
+
+            <p>Consider the <code>Array.prototype.reduce</code> method. In a single function call, it replaces loops, accumulators, and intermediate variables. It is simple not because it is short, but because it communicates intent without ceremony.</p>
+
+            <aside class="pull-quote">The best code is the code that was never written. The second best is the code you had the courage to delete.</aside>
+
+            <h2 id="s2">Complexity as debt</h2>
+            <p>Every abstraction has a carrying cost. Every layer of indirection is a tax on the next developer who must trace a bug through the stack. We call this "technical debt" but the metaphor is imprecise. Debt implies a conscious borrowing with intent to repay. Most complexity accumulates not through deliberate trade-offs but through inattention — the slow accretion of "just one more" until the system collapses under its own weight.</p>
+
+            <figure>
+              <div class="img-placeholder"></div>
+              <figcaption>A visualization of module dependencies before and after the simplification effort.</figcaption>
+            </figure>
+
+            <h2 id="s3">The rewrite trap</h2>
+            <p>The temptation, when facing a complex system, is to rewrite it from scratch. This is almost always wrong. A rewrite discards hard-won knowledge embedded in edge-case handling, error recovery, and performance optimizations that were added one painful bug at a time over years.</p>
+
+            <blockquote>The problem with rewrites is not that they fail to deliver the new architecture. It is that they fail to deliver the old behavior.</blockquote>
+
+            <p>Instead of rewriting, reduce. Find the seams. Extract the unnecessary. Inline the over-abstracted. Delete the dead code that everyone is afraid to touch because "it might be used somewhere."</p>
+
+            <h2 id="s4">Principles of reduction</h2>
+            <p>First, measure. You cannot simplify what you do not understand. Map the dependencies. Count the call sites. Profile the hot paths. Only then can you know which removals will have the greatest impact with the least risk.</p>
+
+            <p>Second, automate the verification. Every deletion should be backed by a test that proves the system still behaves correctly. If you cannot write that test, you do not understand the code well enough to delete it safely.</p>
+
+            <p>Third, communicate the intent. A deletion pull request with no description terrifies reviewers. Explain what was removed, why it existed in the first place, and what evidence shows it is no longer needed. The commit message is a letter to your future self.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — drop cap + progress bar</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="reading-progress"&gt;&lt;/div&gt;
+&lt;article class="prose"&gt;
+  &lt;h1&gt;On the Art of CSS&lt;/h1&gt;
+  &lt;p class="intro"&gt;Every stylesheet tells a story.
+  The best ones read like poetry — each
+  selector placed with intention, each
+  property serving the whole.&lt;/p&gt;
+  &lt;p&gt;The craft of CSS is not in knowing
+  every property. It is in knowing which
+  properties to reach for, and when to
+  let the defaults do the work.&lt;/p&gt;
+  &lt;p&gt;Repeat this paragraph many times
+  to test the progress bar scrolling
+  behavior with longer content...&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: Georgia, serif;
+  margin: 0;
+  line-height: 1.8;
+  color: oklch(20% 0.01 264);
+}
+
+/* Reading progress bar */
+.reading-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  block-size: 3px;
+  background: oklch(55% 0.22 275);
+  inline-size: 0%;
+  z-index: 100;
+}
+@supports (animation-timeline: scroll()) {
+  .reading-progress {
+    animation: grow linear both;
+    animation-timeline: scroll();
+  }
+  @keyframes grow {
+    to { inline-size: 100%; }
+  }
+}
+
+/* Prose */
+.prose {
+  max-inline-size: 65ch;
+  margin-inline: auto;
+  padding: 3rem 1.5rem;
+}
+.prose h1 {
+  font-size: 2.25rem;
+  line-height: 1.2;
+  margin-block-end: 1.5rem;
+}
+.prose p { margin-block-start: 1.25rem; }
+
+/* Drop cap */
+.prose .intro::first-letter {
+  float: inline-start;
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-inline-end: 0.1em;
+  padding-block-start: 0.05em;
+  font-weight: 700;
+  color: oklch(40% 0.18 275);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>A beautiful reading experience requires no framework, no build tool, no JavaScript. The optimal <code>max-inline-size: 65ch</code>, proper <code>line-height</code>, and <code>::first-letter</code> styling create a Medium-quality reading experience. The scroll-driven progress bar is a single element with <code>animation-timeline: scroll()</code>. Typography is the highest-leverage CSS skill.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.2-dashboard-layout.html">&larr; Lesson 16.2</a>
+      <a href="./lesson-16.4-ecommerce-product.html">Lesson 16.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.3 — Badges, Dots & Count Bubbles · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.3 · Micro-Interactions</p>
+      <h1>Badges, Dots &amp; Count Bubbles</h1>
+      <p class="lead">The red notification dot. The count badge that bounces in. The "new" indicator that pulses. These tiny markers carry outsized importance — they guide attention, signal urgency, and must animate with precision so they feel informative rather than annoying.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The notification dot</h2>
+      <p>The simplest badge: a small colored circle positioned at the top-right of an icon or avatar using <code>::after</code>. The parent needs <code>position: relative</code>, and the dot is absolutely positioned with negative offsets to overlap the edge. Size is typically 8-12px. Color is the danger token: <code>oklch(60% 0.25 25)</code>.</p>
+
+      <h2>The count badge</h2>
+      <p>When you need to show a number ("3 unread"), the badge becomes a pill-shaped element with <code>min-width</code> equal to its height (so a single digit is a circle) and horizontal padding for wider numbers. Above 99, display "99+" to prevent layout overflow. The font-size is typically 10-11px with font-weight 600.</p>
+
+      <h3>Entry animation with @starting-style</h3>
+      <p>The badge should bounce in when it first appears. Using <code>@starting-style</code>, we define the initial state as <code>scale(0)</code> and transition to <code>scale(1)</code> with a bounce easing (<code>cubic-bezier(0.34, 1.56, 0.64, 1)</code>). This fires automatically when the badge element is added to the DOM or when its <code>display</code> changes from <code>none</code>.</p>
+
+      <h2>The "new" badge</h2>
+      <p>A text badge ("NEW") with a pulsing box-shadow. The pulse uses a keyframe that animates <code>box-shadow</code> spread from 0 to 4px and back, with the same hue as the badge background but lower opacity. This creates a subtle "breathing" glow that draws the eye without being distracting.</p>
+
+      <h2>Positioning strategies</h2>
+      <p>The ideal approach uses CSS anchor positioning when supported. The badge anchors to the top-right corner of its target element. For browsers without support, absolute positioning with <code>top: -4px; right: -4px</code> is the fallback. The <code>@supports(anchor-name: --badge)</code> query handles the progressive enhancement.</p>
+
+      <h2>Badge contexts</h2>
+      <p>Badges appear on icons (nav items, toolbar buttons), on avatars (online status), and on cards (notification counts). Each context requires slightly different positioning offsets due to the varying shapes of the parent element.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Badge variants</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-3 {
+            display: flex; gap: 3rem; padding: 2rem; font-family: system-ui;
+            align-items: center; flex-wrap: wrap;
+          }
+          .demo-17-3 .icon-wrap {
+            position: relative; display: inline-flex;
+            padding: 0.5rem;
+          }
+          .demo-17-3 .icon-wrap .icon {
+            width: 1.75rem; height: 1.75rem;
+            background: oklch(70% 0 0);
+            border-radius: 0.25rem;
+            clip-path: polygon(50% 5%, 95% 30%, 95% 70%, 50% 95%, 5% 70%, 5% 30%);
+          }
+          /* Dot badge */
+          .demo-17-3 .badge-dot::after {
+            content: "";
+            position: absolute;
+            top: 4px; right: 4px;
+            width: 10px; height: 10px;
+            background: oklch(60% 0.25 25);
+            border-radius: 50%;
+            border: 2px solid oklch(100% 0 0);
+          }
+          /* Count badge */
+          .demo-17-3 .badge-count {
+            position: absolute;
+            top: -2px; right: -6px;
+            min-width: 1.1rem; height: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 0.3rem;
+            background: oklch(60% 0.25 25);
+            color: oklch(100% 0 0);
+            font-size: 0.65rem; font-weight: 700;
+            border-radius: 0.55rem;
+            border: 2px solid oklch(100% 0 0);
+            transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+            @starting-style { transform: scale(0); }
+          }
+          /* Pulsing "new" badge */
+          .demo-17-3 .badge-new {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: oklch(55% 0.2 260);
+            color: oklch(100% 0 0);
+            font-size: 0.6rem; font-weight: 700;
+            letter-spacing: 0.05em;
+            border-radius: 0.25rem;
+            animation: pulse-badge-17 2s ease-in-out infinite;
+          }
+          @keyframes pulse-badge-17 {
+            0%, 100% { box-shadow: 0 0 0 0 oklch(55% 0.2 260 / 0.4); }
+            50% { box-shadow: 0 0 0 6px oklch(55% 0.2 260 / 0); }
+          }
+          /* Avatar with online dot */
+          .demo-17-3 .avatar {
+            position: relative;
+            width: 2.5rem; height: 2.5rem;
+            background: oklch(75% 0.1 200);
+            border-radius: 50%;
+          }
+          .demo-17-3 .avatar::after {
+            content: "";
+            position: absolute;
+            bottom: 1px; right: 1px;
+            width: 0.65rem; height: 0.65rem;
+            background: oklch(70% 0.2 145);
+            border-radius: 50%;
+            border: 2px solid oklch(100% 0 0);
+          }
+          /* Nav item */
+          .demo-17-3 .nav-item {
+            position: relative;
+            padding: 0.5rem 1rem;
+            background: oklch(95% 0 0);
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            color: oklch(30% 0 0);
+          }
+          .demo-17-3 .nav-item .badge-count {
+            top: -4px; right: -4px;
+          }
+        </style>
+        <div class="demo-17-3">
+          <div class="icon-wrap badge-dot"><div class="icon"></div></div>
+          <div class="icon-wrap"><div class="icon"></div><span class="badge-count">3</span></div>
+          <div class="icon-wrap"><div class="icon"></div><span class="badge-count">99+</span></div>
+          <span class="badge-new">NEW</span>
+          <div class="avatar"></div>
+          <div class="nav-item">Messages<span class="badge-count">12</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="icons-row"&gt;
+  &lt;!-- Dot badge --&gt;
+  &lt;div class="icon-btn has-dot"&gt;
+    &lt;span class="icon"&gt;&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Count badge --&gt;
+  &lt;div class="icon-btn"&gt;
+    &lt;span class="icon"&gt;&lt;/span&gt;
+    &lt;span class="count-badge"&gt;5&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Large count --&gt;
+  &lt;div class="icon-btn"&gt;
+    &lt;span class="icon"&gt;&lt;/span&gt;
+    &lt;span class="count-badge"&gt;99+&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Avatar with status --&gt;
+  &lt;div class="avatar online"&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="label-row"&gt;
+  &lt;span class="badge-new"&gt;NEW&lt;/span&gt;
+  &lt;span class="badge-beta"&gt;BETA&lt;/span&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.icons-row, .label-row { display: flex; gap: 2rem; align-items: center; }
+
+/* Icon button base */
+.icon-btn {
+  position: relative;
+  padding: 0.6rem;
+}
+.icon {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: oklch(70% 0 0);
+  border-radius: 0.2rem;
+}
+
+/* Simple dot via ::after */
+.has-dot::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 9px;
+  height: 9px;
+  background: oklch(60% 0.25 25);
+  border-radius: 50%;
+  border: 2px solid oklch(100% 0 0);
+}
+
+/* Count badge */
+.count-badge {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.3rem;
+  background: oklch(60% 0.25 25);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 0.55rem;
+  border: 2px solid oklch(100% 0 0);
+  /* Bounce-in on appear */
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  @starting-style { transform: scale(0); }
+}
+
+/* Avatar */
+.avatar {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: oklch(75% 0.1 200);
+  border-radius: 50%;
+}
+.avatar.online::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: oklch(70% 0.2 145);
+  border-radius: 50%;
+  border: 2px solid oklch(100% 0 0);
+}
+
+/* Text badges */
+.badge-new, .badge-beta {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  border-radius: 0.25rem;
+  color: white;
+}
+.badge-new {
+  background: oklch(60% 0.25 25);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.badge-beta { background: oklch(55% 0.2 260); }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(60% 0.25 25 / 0.4); }
+  50% { box-shadow: 0 0 0 5px oklch(60% 0.25 25 / 0); }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Make the count badge animate when its number changes. Use a CSS class swap (e.g., <code>.badge--updated</code>) that triggers a quick scale bounce. Also add a "badge-remove" animation: when a badge disappears, it should scale down to 0 and fade out over 200ms rather than vanishing instantly. Use <code>transition-behavior: allow-discrete</code> with a transition on <code>display</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.2-loading-spinners.html">&larr; Lesson 17.2</a>
+      <a href="./lesson-17.4-skeleton-loading-states.html">Lesson 17.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

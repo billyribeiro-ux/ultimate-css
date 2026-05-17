@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.2 — The Dashboard Layout · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.2 · Real-World Layout</p>
+      <h1>The Dashboard (Linear/Notion Style)</h1>
+      <p class="lead">Every SaaS product has a dashboard. The layout is deceptively simple — sidebar, header, main content — but the implementation requires careful grid work, collapsible navigation via <code>:has()</code>, and a dark-first color system. This lesson rebuilds the Linear/Notion dashboard pattern from scratch.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Layout architecture</h2>
+      <p>The dashboard uses a CSS Grid with two columns: a fixed-width sidebar (16rem) and a flexible main area (<code>1fr</code>). The sidebar collapses when a hidden checkbox is checked, detected by <code>:has(#sidebar-toggle:checked)</code> on the wrapper. This changes the grid template to <code>0fr 1fr</code> with a transition on <code>grid-template-columns</code>.</p>
+
+      <h2>The dark-first approach</h2>
+      <p>Dashboards are always dark. The colors use OKLCH with very low lightness (6-14%) for surfaces and high lightness (85-95%) for text. The <code>light-dark()</code> function provides a light alternative, but the primary experience is dark.</p>
+
+      <h2>The CSS-only bar chart</h2>
+      <p>The chart section uses flexbox with items aligned to the bottom (<code>align-items: flex-end</code>). Each bar's height is set via a <code>--h</code> custom property. The bars use OKLCH gradients from bottom to top, creating a polished data visualization without any charting library.</p>
+
+      <h2>Navigation with :target</h2>
+      <p>Sidebar links use the <code>:target</code> pseudo-class to indicate the active section. When a navigation link is clicked, the corresponding section's ID is targeted, and the matching nav item receives its active style via <code>:target</code> combined with sibling selectors.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full dashboard layout</h2>
+      <div class="demo-frame" style="padding:0; overflow:hidden; max-block-size:80vh; resize:both;">
+        <style>
+          .demo-16-2 { font-family: system-ui, -apple-system, sans-serif; font-size: 0.8125rem; color: oklch(88% 0.01 264); background: oklch(8% 0.015 264); block-size: 600px; display: grid; grid-template-columns: 15rem 1fr; grid-template-rows: auto 1fr; overflow: hidden; transition: grid-template-columns 300ms cubic-bezier(0.4, 0, 0.2, 1); }
+          .demo-16-2:has(#sidebar-toggle-16:checked) { grid-template-columns: 3.5rem 1fr; }
+          .demo-16-2 *, .demo-16-2 *::before, .demo-16-2 *::after { box-sizing: border-box; margin: 0; }
+
+          /* Sidebar */
+          .demo-16-2 .sidebar { grid-row: 1 / -1; background: oklch(6% 0.012 264); border-inline-end: 1px solid oklch(16% 0.01 264); padding: 1rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; overflow: hidden; }
+          .demo-16-2 .sidebar .logo { font-weight: 700; font-size: 0.9rem; padding: 0.5rem; margin-block-end: 1rem; color: oklch(92% 0.01 264); white-space: nowrap; }
+          .demo-16-2 .sidebar .toggle-label { padding: 0.5rem; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.625rem; color: oklch(55% 0.01 264); white-space: nowrap; }
+          .demo-16-2 .sidebar .toggle-label:hover { background: oklch(14% 0.01 264); color: oklch(80% 0.01 264); }
+          .demo-16-2 #sidebar-toggle-16 { position: absolute; opacity: 0; pointer-events: none; }
+          .demo-16-2 .nav-item { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem; border-radius: 0.375rem; color: oklch(55% 0.01 264); text-decoration: none; white-space: nowrap; transition: background 150ms, color 150ms; }
+          .demo-16-2 .nav-item:hover { background: oklch(14% 0.01 264); color: oklch(80% 0.01 264); }
+          .demo-16-2 .nav-item.active { background: oklch(18% 0.02 275); color: oklch(85% 0.08 275); }
+          .demo-16-2 .nav-icon { flex-shrink: 0; inline-size: 1rem; block-size: 1rem; border-radius: 0.25rem; background: oklch(25% 0.02 264); }
+          .demo-16-2 .nav-item.active .nav-icon { background: oklch(48% 0.18 275); }
+          .demo-16-2 .sidebar-spacer { flex: 1; }
+          .demo-16-2 .sidebar .user-block { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-block-start: 1px solid oklch(16% 0.01 264); padding-block-start: 0.75rem; white-space: nowrap; }
+          .demo-16-2 .sidebar .avatar-sm { inline-size: 1.5rem; block-size: 1.5rem; border-radius: 50%; background: linear-gradient(135deg, oklch(55% 0.2 275), oklch(45% 0.18 200)); flex-shrink: 0; }
+
+          /* Header */
+          .demo-16-2 .dash-header { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; border-block-end: 1px solid oklch(16% 0.01 264); background: oklch(8% 0.015 264); }
+          .demo-16-2 .breadcrumbs { display: flex; gap: 0.375rem; color: oklch(45% 0.01 264); font-size: 0.75rem; }
+          .demo-16-2 .breadcrumbs span:last-child { color: oklch(80% 0.01 264); }
+          .demo-16-2 .search-bar { margin-inline-start: auto; padding: 0.375rem 0.75rem; border-radius: 0.375rem; background: oklch(12% 0.01 264); border: 1px solid oklch(20% 0.01 264); color: oklch(55% 0.01 264); font-size: 0.75rem; inline-size: 14rem; }
+          .demo-16-2 .header-avatar { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; background: linear-gradient(135deg, oklch(55% 0.2 160), oklch(45% 0.18 200)); }
+
+          /* Main content */
+          .demo-16-2 .dash-main { padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+          /* Stat cards */
+          .demo-16-2 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+          .demo-16-2 .stat-card { padding: 1.25rem; border-radius: 0.625rem; background: oklch(11% 0.015 264); border: 1px solid oklch(18% 0.01 264); }
+          .demo-16-2 .stat-card .label { font-size: 0.6875rem; color: oklch(50% 0.01 264); text-transform: uppercase; letter-spacing: 0.06em; margin-block-end: 0.375rem; }
+          .demo-16-2 .stat-card .value { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+          .demo-16-2 .stat-card .change { font-size: 0.6875rem; color: oklch(72% 0.18 155); margin-block-start: 0.25rem; }
+          .demo-16-2 .stat-card:nth-child(3) .change { color: oklch(65% 0.2 25); }
+
+          /* Chart */
+          .demo-16-2 .chart-section { padding: 1.25rem; border-radius: 0.625rem; background: oklch(11% 0.015 264); border: 1px solid oklch(18% 0.01 264); }
+          .demo-16-2 .chart-title { font-size: 0.8125rem; font-weight: 600; margin-block-end: 1rem; }
+          .demo-16-2 .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; block-size: 8rem; padding-block-start: 0.5rem; }
+          .demo-16-2 .bar { flex: 1; border-radius: 0.25rem 0.25rem 0 0; background: linear-gradient(to top, oklch(45% 0.2 275), oklch(60% 0.18 250)); min-block-size: 0.5rem; transition: block-size 500ms cubic-bezier(0.4, 0, 0.2, 1); }
+          .demo-16-2 .bar:hover { background: linear-gradient(to top, oklch(55% 0.22 275), oklch(70% 0.2 250)); }
+          .demo-16-2 .chart-labels { display: flex; gap: 0.5rem; margin-block-start: 0.5rem; }
+          .demo-16-2 .chart-labels span { flex: 1; text-align: center; font-size: 0.625rem; color: oklch(42% 0.01 264); }
+
+          /* Table */
+          .demo-16-2 .table-section { padding: 1.25rem; border-radius: 0.625rem; background: oklch(11% 0.015 264); border: 1px solid oklch(18% 0.01 264); }
+          .demo-16-2 .table-title { font-size: 0.8125rem; font-weight: 600; margin-block-end: 1rem; }
+          .demo-16-2 table { inline-size: 100%; border-collapse: collapse; font-size: 0.75rem; }
+          .demo-16-2 th { text-align: start; padding: 0.5rem; color: oklch(50% 0.01 264); font-weight: 500; border-block-end: 1px solid oklch(18% 0.01 264); }
+          .demo-16-2 td { padding: 0.5rem; border-block-end: 1px solid oklch(14% 0.01 264); }
+          .demo-16-2 .status { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 1rem; font-size: 0.625rem; font-weight: 500; }
+          .demo-16-2 .status.done { background: oklch(30% 0.08 155); color: oklch(80% 0.12 155); }
+          .demo-16-2 .status.progress { background: oklch(30% 0.08 60); color: oklch(80% 0.12 60); }
+          .demo-16-2 .status.todo { background: oklch(22% 0.02 264); color: oklch(65% 0.01 264); }
+        </style>
+        <div class="demo-16-2">
+          <aside class="sidebar">
+            <div class="logo">Linear</div>
+            <input type="checkbox" id="sidebar-toggle-16">
+            <label for="sidebar-toggle-16" class="toggle-label"><span class="nav-icon"></span> Toggle sidebar</label>
+            <a href="#" class="nav-item active"><span class="nav-icon"></span> My Issues</a>
+            <a href="#" class="nav-item"><span class="nav-icon"></span> Projects</a>
+            <a href="#" class="nav-item"><span class="nav-icon"></span> Views</a>
+            <a href="#" class="nav-item"><span class="nav-icon"></span> Teams</a>
+            <a href="#" class="nav-item"><span class="nav-icon"></span> Cycles</a>
+            <a href="#" class="nav-item"><span class="nav-icon"></span> Settings</a>
+            <div class="sidebar-spacer"></div>
+            <div class="user-block"><span class="avatar-sm"></span> Alex Chen</div>
+          </aside>
+
+          <header class="dash-header">
+            <div class="breadcrumbs">
+              <span>Workspace</span><span>/</span><span>My Issues</span>
+            </div>
+            <input class="search-bar" type="text" placeholder="Search issues..." readonly>
+            <div class="header-avatar"></div>
+          </header>
+
+          <main class="dash-main">
+            <div class="stat-grid">
+              <div class="stat-card"><div class="label">Open issues</div><div class="value">142</div><div class="change">+12 this week</div></div>
+              <div class="stat-card"><div class="label">Completed</div><div class="value">1,847</div><div class="change">+89 this week</div></div>
+              <div class="stat-card"><div class="label">Overdue</div><div class="value">7</div><div class="change">+3 this week</div></div>
+              <div class="stat-card"><div class="label">Velocity</div><div class="value">94%</div><div class="change">+2% vs last cycle</div></div>
+            </div>
+
+            <div class="chart-section">
+              <div class="chart-title">Issues closed per week</div>
+              <div class="bar-chart">
+                <div class="bar" style="block-size: 45%"></div>
+                <div class="bar" style="block-size: 62%"></div>
+                <div class="bar" style="block-size: 38%"></div>
+                <div class="bar" style="block-size: 78%"></div>
+                <div class="bar" style="block-size: 55%"></div>
+                <div class="bar" style="block-size: 90%"></div>
+                <div class="bar" style="block-size: 72%"></div>
+                <div class="bar" style="block-size: 85%"></div>
+                <div class="bar" style="block-size: 60%"></div>
+                <div class="bar" style="block-size: 95%"></div>
+                <div class="bar" style="block-size: 70%"></div>
+                <div class="bar" style="block-size: 82%"></div>
+              </div>
+              <div class="chart-labels"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span></div>
+            </div>
+
+            <div class="table-section">
+              <div class="table-title">Recent issues</div>
+              <table>
+                <thead><tr><th>Issue</th><th>Status</th><th>Priority</th><th>Assignee</th></tr></thead>
+                <tbody>
+                  <tr><td>Fix auth redirect loop</td><td><span class="status done">Done</span></td><td>Urgent</td><td>Alex</td></tr>
+                  <tr><td>Add dark mode toggle</td><td><span class="status progress">In Progress</span></td><td>High</td><td>Jordan</td></tr>
+                  <tr><td>Update billing page copy</td><td><span class="status todo">Todo</span></td><td>Medium</td><td>Sam</td></tr>
+                  <tr><td>Migrate to edge runtime</td><td><span class="status progress">In Progress</span></td><td>High</td><td>Alex</td></tr>
+                  <tr><td>Redesign settings panel</td><td><span class="status todo">Todo</span></td><td>Low</td><td>Morgan</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — collapsible sidebar</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="dashboard"&gt;
+  &lt;input type="checkbox" id="collapse"&gt;
+  &lt;aside class="side"&gt;
+    &lt;label for="collapse" class="toggle"&gt;Toggle&lt;/label&gt;
+    &lt;a href="#" class="link active"&gt;Issues&lt;/a&gt;
+    &lt;a href="#" class="link"&gt;Projects&lt;/a&gt;
+    &lt;a href="#" class="link"&gt;Settings&lt;/a&gt;
+  &lt;/aside&gt;
+  &lt;main class="content"&gt;
+    &lt;h1&gt;My Issues&lt;/h1&gt;
+    &lt;p&gt;Content area expands when sidebar collapses.&lt;/p&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { margin: 0; font-family: system-ui; }
+#collapse { position: absolute; opacity: 0; }
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  block-size: 100vh;
+  background: oklch(8% 0.015 264);
+  color: oklch(88% 0.01 264);
+  transition: grid-template-columns 300ms ease;
+}
+
+/* Collapse via :has() */
+.dashboard:has(#collapse:checked) {
+  grid-template-columns: 3rem 1fr;
+}
+.dashboard:has(#collapse:checked) .link {
+  font-size: 0;
+  padding-inline: 0.75rem;
+}
+
+.side {
+  background: oklch(6% 0.01 264);
+  border-inline-end: 1px solid oklch(18% 0.01 264);
+  padding: 1rem 0.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.toggle {
+  padding: 0.5rem;
+  cursor: pointer;
+  color: oklch(55% 0.01 264);
+  font-size: 0.8rem;
+}
+.link {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  color: oklch(60% 0.01 264);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  transition: all 200ms;
+}
+.link:hover { background: oklch(14% 0.01 264); color: oklch(85% 0.01 264); }
+.link.active { background: oklch(18% 0.02 275); color: oklch(85% 0.08 275); }
+
+.content { padding: 2rem; }
+.content h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+.content p { color: oklch(55% 0.01 264); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>The collapsible sidebar pattern uses a single checkbox and <code>:has()</code> to modify the parent grid. The sidebar content overflows hidden when the column shrinks. No JavaScript state, no event listeners. The grid transition is smooth because <code>grid-template-columns</code> with <code>fr</code> units is interpolable.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.1-saas-landing-page.html">&larr; Lesson 16.1</a>
+      <a href="./lesson-16.3-blog-article.html">Lesson 16.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

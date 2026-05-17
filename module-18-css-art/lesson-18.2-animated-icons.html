@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.2 — Animated SVG-Free Icons · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.2 · Animated Icons</p>
+      <h1>Animated SVG-Free Icons</h1>
+      <p class="lead">Every icon in this lesson is built from a single element (plus its two pseudo-elements at most). No SVG, no icon fonts, no images. Just borders, backgrounds, clip-paths, and <code>@keyframes</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The constraint</h2>
+      <p>One element. Two pseudo-elements. That is the budget. The element itself provides one shape (via border, border-radius, background). <code>::before</code> and <code>::after</code> provide two more. Between them, you can construct any icon that decomposes into three or fewer geometric primitives — which covers almost every UI icon in existence.</p>
+
+      <h2>Animation approach</h2>
+      <p>Each icon has a resting state and an active state. The transition between them uses either <code>transition</code> (for simple two-state morphs) or <code>@keyframes</code> (for multi-step sequences). Hover or checkbox state triggers the animation.</p>
+
+      <h2>Why not SVG?</h2>
+      <p>In production, SVG is better for icons. This exercise exists to prove you understand CSS geometry, transforms, and animation deeply enough to reconstruct any shape from first principles. That understanding makes you better at styling SVG too.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — 8 Animated Icons</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-18-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            font-family: system-ui;
+          }
+          .demo-18-2 .icon-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .demo-18-2 .icon-box span {
+            font-size: 0.7rem;
+            color: oklch(60% 0 0);
+          }
+          .demo-18-2 input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+          }
+          .demo-18-2 label {
+            cursor: pointer;
+          }
+
+          /* --- 1. Hamburger to X --- */
+          .icon-hamburger {
+            width: 30px;
+            height: 20px;
+            position: relative;
+            display: block;
+            border-top: 3px solid oklch(30% 0 0);
+            border-bottom: 3px solid oklch(30% 0 0);
+            transition: border-color 0.3s;
+          }
+          .icon-hamburger::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: oklch(30% 0 0);
+            translate: 0 -50%;
+            transition: rotate 0.3s, background 0.3s;
+          }
+          .icon-hamburger::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: oklch(30% 0 0);
+            translate: 0 -50%;
+            transition: rotate 0.3s;
+          }
+          #icon1:checked ~ label .icon-hamburger {
+            border-color: transparent;
+          }
+          #icon1:checked ~ label .icon-hamburger::before {
+            rotate: 45deg;
+            background: oklch(50% 0.2 25);
+          }
+          #icon1:checked ~ label .icon-hamburger::after {
+            rotate: -45deg;
+          }
+
+          /* --- 2. Play to Pause --- */
+          .icon-play {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            display: block;
+            clip-path: polygon(10% 0%, 100% 50%, 10% 100%);
+            background: oklch(50% 0.2 160);
+            transition: clip-path 0.3s ease;
+          }
+          #icon2:checked ~ label .icon-play {
+            clip-path: polygon(10% 0%, 38% 0%, 38% 100%, 10% 100%);
+            background: oklch(50% 0.2 160);
+          }
+          .icon-play::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: oklch(50% 0.2 160);
+            clip-path: polygon(62% 0%, 90% 0%, 90% 100%, 62% 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+          }
+          #icon2:checked ~ label .icon-play::after {
+            opacity: 1;
+          }
+
+          /* --- 3. Heartbeat --- */
+          .icon-heart {
+            width: 30px;
+            height: 28px;
+            position: relative;
+            display: block;
+            animation: heartbeat-18-2 1.2s ease-in-out infinite;
+          }
+          .icon-heart::before,
+          .icon-heart::after {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 28px;
+            background: oklch(60% 0.25 15);
+            border-radius: 50% 50% 0 0;
+          }
+          .icon-heart::before {
+            left: 0;
+            transform: rotate(-45deg);
+            transform-origin: bottom right;
+          }
+          .icon-heart::after {
+            right: 0;
+            transform: rotate(45deg);
+            transform-origin: bottom left;
+          }
+          @keyframes heartbeat-18-2 {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.1); }
+            60% { transform: scale(1); }
+          }
+
+          /* --- 4. Loading to Checkmark --- */
+          .icon-loader {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            display: block;
+            border: 3px solid oklch(85% 0.05 270);
+            border-top-color: oklch(55% 0.2 270);
+            border-radius: 50%;
+            animation: spin-18-2 0.8s linear infinite;
+          }
+          #icon4:checked ~ label .icon-loader {
+            border-color: oklch(55% 0.2 160);
+            animation: none;
+            transition: border-color 0.3s;
+          }
+          .icon-loader::after {
+            content: "";
+            position: absolute;
+            top: 45%;
+            left: 22%;
+            width: 10px;
+            height: 16px;
+            border-right: 3px solid oklch(55% 0.2 160);
+            border-bottom: 3px solid oklch(55% 0.2 160);
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s 0.2s;
+          }
+          #icon4:checked ~ label .icon-loader::after {
+            opacity: 1;
+          }
+          @keyframes spin-18-2 {
+            to { rotate: 360deg; }
+          }
+
+          /* --- 5. Bell Ring --- */
+          .icon-bell {
+            width: 24px;
+            height: 26px;
+            position: relative;
+            display: block;
+            background: oklch(75% 0.15 80);
+            border-radius: 12px 12px 0 0;
+            animation: ring-18-2 2s ease-in-out infinite;
+            transform-origin: top center;
+          }
+          .icon-bell::before {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: -4px;
+            width: 32px;
+            height: 6px;
+            background: oklch(75% 0.15 80);
+            border-radius: 3px;
+          }
+          .icon-bell::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            translate: -50% 0;
+            width: 8px;
+            height: 8px;
+            background: oklch(75% 0.15 80);
+            border-radius: 50%;
+          }
+          @keyframes ring-18-2 {
+            0%, 100% { rotate: 0deg; }
+            10% { rotate: 14deg; }
+            20% { rotate: -12deg; }
+            30% { rotate: 8deg; }
+            40% { rotate: -5deg; }
+            50% { rotate: 2deg; }
+            60% { rotate: 0deg; }
+          }
+
+          /* --- 6. Envelope Open --- */
+          .icon-envelope {
+            width: 32px;
+            height: 22px;
+            position: relative;
+            display: block;
+            background: oklch(90% 0.05 250);
+            border: 2px solid oklch(55% 0.15 250);
+            border-radius: 2px;
+            perspective: 200px;
+          }
+          .icon-envelope::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 32px;
+            height: 14px;
+            background: oklch(85% 0.08 250);
+            border: 2px solid oklch(55% 0.15 250);
+            clip-path: polygon(0 0, 50% 100%, 100% 0);
+            transform-origin: top center;
+            transition: transform 0.4s ease;
+          }
+          #icon6:checked ~ label .icon-envelope::before {
+            transform: rotateX(180deg);
+          }
+          .icon-envelope::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(0 100%, 50% 40%, 100% 100%);
+            background: oklch(92% 0.04 250);
+          }
+
+          /* --- 7. Sound Waves --- */
+          .icon-sound {
+            width: 6px;
+            height: 14px;
+            position: relative;
+            display: block;
+            background: oklch(50% 0.2 200);
+            border-radius: 2px;
+          }
+          .icon-sound::before,
+          .icon-sound::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            translate: 0 -50%;
+            border: 2.5px solid transparent;
+            border-right-color: oklch(50% 0.2 200);
+            border-radius: 0 50% 50% 0;
+            animation: pulse-18-2 1.5s ease-out infinite;
+          }
+          .icon-sound::before {
+            width: 10px;
+            height: 16px;
+          }
+          .icon-sound::after {
+            width: 18px;
+            height: 24px;
+            animation-delay: 0.3s;
+          }
+          @keyframes pulse-18-2 {
+            0%, 100% { opacity: 0; transform: scale(0.8) translateY(-50%); }
+            20%, 60% { opacity: 1; transform: scale(1) translateY(-50%); }
+          }
+
+          /* --- 8. Download Arrow to Check --- */
+          .icon-download {
+            width: 20px;
+            height: 3px;
+            position: relative;
+            display: block;
+            background: oklch(50% 0.15 270);
+            border-radius: 2px;
+            margin-top: 20px;
+            transition: all 0.3s;
+          }
+          .icon-download::before {
+            content: "";
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            width: 3px;
+            height: 18px;
+            background: oklch(50% 0.15 270);
+            translate: -50% 0;
+            border-radius: 2px;
+            transition: all 0.3s;
+          }
+          .icon-download::after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            translate: -50% 0;
+            width: 12px;
+            height: 12px;
+            border-bottom: 3px solid oklch(50% 0.15 270);
+            border-right: 3px solid oklch(50% 0.15 270);
+            rotate: 45deg;
+            transition: all 0.3s;
+          }
+          #icon8:checked ~ label .icon-download {
+            background: transparent;
+          }
+          #icon8:checked ~ label .icon-download::before {
+            height: 12px;
+            bottom: 2px;
+            left: 25%;
+            rotate: -45deg;
+            background: oklch(55% 0.2 160);
+          }
+          #icon8:checked ~ label .icon-download::after {
+            width: 18px;
+            height: 18px;
+            bottom: 2px;
+            left: 35%;
+            translate: 0 0;
+            border-color: oklch(55% 0.2 160);
+          }
+        </style>
+        <div class="demo-18-2">
+          <div class="icon-box">
+            <input type="checkbox" id="icon1">
+            <label for="icon1"><span class="icon-hamburger"></span></label>
+            <span>Menu/Close</span>
+          </div>
+          <div class="icon-box">
+            <input type="checkbox" id="icon2">
+            <label for="icon2"><span class="icon-play"></span></label>
+            <span>Play/Pause</span>
+          </div>
+          <div class="icon-box">
+            <span class="icon-heart"></span>
+            <span>Heartbeat</span>
+          </div>
+          <div class="icon-box">
+            <input type="checkbox" id="icon4">
+            <label for="icon4"><span class="icon-loader"></span></label>
+            <span>Load/Done</span>
+          </div>
+          <div class="icon-box">
+            <span class="icon-bell"></span>
+            <span>Bell Ring</span>
+          </div>
+          <div class="icon-box">
+            <input type="checkbox" id="icon6">
+            <label for="icon6"><span class="icon-envelope"></span></label>
+            <span>Envelope</span>
+          </div>
+          <div class="icon-box">
+            <span class="icon-sound"></span>
+            <span>Sound</span>
+          </div>
+          <div class="icon-box">
+            <input type="checkbox" id="icon8">
+            <label for="icon8"><span class="icon-download"></span></label>
+            <span>Download/Done</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;input type="checkbox" id="toggle"&gt;
+&lt;label for="toggle"&gt;
+  &lt;span class="icon-hamburger"&gt;&lt;/span&gt;
+&lt;/label&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { display: grid; place-items: center; min-height: 80vh; }
+input { display: none; }
+label { cursor: pointer; }
+
+.icon-hamburger {
+  width: 36px;
+  height: 24px;
+  position: relative;
+  display: block;
+  border-top: 4px solid oklch(30% 0 0);
+  border-bottom: 4px solid oklch(30% 0 0);
+  transition: border-color 0.3s;
+}
+.icon-hamburger::before,
+.icon-hamburger::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  height: 4px;
+  background: oklch(30% 0 0);
+  translate: 0 -50%;
+  transition: rotate 0.3s ease;
+}
+input:checked ~ label .icon-hamburger {
+  border-color: transparent;
+}
+input:checked ~ label .icon-hamburger::before {
+  rotate: 45deg;
+}
+input:checked ~ label .icon-hamburger::after {
+  rotate: -45deg;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Build a ninth icon: a gear/cog. Hint: use a circle (<code>border-radius: 50%</code>) for the body, and <code>box-shadow</code> with 8 offset copies arranged in a ring to create teeth. Animate it with a slow <code>rotate</code> on hover. The center hole is <code>::after</code> with a matching background color and a smaller circle.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.1-css-illustrations.html">&larr; Lesson 18.1</a>
+      <a href="./lesson-18.3-css-only-game-tic-tac-toe.html">Lesson 18.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
