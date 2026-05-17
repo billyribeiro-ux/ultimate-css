@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25.7 — Controlling Animations with Custom Properties · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 25</a>
+      <span>Lesson 25.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 25.7 · Custom Properties</p>
+      <h1>Controlling Animations with Custom Properties</h1>
+      <p class="lead">A single <code>--progress</code> property can drive a progress bar, color gradient, transform, and opacity simultaneously. This "conductor pattern" gives you one animated value with many visual consumers — the foundation of scroll-driven and timeline-based effects.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The conductor pattern</h2>
+      <p>Instead of animating each property independently, animate one custom property and let multiple elements consume it:</p>
+      <pre><code>@property --progress {
+  syntax: "&lt;number&gt;";
+  inherits: true;
+  initial-value: 0;
+}
+
+.scene {
+  --progress: 0;
+  transition: --progress 0.5s;
+}
+.scene:hover { --progress: 1; }
+
+.bar   { width: calc(var(--progress) * 100%); }
+.fade  { opacity: var(--progress); }
+.slide { transform: translateX(calc(var(--progress) * 200px)); }
+.color { background: oklch(calc(50% + var(--progress) * 30%) 0.2 275); }</code></pre>
+
+      <h3>Why @property registration matters</h3>
+      <p>Without <code>@property</code>, the browser treats custom properties as strings and cannot interpolate them. Registering with a <code>syntax</code> of <code>"&lt;number&gt;"</code> or <code>"&lt;percentage&gt;"</code> enables smooth transitions and keyframe animations on the property itself.</p>
+
+      <h2>Scroll-driven animations</h2>
+      <p>With scroll-driven animations, you can bind <code>--progress</code> to scroll position:</p>
+      <pre><code>@keyframes track-scroll {
+  from { --progress: 0; }
+  to   { --progress: 1; }
+}
+
+.scene {
+  animation: track-scroll linear;
+  animation-timeline: scroll();
+}</code></pre>
+      <p>Now every consumer element reacts to scroll position through a single property.</p>
+
+      <h2>Multiple timelines, one property</h2>
+      <p>Different scroll containers or view timelines can each set their own progress property. Child elements subscribe to whichever is relevant — the inheritance model handles distribution.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Scroll progress driving 5 effects</h2>
+      <div class="demo-frame">
+        <style>
+          @property --scroll-progress {
+            syntax: "<number>";
+            inherits: true;
+            initial-value: 0;
+          }
+          .demo-25-7 {
+            font-family: system-ui;
+            position: relative;
+          }
+          .demo-25-7 .scroll-container {
+            --scroll-progress: 0;
+            block-size: 15rem;
+            overflow-y: scroll;
+            border: 2px solid oklch(80% 0.05 275);
+            border-radius: 0.75rem;
+            padding: 1rem;
+          }
+          .demo-25-7 .scroll-content {
+            block-size: 60rem;
+            background: linear-gradient(
+              to bottom,
+              oklch(95% 0.03 275),
+              oklch(85% 0.08 275),
+              oklch(75% 0.12 275)
+            );
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: oklch(40% 0.05 275);
+          }
+          .demo-25-7 .effects {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-block-start: 1rem;
+          }
+          .demo-25-7 .effect {
+            background: oklch(95% 0.02 275);
+            border: 1px solid oklch(88% 0.04 275);
+            border-radius: 0.5rem;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: oklch(40% 0.1 275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .demo-25-7 .effect-bar {
+            inline-size: 100%;
+            block-size: 0.35rem;
+            background: oklch(88% 0.04 275);
+            border-radius: 1rem;
+            overflow: hidden;
+          }
+          .demo-25-7 .effect-bar-fill {
+            block-size: 100%;
+            background: oklch(55% 0.22 275);
+            inline-size: calc(var(--scroll-progress) * 100%);
+            transition: inline-size 0.1s;
+          }
+          .demo-25-7 .effect-circle {
+            inline-size: 2rem;
+            block-size: 2rem;
+            border-radius: 50%;
+            background: oklch(calc(55% + var(--scroll-progress) * 30%) 0.2 275);
+            opacity: calc(0.3 + var(--scroll-progress) * 0.7);
+            transform: scale(calc(0.5 + var(--scroll-progress) * 0.5));
+            transition: all 0.1s;
+          }
+          .demo-25-7 .effect-rotate {
+            inline-size: 1.5rem;
+            block-size: 1.5rem;
+            background: oklch(55% 0.22 275);
+            border-radius: 0.2rem;
+            transform: rotate(calc(var(--scroll-progress) * 360deg));
+            transition: transform 0.1s;
+          }
+        </style>
+        <div class="demo-25-7">
+          <div class="scroll-container" id="scroll-demo"
+            onscroll="let p=this.scrollTop/(this.scrollHeight-this.clientHeight);this.style.setProperty('--scroll-progress',p.toFixed(3))">
+            <div class="scroll-content">
+              Scroll this container to drive --scroll-progress from 0 to 1. All effects below react to this single property.
+            </div>
+          </div>
+          <div class="effects" style="--scroll-progress: inherit">
+            <div class="effect">
+              <div class="effect-bar"><div class="effect-bar-fill"></div></div>
+              Width
+            </div>
+            <div class="effect">
+              <div class="effect-circle"></div>
+              Opacity
+            </div>
+            <div class="effect">
+              <div class="effect-circle"></div>
+              Scale
+            </div>
+            <div class="effect">
+              <div class="effect-rotate"></div>
+              Rotate
+            </div>
+            <div class="effect">
+              <div class="effect-circle"></div>
+              Color
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;input type="range" min="0" max="100" value="0"
+    oninput="this.parentElement.style.setProperty('--progress',this.value/100)"&gt;
+  &lt;div class="bar"&gt;&lt;/div&gt;
+  &lt;div class="box"&gt;&lt;/div&gt;
+  &lt;div class="circle"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.scene {
+  --progress: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+input[type="range"] { width: 100%; }
+
+.bar {
+  height: 0.5rem;
+  background: oklch(88% 0.04 275);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.bar::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: calc(var(--progress) * 100%);
+  background: oklch(55% 0.22 275);
+  border-radius: 1rem;
+}
+
+.box {
+  width: 3rem; height: 3rem;
+  background: oklch(55% 0.22 275);
+  border-radius: 0.25rem;
+  transform: translateX(calc(var(--progress) * 200px))
+             rotate(calc(var(--progress) * 180deg));
+}
+
+.circle {
+  width: 3rem; height: 3rem;
+  border-radius: 50%;
+  background: oklch(calc(40% + var(--progress) * 40%) 0.2 calc(275 - var(--progress) * 150));
+  opacity: calc(0.3 + var(--progress) * 0.7);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add two more visual consumers: a text element whose <code>font-size</code> scales from <code>1rem</code> to <code>2rem</code> with progress, and a border whose width grows from <code>1px</code> to <code>6px</code>. All should animate from the same <code>--progress</code> value driven by the range input.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-25.6-responsive-custom-props.html">← Lesson 25.6</a>
+      <a href="./lesson-25.8-computed-layouts.html">Lesson 25.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

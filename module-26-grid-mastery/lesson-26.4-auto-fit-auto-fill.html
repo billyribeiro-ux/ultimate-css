@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.4 — auto-fit vs auto-fill: The Responsive Grid Secret · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.4 · Layout</p>
+      <h1>auto-fit vs auto-fill: The Responsive Grid Secret</h1>
+      <p class="lead">One line of CSS creates a fully responsive grid with no media queries: <code>repeat(auto-fit, minmax(18rem, 1fr))</code>. Understanding the difference between <code>auto-fit</code> and <code>auto-fill</code> unlocks layouts that adapt to any container width.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The pattern</h2>
+      <pre><code>.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1rem;
+}</code></pre>
+      <p>This creates as many columns as fit, each at least 18rem wide. When space permits more columns, they appear. When it doesn't, columns drop to the next row. No breakpoints needed.</p>
+
+      <h2>auto-fit vs auto-fill</h2>
+      <p>The difference only matters when there are <strong>fewer items than available columns</strong>:</p>
+      <ul>
+        <li><strong>auto-fit</strong> — collapses empty tracks to zero width. Items stretch to fill the container.</li>
+        <li><strong>auto-fill</strong> — keeps empty tracks at their minmax size. Items stay at the minimum width, leaving visible empty space.</li>
+      </ul>
+      <p>With 3 items in a container wide enough for 5: <code>auto-fit</code> gives you 3 stretched columns; <code>auto-fill</code> gives you 3 minimum-width columns with empty tracks on the right.</p>
+
+      <h3>When to use each</h3>
+      <ul>
+        <li><strong>auto-fit</strong> — card grids, image galleries, any layout where items should stretch to fill available space.</li>
+        <li><strong>auto-fill</strong> — layouts where items must maintain a specific maximum width regardless of container size (e.g., a form with fixed-width input groups).</li>
+      </ul>
+
+      <h2>Combining with min()</h2>
+      <pre><code>grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));</code></pre>
+      <p>The <code>min(18rem, 100%)</code> prevents overflow on containers narrower than 18rem — the minimum becomes 100% of the container instead.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — auto-fit vs auto-fill side by side</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-4 {
+            font-family: system-ui;
+            padding: 1rem;
+            display: grid;
+            gap: 1.5rem;
+          }
+          .demo-26-4 h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.85rem;
+            color: oklch(50% 0 0);
+          }
+          .demo-26-4 .fit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+            gap: 0.5rem;
+          }
+          .demo-26-4 .fill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+            gap: 0.5rem;
+          }
+          .demo-26-4 .card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+          }
+          .demo-26-4 .fit-grid .card { background: oklch(75% 0.15 275); color: white; }
+          .demo-26-4 .fill-grid .card { background: oklch(75% 0.15 160); color: oklch(20% 0.05 160); }
+        </style>
+        <div class="demo-26-4">
+          <div>
+            <h3>auto-fit (items stretch to fill)</h3>
+            <div class="fit-grid">
+              <div class="card">Item 1</div>
+              <div class="card">Item 2</div>
+              <div class="card">Item 3</div>
+            </div>
+          </div>
+          <div>
+            <h3>auto-fill (empty tracks preserved)</h3>
+            <div class="fill-grid">
+              <div class="card">Item 1</div>
+              <div class="card">Item 2</div>
+              <div class="card">Item 3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;h3&gt;auto-fit&lt;/h3&gt;
+&lt;div class="grid fit"&gt;
+  &lt;div class="card"&gt;One&lt;/div&gt;
+  &lt;div class="card"&gt;Two&lt;/div&gt;
+  &lt;div class="card"&gt;Three&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;h3&gt;auto-fill&lt;/h3&gt;
+&lt;div class="grid fill"&gt;
+  &lt;div class="card"&gt;One&lt;/div&gt;
+  &lt;div class="card"&gt;Two&lt;/div&gt;
+  &lt;div class="card"&gt;Three&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+h3 { color: oklch(50% 0 0); font-size: 0.9rem; }
+
+.grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-block-end: 2rem;
+}
+
+.fit  { grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
+.fill { grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); }
+
+.card {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+  background: oklch(75% 0.15 275);
+  color: white;
+}
+
+/* Resize the preview to see the difference! */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add more items (6-8) to both grids and resize the preview. With many items, auto-fit and auto-fill behave identically. Remove items until only 2 remain to see the difference. Try changing <code>minmax(8rem, 1fr)</code> to <code>minmax(min(8rem, 100%), 1fr)</code> and make the preview very narrow.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.3-named-grid-areas.html">← Lesson 26.3</a>
+      <a href="./lesson-26.5-alignment-deep-dive.html">Lesson 26.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

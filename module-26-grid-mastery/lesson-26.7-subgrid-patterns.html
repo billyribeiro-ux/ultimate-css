@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.7 — Subgrid: Nested Alignment Patterns · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.7 · Layout</p>
+      <h1>Subgrid: Nested Alignment Patterns</h1>
+      <p class="lead">Subgrid lets child elements participate in a parent's grid tracks. This solves the "content alignment across siblings" problem — card headings that line up, form labels that align, pricing tiers that match — without JavaScript or fixed heights.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The problem</h2>
+      <p>You have 4 cards in a grid. Each card has a heading, description, and button. The headings are different lengths, so the descriptions start at different vertical positions. Without subgrid, you'd need fixed heights or JS to align them.</p>
+
+      <h2>The solution</h2>
+      <pre><code>.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: subgrid; /* not here — on the children */
+  gap: 1rem;
+}
+
+/* Each card spans 3 rows and uses parent's row tracks */
+.card {
+  grid-row: span 3;
+  display: grid;
+  grid-template-rows: subgrid;
+  gap: 0.75rem;
+}</code></pre>
+      <p>The card becomes a grid that <em>inherits</em> its row tracks from the parent. All cards share the same row lines, so headings align across cards, descriptions align, and CTAs align.</p>
+
+      <h3>How subgrid works</h3>
+      <ul>
+        <li>Set <code>grid-template-rows: subgrid</code> (or columns) on a grid item that is also <code>display: grid</code></li>
+        <li>The item adopts the parent's tracks for that axis instead of defining its own</li>
+        <li>The item must span multiple tracks in the parent for subgrid to be useful</li>
+        <li>You can subgrid one axis and define the other normally</li>
+      </ul>
+
+      <h3>Form alignment pattern</h3>
+      <pre><code>.form-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1rem;
+}
+.form-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}</code></pre>
+      <p>Labels and inputs align across all rows because they share the parent's column tracks.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Cards with subgrid-aligned content</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-7 {
+            font-family: system-ui;
+            padding: 1rem;
+          }
+          .demo-26-7 .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+            grid-template-rows: auto auto 1fr auto;
+            gap: 1rem;
+          }
+          .demo-26-7 .card {
+            grid-row: span 4;
+            display: grid;
+            grid-template-rows: subgrid;
+            gap: 0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid oklch(85% 0.02 275);
+          }
+          .demo-26-7 .card-img {
+            height: 4rem;
+            background: oklch(75% 0.12 275);
+          }
+          .demo-26-7 .card:nth-child(2) .card-img { background: oklch(75% 0.12 160); }
+          .demo-26-7 .card:nth-child(3) .card-img { background: oklch(75% 0.12 30); }
+          .demo-26-7 .card:nth-child(4) .card-img { background: oklch(75% 0.12 60); }
+          .demo-26-7 .card h3 {
+            margin: 0;
+            padding: 0.75rem 0.75rem 0;
+            font-size: 0.85rem;
+          }
+          .demo-26-7 .card p {
+            margin: 0;
+            padding: 0 0.75rem;
+            font-size: 0.75rem;
+            color: oklch(50% 0 0);
+          }
+          .demo-26-7 .card .cta {
+            margin: 0.75rem;
+            padding: 0.4rem 0.75rem;
+            background: oklch(50% 0.18 275);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: end;
+          }
+        </style>
+        <div class="demo-26-7">
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-img"></div>
+              <h3>Short Title</h3>
+              <p>Brief description of this card's content.</p>
+              <button class="cta">Action</button>
+            </div>
+            <div class="card">
+              <div class="card-img"></div>
+              <h3>A Much Longer Card Title That Wraps</h3>
+              <p>This card has more text in the description area to show alignment.</p>
+              <button class="cta">Action</button>
+            </div>
+            <div class="card">
+              <div class="card-img"></div>
+              <h3>Medium Title Here</h3>
+              <p>Notice how buttons align at the bottom across all cards.</p>
+              <button class="cta">Action</button>
+            </div>
+            <div class="card">
+              <div class="card-img"></div>
+              <h3>Grid</h3>
+              <p>Subgrid ensures row alignment.</p>
+              <button class="cta">Action</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card-grid"&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Short&lt;/h3&gt;
+    &lt;p&gt;Brief text.&lt;/p&gt;
+    &lt;button&gt;Buy&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;A Longer Heading That Will Wrap to Two Lines&lt;/h3&gt;
+    &lt;p&gt;More descriptive text that takes up space.&lt;/p&gt;
+    &lt;button&gt;Buy&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="card"&gt;
+    &lt;h3&gt;Medium Title&lt;/h3&gt;
+    &lt;p&gt;Some description.&lt;/p&gt;
+    &lt;button&gt;Buy&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+}
+
+.card {
+  grid-row: span 3;
+  display: grid;
+  grid-template-rows: subgrid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid oklch(85% 0.02 275);
+  border-radius: 0.75rem;
+}
+
+.card h3 { margin: 0; font-size: 1rem; }
+.card p { margin: 0; font-size: 0.85rem; color: oklch(50% 0 0); }
+.card button {
+  align-self: end;
+  padding: 0.5rem 1rem;
+  background: oklch(50% 0.18 275);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Try removing grid-template-rows: subgrid from .card */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Remove <code>grid-template-rows: subgrid</code> from <code>.card</code> and watch the buttons misalign. Add it back. Then add a 4th row to the parent (<code>grid-template-rows: auto auto 1fr auto</code>), add an image placeholder <code>&lt;div&gt;</code> to each card, update <code>grid-row: span 4</code>, and see how all 4 rows now align across cards.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.6-auto-placement.html">← Lesson 26.6</a>
+      <a href="./lesson-26.8-grid-and-flexbox.html">Lesson 26.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

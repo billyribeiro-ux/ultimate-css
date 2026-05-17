@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25.5 — Runtime Theme Generation · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 25</a>
+      <span>Lesson 25.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 25.5 · Custom Properties</p>
+      <h1>Runtime Theme Generation</h1>
+      <p class="lead">One <code>--hue</code> property generates an entire color system. Primary, secondary, surface, and accent colors all derive from a single input — enabling real-time theme customization with zero JavaScript color math.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single-hue architecture</h2>
+      <p>OKLCH separates lightness, chroma, and hue. By fixing lightness and chroma while varying hue, you get a perceptually uniform palette from a single variable:</p>
+      <pre><code>:root {
+  --hue: 275;
+  --primary: oklch(55% 0.22 var(--hue));
+  --secondary: oklch(55% 0.15 calc(var(--hue) + 60));
+  --tertiary: oklch(55% 0.12 calc(var(--hue) + 180));
+  --surface: oklch(97% 0.01 var(--hue));
+  --on-surface: oklch(20% 0.02 var(--hue));
+}</code></pre>
+
+      <h3>Derived palette tokens</h3>
+      <p>Once you have the base colors, derive everything else with lightness adjustments:</p>
+      <pre><code>--primary-light: oklch(75% 0.15 var(--hue));
+--primary-dark: oklch(35% 0.18 var(--hue));
+--primary-container: oklch(90% 0.06 var(--hue));
+--on-primary-container: oklch(25% 0.12 var(--hue));</code></pre>
+
+      <h2>Combining with light-dark()</h2>
+      <p>Use the <code>light-dark()</code> function for automatic mode switching:</p>
+      <pre><code>:root { color-scheme: light dark; }
+body {
+  background: light-dark(
+    oklch(97% 0.01 var(--hue)),
+    oklch(15% 0.02 var(--hue))
+  );
+  color: light-dark(
+    oklch(20% 0.02 var(--hue)),
+    oklch(92% 0.01 var(--hue))
+  );
+}</code></pre>
+
+      <h2>The range input technique</h2>
+      <p>A single <code>&lt;input type="range"&gt;</code> sets <code>--hue</code> on <code>:root</code> via minimal JS:</p>
+      <pre><code>&lt;input type="range" min="0" max="360" value="275"
+  oninput="document.documentElement.style.setProperty('--hue', this.value)"&gt;</code></pre>
+      <p>Everything recolors instantly because all colors reference <code>var(--hue)</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Hue slider theme generator</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-25-5 {
+            --hue: 275;
+            --primary: oklch(55% 0.22 var(--hue));
+            --secondary: oklch(55% 0.15 calc(var(--hue) + 60));
+            --surface: oklch(97% 0.015 var(--hue));
+            --surface-alt: oklch(93% 0.03 var(--hue));
+            --on-surface: oklch(20% 0.02 var(--hue));
+            --primary-container: oklch(88% 0.06 var(--hue));
+
+            background: var(--surface);
+            color: var(--on-surface);
+            padding: 1.5rem;
+            font-family: system-ui;
+            border-radius: 0.75rem;
+          }
+          .demo-25-5 .hue-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-block-end: 1.25rem;
+          }
+          .demo-25-5 .hue-control label {
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+          .demo-25-5 .hue-control input[type="range"] {
+            flex: 1;
+            accent-color: var(--primary);
+          }
+          .demo-25-5 .hue-control .hue-val {
+            font-size: 0.8rem;
+            font-variant-numeric: tabular-nums;
+            min-inline-size: 2.5rem;
+          }
+          .demo-25-5 .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+          }
+          .demo-25-5 .theme-card {
+            background: var(--primary-container);
+            border-radius: 0.5rem;
+            padding: 1rem;
+          }
+          .demo-25-5 .theme-card h3 {
+            margin: 0 0 0.25rem;
+            font-size: 0.85rem;
+            color: oklch(30% 0.12 var(--hue));
+          }
+          .demo-25-5 .theme-card p {
+            margin: 0;
+            font-size: 0.78rem;
+            opacity: 0.8;
+          }
+          .demo-25-5 .btn-row {
+            margin-block-start: 1rem;
+            display: flex;
+            gap: 0.5rem;
+          }
+          .demo-25-5 .btn-primary {
+            background: var(--primary);
+            color: oklch(100% 0 0);
+            border: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.4rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+          }
+          .demo-25-5 .btn-secondary {
+            background: var(--secondary);
+            color: oklch(100% 0 0);
+            border: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.4rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+          }
+        </style>
+        <div class="demo-25-5" id="theme-demo">
+          <div class="hue-control">
+            <label>--hue</label>
+            <input type="range" min="0" max="360" value="275"
+              oninput="this.closest('.demo-25-5').style.setProperty('--hue', this.value); this.nextElementSibling.textContent=this.value">
+            <span class="hue-val">275</span>
+          </div>
+          <div class="theme-grid">
+            <div class="theme-card">
+              <h3>Primary Container</h3>
+              <p>Derived from --hue with 88% lightness and low chroma.</p>
+            </div>
+            <div class="theme-card">
+              <h3>Dynamic Palette</h3>
+              <p>Every color in this demo recalculates when the slider moves.</p>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary">Primary</button>
+            <button class="btn-secondary">Secondary (+60)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;input type="range" min="0" max="360" value="275"
+    oninput="document.querySelector('.page').style.setProperty('--hue',this.value)"&gt;
+  &lt;div class="card"&gt;
+    &lt;h2&gt;Dynamic Theme&lt;/h2&gt;
+    &lt;p&gt;Move the slider to shift the entire color system.&lt;/p&gt;
+    &lt;button class="cta"&gt;Call to Action&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.page {
+  --hue: 275;
+  --primary: oklch(55% 0.22 var(--hue));
+  --surface: oklch(96% 0.015 var(--hue));
+  --on-surface: oklch(20% 0.02 var(--hue));
+}
+
+.card {
+  background: var(--surface);
+  color: var(--on-surface);
+  border: 1px solid oklch(85% 0.05 var(--hue));
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-block-start: 1rem;
+}
+
+.cta {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: .6rem 1.5rem;
+  border-radius: .4rem;
+  font-weight: 600;
+  margin-block-start: 1rem;
+  cursor: pointer;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a secondary color at <code>calc(var(--hue) + 120)</code> and a tertiary at <code>calc(var(--hue) + 240)</code> to create a triadic palette. Add swatches below the slider showing all three colors updating in real time. Then try adding a <code>light-dark()</code> wrapper to make the card background switch between light and dark automatically.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-25.4-component-state-machine.html">← Lesson 25.4</a>
+      <a href="./lesson-25.6-responsive-custom-props.html">Lesson 25.6 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

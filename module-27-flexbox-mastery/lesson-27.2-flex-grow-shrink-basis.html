@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 27.2 — flex-grow, flex-shrink, flex-basis · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 27</a>
+      <span>Lesson 27.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 27.2 · Layout</p>
+      <h1>flex-grow, flex-shrink, flex-basis: The Sizing Triad</h1>
+      <p class="lead">These three properties control how flex items claim, surrender, and start with space. The <code>flex</code> shorthand is the way you should always set them. Understanding the difference between <code>flex: 1</code>, <code>flex: auto</code>, and <code>flex: none</code> is essential.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>flex-basis: the starting size</h2>
+      <p><code>flex-basis</code> sets the initial main size of a flex item before growing or shrinking occurs. It defaults to <code>auto</code>, which means "use my width/height property, or my content size."</p>
+      <pre><code>/* The item starts at 200px before growing/shrinking */
+flex-basis: 200px;
+
+/* The item starts at its content size (default) */
+flex-basis: auto;
+
+/* The item starts at zero — it gets all its size from flex-grow */
+flex-basis: 0;</code></pre>
+      <p>When <code>flex-basis</code> is <code>0</code>, the item's content size is ignored during space distribution. All available space is distributed proportionally by <code>flex-grow</code>. When <code>flex-basis</code> is <code>auto</code>, only the <em>remaining</em> space after content is considered is distributed.</p>
+
+      <h2>flex-grow: claiming extra space</h2>
+      <p><code>flex-grow</code> determines how much of the <em>remaining</em> space an item claims. It defaults to <code>0</code> — items do not grow by default.</p>
+      <pre><code>/* All items grow equally */
+.item { flex-grow: 1; }
+
+/* The middle item grows twice as much as the others */
+.item:nth-child(2) { flex-grow: 2; }</code></pre>
+      <p>The algorithm: (1) lay out all items at their <code>flex-basis</code> size, (2) calculate remaining space, (3) distribute it proportionally by each item's <code>flex-grow</code> value.</p>
+
+      <h2>flex-shrink: surrendering space</h2>
+      <p><code>flex-shrink</code> determines how much an item shrinks when the container is too small. It defaults to <code>1</code> — items shrink equally by default. Set it to <code>0</code> to prevent an item from shrinking.</p>
+      <pre><code>/* This item will not shrink below its flex-basis */
+.logo { flex-shrink: 0; }
+
+/* This item shrinks 3x as aggressively as the default */
+.collapsible { flex-shrink: 3; }</code></pre>
+      <p>Shrink is proportional to both the <code>flex-shrink</code> factor <em>and</em> the item's <code>flex-basis</code>. A larger item with the same shrink factor surrenders more absolute space than a smaller one.</p>
+
+      <h2>The flex shorthand</h2>
+      <p>Always use <code>flex</code> instead of the individual properties. The shorthand sets intelligent defaults that the individual properties do not:</p>
+      <pre><code>/* flex: grow shrink basis */
+flex: 1 1 0%;     /* = flex: 1 */
+flex: 1 1 auto;   /* = flex: auto */
+flex: 0 0 auto;   /* = flex: none */
+flex: 0 1 auto;   /* = the initial value */</code></pre>
+
+      <h3>flex: 1 — equal distribution</h3>
+      <p>Expands to <code>flex: 1 1 0%</code>. Basis is <code>0</code>, so all space is distributed by grow. Items end up the same size regardless of content. This is the most common pattern for equal-width columns.</p>
+
+      <h3>flex: auto — content-aware distribution</h3>
+      <p>Expands to <code>flex: 1 1 auto</code>. Basis is <code>auto</code>, so each item starts at its content size, and only the leftover space is distributed equally. Items with more content end up wider.</p>
+
+      <h3>flex: none — rigid</h3>
+      <p>Expands to <code>flex: 0 0 auto</code>. The item neither grows nor shrinks. It stays at its content size. Use this for icons, logos, or any element that should not flex.</p>
+
+      <h2>Common gotcha: flex-basis vs width</h2>
+      <p>When both <code>flex-basis</code> (not <code>auto</code>) and <code>width</code> are set, <code>flex-basis</code> wins. But when <code>flex-basis: auto</code>, the item uses <code>width</code> (or <code>height</code> in column direction) as its basis. This is why the shorthand is safer — it sets basis explicitly.</p>
+
+      <h2>The math in action</h2>
+      <p>Container is 600px. Three items with <code>flex: 1</code> (basis 0): each gets 600/3 = 200px. Now give item B <code>flex: 2</code>: total grow = 1+2+1 = 4. Item A gets 150px, item B gets 300px, item C gets 150px. Change to <code>flex: auto</code> with content widths of 100px, 200px, 50px: remaining = 600 - 350 = 250px. Each grows by 250/3 ≈ 83px. Final: A = 183px, B = 283px, C = 133px.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — flex: 1 vs flex: auto vs flex: none</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-2 { padding: 1.5rem; font-family: system-ui; }
+          .demo-27-2 h3 { font-size: 0.85rem; margin-block: 1.25rem 0.5rem; color: oklch(60% 0 0); }
+          .demo-27-2 .row {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 2px dashed oklch(70% 0.1 275 / 0.4);
+            border-radius: 0.5rem;
+          }
+          .demo-27-2 .item {
+            padding: 0.75rem 1rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+          .demo-27-2 .item:nth-child(2) { background: oklch(60% 0.18 200); }
+          .demo-27-2 .item:nth-child(3) { background: oklch(55% 0.2 150); }
+          .demo-27-2 .flex-1 .item { flex: 1; }
+          .demo-27-2 .flex-auto .item { flex: auto; }
+          .demo-27-2 .flex-none .item { flex: none; }
+          .demo-27-2 .flex-mixed .item:nth-child(1) { flex: 1; }
+          .demo-27-2 .flex-mixed .item:nth-child(2) { flex: 2; }
+          .demo-27-2 .flex-mixed .item:nth-child(3) { flex: 1; }
+        </style>
+        <div class="demo-27-2">
+          <h3>flex: 1 — equal sizes regardless of content</h3>
+          <div class="row flex-1">
+            <div class="item">Short</div>
+            <div class="item">Medium content here</div>
+            <div class="item">Longer content in this box</div>
+          </div>
+          <h3>flex: auto — content-aware distribution</h3>
+          <div class="row flex-auto">
+            <div class="item">Short</div>
+            <div class="item">Medium content here</div>
+            <div class="item">Longer content in this box</div>
+          </div>
+          <h3>flex: none — rigid, content-sized</h3>
+          <div class="row flex-none">
+            <div class="item">Short</div>
+            <div class="item">Medium content here</div>
+            <div class="item">Longer content in this box</div>
+          </div>
+          <h3>flex: 1 / flex: 2 / flex: 1 — proportional</h3>
+          <div class="row flex-mixed">
+            <div class="item">A (1)</div>
+            <div class="item">B (2)</div>
+            <div class="item">C (1)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="container"&gt;
+  &lt;div class="sidebar"&gt;Sidebar&lt;/div&gt;
+  &lt;div class="main"&gt;Main Content&lt;/div&gt;
+  &lt;div class="aside"&gt;Aside&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.container {
+  display: flex;
+  gap: 1rem;
+  border: 2px solid oklch(70% 0.15 275);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Try changing these flex values */
+.sidebar {
+  flex: none;           /* rigid 200px */
+  width: 200px;
+  background: oklch(55% 0.2 275);
+  color: white;
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+
+.main {
+  flex: 1;              /* takes all remaining space */
+  background: oklch(90% 0.05 275);
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+
+.aside {
+  flex: none;           /* rigid 150px */
+  width: 150px;
+  background: oklch(60% 0.18 200);
+  color: white;
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a two-column layout: a fixed-width sidebar (250px, <code>flex: none</code>) and a fluid main area (<code>flex: 1</code>). Now add a "collapse" state: when the sidebar has a <code>.collapsed</code> class, change it to <code>flex: 0 0 60px</code> and add a <code>transition: flex-basis 300ms</code>. Watch it animate smoothly.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-27.1-flex-container-fundamentals.html">← Lesson 27.1</a>
+      <a href="./lesson-27.3-alignment.html">Lesson 27.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

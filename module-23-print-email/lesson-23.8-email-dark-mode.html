@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.8 — Dark Mode in Email Clients · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.8 · HTML Email</p>
+      <h1>Dark Mode in Email Clients</h1>
+      <p class="lead">Dark mode is everywhere — including email. But each client handles it differently. Apple Mail lets you control it fully. Gmail forces its own dark mode by inverting colors algorithmically. Outlook has partial support. Here's how to handle all three.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Client support landscape</h2>
+      <ul>
+        <li><strong>Apple Mail / iOS Mail</strong> — Full support. Respects <code>@media (prefers-color-scheme: dark)</code> and <code>meta color-scheme</code>.</li>
+        <li><strong>Outlook (macOS)</strong> — Full support for the media query.</li>
+        <li><strong>Outlook (Windows)</strong> — Partial. Has its own dark mode that inverts colors unpredictably.</li>
+        <li><strong>Gmail (Android)</strong> — Forced dark mode. Inverts light backgrounds to dark algorithmically. You cannot fully control it.</li>
+        <li><strong>Gmail (web)</strong> — No dark mode transformation.</li>
+        <li><strong>Yahoo Mail</strong> — Partial forced dark mode on mobile.</li>
+      </ul>
+
+      <h2>The meta tag</h2>
+      <p>Signal dark mode support in the email <code>&lt;head&gt;</code>:</p>
+      <pre><code>&lt;meta name="color-scheme" content="light dark"&gt;
+&lt;meta name="supported-color-schemes" content="light dark"&gt;</code></pre>
+      <p>This tells Apple Mail and iOS that your email is designed for both modes.</p>
+
+      <h2>The CSS approach</h2>
+      <pre><code>&lt;style&gt;
+  :root {
+    color-scheme: light dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .email-body {
+      background-color: #1a1a2e !important;
+    }
+    .email-text {
+      color: #e0e0e0 !important;
+    }
+    .email-heading {
+      color: #ffffff !important;
+    }
+    .email-btn {
+      background-color: #6c63ff !important;
+    }
+    .email-footer {
+      background-color: #12121f !important;
+      color: #999999 !important;
+    }
+  }
+&lt;/style&gt;</code></pre>
+
+      <h2>Gmail's forced dark mode</h2>
+      <p>Gmail on Android forces dark mode by inverting colors. It applies a <code>[data-ogsb]</code> attribute to transformed elements. You can target this (though it's fragile):</p>
+      <pre><code>/* Target Gmail's forced dark mode */
+u + .body .email-body {
+  background-color: #1a1a2e !important;
+}
+
+/* Or use the data attribute (Android Gmail) */
+[data-ogsb] .email-text {
+  color: #e0e0e0 !important;
+}</code></pre>
+      <p>The <code>u + .body</code> selector targets Gmail's specific DOM wrapping.</p>
+
+      <h2>Transparent images</h2>
+      <p>A logo with a white background looks terrible in dark mode. Use transparent PNGs instead:</p>
+      <pre><code>&lt;!-- Bad: white background logo --&gt;
+&lt;img src="logo-white-bg.jpg"&gt;
+
+&lt;!-- Good: transparent PNG --&gt;
+&lt;img src="logo-transparent.png"&gt;
+
+&lt;!-- Best: swap images for dark mode --&gt;
+&lt;style&gt;
+  @media (prefers-color-scheme: dark) {
+    .logo-light { display: none !important; }
+    .logo-dark { display: block !important; }
+  }
+&lt;/style&gt;
+&lt;img class="logo-light" src="logo-dark-text.png"&gt;
+&lt;img class="logo-dark" src="logo-light-text.png" style="display:none;"&gt;</code></pre>
+
+      <h2>Testing</h2>
+      <p>You cannot test dark mode email in a browser alone. Tools like <strong>Litmus</strong> and <strong>Email on Acid</strong> provide previews across clients and modes. At minimum, test in:</p>
+      <ul>
+        <li>Apple Mail (macOS) with dark mode on</li>
+        <li>iOS Mail with dark mode on</li>
+        <li>Gmail app (Android) with dark mode on</li>
+        <li>Outlook (Windows) with dark mode on</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Email in light and dark mode</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-8 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(92% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-8 .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+          }
+          .demo-23-8 .mode-btn {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid oklch(75% 0.05 270);
+            background: #fff;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 150ms;
+          }
+          .demo-23-8 .mode-btn.active {
+            background: oklch(25% 0.08 270);
+            color: #fff;
+            border-color: oklch(25% 0.08 270);
+          }
+          .demo-23-8 .email-sim {
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px oklch(0% 0 0 / 0.1);
+            transition: all 300ms;
+          }
+          .demo-23-8 .email-sim.light {
+            background: #ffffff;
+          }
+          .demo-23-8 .email-sim.dark {
+            background: #1a1a2e;
+          }
+          .demo-23-8 .es-header {
+            padding: 20px 24px;
+            text-align: center;
+            transition: all 300ms;
+          }
+          .demo-23-8 .light .es-header { background: #2d2d6b; }
+          .demo-23-8 .dark .es-header { background: #12121f; }
+          .demo-23-8 .es-header h3 {
+            color: #fff;
+            margin: 0;
+            font-size: 1.1rem;
+          }
+          .demo-23-8 .es-body {
+            padding: 24px;
+            transition: all 300ms;
+          }
+          .demo-23-8 .es-body p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0 0 12px;
+            transition: color 300ms;
+          }
+          .demo-23-8 .light .es-body p { color: #333333; }
+          .demo-23-8 .dark .es-body p { color: #d0d0d0; }
+          .demo-23-8 .es-btn {
+            display: inline-block;
+            padding: 10px 22px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 300ms;
+          }
+          .demo-23-8 .light .es-btn { background: #4a3fbf; color: #fff; }
+          .demo-23-8 .dark .es-btn { background: #6c63ff; color: #fff; }
+          .demo-23-8 .es-footer {
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 0.7rem;
+            transition: all 300ms;
+          }
+          .demo-23-8 .light .es-footer { background: #f5f5f5; color: #888; }
+          .demo-23-8 .dark .es-footer { background: #12121f; color: #666; }
+          .demo-23-8 .es-logo {
+            width: 80px;
+            height: 30px;
+            margin: 0 auto 8px;
+            border-radius: 4px;
+            transition: all 300ms;
+          }
+          .demo-23-8 .light .es-logo { background: oklch(90% 0.05 270); }
+          .demo-23-8 .dark .es-logo { background: oklch(30% 0.05 270); }
+        </style>
+        <div class="demo-23-8">
+          <div class="mode-toggle">
+            <button class="mode-btn active" onclick="let s=this.closest('.demo-23-8').querySelector('.email-sim');s.classList.remove('dark');s.classList.add('light');this.classList.add('active');this.nextElementSibling.classList.remove('active');">Light Mode</button>
+            <button class="mode-btn" onclick="let s=this.closest('.demo-23-8').querySelector('.email-sim');s.classList.remove('light');s.classList.add('dark');this.classList.add('active');this.previousElementSibling.classList.remove('active');">Dark Mode</button>
+          </div>
+          <div class="email-sim light">
+            <div class="es-header">
+              <div class="es-logo"></div>
+              <h3>Your Weekly Digest</h3>
+            </div>
+            <div class="es-body">
+              <p>Hi there! Here's what you missed this week. Toggle between light and dark mode to see how the email adapts.</p>
+              <p>Notice: colors shift, the logo background adapts, and the button color changes for better contrast in dark mode.</p>
+              <p style="text-align:center;padding-top:8px;">
+                <a href="#" class="es-btn">View Full Digest</a>
+              </p>
+            </div>
+            <div class="es-footer">
+              You're receiving this because you subscribed. <a href="#" style="color:inherit;">Unsubscribe</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Dark mode-ready email --&gt;
+&lt;table role="presentation" cellpadding="0" cellspacing="0" border="0"
+       style="width:100%;max-width:600px;margin:0 auto;font-family:Arial,sans-serif;"&gt;
+  &lt;tr&gt;
+    &lt;td class="email-header" style="background-color:#2d2d6b;padding:24px;text-align:center;"&gt;
+      &lt;!-- Light logo --&gt;
+      &lt;img class="logo-light" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='30'%3E%3Crect fill='%23fff' rx='4' width='120' height='30'/%3E%3Ctext x='60' y='20' text-anchor='middle' fill='%232d2d6b' font-size='14' font-family='Arial'%3EBrand%3C/text%3E%3C/svg%3E" width="120" height="30" alt="Brand" style="display:block;margin:0 auto;"&gt;
+      &lt;!-- Dark logo (hidden by default) --&gt;
+      &lt;img class="logo-dark" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='30'%3E%3Crect fill='%236c63ff' rx='4' width='120' height='30'/%3E%3Ctext x='60' y='20' text-anchor='middle' fill='%23fff' font-size='14' font-family='Arial'%3EBrand%3C/text%3E%3C/svg%3E" width="120" height="30" alt="Brand" style="display:none;margin:0 auto;"&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="email-body" style="padding:30px;background-color:#ffffff;"&gt;
+      &lt;h2 class="email-heading" style="color:#1a1a1a;font-size:20px;margin:0 0 12px;"&gt;Hello!&lt;/h2&gt;
+      &lt;p class="email-text" style="font-size:15px;color:#333333;line-height:1.6;margin:0 0 16px;"&gt;
+        This email supports dark mode. In Apple Mail and iOS, colors will adapt. In Gmail Android, colors may be inverted automatically.
+      &lt;/p&gt;
+      &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"&gt;
+        &lt;tr&gt;
+          &lt;td class="email-btn" style="border-radius:4px;background-color:#4a3fbf;"&gt;
+            &lt;a href="#" style="display:inline-block;padding:12px 28px;color:#ffffff;text-decoration:none;font-weight:bold;"&gt;Take Action&lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="email-footer" style="background-color:#f5f5f5;padding:16px;text-align:center;font-size:12px;color:#888;"&gt;
+      &amp;copy; 2026 Brand | &lt;a href="#" style="color:#888;"&gt;Unsubscribe&lt;/a&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #e8e8e8;
+}
+
+/* Dark mode styles for Apple Mail / iOS */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0a0a12 !important;
+  }
+  .email-header {
+    background-color: #12121f !important;
+  }
+  .email-body {
+    background-color: #1a1a2e !important;
+  }
+  .email-heading {
+    color: #ffffff !important;
+  }
+  .email-text {
+    color: #d0d0d0 !important;
+  }
+  .email-btn {
+    background-color: #6c63ff !important;
+  }
+  .email-footer {
+    background-color: #12121f !important;
+    color: #666666 !important;
+  }
+  /* Swap logos */
+  .logo-light {
+    display: none !important;
+  }
+  .logo-dark {
+    display: block !important;
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add dark mode support to an existing email template. Include the <code>&lt;meta name="color-scheme"&gt;</code> tag, add <code>:root { color-scheme: light dark; }</code>, and write a full <code>@media (prefers-color-scheme: dark)</code> block that adjusts backgrounds, text colors, and button colors. Use transparent PNGs for logos. Test by toggling your OS dark mode and viewing in a supported client.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-23.7-email-components.html">&larr; Lesson 23.7</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

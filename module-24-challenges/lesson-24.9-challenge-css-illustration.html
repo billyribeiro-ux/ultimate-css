@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 9 — Draw a Scene with One Element · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 9 · Expert</p>
+      <h1>Draw a Scene with One Element</h1>
+      <p class="lead">Create a landscape scene — sun, sky, mountains, and water — using a SINGLE <code>&lt;div&gt;</code> element. Only <code>::before</code>, <code>::after</code>, <code>box-shadow</code>, and gradients allowed.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The challenge</h2>
+      <p>CSS art pushed to its limit: a recognizable landscape using one HTML element. You have three "layers" — the element itself, <code>::before</code>, and <code>::after</code>. For additional shapes, you must use <code>box-shadow</code> (which can create unlimited copies of a shape) and multiple backgrounds with gradients.</p>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>Only ONE <code>&lt;div&gt;</code> element in HTML — no additional elements</li>
+        <li>Only <code>::before</code> and <code>::after</code> pseudo-elements allowed</li>
+        <li>No external images, SVGs, or URLs</li>
+        <li>Must use gradients for sky, mountains, and water</li>
+        <li>Must use <code>box-shadow</code> for the sun (and optionally clouds)</li>
+        <li>The scene must be recognizable as a landscape</li>
+        <li>Colors must use OKLCH</li>
+      </ul>
+
+      <h2>Techniques available</h2>
+      <ul>
+        <li><code>background: linear-gradient(), radial-gradient()</code> — layered, for sky and terrain</li>
+        <li><code>box-shadow</code> — for duplicating shapes (sun, clouds, reflections)</li>
+        <li><code>::before / ::after</code> — for additional shaped elements (mountains, sun disc)</li>
+        <li><code>border-radius</code> — for rounded shapes</li>
+        <li><code>clip-path</code> — for mountain peaks (polygon)</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Target — single-element landscape</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-9 {
+            display: grid;
+            place-items: center;
+            padding: 2rem;
+            background: oklch(20% 0.02 260);
+          }
+          .demo-24-9 .landscape {
+            position: relative;
+            width: min(100%, 28rem);
+            aspect-ratio: 16 / 9;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background:
+              linear-gradient(180deg,
+                oklch(70% 0.12 250) 0%,
+                oklch(80% 0.08 220) 35%,
+                oklch(85% 0.06 80) 38%,
+                oklch(90% 0.04 80) 42%,
+                oklch(55% 0.1 150) 42%,
+                oklch(45% 0.12 160) 55%,
+                oklch(50% 0.08 220) 55%,
+                oklch(60% 0.1 240) 100%
+              );
+          }
+          .demo-24-9 .landscape::before {
+            content: "";
+            position: absolute;
+            top: 8%;
+            right: 15%;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: oklch(95% 0.08 80);
+            box-shadow:
+              0 0 0 0.5rem oklch(95% 0.06 80 / 0.3),
+              0 0 2rem 1rem oklch(90% 0.08 70 / 0.2),
+              -8rem 2rem 0 -0.5rem oklch(95% 0.01 260 / 0.7),
+              -7rem 1.8rem 0 0.3rem oklch(95% 0.01 260 / 0.5),
+              -9rem 2.2rem 0 -0.2rem oklch(95% 0.01 260 / 0.4);
+          }
+          .demo-24-9 .landscape::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 45%;
+            background:
+              linear-gradient(180deg,
+                transparent 0%,
+                oklch(50% 0.08 220 / 0.3) 10%,
+                oklch(55% 0.1 230 / 0.5) 50%,
+                oklch(45% 0.12 240) 100%
+              );
+            clip-path: polygon(
+              0% 20%, 8% 0%, 20% 25%, 35% 5%, 50% 30%, 65% 10%, 80% 28%, 95% 8%, 100% 22%,
+              100% 100%, 0% 100%
+            );
+          }
+          .demo-24-9 .note {
+            margin-block-start: 1rem;
+            font-size: 0.7rem;
+            color: oklch(70% 0.02 260);
+            text-align: center;
+            font-family: system-ui;
+          }
+        </style>
+        <div class="demo-24-9">
+          <div class="landscape"></div>
+          <p class="note">One &lt;div&gt;, zero images — only CSS gradients, box-shadow, and clip-path</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- ONE element only. No changes allowed. --&gt;
+&lt;div class="scene"&gt;&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Draw a landscape scene using ONLY:
+   - .scene (the single div)
+   - .scene::before
+   - .scene::after
+   - Gradients (linear-gradient, radial-gradient)
+   - box-shadow (for duplicating shapes)
+   - clip-path (for mountain silhouettes)
+   - OKLCH colors only
+
+   Your scene must include:
+   - Sky (gradient background)
+   - Sun (box-shadow or radial-gradient)
+   - Mountains (clip-path polygon)
+   - Water (gradient, bottom portion)
+*/
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: oklch(20% 0.02 260);
+}
+
+.scene {
+  position: relative;
+  width: min(90vw, 28rem);
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  overflow: hidden;
+
+  /* Layer your background gradients here for sky + water */
+}
+
+.scene::before {
+  content: "";
+  position: absolute;
+  /* Sun and clouds using box-shadow */
+}
+
+.scene::after {
+  content: "";
+  position: absolute;
+  /* Mountains using clip-path */
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Hint</h2>
+      <p>The main <code>.scene</code> div handles sky + water via layered gradients (top = sky blue, middle = horizon glow, bottom = water blue). <code>::before</code> is a small circle (border-radius: 50%) positioned top-right for the sun, with <code>box-shadow</code> for the glow and cloud shapes. <code>::after</code> covers the bottom portion with <code>clip-path: polygon(...)</code> creating mountain peaks, colored in dark greens/browns.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-24.8-challenge-form-validation.html">&larr; Challenge 8</a>
+      <a href="./lesson-24.10-challenge-clone-ui.html">Challenge 10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

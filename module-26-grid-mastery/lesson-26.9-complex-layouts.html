@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.9 — Complex Layouts Only Grid Can Build · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.9 · Layout</p>
+      <h1>Complex Layouts Only Grid Can Build</h1>
+      <p class="lead">Some layouts are impossible (or absurdly complex) without CSS Grid. The full-bleed pattern, overlapping elements without absolute positioning, and the pancake stack are patterns that showcase Grid's unique power.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The full-bleed pattern</h2>
+      <p>Content constrained to a max-width, but some elements (images, banners) break out to fill the full viewport width:</p>
+      <pre><code>.content {
+  display: grid;
+  grid-template-columns: 1fr min(65ch, 100%) 1fr;
+}
+.content > * {
+  grid-column: 2;
+}
+.content > .full-bleed {
+  grid-column: 1 / -1;
+}</code></pre>
+      <p>The outer <code>1fr</code> columns act as gutters. Normal content sits in the middle. Full-bleed items span all three.</p>
+
+      <h2>The pancake stack</h2>
+      <pre><code>.page {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}</code></pre>
+      <p>Header and footer size to content (<code>auto</code>). Main stretches to fill remaining space (<code>1fr</code>). Footer always at the bottom — no sticky footer hacks needed.</p>
+
+      <h2>Overlapping elements (no position:absolute)</h2>
+      <pre><code>.stack {
+  display: grid;
+}
+.stack > * {
+  grid-area: 1 / 1;  /* all items occupy the same cell */
+}
+.stack .overlay {
+  align-self: end;
+  padding: 1rem;
+  background: oklch(0% 0 0 / 0.6);
+  color: white;
+}</code></pre>
+      <p>Items placed in the same grid area overlap naturally. Source order determines stacking (later = on top). No <code>position: absolute</code>, no z-index battles, no collapsed containers.</p>
+
+      <h2>The sidebar that matches content height</h2>
+      <pre><code>.layout {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+}
+/* Sidebar and content automatically have equal height */</code></pre>
+      <p>Grid items stretch to fill their row by default. The sidebar always matches the content height — no height: 100%, no flexbox column hacks.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full-bleed within a constrained container</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-9 {
+            font-family: system-ui;
+            font-size: 0.8rem;
+            line-height: 1.6;
+          }
+          .demo-26-9 .content {
+            display: grid;
+            grid-template-columns: 1fr min(40ch, 100%) 1fr;
+          }
+          .demo-26-9 .content > * {
+            grid-column: 2;
+          }
+          .demo-26-9 .content > .full-bleed {
+            grid-column: 1 / -1;
+          }
+          .demo-26-9 p { margin: 0.75rem 0; }
+          .demo-26-9 h2 { margin: 1rem 0 0.5rem; font-size: 1rem; }
+          .demo-26-9 .full-bleed {
+            background: oklch(70% 0.15 275);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+          }
+          .demo-26-9 .overlap-demo {
+            display: grid;
+            grid-column: 2;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin: 1rem 0;
+          }
+          .demo-26-9 .overlap-demo > * { grid-area: 1 / 1; }
+          .demo-26-9 .overlap-demo .bg {
+            height: 6rem;
+            background: oklch(65% 0.12 200);
+          }
+          .demo-26-9 .overlap-demo .overlay {
+            align-self: end;
+            padding: 0.5rem 0.75rem;
+            background: oklch(0% 0 0 / 0.6);
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+          }
+        </style>
+        <div class="demo-26-9">
+          <div class="content">
+            <h2>Full-Bleed Pattern</h2>
+            <p>This paragraph is constrained to max 40ch width, centered in the container.</p>
+            <div class="full-bleed">This element breaks out to full width (1 / -1)</div>
+            <p>Back to constrained width. The grid handles the centering and breakout elegantly.</p>
+            <div class="overlap-demo">
+              <div class="bg"></div>
+              <div class="overlay">Overlapping — no position:absolute needed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="content"&gt;
+  &lt;h1&gt;Article Title&lt;/h1&gt;
+  &lt;p&gt;This content is constrained to a readable width.&lt;/p&gt;
+  &lt;div class="full-bleed"&gt;Full-bleed banner — spans the entire width&lt;/div&gt;
+  &lt;p&gt;Back to constrained content after the bleed.&lt;/p&gt;
+  &lt;p&gt;More constrained paragraphs here.&lt;/p&gt;
+  &lt;img class="full-bleed" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='100'%3E%3Crect fill='%23667' width='800' height='100'/%3E%3C/svg%3E" alt="Full bleed image" style="width:100%;display:block"&gt;
+  &lt;p&gt;Final constrained paragraph.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; padding: 0; }
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr min(50ch, 100%) 1fr;
+}
+
+.content > * {
+  grid-column: 2;
+}
+
+.content > .full-bleed {
+  grid-column: 1 / -1;
+}
+
+h1 { margin: 2rem 0 1rem; }
+p { margin: 0.75rem 0; line-height: 1.6; }
+
+.full-bleed {
+  background: oklch(65% 0.18 275);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Extend the full-bleed grid to include a "popout" level: <code>grid-template-columns: 1fr 1fr min(50ch, 100%) 1fr 1fr</code>. Add a <code>.popout</code> class with <code>grid-column: 2 / -2</code> — it breaks out partially but not to full width. This "wide" content pattern is common in articles with wider images.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.8-grid-and-flexbox.html">← Lesson 26.8</a>
+      <a href="./lesson-26.10-grid-animations.html">Lesson 26.10 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

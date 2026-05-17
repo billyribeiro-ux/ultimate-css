@@ -44,21 +44,30 @@
 
       <h3>1. Layer boundary violations</h3>
       <p>Is the new CSS in the correct layer? A component style in the utilities layer, or a token definition inside a component file, signals an architectural boundary violation. The rule: each piece of CSS lives in exactly one layer, and that layer matches its purpose.</p>
+      <p>What to look for: <code>@layer</code> declarations in the wrong file, styles that affect elements outside their intended scope, utility-style rules (single-property overrides) inside component files, or component-style rules (multi-property blocks) inside utility files.</p>
 
       <h3>2. Hard-coded values</h3>
       <p>Any raw color, font-size, or spacing value that should reference a token is technical debt. Search for <code>oklch(</code>, <code>#</code>, <code>rgb(</code> outside the token layer. Search for pixel values that don't match the spacing scale. Each hard-coded value is a point where the system can drift.</p>
+      <p>Exception: values that are truly one-off and contextual (a specific animation offset, a clip-path coordinate) may be legitimately hard-coded. The test: would changing this value ever need to be coordinated with other components? If yes, it should be a token.</p>
 
       <h3>3. Specificity escalation</h3>
       <p>Are selectors unnecessarily specific? A <code>.header .nav .link.active</code> when <code>.nav-link[aria-current]</code> would suffice signals specificity inflation. With <code>@layer</code>, specificity within a layer only matters against other rules in that same layer — but unnecessary specificity still makes code harder to override and reason about.</p>
+      <p>Red flags: descendant selectors more than 2 levels deep, ID selectors in component CSS, qualifying class selectors with element types (e.g., <code>button.btn</code> instead of <code>.btn</code>), and chained classes that could be simplified.</p>
 
       <h3>4. Missing @supports</h3>
       <p>Does the code use modern features without fallback consideration? If the project supports older browsers, progressive enhancement via <code>@supports</code> should wrap newer features. Even in modern-only projects, <code>@supports</code> documents which features are load-bearing.</p>
+      <p>Check for: <code>@scope</code>, <code>:has()</code>, <code>container queries</code>, <code>anchor positioning</code>, <code>subgrid</code> — all features that may need graceful degradation depending on the browser support matrix.</p>
 
       <h3>5. Accessibility gaps</h3>
-      <p>Focus styles present and visible? Color contrast sufficient? Motion respects <code>prefers-reduced-motion</code>? Interactive elements have sufficient touch targets (44x44px minimum)? Text remains readable at 200% zoom? These are not optional — they are requirements.</p>
+      <p>Focus styles present and visible? Color contrast sufficient (4.5:1 for normal text, 3:1 for large text)? Motion respects <code>prefers-reduced-motion</code>? Interactive elements have sufficient touch targets (44x44px minimum)? Text remains readable at 200% zoom? Content reflows properly at 320px viewport? These are not optional — they are requirements.</p>
+      <p>Additional checks: <code>display: none</code> hiding content that should remain accessible to screen readers (use <code>.visually-hidden</code> instead), color being the sole indicator of state (add an icon or text label), and custom focus styles that are less visible than the browser default.</p>
 
       <h3>6. Performance anti-patterns</h3>
-      <p>Expensive selectors (<code>*</code> with complex combinators), forced reflows from layout-triggering properties in transitions, excessive use of <code>filter</code> or <code>backdrop-filter</code> on large areas, and unused CSS that bloats the bundle. Each has a measurable cost at scale.</p>
+      <p>Expensive selectors (<code>*</code> with complex combinators), forced reflows from layout-triggering properties in transitions (avoid animating <code>width</code>, <code>height</code>, <code>top</code>, <code>left</code> — use <code>transform</code> instead), excessive use of <code>filter</code> or <code>backdrop-filter</code> on large areas, and unused CSS that bloats the bundle. Each has a measurable cost at scale.</p>
+      <p>Also check: <code>will-change</code> applied permanently instead of on interaction, <code>contain</code> missing on components that would benefit from layout containment, and <code>@font-face</code> loading strategies that block rendering.</p>
+
+      <h3>7. Naming and intent clarity</h3>
+      <p>Even without strict BEM naming, CSS should communicate intent. A class called <code>.x</code> or <code>.wrapper2</code> tells future developers nothing. A class called <code>.product-grid</code> or <code>.auth-form</code> is self-documenting. Custom properties should describe what they control, not their current value: <code>--spacing-section</code> not <code>--24px</code>.</p>
 
       <h2>The PE7 audit automated with grep</h2>
       <p>Automate the easy checks:</p>
@@ -87,6 +96,50 @@ grep -rL "prefers-reduced-motion" src/components/*animation*</code></pre>
 
       <h3>The "copy-paste component" pattern</h3>
       <p>A new component is created by copying an existing one and modifying it. The result: duplicated tokens, duplicated structure, diverging implementations. The fix: extract the shared API into custom properties and create variants, not copies.</p>
+
+      <h3>The "magic number" pattern</h3>
+      <p>Hard-coded values with no explanation: <code>margin-top: 37px</code>, <code>width: 287px</code>. These numbers encode implicit relationships. The fix: replace with a token or add a comment explaining the derivation. If the value derives from a calculation, make that calculation explicit with <code>calc()</code>.</p>
+
+      <h3>The "override chain" pattern</h3>
+      <p>A series of selectors where each overrides the previous, creating a fragile chain where removing one rule breaks others downstream. The fix: flatten the cascade using layers so each rule operates independently without depending on being overridden.</p>
+
+      <h2>Review examples: before and after</h2>
+
+      <h3>Example 1: Hard-coded color in a component</h3>
+      <pre><code>/* Before — hard-coded value */
+.alert { background: oklch(92% 0.05 25); }
+
+/* After — using a token */
+.alert { background: var(--color-danger-surface); }</code></pre>
+      <p>Review comment: "This color should reference the danger-surface token so it updates automatically with theme changes and stays in sync with other danger indicators across the app."</p>
+
+      <h3>Example 2: Specificity escalation</h3>
+      <pre><code>/* Before — specificity arms race */
+.sidebar .nav .link { color: blue; }
+.sidebar .nav .link.active { color: darkblue; }
+body .sidebar .nav .link.active.current { color: navy; }
+
+/* After — layer-based priority */
+@layer components {
+  .nav-link { color: var(--nav-link-color); }
+  .nav-link[aria-current="page"] { color: var(--nav-link-active); }
+}</code></pre>
+      <p>Review comment: "The selector specificity here is escalating to override prior rules. With @layer, simple selectors suffice because layer order provides the priority. This also makes the active state accessible via aria-current."</p>
+
+      <h3>Example 3: Missing accessibility</h3>
+      <pre><code>/* Before — motion without preference check */
+.hero { animation: slide-in 800ms ease; }
+
+/* After — respects user preferences */
+.hero { animation: slide-in 800ms ease; }
+@media (prefers-reduced-motion: reduce) {
+  .hero { animation: none; }
+}</code></pre>
+      <p>Review comment (blocking): "This animation runs unconditionally. Users with vestibular disorders can experience nausea from unexpected motion. Wrap in a prefers-reduced-motion check or use the motion-safe utility pattern."</p>
+
+      <h2>Building a review culture</h2>
+      <p>CSS reviews work best when the team agrees on principles before the first review. Document the architecture in an ADR (Module 22 Project). Share the checklist. Run lunch-and-learn sessions on common patterns. When everyone understands the why, reviews become collaborative rather than adversarial.</p>
+      <p>The goal is not zero review comments — it is reviewers catching things that automated tooling cannot: semantic correctness, user experience implications, and architectural intent. Automate what you can (see Lesson 22.8), review what requires human judgment.</p>
     </section>
 
     <section class="callout">

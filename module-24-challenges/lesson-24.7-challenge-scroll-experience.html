@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 7 — Build a Scroll-Driven Story · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 7 · Advanced</p>
+      <h1>Build a Scroll-Driven Story</h1>
+      <p class="lead">Build a cinematic scrolling page where each section reveals with a different animation, a progress bar fills as you scroll, and a sticky heading updates. All using <code>animation-timeline: view()</code> and <code>scroll()</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Requirements</h2>
+      <ol>
+        <li><strong>Progress bar:</strong> A thin bar at the very top fills from 0% to 100% width as you scroll the page. Uses <code>animation-timeline: scroll()</code>.</li>
+        <li><strong>Section reveals:</strong> Four content sections, each with a different entrance animation:
+          <ul>
+            <li>Section 1: fade-up (translateY + opacity)</li>
+            <li>Section 2: slide-left (translateX + opacity)</li>
+            <li>Section 3: scale (scale + opacity)</li>
+            <li>Section 4: rotate-in (rotate + opacity)</li>
+          </ul>
+          Each uses <code>animation-timeline: view()</code>.
+        </li>
+        <li><strong>Sticky heading:</strong> A position-sticky element near the top that persists as you scroll.</li>
+        <li><strong>Fallback:</strong> Wrap scroll-driven features in <code>@supports (animation-timeline: view())</code> so unsupported browsers see static content.</li>
+      </ol>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>Pure CSS — zero JavaScript</li>
+        <li>All scroll animations must use the Scroll-Driven Animations API (<code>animation-timeline</code>)</li>
+        <li>Must include <code>@supports</code> fallback for every scroll-driven feature</li>
+        <li>Must respect <code>prefers-reduced-motion</code></li>
+        <li>Content must be readable even without the animations</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Target — scroll behavior preview</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-7 {
+            font-family: system-ui;
+            position: relative;
+            height: 24rem;
+            overflow-y: auto;
+            border-radius: 0.5rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-24-7 .progress {
+            position: sticky;
+            top: 0;
+            height: 3px;
+            background: oklch(55% 0.2 260);
+            width: 45%;
+            z-index: 10;
+            border-radius: 0 2px 2px 0;
+          }
+          .demo-24-7 .sticky-head {
+            position: sticky;
+            top: 3px;
+            background: oklch(100% 0 0 / 0.9);
+            backdrop-filter: blur(8px);
+            padding: 0.75rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: oklch(40% 0.15 260);
+            border-block-end: 1px solid oklch(90% 0.02 260);
+            z-index: 5;
+          }
+          .demo-24-7 .story-section {
+            padding: 3rem 2rem;
+            min-height: 12rem;
+            display: grid;
+            place-items: center;
+            text-align: center;
+          }
+          .demo-24-7 .story-section:nth-child(odd) {
+            background: oklch(95% 0.02 260);
+          }
+          .demo-24-7 .story-section h3 {
+            font-size: 1.25rem;
+            margin-block-end: 0.5rem;
+            color: oklch(35% 0.12 260);
+          }
+          .demo-24-7 .story-section p {
+            max-inline-size: 40ch;
+            line-height: 1.6;
+            font-size: 0.85rem;
+            color: oklch(40% 0.02 260);
+          }
+          .demo-24-7 .anim-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: oklch(60% 0.12 260);
+            margin-block-end: 0.5rem;
+          }
+        </style>
+        <div class="demo-24-7">
+          <div class="progress"></div>
+          <div class="sticky-head">Scroll-Driven Story</div>
+          <div class="story-section">
+            <div>
+              <p class="anim-label">fade-up</p>
+              <h3>Chapter 1: The Beginning</h3>
+              <p>Every great story starts with a single scroll. This section fades up as it enters the viewport.</p>
+            </div>
+          </div>
+          <div class="story-section">
+            <div>
+              <p class="anim-label">slide-left</p>
+              <h3>Chapter 2: The Journey</h3>
+              <p>The narrative builds. This section slides in from the right as you scroll it into view.</p>
+            </div>
+          </div>
+          <div class="story-section">
+            <div>
+              <p class="anim-label">scale</p>
+              <h3>Chapter 3: The Climax</h3>
+              <p>Tension peaks. This section scales up from 80% as it crosses the viewport threshold.</p>
+            </div>
+          </div>
+          <div class="story-section">
+            <div>
+              <p class="anim-label">rotate-in</p>
+              <h3>Chapter 4: The Resolution</h3>
+              <p>Everything comes together. This section rotates subtly into place as the scroll concludes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="story"&gt;
+  &lt;div class="progress-bar"&gt;&lt;/div&gt;
+  &lt;header class="sticky-heading"&gt;Scroll-Driven Story&lt;/header&gt;
+
+  &lt;section class="chapter fade-up"&gt;
+    &lt;h2&gt;Chapter 1: The Beginning&lt;/h2&gt;
+    &lt;p&gt;Every great story starts with a single scroll. This section fades up as it enters the viewport.&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class="chapter slide-left"&gt;
+    &lt;h2&gt;Chapter 2: The Journey&lt;/h2&gt;
+    &lt;p&gt;The narrative builds. This section slides in from the right as you scroll it into view.&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class="chapter scale-in"&gt;
+    &lt;h2&gt;Chapter 3: The Climax&lt;/h2&gt;
+    &lt;p&gt;Tension peaks. This section scales up from small as it crosses the viewport threshold.&lt;/p&gt;
+  &lt;/section&gt;
+
+  &lt;section class="chapter rotate-in"&gt;
+    &lt;h2&gt;Chapter 4: The Resolution&lt;/h2&gt;
+    &lt;p&gt;Everything comes together. This section rotates subtly into place as the scroll concludes.&lt;/p&gt;
+  &lt;/section&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Build a scroll-driven story:
+   1. .progress-bar fills width with animation-timeline: scroll()
+   2. Each .chapter has a different reveal animation with animation-timeline: view()
+   3. .sticky-heading stays at top
+   4. @supports fallback for browsers without scroll-driven animations
+   5. prefers-reduced-motion support
+*/
+
+body {
+  margin: 0;
+  font-family: system-ui;
+  background: oklch(97% 0.005 260);
+  color: oklch(25% 0.02 260);
+}
+
+/* Build your scroll-driven experience below */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Hint</h2>
+      <p>For the progress bar: <code>@keyframes fill { from { width: 0% } to { width: 100% } }</code> with <code>animation: fill linear; animation-timeline: scroll();</code>. For section reveals: define separate <code>@keyframes</code> for each animation type, then apply with <code>animation-timeline: view(); animation-range: entry 0% cover 40%;</code>. The <code>animation-range</code> controls when in the scroll the animation plays.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-24.6-challenge-animation-chain.html">&larr; Challenge 6</a>
+      <a href="./lesson-24.8-challenge-form-validation.html">Challenge 8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

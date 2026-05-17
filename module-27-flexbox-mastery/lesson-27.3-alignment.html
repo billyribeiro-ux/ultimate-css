@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 27.3 — Alignment: justify-content, align-items, align-self, gap · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 27</a>
+      <span>Lesson 27.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 27.3 · Layout</p>
+      <h1>Alignment: justify-content, align-items, align-self, gap</h1>
+      <p class="lead">Flexbox alignment is where the magic lives. Once you internalize which axis each property targets, you can center anything, distribute space perfectly, and create component layouts that respond beautifully to variable content.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>justify-content — main axis distribution</h2>
+      <p>Controls how items are distributed along the main axis (horizontal by default):</p>
+      <pre><code>justify-content: flex-start;      /* pack to start (default) */
+justify-content: flex-end;        /* pack to end */
+justify-content: center;          /* center the group */
+justify-content: space-between;   /* first flush start, last flush end, equal gaps */
+justify-content: space-around;    /* equal space around each item (half at edges) */
+justify-content: space-evenly;    /* truly equal gaps including edges */</code></pre>
+      <p><strong>The key difference:</strong> <code>space-between</code> gives zero space at edges. <code>space-around</code> gives half-sized space at edges. <code>space-evenly</code> gives equal space everywhere. For most UI work, <code>space-between</code> or the <code>gap</code> property is preferred.</p>
+
+      <h2>align-items — cross axis alignment</h2>
+      <p>Controls how items align along the cross axis (vertical by default):</p>
+      <pre><code>align-items: stretch;     /* items stretch to fill container height (default) */
+align-items: flex-start;  /* items align to top */
+align-items: flex-end;    /* items align to bottom */
+align-items: center;      /* items vertically centered */
+align-items: baseline;    /* items align on their text baseline */</code></pre>
+      <p>The <code>stretch</code> default is why flex items fill the container height — a common surprise for newcomers. To get natural height, set <code>align-items: flex-start</code>.</p>
+
+      <h2>align-self — per-item override</h2>
+      <p><code>align-self</code> overrides <code>align-items</code> for a single item:</p>
+      <pre><code>.container { align-items: flex-start; }
+.special-item { align-self: flex-end; }    /* this one aligns to bottom */
+.centered-item { align-self: center; }     /* this one centers vertically */</code></pre>
+
+      <h2>align-content — multi-line cross axis</h2>
+      <p>When <code>flex-wrap: wrap</code> creates multiple lines, <code>align-content</code> distributes those lines along the cross axis. Same values as <code>justify-content</code>. Has no effect on single-line containers.</p>
+
+      <h2>gap — the modern spacing tool</h2>
+      <p>The <code>gap</code> property (originally from Grid, now in Flexbox) sets spacing between items without affecting edges:</p>
+      <pre><code>gap: 1rem;              /* equal row and column gap */
+row-gap: 1rem;          /* gap between wrapped lines */
+column-gap: 0.5rem;     /* gap between items on same line */
+gap: 1rem 0.5rem;       /* row-gap column-gap */</code></pre>
+      <p><code>gap</code> replaced the old "margin on all items + negative margin on container" hack. It only creates space <em>between</em> items, never at the edges. This is almost always what you want.</p>
+
+      <h2>place-content and place-items</h2>
+      <p>Shorthands for setting both axes at once:</p>
+      <pre><code>place-content: center;    /* align-content + justify-content */
+place-items: center;      /* align-items + justify-items */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — every justify-content value</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-3 { padding: 1.5rem; font-family: system-ui; }
+          .demo-27-3 h3 { font-size: 0.8rem; margin-block: 1rem 0.4rem; color: oklch(60% 0 0); font-family: monospace; }
+          .demo-27-3 .row {
+            display: flex;
+            gap: 0.4rem;
+            padding: 0.5rem;
+            border: 2px dashed oklch(70% 0.1 275 / 0.4);
+            border-radius: 0.5rem;
+            min-height: 2.5rem;
+            align-items: center;
+          }
+          .demo-27-3 .item {
+            padding: 0.4rem 0.8rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+          .demo-27-3 .jc-start { justify-content: flex-start; }
+          .demo-27-3 .jc-end { justify-content: flex-end; }
+          .demo-27-3 .jc-center { justify-content: center; }
+          .demo-27-3 .jc-between { justify-content: space-between; }
+          .demo-27-3 .jc-around { justify-content: space-around; }
+          .demo-27-3 .jc-evenly { justify-content: space-evenly; }
+        </style>
+        <div class="demo-27-3">
+          <h3>justify-content: flex-start</h3>
+          <div class="row jc-start">
+            <div class="item">A</div><div class="item">B</div><div class="item">C</div>
+          </div>
+          <h3>justify-content: flex-end</h3>
+          <div class="row jc-end">
+            <div class="item">A</div><div class="item">B</div><div class="item">C</div>
+          </div>
+          <h3>justify-content: center</h3>
+          <div class="row jc-center">
+            <div class="item">A</div><div class="item">B</div><div class="item">C</div>
+          </div>
+          <h3>justify-content: space-between</h3>
+          <div class="row jc-between">
+            <div class="item">A</div><div class="item">B</div><div class="item">C</div>
+          </div>
+          <h3>justify-content: space-around</h3>
+          <div class="row jc-around">
+            <div class="item">A</div><div class="item">B</div><div class="item">C</div>
+          </div>
+          <h3>justify-content: space-evenly</h3>
+          <div class="row jc-evenly">
+            <div class="item">A</div><div class="item">B</div><div class="item">C</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="container"&gt;
+  &lt;div class="item tall"&gt;Tall&lt;/div&gt;
+  &lt;div class="item"&gt;Short&lt;/div&gt;
+  &lt;div class="item medium"&gt;Medium&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  min-height: 200px;
+  border: 2px solid oklch(70% 0.15 275);
+  border-radius: 0.5rem;
+}
+
+.item {
+  padding: 1rem 1.5rem;
+  background: oklch(55% 0.2 275);
+  color: white;
+  border-radius: 0.375rem;
+  font-weight: 600;
+}
+
+.tall { padding-block: 3rem; }
+.medium { padding-block: 2rem; }
+
+/* Try: align-self on one item */
+/* .item:nth-child(2) { align-self: flex-end; } */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a card footer with three buttons. Use <code>justify-content: flex-end</code> and <code>gap: 0.5rem</code> to right-align them. Then change the first button to have <code>margin-inline-end: auto</code> — it pushes away from the other two. This is the "split" pattern we explore deeper in Lesson 27.7.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-27.2-flex-grow-shrink-basis.html">← Lesson 27.2</a>
+      <a href="./lesson-27.4-centering.html">Lesson 27.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

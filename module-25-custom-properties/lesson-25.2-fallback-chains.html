@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25.2 — Fallback Chains and Default Values · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 25</a>
+      <span>Lesson 25.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 25.2 · Custom Properties</p>
+      <h1>Fallback Chains and Default Values</h1>
+      <p class="lead">Nested fallbacks let a component gracefully degrade when custom properties are missing. But beware: a property that exists with an incompatible value triggers "invalid at computed-value time" — a subtle trap that every CSS author must understand.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Nested fallbacks</h2>
+      <p>The <code>var()</code> function accepts a fallback as its second argument. That fallback can itself be another <code>var()</code>:</p>
+      <pre><code>color: var(--brand-color, var(--accent, var(--fallback, oklch(55% 0.2 275))));</code></pre>
+      <p>The browser resolves left to right: if <code>--brand-color</code> is defined, use it. Otherwise try <code>--accent</code>. Then <code>--fallback</code>. Finally the literal value.</p>
+
+      <h3>The guaranteed-defined pattern</h3>
+      <p>Always provide a concrete fallback at the usage site so the component works even when no property is set:</p>
+      <pre><code>.card {
+  background: var(--card-bg, var(--surface, oklch(98% 0.01 275)));
+  color: var(--card-color, var(--on-surface, oklch(20% 0 0)));
+}</code></pre>
+
+      <h2>Invalid at computed-value time (IACVT)</h2>
+      <p>When a custom property is defined but holds a value incompatible with the property it is used in, the browser does not use the fallback. Instead, the property becomes "invalid at computed-value time" and the property resets to its inherited value (or initial if not inherited):</p>
+      <pre><code>:root { --size: blue; }
+.box  { width: var(--size, 100px); }
+/* --size exists, so fallback is skipped.
+   "blue" is invalid for width.
+   Result: width inherits or goes to initial (auto). */</code></pre>
+
+      <h3>Missing vs. invalid</h3>
+      <p>Key distinction:</p>
+      <ul>
+        <li><strong>Missing property</strong> (never declared) — fallback kicks in.</li>
+        <li><strong>Invalid value</strong> (property exists, value wrong) — IACVT, no fallback, inherits initial.</li>
+      </ul>
+      <p>This is why <code>@property</code> registration matters: it lets the browser validate the type at parse time rather than failing silently at computed-value time.</p>
+
+      <h2>Best practices</h2>
+      <p>Keep fallback chains to 2 levels maximum. Beyond that, debugging which value is active becomes impractical. If you need more specificity, define intermediate variables:</p>
+      <pre><code>.card {
+  --_bg: var(--card-bg, var(--surface, oklch(98% 0.01 275)));
+  background: var(--_bg);
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fallback levels</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-25-2 {
+            padding: 1.5rem;
+            font-family: system-ui;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+            gap: 1rem;
+          }
+          .demo-25-2 .card {
+            background: var(--card-bg, var(--surface, oklch(95% 0.02 275)));
+            color: var(--card-color, var(--on-surface, oklch(20% 0 0)));
+            border: 1px solid var(--card-border, oklch(80% 0.05 275));
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+          }
+          .demo-25-2 .card h3 {
+            font-size: 0.85rem;
+            margin: 0 0 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+          }
+          .demo-25-2 .card p {
+            margin: 0;
+            font-size: 0.9rem;
+          }
+          .demo-25-2 .has-surface {
+            --surface: oklch(90% 0.08 150);
+            --on-surface: oklch(15% 0.05 150);
+          }
+          .demo-25-2 .has-card-bg {
+            --card-bg: oklch(45% 0.2 275);
+            --card-color: oklch(98% 0 0);
+            --card-border: oklch(40% 0.22 275);
+          }
+          .demo-25-2 .has-all {
+            --card-bg: oklch(25% 0.05 30);
+            --card-color: oklch(95% 0.02 30);
+            --card-border: oklch(40% 0.15 30);
+            --surface: oklch(90% 0.05 30);
+          }
+        </style>
+        <div class="demo-25-2">
+          <div class="card">
+            <h3>No props set</h3>
+            <p>Uses the final literal fallback in the chain.</p>
+          </div>
+          <div class="card has-surface">
+            <h3>--surface set</h3>
+            <p>Second fallback level activates.</p>
+          </div>
+          <div class="card has-card-bg">
+            <h3>--card-bg set</h3>
+            <p>First fallback level activates.</p>
+          </div>
+          <div class="card has-all">
+            <h3>All props set</h3>
+            <p>Most specific wins (--card-bg).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="wrapper"&gt;
+  &lt;div class="box"&gt;Default&lt;/div&gt;
+  &lt;div class="box themed"&gt;Themed&lt;/div&gt;
+  &lt;div class="box override"&gt;Override&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.wrapper { display: flex; gap: 1rem; }
+
+.box {
+  padding: 1.5rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  /* 3-level fallback chain */
+  background: var(--box-bg, var(--surface, oklch(92% 0.02 275)));
+  color: var(--box-color, var(--on-surface, oklch(20% 0 0)));
+}
+
+/* Set middle fallback */
+.themed {
+  --surface: oklch(85% 0.1 150);
+  --on-surface: oklch(15% 0.08 150);
+}
+
+/* Set direct property */
+.override {
+  --box-bg: oklch(50% 0.22 275);
+  --box-color: oklch(98% 0 0);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a fourth box with <code>--box-bg: not-a-color</code>. Observe what happens: the background will not be the fallback (because <code>--box-bg</code> exists), but it will not be "not-a-color" either. The browser triggers IACVT and the background resolves to the inherited or initial value. This is the trap to remember.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-25.1-inheritance-cascade.html">← Lesson 25.1</a>
+      <a href="./lesson-25.3-space-toggle-hack.html">Lesson 25.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

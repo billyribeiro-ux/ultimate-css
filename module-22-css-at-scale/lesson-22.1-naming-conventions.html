@@ -43,26 +43,70 @@
       <h2>BEM: Block, Element, Modifier</h2>
       <p>BEM encodes the component hierarchy directly in class names. A <code>.card__title--featured</code> tells you the block (card), the element (title), and the modifier (featured) at a glance. The contract: every class is self-documenting.</p>
       <h3>Strengths</h3>
-      <p>Explicit relationships. Zero cascade dependency. Grep-friendly. Easy onboarding for new developers. Works without any build tool or modern CSS feature.</p>
+      <p>Explicit relationships between elements. Zero cascade dependency — specificity is flat by convention. Grep-friendly — you can find every usage of a block instantly. Easy onboarding for new developers who can read the HTML and understand the structure. Works without any build tool or modern CSS feature — pure convention.</p>
       <h3>Weaknesses</h3>
-      <p>Verbose HTML. No cascade awareness means duplication. Modifier explosion for complex states. The naming becomes the architecture rather than the architecture informing the naming.</p>
+      <p>Verbose HTML. A complex component can require 15+ unique class names. No cascade awareness means duplication — shared styles between blocks must be extracted manually. Modifier explosion for complex states (responsive + theme + state = combinatorial naming). The naming becomes the architecture rather than the architecture informing the naming. Teams spend hours debating whether something is a block or an element.</p>
+      <h3>BEM in practice</h3>
+      <pre><code>/* The BEM naming contract */
+.card { }                    /* Block */
+.card__title { }             /* Element */
+.card__title--large { }      /* Modifier */
+.card--featured { }          /* Block modifier */
+.card--featured .card__title { } /* Contextual override */</code></pre>
 
       <h2>CUBE CSS: Composition, Utility, Block, Exception</h2>
-      <p>Andy Bell's CUBE CSS embraces the cascade instead of fighting it. Composition classes handle layout (<code>.flow</code>, <code>.cluster</code>). Utility classes handle single-purpose overrides. Block classes handle component-specific styling. Exceptions handle state with data attributes.</p>
+      <p>Andy Bell's CUBE CSS embraces the cascade instead of fighting it. Composition classes handle layout (<code>.flow</code>, <code>.cluster</code>, <code>.sidebar</code>). Utility classes handle single-purpose overrides (<code>.text-center</code>, <code>.gap-lg</code>). Block classes handle component-specific styling. Exceptions handle state with data attributes (<code>[data-state="active"]</code>).</p>
       <h3>Strengths</h3>
-      <p>Cascade-friendly. Less HTML markup. Leverages browser defaults. Encourages design tokens via utilities.</p>
+      <p>Cascade-friendly — works with the browser rather than against it. Less HTML markup since composition classes are reusable. Leverages browser defaults and inheritance. Encourages design tokens via utility classes. The categorization (C-U-B-E) gives developers a mental model for where styles belong.</p>
       <h3>Weaknesses</h3>
-      <p>Utility class proliferation. Less explicit than BEM for large teams. Requires cascade understanding that junior developers may lack.</p>
+      <p>Utility class proliferation can make HTML harder to read. Less explicit than BEM for large teams where multiple developers touch the same components. Requires cascade understanding that junior developers may lack. The line between "composition" and "utility" is sometimes unclear.</p>
+      <h3>CUBE in practice</h3>
+      <pre><code>/* Composition — layout primitives */
+.flow > * + * { margin-block-start: var(--flow-space, 1em); }
+.cluster { display: flex; flex-wrap: wrap; gap: var(--cluster-gap, 1rem); }
+
+/* Utility — single-purpose overrides */
+.text-center { text-align: center; }
+.bg-primary { background: var(--color-primary); }
+
+/* Block — component-specific */
+.card { border-radius: var(--radius-md); padding: var(--space-lg); }
+
+/* Exception — state via data attributes */
+.card[data-state="featured"] { border-color: var(--color-primary); }</code></pre>
 
       <h2>PE7: Layers + @scope + Custom Properties</h2>
-      <p>PE7 eliminates naming conventions as a concern. With <code>@layer</code> controlling specificity order, <code>@scope</code> controlling reach, and custom properties providing the API, the architecture itself prevents conflicts. You name things descriptively without encoding hierarchy.</p>
+      <p>PE7 eliminates naming conventions as a concern entirely. With <code>@layer</code> controlling specificity order, <code>@scope</code> controlling reach, and custom properties providing the component API, the architecture itself prevents conflicts. You name things descriptively — for humans — without needing to encode hierarchy or specificity information in the name.</p>
       <h3>Strengths</h3>
-      <p>Zero naming convention overhead. Architecture replaces discipline. Cascade is controlled by the browser, not by developer agreement. Scales infinitely without naming collisions.</p>
+      <p>Zero naming convention overhead — no team meetings about naming rules. Architecture replaces discipline — you cannot accidentally break specificity because layers enforce order. Cascade is controlled by the browser, not by developer agreement. Scales infinitely without naming collisions because @scope provides true encapsulation. Components use semantic HTML selectors internally.</p>
       <h3>Weaknesses</h3>
-      <p>Requires modern browser support. Steeper learning curve for the architecture itself. Less established community consensus.</p>
+      <p>Requires modern browser support (@layer is broadly supported, @scope is newer). Steeper learning curve for the architecture itself — developers must understand layers, scope, and custom property inheritance. Less established community consensus compared to decade-old BEM. Tooling ecosystem is still maturing.</p>
+      <h3>PE7 in practice</h3>
+      <pre><code>/* Layer order declared once — this IS the architecture */
+@layer tokens, reset, base, layouts, components, utilities;
+
+/* Components use @scope — no naming convention needed */
+@layer components {
+  @scope (.card) {
+    :scope { border-radius: var(--radius-md); padding: var(--space-lg); }
+    h2 { font-size: var(--text-lg); }
+    footer { border-top: 1px solid var(--border-color); }
+  }
+}</code></pre>
+
+      <h2>Side-by-side: the same card component</h2>
+      <p>Consider a card with a title, body text, a footer with two actions, and a "featured" state. In BEM: <code>.card</code>, <code>.card__title</code>, <code>.card__body</code>, <code>.card__footer</code>, <code>.card__action</code>, <code>.card__action--secondary</code>, <code>.card--featured</code>. Seven classes for one component. In CUBE: <code>.card</code> (block), <code>.flow</code> (composition for spacing), <code>[data-state="featured"]</code> (exception). Three or four classes. In PE7: <code>&lt;article class="card"&gt;</code> with internal elements styled by @scope using semantic HTML selectors. One class for the scope root.</p>
+
+      <h2>The real cost of each approach</h2>
+      <p>BEM's cost is markup verbosity and class name management. As a codebase grows to 500+ components, the naming discipline becomes the bottleneck — developers spend time debating names rather than building features. CUBE's cost is requiring cascade literacy from every team member. PE7's cost is requiring modern browser support and understanding of @layer/@scope — but once understood, the naming question disappears entirely.</p>
 
       <h2>When each is appropriate</h2>
-      <p><strong>BEM</strong>: Legacy codebases, teams with mixed CSS skill levels, projects requiring IE11 support. <strong>CUBE</strong>: Small-to-medium teams that understand the cascade, projects with a strong design token system. <strong>PE7</strong>: New projects targeting modern browsers, teams ready to invest in architectural understanding over naming discipline.</p>
+      <p><strong>BEM</strong>: Legacy codebases, teams with mixed CSS skill levels, projects requiring IE11 support, brownfield projects where consistency with existing code matters more than architectural purity.</p>
+      <p><strong>CUBE</strong>: Small-to-medium teams that understand the cascade, projects with a strong design token system, teams that value minimal HTML markup and embrace utility-first patterns.</p>
+      <p><strong>PE7</strong>: New projects targeting modern browsers, teams ready to invest in architectural understanding over naming discipline, design systems that need to scale across multiple consuming applications without conflicts.</p>
+
+      <h2>Migration path between conventions</h2>
+      <p>Moving from BEM to PE7 is incremental: wrap BEM classes in a <code>@layer legacy</code>, write new components with @scope, and migrate existing components one at a time. The BEM classes continue to work inside the legacy layer — no big-bang rewrite needed. This is covered in detail in Lesson 22.6.</p>
     </section>
 
     <section class="demo">

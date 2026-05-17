@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.8 — Testing CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.8 · Enterprise Architecture</p>
+      <h1>Testing CSS: Visual Regression and Beyond</h1>
+      <p class="lead">CSS has no compiler to catch errors. Without testing, regressions ship silently. The testing pyramid for CSS — from unit-level property checks to full visual regression — gives you confidence that changes work without breaking existing pages.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The CSS testing pyramid</h2>
+
+      <h3>Unit: Does this property compute correctly?</h3>
+      <p>At the lowest level, test that custom properties resolve to expected values, that calc() expressions produce correct results, and that media queries trigger at the right breakpoints. Tools: getComputedStyle() assertions in unit tests. Fast, targeted, but does not catch visual issues.</p>
+      <p>Example unit test: verify that <code>--spacing-md</code> computes to <code>1rem</code> (16px at default font size). Verify that <code>calc(var(--col-count) * var(--col-width))</code> produces the expected total. These are cheap to run (milliseconds) and catch token definition errors immediately.</p>
+
+      <h3>Integration: Do these layers compose correctly?</h3>
+      <p>Test that layer order produces the expected cascade behavior. A component in the <code>components</code> layer should override <code>base</code> styles but yield to <code>utilities</code>. Test that @scope boundaries contain styles correctly — a scoped style should not leak to sibling components. Test that token overrides propagate through the inheritance chain.</p>
+      <p>Example integration test: render two cards side by side, one default and one with a custom property override on its parent. Assert that only the overridden card changes. This catches specificity and inheritance bugs that unit tests miss.</p>
+
+      <h3>Visual: Does it look right?</h3>
+      <p>Screenshot comparison is the ultimate CSS test. Render the component in all its states, capture pixels, compare against a baseline. Any unexpected difference is a failure. Slow but comprehensive — catches issues that no other test type detects: misaligned elements, clipped text, invisible focus rings, and z-index conflicts.</p>
+      <p>The visual layer is expensive (seconds per screenshot, large baseline storage) but irreplaceable. It is the only test that answers the question humans actually care about: does it look correct?</p>
+
+      <h2>Visual regression testing</h2>
+      <p>The workflow: (1) Capture baseline screenshots for every component state. (2) After CSS changes, capture new screenshots. (3) Diff pixel-by-pixel. (4) Human reviews any differences — intentional changes update the baseline, unintentional changes are bugs.</p>
+      <p>Key decisions: viewport sizes to test (mobile, tablet, desktop), states to capture (default, hover, focus, active, disabled, error, loading), and threshold for pixel differences (sub-pixel rendering varies across platforms — allow a small tolerance).</p>
+
+      <h2>The PE7 audit as an automated test</h2>
+      <p>Convert the code review checklist into automated CI checks:</p>
+      <pre><code># Fail if hard-coded colors exist outside tokens
+test "no hard-coded colors in components" {
+  count=$(grep -r "oklch\|#[0-9a-f]" src/components/ | wc -l)
+  assertEquals 0 $count
+}
+
+# Fail if !important is used
+test "no !important usage" {
+  count=$(grep -r "!important" src/layers/ | wc -l)
+  assertEquals 0 $count
+}
+
+# Fail if animations lack reduced-motion
+test "all animations respect reduced-motion" {
+  files=$(grep -rl "@keyframes\|animation:" src/)
+  for f in $files; do
+    grep -q "prefers-reduced-motion" "$f"
+    assertTrue "Missing reduced-motion in $f" $?
+  done
+}</code></pre>
+
+      <h2>Accessibility testing</h2>
+      <p>Automated accessibility checks catch the mechanical issues: color contrast ratios, missing focus indicators, incorrect ARIA usage, insufficient touch targets. Tools like axe-core integrate into CI pipelines and can test every component state programmatically.</p>
+      <p>But automated testing catches only approximately 30% of accessibility issues. Manual testing with screen readers (VoiceOver, NVDA, JAWS) and keyboard-only navigation remains essential. The automated tests are the floor, not the ceiling. A passing axe-core audit does not mean the experience is good — it means the experience is not catastrophically broken.</p>
+      <p>CSS-specific accessibility tests to automate: verify all interactive elements have visible focus styles (compare screenshots with and without <code>:focus-visible</code>), verify text contrast meets WCAG AA (4.5:1), verify that <code>prefers-reduced-motion: reduce</code> disables all animations, verify content reflows without horizontal scroll at 320px viewport width.</p>
+
+      <h2>Cross-browser testing strategy</h2>
+      <p>Test the matrix that matters: Chrome (Blink), Firefox (Gecko), Safari (WebKit). Mobile: iOS Safari, Chrome Android. For each, identify which CSS features are at risk (usually the newest features). Use <code>@supports</code> to gate features and test that fallbacks work in older engines.</p>
+      <p>Prioritize testing by risk: features with partial browser support get the most attention. Features that have been stable across all engines for years (flexbox, grid) need less testing. Focus on the boundaries — where your progressive enhancement kicks in.</p>
+
+      <h2>Tools overview</h2>
+      <p><strong>Visual regression</strong>: Playwright (screenshot comparison built into the test runner), Chromatic (Storybook integration with hosted baselines), Percy (SaaS platform with GitHub integration). <strong>Accessibility</strong>: axe-core (programmatic checks), Lighthouse (comprehensive audits), WAVE (browser extension for manual checking). <strong>Architecture</strong>: Stylelint with custom rules for layer violations, grep-based CI scripts for quick audits. <strong>Performance</strong>: Lighthouse CSS coverage report, Chrome DevTools coverage tab for unused CSS detection.</p>
+
+      <h2>Setting up visual regression with Playwright</h2>
+      <p>A minimal Playwright visual regression test for a component:</p>
+      <pre><code>// button.visual.test.js
+import { test, expect } from '@playwright/test';
+
+test('button - all states', async ({ page }) => {
+  await page.goto('/components/button');
+
+  // Default state
+  await expect(page.locator('.btn')).toHaveScreenshot('btn-default.png');
+
+  // Hover state
+  await page.locator('.btn').hover();
+  await expect(page.locator('.btn')).toHaveScreenshot('btn-hover.png');
+
+  // Focus state
+  await page.locator('.btn').focus();
+  await expect(page.locator('.btn')).toHaveScreenshot('btn-focus.png');
+});
+
+// Test across viewports
+for (const width of [375, 768, 1280]) {
+  test(`card - responsive at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/components/card');
+    await expect(page.locator('.card'))
+      .toHaveScreenshot(`card-${width}.png`);
+  });
+}</code></pre>
+
+      <h2>The CI pipeline for CSS</h2>
+      <p>A complete CI pipeline for CSS quality includes: (1) Linting with Stylelint for syntax and convention errors. (2) Architecture audit scripts checking layer boundaries and token usage. (3) Accessibility checks with axe-core on rendered components. (4) Visual regression comparison against baselines. (5) Bundle size check to prevent CSS bloat.</p>
+      <p>Order matters: run fast checks (lint, grep) first, medium checks (accessibility) second, slow checks (visual regression) last. Fail fast on cheap checks to save CI minutes.</p>
+
+      <h2>Managing visual regression baselines</h2>
+      <p>Baselines need updating when intentional visual changes land. The workflow: (1) PR changes CSS. (2) Visual regression test fails (expected). (3) Reviewer inspects the diff screenshots. (4) If the change is intentional, update baselines with a single command. (5) Updated baselines commit alongside the CSS change. Never auto-accept baseline updates — a human must verify every pixel change.</p>
+
+      <h2>What not to test</h2>
+      <p>Do not test browser-default behavior (you are testing the browser, not your code). Do not test pixel-perfect positioning across browsers (sub-pixel rendering differs — allow a tolerance threshold). Do not test third-party CSS (test your integration with it, not the library itself). Do not test styles that are overridden by consumer applications (that is their responsibility). Focus testing effort where your code can actually break.</p>
+
+      <h2>The testing investment</h2>
+      <p>Setting up CSS testing has a front-loaded cost. Visual regression infrastructure takes 2-3 days to configure properly. Architecture audit scripts take a day. But the ongoing cost is minimal: tests run automatically, and they catch regressions that would otherwise reach production and require emergency hotfixes. The return on investment is measured in incidents prevented, not features shipped.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>CSS testing is not optional at scale — it is infrastructure. Without visual regression tests, every CSS change is a gamble. Without automated architecture checks, governance erodes. Without accessibility testing, you ship exclusion. Build the testing pyramid from day one, not as an afterthought after the first production regression.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.7-design-system-css.html">&larr; Lesson 22.7</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

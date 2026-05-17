@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 27.4 — The Holy Grail of Centering · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 27</a>
+      <span>Lesson 27.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 27.4 · Layout</p>
+      <h1>The Holy Grail of Centering</h1>
+      <p class="lead">CSS centering used to be notoriously difficult. Today we have at least five reliable techniques. Each has a specific use case where it shines. Here they all are, compared side by side, so you always know which one to reach for.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Pattern 1: Flexbox — the all-rounder</h2>
+      <pre><code>.parent {
+  display: flex;
+  justify-content: center;   /* horizontal */
+  align-items: center;       /* vertical */
+}</code></pre>
+      <p><strong>When to use:</strong> centering one or more children inside a container. Works regardless of child dimensions. The default choice for component-level centering.</p>
+
+      <h2>Pattern 2: Grid place-items — the one-liner</h2>
+      <pre><code>.parent {
+  display: grid;
+  place-items: center;
+}</code></pre>
+      <p><strong>When to use:</strong> identical to flex centering but with fewer lines. Particularly clean when you want all items stacked in the center. Preferred for page-level centering (e.g., a loading spinner).</p>
+
+      <h2>Pattern 3: Flex + margin: auto — the single-child method</h2>
+      <pre><code>.parent {
+  display: flex;
+}
+.child {
+  margin: auto;
+}</code></pre>
+      <p><strong>When to use:</strong> centering a single child. <code>margin: auto</code> in a flex container absorbs all available space on both axes. Elegant for cards, modals, and hero CTAs.</p>
+
+      <h2>Pattern 4: Absolute + translate — the overlay method</h2>
+      <pre><code>.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+}</code></pre>
+      <p><strong>When to use:</strong> when the child must be removed from flow (overlays, tooltips, badges). The <code>translate</code> moves the element back by half its own dimensions. Works even when you don't know the child's size.</p>
+
+      <h2>Pattern 5: margin: auto on a block — horizontal only</h2>
+      <pre><code>.child {
+  width: fit-content;   /* or a fixed width */
+  margin-inline: auto;
+}</code></pre>
+      <p><strong>When to use:</strong> horizontal centering of a block element. The classic pattern. Does <em>not</em> work for vertical centering — <code>margin-block: auto</code> only works in flex/grid contexts.</p>
+
+      <h2>The decision tree</h2>
+      <ul>
+        <li><strong>Need both axes centered?</strong> Use Pattern 1 or 2.</li>
+        <li><strong>Single child, both axes?</strong> Pattern 3 is cleanest.</li>
+        <li><strong>Child must overlay content?</strong> Pattern 4.</li>
+        <li><strong>Horizontal only, normal flow?</strong> Pattern 5.</li>
+        <li><strong>Multiple children in a centered stack?</strong> Pattern 2 with <code>place-items: center</code>.</li>
+      </ul>
+
+      <h2>Common mistakes</h2>
+      <ul>
+        <li>Using <code>text-align: center</code> for block centering — it only centers inline/inline-block children.</li>
+        <li>Forgetting <code>height</code> on the parent — vertical centering requires the parent to have more height than the child.</li>
+        <li>Using <code>margin: 0 auto</code> without a width — auto margins collapse to zero when the element is full-width.</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — five centering patterns</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-4 { padding: 1rem; font-family: system-ui; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+          .demo-27-4 .box {
+            height: 150px;
+            border: 2px dashed oklch(70% 0.1 275 / 0.5);
+            border-radius: 0.5rem;
+            position: relative;
+          }
+          .demo-27-4 .label {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.5rem;
+            font-size: 0.65rem;
+            color: oklch(55% 0 0);
+          }
+          .demo-27-4 .dot {
+            width: 40px;
+            height: 40px;
+            background: oklch(55% 0.2 275);
+            border-radius: 50%;
+          }
+          .demo-27-4 .p1 { display: flex; justify-content: center; align-items: center; }
+          .demo-27-4 .p2 { display: grid; place-items: center; }
+          .demo-27-4 .p3 { display: flex; }
+          .demo-27-4 .p3 .dot { margin: auto; }
+          .demo-27-4 .p4 .dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            translate: -50% -50%;
+          }
+          .demo-27-4 .p5 .dot {
+            margin-inline: auto;
+            margin-block-start: 55px;
+          }
+        </style>
+        <div class="demo-27-4">
+          <div class="box p1"><span class="label">flex center</span><div class="dot"></div></div>
+          <div class="box p2"><span class="label">grid place-items</span><div class="dot"></div></div>
+          <div class="box p3"><span class="label">flex + margin:auto</span><div class="dot"></div></div>
+          <div class="box p4"><span class="label">absolute + translate</span><div class="dot"></div></div>
+          <div class="box p5"><span class="label">margin-inline:auto</span><div class="dot"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="hero"&gt;
+  &lt;div class="card"&gt;
+    &lt;h2&gt;Welcome&lt;/h2&gt;
+    &lt;p&gt;This card is perfectly centered.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { margin: 0; font-family: system-ui; }
+
+.hero {
+  min-height: 100vh;
+  background: oklch(95% 0.02 275);
+
+  /* Method 1: Flex centering */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Try Method 2: replace above with
+  display: grid;
+  place-items: center;
+  */
+}
+
+.card {
+  padding: 2rem 3rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px oklch(0% 0 0 / 0.1);
+  text-align: center;
+
+  /* Try Method 3: remove parent alignment, use:
+  margin: auto;
+  */
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a full-viewport overlay (<code>position: fixed; inset: 0</code>) with a modal dialog centered using Pattern 3 (flex + margin:auto). Then add a close button positioned at top-right of the modal using Pattern 4 (absolute + translate). Both centering patterns working together in one component.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-27.3-alignment.html">← Lesson 27.3</a>
+      <a href="./lesson-27.5-flex-wrapping-patterns.html">Lesson 27.5 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

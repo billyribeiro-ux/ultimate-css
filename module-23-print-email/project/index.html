@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Module 23 Project — Print + Email Showcase · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 23</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 23 · Project</p>
+      <h1>Print + Email Showcase</h1>
+      <p class="lead">Two production patterns in one page. Section 1: a print-optimized article with @page rules, page numbers, and linearized layout. Section 2: a complete HTML email template with inline styles, table layout, fluid-hybrid responsive, and dark mode support.</p>
+    </header>
+
+    <!-- ============================================
+         SECTION 1: PRINT-OPTIMIZED ARTICLE
+         ============================================ -->
+    <section class="lesson-body stack">
+      <h2>Part 1: Print-Optimized Article</h2>
+      <p>The article below is styled for both screen and print. Open print preview (Ctrl+P / Cmd+P) to see the transformation: navigation hides, links show their URLs, the layout linearizes, and page breaks are controlled.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Print-ready article</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-proj-print {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(94% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-proj-print .article-page {
+            background: #fff;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 2.5rem;
+            border: 1px solid oklch(88% 0.02 270);
+            border-radius: 0.25rem;
+            box-shadow: 0 4px 16px oklch(0% 0 0 / 0.06);
+          }
+          .demo-23-proj-print .fake-nav {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 0.75rem;
+            background: oklch(25% 0.05 270);
+            border-radius: 0.25rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+          }
+          .demo-23-proj-print .fake-nav a {
+            color: oklch(80% 0.1 270);
+            text-decoration: none;
+          }
+          .demo-23-proj-print .fake-nav .print-note {
+            margin-left: auto;
+            color: oklch(65% 0.1 25);
+            font-size: 0.65rem;
+            font-style: italic;
+          }
+          .demo-23-proj-print .article-meta {
+            font-size: 0.75rem;
+            color: oklch(55% 0.03 270);
+            margin-bottom: 0.5rem;
+          }
+          .demo-23-proj-print h3 {
+            font-size: 1.5rem;
+            color: oklch(20% 0.08 270);
+            margin: 0 0 0.75rem;
+            line-height: 1.3;
+          }
+          .demo-23-proj-print h4 {
+            font-size: 1.1rem;
+            color: oklch(25% 0.06 270);
+            margin: 1.5rem 0 0.5rem;
+          }
+          .demo-23-proj-print p {
+            font-family: Georgia, serif;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: oklch(30% 0.02 270);
+            margin: 0 0 1rem;
+          }
+          .demo-23-proj-print .article-link {
+            color: oklch(40% 0.18 270);
+          }
+          .demo-23-proj-print .article-link::after {
+            content: " (https://example.com/resource)";
+            font-size: 0.75em;
+            color: oklch(50% 0.05 270);
+            font-family: system-ui;
+          }
+          .demo-23-proj-print figure {
+            margin: 1.25rem 0;
+            padding: 1rem;
+            background: oklch(97% 0.01 270);
+            border: 1px solid oklch(90% 0.02 270);
+            border-radius: 0.25rem;
+          }
+          .demo-23-proj-print figure .fig-placeholder {
+            height: 60px;
+            background: oklch(90% 0.04 270);
+            border-radius: 0.15rem;
+            margin-bottom: 0.5rem;
+          }
+          .demo-23-proj-print figcaption {
+            font-size: 0.75rem;
+            color: oklch(50% 0.03 270);
+            font-style: italic;
+          }
+          .demo-23-proj-print .page-footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid oklch(90% 0.02 270);
+            font-size: 0.7rem;
+            color: oklch(55% 0.03 270);
+            text-align: center;
+          }
+          .demo-23-proj-print .break-info {
+            display: inline-block;
+            background: oklch(90% 0.08 145);
+            color: oklch(30% 0.12 145);
+            font-size: 0.6rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.15rem;
+            font-weight: 600;
+            font-family: system-ui;
+            margin-left: 0.25rem;
+          }
+        </style>
+        <div class="demo-23-proj-print">
+          <div class="article-page">
+            <nav class="fake-nav">
+              <a href="#">Home</a>
+              <a href="#">Blog</a>
+              <a href="#">About</a>
+              <span class="print-note">hidden in print</span>
+            </nav>
+            <div class="article-meta">Published May 15, 2026 | 8 min read</div>
+            <h3>The Complete Guide to CSS Print Stylesheets</h3>
+            <p>When users print your page, they deserve a clean, readable document — not a mess of navigation bars and broken layouts. This guide covers everything you need to know about making your web content print-ready.</p>
+
+            <h4>Setting Up <span class="break-info">break-after: avoid</span></h4>
+            <p>The foundation of any print stylesheet is the <code>@media print</code> block. Inside it, you control what shows, what hides, and how content flows across pages. Read the <a href="#" class="article-link">full specification</a> for details.</p>
+
+            <figure>
+              <div class="fig-placeholder"></div>
+              <figcaption>Figure 1 — Print layout comparison. <span class="break-info">break-inside: avoid</span></figcaption>
+            </figure>
+
+            <h4>Page Control <span class="break-info">break-before: page</span></h4>
+            <p>With <code>@page</code> rules you control margins, size, and orientation. Combined with break properties, you get precise control over pagination — headings never orphan, figures never split.</p>
+            <p>The orphans and widows properties ensure at least 3 lines appear on each side of a page break, preventing the "dangling single line" problem that makes printed documents look unprofessional.</p>
+
+            <div class="page-footer">Page 1 of 2 | @page { margin: 2cm } | 12pt body text</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================
+         SECTION 2: HTML EMAIL TEMPLATE
+         ============================================ -->
+    <section class="lesson-body stack">
+      <h2>Part 2: HTML Email Template</h2>
+      <p>A complete, production-ready email template demonstrating: table-based layout, inline styles, fluid-hybrid responsive columns, bulletproof button, and dark mode support. Toggle between light/dark and desktop/mobile to see it adapt.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Complete email template</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-proj-email {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(92% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-proj-email .controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+          }
+          .demo-23-proj-email .ctrl-btn {
+            padding: 0.35rem 0.7rem;
+            border: 1px solid oklch(75% 0.05 270);
+            background: #fff;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 150ms;
+          }
+          .demo-23-proj-email .ctrl-btn.active {
+            background: oklch(35% 0.15 270);
+            color: #fff;
+            border-color: oklch(35% 0.15 270);
+          }
+          .demo-23-proj-email .email-frame {
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 16px oklch(0% 0 0 / 0.1);
+            transition: all 350ms ease;
+          }
+          .demo-23-proj-email .email-frame.mobile {
+            max-width: 320px;
+            border-radius: 1.25rem;
+            border: 3px solid oklch(60% 0.03 270);
+          }
+          /* Light mode email */
+          .demo-23-proj-email .email-frame.light { background: #ffffff; }
+          .demo-23-proj-email .email-frame.dark { background: #1a1a2e; }
+
+          .demo-23-proj-email .ef-header {
+            padding: 24px;
+            text-align: center;
+            transition: background 300ms;
+          }
+          .demo-23-proj-email .light .ef-header { background: #2d2d6b; }
+          .demo-23-proj-email .dark .ef-header { background: #12121f; }
+          .demo-23-proj-email .ef-header h3 {
+            color: #fff;
+            margin: 0 0 4px;
+            font-size: 1.2rem;
+          }
+          .demo-23-proj-email .ef-header p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+            margin: 0;
+          }
+
+          .demo-23-proj-email .ef-body {
+            padding: 24px;
+            transition: all 300ms;
+          }
+          .demo-23-proj-email .ef-body p {
+            font-family: Arial, sans-serif;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0 0 14px;
+            transition: color 300ms;
+          }
+          .demo-23-proj-email .light .ef-body p { color: #333333; }
+          .demo-23-proj-email .dark .ef-body p { color: #d0d0d0; }
+
+          .demo-23-proj-email .ef-columns {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+            transition: all 300ms;
+          }
+          .demo-23-proj-email .mobile .ef-columns {
+            flex-direction: column;
+          }
+          .demo-23-proj-email .ef-col {
+            flex: 1;
+            padding: 14px;
+            border-radius: 4px;
+            transition: all 300ms;
+          }
+          .demo-23-proj-email .light .ef-col { background: #f8f8fc; border: 1px solid #e8e8f0; }
+          .demo-23-proj-email .dark .ef-col { background: #252540; border: 1px solid #333355; }
+          .demo-23-proj-email .ef-col h4 {
+            font-size: 0.8rem;
+            margin: 0 0 6px;
+            transition: color 300ms;
+          }
+          .demo-23-proj-email .light .ef-col h4 { color: #2d2d6b; }
+          .demo-23-proj-email .dark .ef-col h4 { color: #a8a8ff; }
+          .demo-23-proj-email .ef-col p {
+            font-size: 0.75rem !important;
+            margin: 0 !important;
+          }
+
+          .demo-23-proj-email .ef-divider {
+            height: 1px;
+            margin: 16px 0;
+            transition: background 300ms;
+          }
+          .demo-23-proj-email .light .ef-divider { background: #e8e8e8; }
+          .demo-23-proj-email .dark .ef-divider { background: #333355; }
+
+          .demo-23-proj-email .ef-btn-wrap { text-align: center; padding: 8px 0; }
+          .demo-23-proj-email .ef-btn {
+            display: inline-block;
+            padding: 11px 26px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #fff;
+            transition: background 300ms;
+          }
+          .demo-23-proj-email .light .ef-btn { background: #4a3fbf; }
+          .demo-23-proj-email .dark .ef-btn { background: #6c63ff; }
+
+          .demo-23-proj-email .ef-footer {
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 0.65rem;
+            transition: all 300ms;
+          }
+          .demo-23-proj-email .light .ef-footer { background: #f5f5f5; color: #888; }
+          .demo-23-proj-email .dark .ef-footer { background: #12121f; color: #555; }
+
+          .demo-23-proj-email .tech-notes {
+            margin-top: 1.25rem;
+            padding: 1rem;
+            background: oklch(96% 0.02 270);
+            border: 1px solid oklch(90% 0.03 270);
+            border-radius: 0.35rem;
+            font-size: 0.7rem;
+            line-height: 1.5;
+            color: oklch(40% 0.03 270);
+          }
+          .demo-23-proj-email .tech-notes h4 {
+            font-size: 0.75rem;
+            margin: 0 0 0.5rem;
+            color: oklch(30% 0.08 270);
+          }
+          .demo-23-proj-email .tech-notes ul {
+            margin: 0;
+            padding-left: 1.25rem;
+          }
+          .demo-23-proj-email .tech-notes li { margin-bottom: 0.25rem; }
+          .demo-23-proj-email .tech-notes code {
+            background: oklch(92% 0.03 270);
+            padding: 0.1rem 0.3rem;
+            border-radius: 0.15rem;
+            font-size: 0.65rem;
+          }
+        </style>
+        <div class="demo-23-proj-email">
+          <div class="controls">
+            <button class="ctrl-btn active" onclick="let f=this.closest('.demo-23-proj-email').querySelector('.email-frame');f.classList.remove('dark');f.classList.add('light');this.classList.add('active');this.parentElement.querySelectorAll('.ctrl-btn')[1].classList.remove('active');">Light</button>
+            <button class="ctrl-btn" onclick="let f=this.closest('.demo-23-proj-email').querySelector('.email-frame');f.classList.remove('light');f.classList.add('dark');this.classList.add('active');this.parentElement.querySelectorAll('.ctrl-btn')[0].classList.remove('active');">Dark</button>
+            <button class="ctrl-btn active" onclick="let f=this.closest('.demo-23-proj-email').querySelector('.email-frame');f.classList.remove('mobile');this.classList.add('active');this.parentElement.querySelectorAll('.ctrl-btn')[3].classList.remove('active');">Desktop</button>
+            <button class="ctrl-btn" onclick="let f=this.closest('.demo-23-proj-email').querySelector('.email-frame');f.classList.add('mobile');this.classList.add('active');this.parentElement.querySelectorAll('.ctrl-btn')[2].classList.remove('active');">Mobile</button>
+          </div>
+          <div class="email-frame light">
+            <div class="ef-header">
+              <h3>Product Update</h3>
+              <p>May 2026 Release Notes</p>
+            </div>
+            <div class="ef-body">
+              <p>Hi there! We've shipped two major features this month. Here's what's new:</p>
+              <div class="ef-columns">
+                <div class="ef-col">
+                  <h4>Real-time Sync</h4>
+                  <p>Collaborate with your team instantly. Changes appear as they're made.</p>
+                </div>
+                <div class="ef-col">
+                  <h4>API v3</h4>
+                  <p>New endpoints, better rate limits, and full webhook support.</p>
+                </div>
+              </div>
+              <div class="ef-divider"></div>
+              <p>Ready to explore? Click below to see the full changelog and start using these features today.</p>
+              <div class="ef-btn-wrap">
+                <a href="#" class="ef-btn">View Changelog</a>
+              </div>
+            </div>
+            <div class="ef-footer">
+              Acme Corp, 123 Business Lane, SF CA 94102<br>
+              <a href="#" style="color:inherit;">Unsubscribe</a> | <a href="#" style="color:inherit;">View in browser</a>
+            </div>
+          </div>
+          <div class="tech-notes">
+            <h4>Production techniques used:</h4>
+            <ul>
+              <li>Table-based layout with <code>role="presentation"</code></li>
+              <li>All styles inline for Gmail compatibility</li>
+              <li>Fluid-hybrid columns: <code>display:inline-block</code> + <code>max-width</code></li>
+              <li>Bulletproof button: <code>&lt;td&gt;</code> with background + <code>&lt;a&gt;</code> link</li>
+              <li>MSO conditional comments for Outlook fixed-width fallback</li>
+              <li><code>@media (prefers-color-scheme: dark)</code> for Apple Mail/iOS</li>
+              <li><code>&lt;meta name="color-scheme" content="light dark"&gt;</code></li>
+              <li>Transparent logo swap for dark mode</li>
+              <li>600px max-width "spongy" outer container</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Combined print + email showcase --&gt;
+
+&lt;!-- PART 1: Print-optimized article --&gt;
+&lt;article class="print-article"&gt;
+  &lt;nav class="article-nav no-print"&gt;
+    &lt;a href="#"&gt;Home&lt;/a&gt; | &lt;a href="#"&gt;Blog&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;h1&gt;CSS Print &amp; Email Guide&lt;/h1&gt;
+  &lt;p&gt;A comprehensive guide to CSS beyond the browser. Visit &lt;a href="https://example.com/docs" class="ext-link"&gt;the docs&lt;/a&gt; for more.&lt;/p&gt;
+  &lt;h2 class="chapter-break"&gt;Chapter 2: Email Patterns&lt;/h2&gt;
+  &lt;p&gt;HTML email uses table-based layouts and inline styles for maximum compatibility across clients.&lt;/p&gt;
+  &lt;figure&gt;
+    &lt;div class="fig-img"&gt;&lt;/div&gt;
+    &lt;figcaption&gt;Figure 1 — Email client compatibility matrix&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/article&gt;
+
+&lt;hr style="margin:3rem 0;"&gt;
+
+&lt;!-- PART 2: Email template (inline styles) --&gt;
+&lt;table role="presentation" cellpadding="0" cellspacing="0" border="0"
+       class="email-template"
+       style="width:100%;max-width:600px;margin:0 auto;font-family:Arial,sans-serif;"&gt;
+  &lt;tr&gt;
+    &lt;td style="background-color:#2d2d6b;padding:20px;text-align:center;"&gt;
+      &lt;h2 style="color:#fff;font-size:20px;margin:0;"&gt;Newsletter&lt;/h2&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td style="padding:24px;background-color:#fff;"&gt;
+      &lt;p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 16px;"&gt;
+        This is a production email template with inline styles.
+      &lt;/p&gt;
+      &lt;table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"&gt;
+        &lt;tr&gt;
+          &lt;td style="background-color:#4a3fbf;border-radius:4px;"&gt;
+            &lt;a href="#" style="display:inline-block;padding:12px 24px;color:#fff;text-decoration:none;font-weight:bold;font-size:14px;"&gt;Read More&lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td style="background-color:#f5f5f5;padding:16px;text-align:center;font-size:11px;color:#888;"&gt;
+      &amp;copy; 2026 Company | &lt;a href="#" style="color:#888;"&gt;Unsubscribe&lt;/a&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* === PRINT STYLES === */
+body {
+  font-family: Georgia, serif;
+  max-width: 70ch;
+  margin: 2rem auto;
+  padding: 1rem;
+  line-height: 1.7;
+}
+
+.article-nav {
+  padding: 0.5rem;
+  background: #1a1a2e;
+  border-radius: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+.article-nav a { color: #a8b4ff; text-decoration: none; margin: 0 0.5rem; }
+
+h1 { font-size: 2rem; color: #1a1a4e; margin-bottom: 0.5rem; }
+h2 { font-size: 1.4rem; color: #2a2a5a; margin-top: 2rem; }
+.ext-link { color: #4a3fbf; }
+.fig-img { height: 60px; background: #e8e8f0; border-radius: 0.25rem; margin-bottom: 0.5rem; }
+figcaption { font-size: 0.8rem; color: #666; font-style: italic; }
+
+/* Print overrides */
+@media print {
+  .no-print { display: none !important; }
+  body { font-size: 12pt; color: #000; max-width: none; }
+  a.ext-link::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
+  .chapter-break { break-before: page; }
+  figure { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+
+@page { margin: 2cm; }
+@page :first { margin-top: 3cm; }
+
+/* === EMAIL STYLES (progressive enhancement) === */
+.email-template { border: 1px solid #ddd; }
+
+@media (prefers-color-scheme: dark) {
+  .email-template td[style*="background-color:#fff"] {
+    background-color: #1a1a2e !important;
+  }
+  .email-template p { color: #d0d0d0 !important; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Project challenge</h2>
+      <p>Extend this showcase with: (1) Add a @page rule with page numbers using <code>@bottom-center { content: counter(page); }</code>. (2) Add a third email column that collapses on mobile. (3) Implement the VML bulletproof button for Outlook. (4) Add <code>[data-ogsb]</code> targeting for Gmail's forced dark mode. (5) Create a print stylesheet for the email template itself — so printing the email preview produces a clean one-page document.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-23.8-email-dark-mode.html">&larr; Lesson 23.8</a>
+      <a href="../../index.html">Course Home &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/editor.js" defer></script>
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

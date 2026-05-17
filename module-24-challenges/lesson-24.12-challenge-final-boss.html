@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Challenge 12 — The Final Boss · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 24</a>
+      <span>Challenge 12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Challenge 12 · Boss</p>
+      <h1>The Final Boss</h1>
+      <p class="lead">Build a complete single-page portfolio site from scratch — hero with parallax, scroll reveals, project grid with hover effects, contact form with validation, dark mode, fully responsive, fully accessible — all in under 500 lines of CSS. Zero JavaScript.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The ultimate test</h2>
+      <p>This challenge combines every technique from the entire course into one deliverable. You're building a production-quality portfolio page that would impress a hiring manager — not because of flashy gimmicks, but because of the architectural quality of the CSS.</p>
+
+      <h2>Required sections</h2>
+      <ol>
+        <li><strong>Hero:</strong> Full-viewport hero with parallax scroll effect, fluid heading, entrance animation via <code>@starting-style</code></li>
+        <li><strong>About:</strong> Two-column text+skills layout that reflows to single column, reveals on scroll using <code>animation-timeline: view()</code></li>
+        <li><strong>Projects:</strong> Auto-fit grid of project cards with hover scale + shadow transition, gradient placeholders for images</li>
+        <li><strong>Testimonials:</strong> Horizontal scroll or wrap section with quote cards</li>
+        <li><strong>Contact:</strong> Form with CSS-only validation (required fields, email pattern, visual feedback)</li>
+      </ol>
+
+      <h2>Required features</h2>
+      <ul>
+        <li><strong>Dark mode:</strong> Toggle via <code>color-scheme</code> + <code>light-dark()</code> throughout</li>
+        <li><strong>Responsive:</strong> 320px to 2560px, zero media queries (intrinsic only — or minimal media queries for the toggle)</li>
+        <li><strong>Accessible:</strong> Focus indicators, reduced-motion support, semantic HTML, proper contrast</li>
+        <li><strong>Animated:</strong> Entry animations, scroll reveals, hover effects — all respecting <code>prefers-reduced-motion</code></li>
+        <li><strong>Architecture:</strong> PE7 layers (<code>@layer tokens, reset, base, layout, components, animations, utilities</code>)</li>
+      </ul>
+
+      <h2>Constraints</h2>
+      <ul>
+        <li>Under 500 lines of CSS (excluding the HTML)</li>
+        <li>Zero JavaScript</li>
+        <li>No external images — gradients and shapes only</li>
+        <li>PE7 architecture with proper <code>@layer</code> organization</li>
+        <li>Must pass: keyboard navigation, screen reader basics, color contrast</li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Target — portfolio preview</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-24-12 {
+            font-family: system-ui;
+            font-size: 0.75rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            max-height: 28rem;
+            overflow-y: auto;
+          }
+          .demo-24-12 .hero-section {
+            background: linear-gradient(135deg, oklch(25% 0.12 260), oklch(20% 0.15 300));
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+          }
+          .demo-24-12 .hero-section h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-block-end: 0.5rem;
+          }
+          .demo-24-12 .hero-section p {
+            opacity: 0.8;
+            max-inline-size: 35ch;
+            margin-inline: auto;
+            line-height: 1.6;
+          }
+          .demo-24-12 .about-section {
+            padding: 2.5rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+            gap: 2rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-24-12 .about-section h3 {
+            font-size: 1rem;
+            color: oklch(40% 0.15 260);
+            margin-block-end: 0.5rem;
+          }
+          .demo-24-12 .about-section p {
+            line-height: 1.6;
+            color: oklch(35% 0.02 260);
+          }
+          .demo-24-12 .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+          }
+          .demo-24-12 .skill {
+            padding: 0.2rem 0.6rem;
+            background: oklch(90% 0.05 260);
+            border-radius: 1rem;
+            font-size: 0.65rem;
+            color: oklch(40% 0.12 260);
+          }
+          .demo-24-12 .projects-section {
+            padding: 2.5rem 2rem;
+            background: oklch(94% 0.01 260);
+          }
+          .demo-24-12 .projects-section h3 {
+            font-size: 1rem;
+            text-align: center;
+            margin-block-end: 1.5rem;
+            color: oklch(30% 0.1 260);
+          }
+          .demo-24-12 .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+            gap: 1rem;
+          }
+          .demo-24-12 .project-card {
+            background: oklch(99% 0.005 260);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 6px oklch(0% 0 0 / 0.06);
+          }
+          .demo-24-12 .project-thumb {
+            aspect-ratio: 16 / 10;
+          }
+          .demo-24-12 .project-card p {
+            padding: 0.5rem;
+            font-weight: 600;
+            color: oklch(30% 0.02 260);
+          }
+          .demo-24-12 .contact-section {
+            padding: 2.5rem 2rem;
+            background: oklch(97% 0.005 260);
+            text-align: center;
+          }
+          .demo-24-12 .contact-section h3 {
+            font-size: 1rem;
+            color: oklch(40% 0.15 260);
+            margin-block-end: 1rem;
+          }
+          .demo-24-12 .contact-form {
+            display: grid;
+            gap: 0.75rem;
+            max-inline-size: 20rem;
+            margin-inline: auto;
+            text-align: left;
+          }
+          .demo-24-12 .contact-form input,
+          .demo-24-12 .contact-form textarea {
+            padding: 0.5rem;
+            border: 1px solid oklch(85% 0.02 260);
+            border-radius: 0.3rem;
+            font-size: 0.75rem;
+          }
+          .demo-24-12 .contact-form textarea { min-height: 4rem; resize: vertical; }
+          .demo-24-12 .contact-form button {
+            padding: 0.5rem;
+            background: oklch(50% 0.18 260);
+            color: white;
+            border: none;
+            border-radius: 0.3rem;
+            font-weight: 600;
+            cursor: pointer;
+          }
+        </style>
+        <div class="demo-24-12">
+          <div class="hero-section">
+            <h2>Jane Developer</h2>
+            <p>Frontend engineer crafting fast, accessible, beautiful interfaces with modern CSS.</p>
+          </div>
+          <div class="about-section">
+            <div>
+              <h3>About</h3>
+              <p>I build for the web with a focus on performance, accessibility, and clean architecture. CSS is my superpower.</p>
+            </div>
+            <div>
+              <h3>Skills</h3>
+              <div class="skills">
+                <span class="skill">CSS Architecture</span>
+                <span class="skill">Responsive Design</span>
+                <span class="skill">Accessibility</span>
+                <span class="skill">Animation</span>
+                <span class="skill">Design Systems</span>
+                <span class="skill">Performance</span>
+              </div>
+            </div>
+          </div>
+          <div class="projects-section">
+            <h3>Projects</h3>
+            <div class="project-grid">
+              <div class="project-card">
+                <div class="project-thumb" style="background: linear-gradient(135deg, oklch(55% 0.18 260), oklch(45% 0.15 300));"></div>
+                <p>Design System</p>
+              </div>
+              <div class="project-card">
+                <div class="project-thumb" style="background: linear-gradient(135deg, oklch(55% 0.15 150), oklch(45% 0.12 180));"></div>
+                <p>Dashboard UI</p>
+              </div>
+              <div class="project-card">
+                <div class="project-thumb" style="background: linear-gradient(135deg, oklch(60% 0.18 30), oklch(48% 0.15 10));"></div>
+                <p>E-Commerce</p>
+              </div>
+            </div>
+          </div>
+          <div class="contact-section">
+            <h3>Get in Touch</h3>
+            <div class="contact-form">
+              <input placeholder="Name" disabled>
+              <input placeholder="Email" disabled>
+              <textarea placeholder="Message" disabled></textarea>
+              <button disabled>Send Message</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Your challenge</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="portfolio"&gt;
+  &lt;header class="hero"&gt;
+    &lt;h1&gt;Jane Developer&lt;/h1&gt;
+    &lt;p&gt;Frontend engineer crafting fast, accessible, beautiful interfaces with modern CSS.&lt;/p&gt;
+    &lt;a href="#contact" class="cta"&gt;Get in Touch&lt;/a&gt;
+  &lt;/header&gt;
+
+  &lt;section class="about" aria-labelledby="about-heading"&gt;
+    &lt;div class="about-text"&gt;
+      &lt;h2 id="about-heading"&gt;About&lt;/h2&gt;
+      &lt;p&gt;I build for the web with a focus on performance, accessibility, and clean architecture. CSS is my superpower — I believe great interfaces start with great stylesheets.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="about-skills"&gt;
+      &lt;h2&gt;Skills&lt;/h2&gt;
+      &lt;ul class="skill-list"&gt;
+        &lt;li&gt;CSS Architecture&lt;/li&gt;
+        &lt;li&gt;Responsive Design&lt;/li&gt;
+        &lt;li&gt;Accessibility&lt;/li&gt;
+        &lt;li&gt;Animation&lt;/li&gt;
+        &lt;li&gt;Design Systems&lt;/li&gt;
+        &lt;li&gt;Performance&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class="projects" aria-labelledby="projects-heading"&gt;
+    &lt;h2 id="projects-heading"&gt;Projects&lt;/h2&gt;
+    &lt;div class="project-grid"&gt;
+      &lt;article class="project-card"&gt;
+        &lt;div class="project-thumb" style="background: linear-gradient(135deg, oklch(55% 0.18 260), oklch(45% 0.15 300));"&gt;&lt;/div&gt;
+        &lt;h3&gt;Design System&lt;/h3&gt;
+        &lt;p&gt;Component library with tokens, variants, and documentation.&lt;/p&gt;
+      &lt;/article&gt;
+      &lt;article class="project-card"&gt;
+        &lt;div class="project-thumb" style="background: linear-gradient(135deg, oklch(55% 0.15 150), oklch(45% 0.12 180));"&gt;&lt;/div&gt;
+        &lt;h3&gt;Dashboard UI&lt;/h3&gt;
+        &lt;p&gt;Real-time analytics dashboard with responsive grid layout.&lt;/p&gt;
+      &lt;/article&gt;
+      &lt;article class="project-card"&gt;
+        &lt;div class="project-thumb" style="background: linear-gradient(135deg, oklch(60% 0.18 30), oklch(48% 0.15 10));"&gt;&lt;/div&gt;
+        &lt;h3&gt;E-Commerce&lt;/h3&gt;
+        &lt;p&gt;Full storefront with accessible product grid and cart.&lt;/p&gt;
+      &lt;/article&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class="testimonials" aria-labelledby="testimonials-heading"&gt;
+    &lt;h2 id="testimonials-heading"&gt;What People Say&lt;/h2&gt;
+    &lt;div class="testimonial-row"&gt;
+      &lt;blockquote&gt;
+        &lt;p&gt;"Jane's CSS architecture transformed our codebase. Maintenance time dropped 60%."&lt;/p&gt;
+        &lt;cite&gt;— Tech Lead, StartupCo&lt;/cite&gt;
+      &lt;/blockquote&gt;
+      &lt;blockquote&gt;
+        &lt;p&gt;"The most accessible and performant UI we've ever shipped."&lt;/p&gt;
+        &lt;cite&gt;— Product Manager, BigCorp&lt;/cite&gt;
+      &lt;/blockquote&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section id="contact" class="contact" aria-labelledby="contact-heading"&gt;
+    &lt;h2 id="contact-heading"&gt;Get in Touch&lt;/h2&gt;
+    &lt;form class="contact-form"&gt;
+      &lt;div class="field"&gt;
+        &lt;label for="c-name"&gt;Name&lt;/label&gt;
+        &lt;input id="c-name" type="text" required minlength="2" placeholder="Your name"&gt;
+      &lt;/div&gt;
+      &lt;div class="field"&gt;
+        &lt;label for="c-email"&gt;Email&lt;/label&gt;
+        &lt;input id="c-email" type="email" required placeholder="you@example.com"&gt;
+      &lt;/div&gt;
+      &lt;div class="field"&gt;
+        &lt;label for="c-msg"&gt;Message&lt;/label&gt;
+        &lt;textarea id="c-msg" required minlength="10" placeholder="Your message..."&gt;&lt;/textarea&gt;
+      &lt;/div&gt;
+      &lt;button type="submit" class="submit-btn"&gt;Send Message&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/section&gt;
+
+  &lt;footer class="site-footer"&gt;
+    &lt;p&gt;Built with zero JavaScript and under 500 lines of CSS.&lt;/p&gt;
+  &lt;/footer&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* THE FINAL BOSS
+   Build a complete portfolio under 500 lines of CSS.
+   PE7 architecture required.
+
+   @layer tokens, reset, base, layout, components, animations, utilities;
+*/
+
+/* Your CSS here — aim for under 500 lines */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Strategy</h2>
+      <p>Work in layers: (1) Set up the <code>@layer</code> order and tokens first. (2) Add reset + base typography. (3) Build the layout — the portfolio is a single-column stack. (4) Style each component section. (5) Add animations last — entrance via <code>@starting-style</code>, scroll reveals via <code>animation-timeline: view()</code>, hover effects on cards. (6) Add dark mode by replacing token values with <code>light-dark()</code>. (7) Add reduced-motion support. Count your lines — stay under 500.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-24.11-challenge-accessible-component.html">&larr; Challenge 11</a>
+      <a href="./project/index.html">Solutions &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

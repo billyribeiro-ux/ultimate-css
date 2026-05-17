@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project — Architecture Decision Record · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../../index.html">Course</a>
+      <a href="../index.html">Module 22</a>
+      <span>Project</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 22 · Project</p>
+      <h1>Architecture Decision Record</h1>
+      <p class="lead">An ADR documents why a technical decision was made. This template captures the PE7 architecture decision as an example. Use this format for any CSS architecture proposal your team evaluates.</p>
+    </header>
+
+    <section class="demo">
+      <h2>ADR-001: Adopt PE7 CSS Architecture</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-p {
+            font-family: system-ui;
+            padding: 2rem;
+            max-inline-size: 680px;
+            margin-inline: auto;
+          }
+          .demo-22-p .adr-meta {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.25rem 1rem;
+            font-size: 0.8rem;
+            margin-block-end: 2rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 275);
+            border-radius: 0.5rem;
+            border-left: 4px solid oklch(48% 0.18 275);
+          }
+          .demo-22-p .adr-meta dt { font-weight: 600; color: oklch(35% 0.02 275); }
+          .demo-22-p .adr-meta dd { color: oklch(45% 0.02 275); margin: 0; }
+          .demo-22-p .adr-section {
+            margin-block-end: 2rem;
+          }
+          .demo-22-p .adr-section h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: oklch(48% 0.18 275);
+            margin-block-end: 0.75rem;
+            padding-block-end: 0.5rem;
+            border-bottom: 1px solid oklch(90% 0.01 275);
+          }
+          .demo-22-p .adr-section p {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: oklch(30% 0.02 275);
+            margin-block-end: 0.75rem;
+          }
+          .demo-22-p .adr-section ul {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: oklch(30% 0.02 275);
+            padding-inline-start: 1.25rem;
+            margin-block-end: 0.75rem;
+          }
+          .demo-22-p .adr-section li { margin-block-end: 0.4rem; }
+          .demo-22-p .status-badge {
+            display: inline-block;
+            background: oklch(92% 0.05 145);
+            color: oklch(35% 0.12 145);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+          }
+          .demo-22-p .checklist {
+            background: oklch(97% 0.005 275);
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            margin-block-start: 2rem;
+          }
+          .demo-22-p .checklist h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: oklch(48% 0.18 275);
+            margin-block-end: 1rem;
+            border-bottom: none;
+            padding-block-end: 0;
+          }
+          .demo-22-p .checklist ul {
+            list-style: none;
+            padding: 0;
+          }
+          .demo-22-p .checklist li {
+            font-size: 0.8rem;
+            color: oklch(35% 0.02 275);
+            padding: 0.4rem 0;
+            padding-inline-start: 1.5rem;
+            position: relative;
+            border-bottom: 1px solid oklch(92% 0.005 275);
+          }
+          .demo-22-p .checklist li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            inline-size: 0.85rem;
+            block-size: 0.85rem;
+            border: 1.5px solid oklch(70% 0.02 275);
+            border-radius: 0.2rem;
+          }
+          .demo-22-p .checklist li.checked::before {
+            background: oklch(48% 0.18 275);
+            border-color: oklch(48% 0.18 275);
+          }
+          .demo-22-p .checklist li.checked::after {
+            content: "";
+            position: absolute;
+            left: 0.25rem;
+            top: 0.65rem;
+            inline-size: 0.35rem;
+            block-size: 0.55rem;
+            border-right: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+          }
+        </style>
+        <div class="demo-22-p">
+          <dl class="adr-meta">
+            <dt>Status</dt>
+            <dd><span class="status-badge">Accepted</span></dd>
+            <dt>Date</dt>
+            <dd>2026-01-15</dd>
+            <dt>Decision Makers</dt>
+            <dd>Frontend Architecture Team</dd>
+            <dt>Supersedes</dt>
+            <dd>ADR-000 (BEM + SCSS Architecture)</dd>
+          </dl>
+
+          <div class="adr-section">
+            <h3>Context</h3>
+            <p>Our current CSS architecture uses BEM naming with SCSS compilation. We have 12,000 lines of CSS across 3 applications. Pain points include:</p>
+            <ul>
+              <li>Specificity conflicts requiring !important (47 instances across the codebase)</li>
+              <li>Inconsistent naming conventions between teams (some use BEM, some use utility classes)</li>
+              <li>No architectural boundary enforcement — any file can override any other file</li>
+              <li>Theme support requires duplicating component styles per theme</li>
+              <li>Design tokens are hard-coded values scattered across component files</li>
+            </ul>
+          </div>
+
+          <div class="adr-section">
+            <h3>Decision</h3>
+            <p>We will adopt the PE7 architecture: @layer for cascade control, @scope for component boundaries, and custom properties for theming and component APIs. Migration will follow the incremental strategy (Lesson 22.6) over 6 months.</p>
+            <p>Key architectural choices:</p>
+            <ul>
+              <li>Layer order: reset, tokens, base, layouts, components, utilities, overrides</li>
+              <li>All design tokens centralized in the tokens layer as custom properties</li>
+              <li>Component APIs exposed via documented custom properties</li>
+              <li>Themes implemented as token reassignment via data attributes</li>
+              <li>No naming convention enforced — @scope provides encapsulation</li>
+            </ul>
+          </div>
+
+          <div class="adr-section">
+            <h3>Consequences</h3>
+            <p><strong>Positive:</strong> Zero specificity conflicts (layers control order). Theme support without component duplication. Clear ownership model for tokens. Architecture is enforced by the browser, not by developer discipline.</p>
+            <p><strong>Negative:</strong> Requires modern browser baseline (no IE11). Team needs training on @layer and @scope. Existing SCSS tooling must be deprecated. 6-month migration period with legacy and modern code coexisting.</p>
+            <p><strong>Risks:</strong> Incomplete migration leaving the codebase in a hybrid state. Team resistance to abandoning familiar BEM patterns. Third-party CSS libraries that do not use @layer requiring wrapper layers.</p>
+          </div>
+
+          <div class="checklist">
+            <h3>Architecture Evaluation Checklist</h3>
+            <ul>
+              <li class="checked">Does it prevent specificity conflicts at scale?</li>
+              <li class="checked">Does it support multiple themes without component duplication?</li>
+              <li class="checked">Does it centralize design tokens with clear ownership?</li>
+              <li class="checked">Does it provide component encapsulation?</li>
+              <li class="checked">Can it be adopted incrementally?</li>
+              <li class="checked">Does it work with third-party CSS?</li>
+              <li class="checked">Does it reduce or eliminate !important usage?</li>
+              <li class="checked">Can architecture violations be detected automatically?</li>
+              <li class="checked">Does it have a clear documentation pattern?</li>
+              <li>Does it support the required browser matrix? (verify per project)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>ADR Template</h2>
+      <p>Use this structure for any CSS architecture decision your team faces:</p>
+      <pre><code>ADR-[number]: [Title]
+
+Status: [Proposed | Accepted | Deprecated | Superseded]
+Date: [YYYY-MM-DD]
+Decision Makers: [Team or individuals]
+Supersedes: [Previous ADR if applicable]
+
+## Context
+What problem are we solving? What pain points exist?
+What constraints do we operate under?
+
+## Decision
+What architecture did we choose? Why?
+What are the key structural choices?
+
+## Consequences
+Positive: What improvements do we expect?
+Negative: What trade-offs are we accepting?
+Risks: What could go wrong?
+
+## Review Date
+When will we revisit this decision?</code></pre>
+
+      <h2>When to write an ADR</h2>
+      <p>Write an ADR when: adopting a new methodology, introducing a build tool, changing the token structure, adding a new layer, or deprecating a pattern. Do not write an ADR for individual component decisions or single-property styling choices. The threshold: if the decision affects multiple developers or multiple sprints of work, it deserves an ADR.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Your task</h2>
+      <p>Write your own ADR for a CSS architecture decision. It can be PE7, BEM, CUBE, or a hybrid approach. Use the Context, Decision, Consequences format. Fill in the evaluation checklist honestly — no architecture scores perfectly on every criterion. The value of the ADR is not the decision itself, but the documented reasoning that future developers can reference when they ask "why did we do it this way?"</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="../lesson-22.8-css-testing.html">&larr; Lesson 22.8</a>
+      <a href="../../index.html">Course Home &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../../assets/js/pwa.js" defer></script>
+</body>
+</html>

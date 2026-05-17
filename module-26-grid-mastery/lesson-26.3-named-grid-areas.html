@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.3 — Named Grid Areas: Visual Layout in CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.3 · Layout</p>
+      <h1>Named Grid Areas: Visual Layout in CSS</h1>
+      <p class="lead"><code>grid-template-areas</code> lets you draw your layout as ASCII art directly in CSS. It is the most readable layout pattern ever created — you can see the page structure at a glance.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The syntax</h2>
+      <pre><code>.page {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header  header"
+    "sidebar content"
+    "footer  footer";
+}
+.page-header  { grid-area: header; }
+.page-sidebar { grid-area: sidebar; }
+.page-content { grid-area: content; }
+.page-footer  { grid-area: footer; }</code></pre>
+      <p>Each quoted string is a row. Area names must form rectangles. A <code>.</code> denotes an empty cell.</p>
+
+      <h3>Empty cells</h3>
+      <pre><code>grid-template-areas:
+  "header header header"
+  "sidebar . content"
+  "footer footer footer";</code></pre>
+      <p>The <code>.</code> leaves the middle cell of row 2 empty. Multiple dots (<code>...</code>) work too for visual alignment.</p>
+
+      <h2>Responsive restructuring</h2>
+      <p>The magic: change <code>grid-template-areas</code> in a media query or container query to completely restructure your layout without touching HTML:</p>
+      <pre><code>@container (max-width: 40rem) {
+  .page {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "content"
+      "sidebar"
+      "footer";
+  }
+}</code></pre>
+
+      <h2>Implicit named lines</h2>
+      <p>When you create an area named <code>content</code>, the browser automatically creates lines named <code>content-start</code> and <code>content-end</code> on both axes. You can reference these lines for placement too.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full page layout with named areas</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-3 {
+            container-type: inline-size;
+            font-family: system-ui;
+            font-size: 0.8rem;
+            padding: 0.5rem;
+          }
+          .demo-26-3 .page {
+            display: grid;
+            grid-template-columns: 8rem 1fr;
+            grid-template-rows: auto 1fr auto;
+            grid-template-areas:
+              "header  header"
+              "sidebar content"
+              "footer  footer";
+            gap: 0.5rem;
+            min-height: 16rem;
+          }
+          .demo-26-3 .area {
+            display: grid;
+            place-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+          }
+          .demo-26-3 .hdr     { grid-area: header; background: oklch(65% 0.18 275); color: white; }
+          .demo-26-3 .side    { grid-area: sidebar; background: oklch(82% 0.1 160); color: oklch(25% 0.05 160); }
+          .demo-26-3 .main    { grid-area: content; background: oklch(94% 0.03 220); color: oklch(30% 0.05 220); }
+          .demo-26-3 .ftr     { grid-area: footer; background: oklch(45% 0.12 275); color: white; }
+
+          @container (max-width: 28rem) {
+            .demo-26-3 .page {
+              grid-template-columns: 1fr;
+              grid-template-areas:
+                "header"
+                "content"
+                "sidebar"
+                "footer";
+            }
+          }
+        </style>
+        <div class="demo-26-3">
+          <div class="page">
+            <div class="area hdr">header</div>
+            <div class="area side">sidebar</div>
+            <div class="area main">content</div>
+            <div class="area ftr">footer</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;header class="area hdr"&gt;Header&lt;/header&gt;
+  &lt;nav class="area nav"&gt;Nav&lt;/nav&gt;
+  &lt;main class="area main"&gt;Main Content&lt;/main&gt;
+  &lt;aside class="area side"&gt;Aside&lt;/aside&gt;
+  &lt;footer class="area ftr"&gt;Footer&lt;/footer&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; margin: 0; }
+
+.page {
+  display: grid;
+  grid-template-columns: 10rem 1fr 10rem;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "hdr  hdr   hdr"
+    "nav  main  side"
+    "ftr  ftr   ftr";
+  gap: 0.5rem;
+  min-height: 80vh;
+}
+
+.area {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+.hdr  { grid-area: hdr; background: oklch(65% 0.18 275); color: white; }
+.nav  { grid-area: nav; background: oklch(82% 0.1 160); }
+.main { grid-area: main; background: oklch(94% 0.03 220); }
+.side { grid-area: side; background: oklch(82% 0.1 50); }
+.ftr  { grid-area: ftr; background: oklch(45% 0.12 275); color: white; }
+
+/* Try restructuring for mobile: single column */
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a container query at <code>max-width: 35rem</code> that stacks the layout into a single column in this order: header, nav, main, aside, footer. Then try using <code>.</code> to leave an empty cell — for instance <code>"nav . side"</code> creates a gap between nav and side.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.2-grid-placement.html">← Lesson 26.2</a>
+      <a href="./lesson-26.4-auto-fit-auto-fill.html">Lesson 26.4 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

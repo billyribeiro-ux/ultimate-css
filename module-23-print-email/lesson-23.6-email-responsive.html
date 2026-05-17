@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23.6 — Responsive HTML Emails · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 23</a>
+      <span>Lesson 23.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 23.6 · HTML Email</p>
+      <h1>Responsive HTML Emails</h1>
+      <p class="lead">Over 60% of emails are opened on mobile. But with Gmail stripping styles and Outlook ignoring media queries, how do you make a responsive email? The answer is the fluid-hybrid method — responsive by default, no media queries required.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The @media query approach</h2>
+      <p>Media queries work in Apple Mail, iOS Mail, and some Android clients. They do NOT work in Gmail (webmail) or Outlook desktop:</p>
+      <pre><code>&lt;style&gt;
+  @media screen and (max-width: 600px) {
+    .container { width: 100% !important; }
+    .column { display: block !important; width: 100% !important; }
+    .mobile-hide { display: none !important; }
+  }
+&lt;/style&gt;</code></pre>
+      <p>Since Gmail strips <code>&lt;style&gt;</code> tags, media queries are an enhancement, not the base.</p>
+
+      <h2>The fluid-hybrid method</h2>
+      <p>This technique makes emails responsive without media queries using a combination of <code>max-width</code>, <code>width: 100%</code>, and Outlook-specific conditional comments:</p>
+      <pre><code>&lt;!--[if mso]&gt;
+&lt;table role="presentation" cellpadding="0" cellspacing="0" width="600" align="center"&gt;
+&lt;tr&gt;&lt;td&gt;
+&lt;![endif]--&gt;
+
+&lt;div style="max-width:600px;margin:0 auto;"&gt;
+  &lt;!-- Content flows at 100% width on mobile,
+       capped at 600px on desktop --&gt;
+&lt;/div&gt;
+
+&lt;!--[if mso]&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;![endif]--&gt;</code></pre>
+      <p>Outlook ignores <code>max-width</code> but reads the conditional comment table. All other clients ignore the comments and use the <code>div</code> with <code>max-width</code>.</p>
+
+      <h2>The 600px convention</h2>
+      <p>Why 600px? It's the widest that fits in most email client preview panes (Outlook's reading pane, Gmail's layout). Wider emails get horizontal scrollbars. It's become the industry standard maximum.</p>
+
+      <h2>The "spongy" outer container</h2>
+      <p>The outer wrapper uses this pattern to be fluid on mobile, fixed on desktop:</p>
+      <pre><code>&lt;table role="presentation" cellpadding="0" cellspacing="0" border="0"
+       style="width:100%;max-width:600px;margin:0 auto;"&gt;
+  &lt;tr&gt;
+    &lt;td style="padding:20px;"&gt;
+      &lt;!-- Email content --&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+
+      <h2>Fluid-hybrid columns</h2>
+      <p>Two-column layouts use <code>display:inline-block</code> with percentage widths. On small screens, they stack naturally:</p>
+      <pre><code>&lt;!--[if mso]&gt;
+&lt;table role="presentation" width="600"&gt;&lt;tr&gt;
+&lt;td width="290" valign="top"&gt;
+&lt;![endif]--&gt;
+&lt;div style="display:inline-block;width:100%;max-width:290px;vertical-align:top;"&gt;
+  Column 1 content
+&lt;/div&gt;
+&lt;!--[if mso]&gt;&lt;/td&gt;
+&lt;td width="290" valign="top"&gt;
+&lt;![endif]--&gt;
+&lt;div style="display:inline-block;width:100%;max-width:290px;vertical-align:top;"&gt;
+  Column 2 content
+&lt;/div&gt;
+&lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;![endif]--&gt;</code></pre>
+
+      <h2>Dark mode in email</h2>
+      <p><code>@media (prefers-color-scheme: dark)</code> works in Apple Mail, iOS Mail, and Outlook on macOS. It's the enhancement layer for dark mode support:</p>
+      <pre><code>@media (prefers-color-scheme: dark) {
+  .email-body { background-color: #1a1a2e !important; }
+  .email-text { color: #e0e0e0 !important; }
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fluid-hybrid responsive email</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-23-6 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(92% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-23-6 .preview-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+          }
+          .demo-23-6 .preview-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: oklch(50% 0.05 270);
+            margin-bottom: 0.5rem;
+          }
+          .demo-23-6 .desktop-view {
+            background: #fff;
+            border: 1px solid oklch(85% 0.02 270);
+            border-radius: 0.25rem;
+            padding: 1rem;
+            box-shadow: 0 2px 8px oklch(0% 0 0 / 0.06);
+          }
+          .demo-23-6 .mobile-view {
+            background: #fff;
+            border: 2px solid oklch(70% 0.03 270);
+            border-radius: 1rem;
+            padding: 1rem 0.75rem;
+            max-width: 220px;
+            box-shadow: 0 2px 8px oklch(0% 0 0 / 0.06);
+          }
+          .demo-23-6 .email-container {
+            font-family: Arial, sans-serif;
+            font-size: 0.7rem;
+            line-height: 1.5;
+          }
+          .demo-23-6 .em-header {
+            background: #2d2d6b;
+            color: #fff;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border-radius: 0.2rem 0.2rem 0 0;
+          }
+          .demo-23-6 .em-content { padding: 12px 16px; }
+          .demo-23-6 .em-cols {
+            display: flex;
+            gap: 8px;
+          }
+          .demo-23-6 .mobile-view .em-cols {
+            flex-direction: column;
+          }
+          .demo-23-6 .em-col {
+            flex: 1;
+            background: #f8f8fc;
+            padding: 10px;
+            border-radius: 0.2rem;
+            border: 1px solid #e8e8f0;
+          }
+          .demo-23-6 .em-col h4 {
+            font-size: 0.65rem;
+            margin: 0 0 4px;
+            color: #333;
+          }
+          .demo-23-6 .em-col p {
+            font-size: 0.6rem;
+            margin: 0;
+            color: #666;
+          }
+          .demo-23-6 .em-footer {
+            background: #f5f5f5;
+            padding: 8px 16px;
+            text-align: center;
+            font-size: 0.55rem;
+            color: #999;
+            border-radius: 0 0 0.2rem 0.2rem;
+          }
+        </style>
+        <div class="demo-23-6">
+          <div class="preview-wrap">
+            <div>
+              <div class="preview-label">Desktop (600px container)</div>
+              <div class="desktop-view">
+                <div class="email-container">
+                  <div class="em-header">Newsletter</div>
+                  <div class="em-content">
+                    <p style="margin:0 0 8px;color:#333;">Two columns side by side at 600px:</p>
+                    <div class="em-cols">
+                      <div class="em-col"><h4>Feature A</h4><p>Description of the first feature goes here.</p></div>
+                      <div class="em-col"><h4>Feature B</h4><p>Description of the second feature goes here.</p></div>
+                    </div>
+                  </div>
+                  <div class="em-footer">Unsubscribe | View in browser</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="preview-label">Mobile (stacked columns)</div>
+              <div class="mobile-view">
+                <div class="email-container">
+                  <div class="em-header">Newsletter</div>
+                  <div class="em-content">
+                    <p style="margin:0 0 8px;color:#333;">Columns stack on mobile:</p>
+                    <div class="em-cols">
+                      <div class="em-col"><h4>Feature A</h4><p>Description of the first feature.</p></div>
+                      <div class="em-col"><h4>Feature B</h4><p>Description of the second feature.</p></div>
+                    </div>
+                  </div>
+                  <div class="em-footer">Unsubscribe | View in browser</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Fluid-hybrid email template --&gt;
+&lt;!-- Outer container: 100% width, max 600px --&gt;
+&lt;table role="presentation" cellpadding="0" cellspacing="0" border="0"
+       style="width:100%;max-width:600px;margin:0 auto;font-family:Arial,sans-serif;"&gt;
+  &lt;!-- Header --&gt;
+  &lt;tr&gt;
+    &lt;td style="background-color:#2d2d6b;padding:20px;text-align:center;"&gt;
+      &lt;h1 style="color:#ffffff;font-size:22px;margin:0;"&gt;Newsletter&lt;/h1&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;!-- Body --&gt;
+  &lt;tr&gt;
+    &lt;td style="padding:24px;background-color:#ffffff;"&gt;
+      &lt;p style="font-size:16px;color:#333;margin:0 0 16px;"&gt;
+        Check out our latest features:
+      &lt;/p&gt;
+      &lt;!-- Two-column fluid-hybrid --&gt;
+      &lt;div style="font-size:0;text-align:center;"&gt;
+        &lt;div style="display:inline-block;width:100%;max-width:260px;vertical-align:top;text-align:left;"&gt;
+          &lt;div style="padding:10px;"&gt;
+            &lt;h3 style="font-size:16px;color:#2d2d6b;margin:0 0 8px;"&gt;Feature One&lt;/h3&gt;
+            &lt;p style="font-size:14px;color:#555;margin:0;line-height:1.5;"&gt;A great new capability that your team will love.&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div style="display:inline-block;width:100%;max-width:260px;vertical-align:top;text-align:left;"&gt;
+          &lt;div style="padding:10px;"&gt;
+            &lt;h3 style="font-size:16px;color:#2d2d6b;margin:0 0 8px;"&gt;Feature Two&lt;/h3&gt;
+            &lt;p style="font-size:14px;color:#555;margin:0;line-height:1.5;"&gt;Another improvement that makes everything faster.&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;!-- Footer --&gt;
+  &lt;tr&gt;
+    &lt;td style="background-color:#f5f5f5;padding:16px;text-align:center;font-size:12px;color:#999;"&gt;
+      &lt;a href="#" style="color:#999;"&gt;Unsubscribe&lt;/a&gt; | &lt;a href="#" style="color:#999;"&gt;View in browser&lt;/a&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Base: no styles needed — everything is inline.
+   These are progressive enhancements for
+   clients that support &lt;style&gt; blocks. */
+
+body {
+  margin: 0;
+  padding: 20px;
+  background: #e8e8e8;
+}
+
+/* Enhancement for Apple Mail / iOS */
+@media screen and (max-width: 600px) {
+  table {
+    width: 100% !important;
+  }
+  div[style*="max-width:260px"] {
+    max-width: 100% !important;
+    display: block !important;
+  }
+}
+
+/* Dark mode enhancement */
+@media (prefers-color-scheme: dark) {
+  body { background: #1a1a1a !important; }
+  td[style*="background-color:#ffffff"] {
+    background-color: #2a2a3e !important;
+  }
+  p { color: #d0d0d0 !important; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a two-column email using the fluid-hybrid method. Use <code>display:inline-block</code> with <code>max-width:280px</code> for each column. Resize the preview below 600px — the columns should stack naturally without any media query. Add MSO conditional comments for Outlook (they won't render in your browser, but the structure should be correct).</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-23.5-email-css-constraints.html">&larr; Lesson 23.5</a>
+      <a href="./lesson-23.7-email-components.html">Lesson 23.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

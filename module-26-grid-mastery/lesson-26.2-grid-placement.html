@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26.2 — Placing Items: Lines, Spans, and Named Lines · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 26</a>
+      <span>Lesson 26.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 26.2 · Layout</p>
+      <h1>Placing Items: Lines, Spans, and Named Lines</h1>
+      <p class="lead">Grid lines are the invisible boundaries between tracks. You place items by referencing these lines — by number, by span count, or by name. Mastering placement is what separates basic grids from precise layouts.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Line numbers</h2>
+      <p>A 3-column grid has 4 column lines (1, 2, 3, 4). Items are placed using start/end lines:</p>
+      <pre><code>.item {
+  grid-column: 1 / 3;   /* spans from line 1 to line 3 (2 columns) */
+  grid-row: 1 / 2;      /* occupies first row */
+}</code></pre>
+
+      <h3>The span keyword</h3>
+      <p>Instead of specifying end lines, use <code>span</code> to say "take N tracks":</p>
+      <pre><code>.item {
+  grid-column: span 2;  /* span 2 columns from auto-placed position */
+  grid-row: span 3;     /* span 3 rows */
+}</code></pre>
+
+      <h3>The -1 trick</h3>
+      <p>Negative line numbers count from the end of the <em>explicit</em> grid. <code>-1</code> is always the last line:</p>
+      <pre><code>.full-width {
+  grid-column: 1 / -1;  /* spans entire grid width */
+}</code></pre>
+
+      <h2>Named lines</h2>
+      <p>You can name lines in your template definition using square brackets:</p>
+      <pre><code>.grid {
+  grid-template-columns:
+    [sidebar-start] 20rem
+    [sidebar-end content-start] 1fr
+    [content-end];
+}
+.sidebar { grid-column: sidebar-start / sidebar-end; }
+.main    { grid-column: content-start / content-end; }</code></pre>
+      <p>Named lines make layouts self-documenting. When you read <code>grid-column: content-start / content-end</code>, the intent is obvious without counting line numbers.</p>
+
+      <h3>Repeat with named lines</h3>
+      <pre><code>grid-template-columns: repeat(3, [col-start] 1fr [col-end]);
+/* Creates: [col-start] 1fr [col-end col-start] 1fr [col-end col-start] 1fr [col-end] */
+/* Reference: col-start 2 = second line named "col-start" */</code></pre>
+
+      <h2>grid-row + grid-column shorthands</h2>
+      <p><code>grid-column: 1 / 3</code> is shorthand for <code>grid-column-start: 1; grid-column-end: 3;</code>. The <code>grid-area</code> shorthand packs all four: <code>grid-area: row-start / col-start / row-end / col-end</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Explicit placement with line numbers and names</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-26-2 {
+            display: grid;
+            grid-template-columns: [sidebar-start] 8rem [sidebar-end content-start] 1fr [content-end aside-start] 8rem [aside-end];
+            grid-template-rows: [header-start] auto [header-end main-start] 6rem [main-end footer-start] auto [footer-end];
+            gap: 0.5rem;
+            padding: 1rem;
+            font-family: system-ui;
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+          .demo-26-2 .cell {
+            display: grid;
+            place-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+          }
+          .demo-26-2 .header {
+            grid-column: 1 / -1;
+            background: oklch(70% 0.15 275);
+            color: oklch(98% 0 0);
+          }
+          .demo-26-2 .sidebar {
+            grid-column: sidebar-start / sidebar-end;
+            background: oklch(80% 0.1 160);
+            color: oklch(20% 0.05 160);
+          }
+          .demo-26-2 .content {
+            grid-column: content-start / content-end;
+            background: oklch(92% 0.04 220);
+            color: oklch(30% 0.05 220);
+          }
+          .demo-26-2 .aside {
+            grid-column: aside-start / aside-end;
+            background: oklch(80% 0.1 50);
+            color: oklch(20% 0.05 50);
+          }
+          .demo-26-2 .footer {
+            grid-column: 1 / -1;
+            background: oklch(50% 0.12 275);
+            color: oklch(98% 0 0);
+          }
+        </style>
+        <div class="demo-26-2">
+          <div class="cell header">Header (1 / -1)</div>
+          <div class="cell sidebar">Sidebar (named)</div>
+          <div class="cell content">Content (named)</div>
+          <div class="cell aside">Aside (named)</div>
+          <div class="cell footer">Footer (1 / -1)</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
+  &lt;div class="cell header"&gt;Header&lt;/div&gt;
+  &lt;div class="cell sidebar"&gt;Sidebar&lt;/div&gt;
+  &lt;div class="cell content"&gt;Content&lt;/div&gt;
+  &lt;div class="cell aside"&gt;Aside&lt;/div&gt;
+  &lt;div class="cell footer"&gt;Footer&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    [sidebar-start] 10rem
+    [sidebar-end content-start] 1fr
+    [content-end aside-start] 10rem
+    [aside-end];
+  grid-template-rows: auto 8rem auto;
+  gap: 0.5rem;
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background: oklch(80% 0.1 250);
+}
+
+.header { grid-column: 1 / -1; background: oklch(70% 0.15 275); color: white; }
+.sidebar { grid-column: sidebar-start / sidebar-end; }
+.content { grid-column: content-start / content-end; background: oklch(92% 0.04 220); }
+.aside { grid-column: aside-start / aside-end; background: oklch(80% 0.1 50); }
+.footer { grid-column: 1 / -1; background: oklch(50% 0.12 275); color: white; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Make the sidebar span 2 rows using <code>grid-row: 2 / span 2</code>. Then try making the content area span from <code>content-start</code> all the way to <code>aside-end</code> (removing the aside). Experiment with <code>grid-column: 2 / -1</code> as an alternative way to achieve full remaining width.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-26.1-grid-fundamentals.html">← Lesson 26.1</a>
+      <a href="./lesson-26.3-named-grid-areas.html">Lesson 26.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

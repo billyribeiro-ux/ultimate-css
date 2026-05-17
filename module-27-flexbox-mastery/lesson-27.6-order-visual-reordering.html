@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 27.6 — Order and Visual Reordering · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 27</a>
+      <span>Lesson 27.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 27.6 · Layout</p>
+      <h1>Order and Visual Reordering</h1>
+      <p class="lead">The <code>order</code> property lets you change the visual sequence of flex items without touching the DOM. But visual reordering disconnects what users <em>see</em> from what screen readers <em>read</em>. Understanding the accessibility implications — and the emerging <code>reading-flow</code> fix — is essential for responsible use.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>How order works</h2>
+      <p>Every flex item has <code>order: 0</code> by default. Items are laid out in ascending order value, then by DOM order within the same value:</p>
+      <pre><code>.item-a { order: 2; }   /* appears third */
+.item-b { order: 1; }   /* appears second */
+.item-c { order: 0; }   /* appears first (default) */</code></pre>
+      <p>Negative values are valid: <code>order: -1</code> moves an item before all default-order items.</p>
+
+      <h2>Common use cases</h2>
+      <ul>
+        <li><strong>Mobile-first source order:</strong> Put content before sidebar in HTML (better for SEO/screen readers), then use <code>order</code> to place the sidebar first visually on desktop.</li>
+        <li><strong>Pinned items:</strong> Give a "pinned" item <code>order: -1</code> to always show it first.</li>
+        <li><strong>Dynamic reordering:</strong> A JavaScript toggle that sets <code>order</code> on filtered items (e.g., sorting a list by date vs. name).</li>
+      </ul>
+
+      <h2>The accessibility problem</h2>
+      <p>Screen readers and keyboard Tab order follow the <strong>DOM order</strong>, not the visual order. When you use <code>order</code> (or <code>flex-direction: row-reverse</code>), sighted users see one sequence while keyboard users navigate another. This creates a confusing, potentially unusable experience for keyboard and assistive technology users.</p>
+
+      <h3>WCAG 2.2 Success Criterion 1.3.2</h3>
+      <p>"When the sequence in which content is presented affects its meaning, a correct reading sequence can be programmatically determined." Visual reordering can violate this when the order carries meaning (e.g., navigation items, steps in a process).</p>
+
+      <h2>The reading-flow fix (CSS 2026)</h2>
+      <p>The <code>reading-flow</code> property (covered in Module 13) instructs the browser to make the Tab order follow the visual layout order instead of DOM order:</p>
+      <pre><code>.container {
+  display: flex;
+  reading-flow: flex-visual;
+}
+/* Now Tab order follows the visual flex order */</code></pre>
+      <p>Values: <code>normal</code> (default, DOM order), <code>flex-visual</code> (follows flex layout), <code>flex-flow</code> (follows flex-flow direction), <code>grid-rows</code>, <code>grid-columns</code>, <code>grid-order</code>.</p>
+
+      <h2>When to use order vs. changing DOM</h2>
+      <ul>
+        <li><strong>Use order:</strong> purely decorative reordering (e.g., alternating image/text layout on even rows), combined with <code>reading-flow</code>.</li>
+        <li><strong>Change DOM order:</strong> when the sequence carries meaning, when you need Tab order to match visuals in browsers that don't support <code>reading-flow</code>, or when server-rendering.</li>
+        <li><strong>Use flex-direction: row-reverse:</strong> for right-to-left visual flow where the logical reading order is still left-to-right (e.g., a "latest first" list).</li>
+      </ul>
+
+      <h2>flex-direction reversal</h2>
+      <p><code>row-reverse</code> and <code>column-reverse</code> also reorder visually. They have the same accessibility concerns as <code>order</code>. The same <code>reading-flow</code> fix applies.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — order property</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-27-6 { padding: 1.5rem; font-family: system-ui; }
+          .demo-27-6 h3 { font-size: 0.85rem; margin-block: 1.25rem 0.5rem; color: oklch(60% 0 0); }
+          .demo-27-6 .row {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 2px dashed oklch(70% 0.1 275 / 0.4);
+            border-radius: 0.5rem;
+          }
+          .demo-27-6 .item {
+            flex: 1;
+            padding: 0.75rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+          }
+          .demo-27-6 .item:nth-child(2) { background: oklch(60% 0.18 200); }
+          .demo-27-6 .item:nth-child(3) { background: oklch(55% 0.2 150); }
+          .demo-27-6 .item:nth-child(4) { background: oklch(58% 0.2 50); }
+          .demo-27-6 .reordered .item:nth-child(1) { order: 3; }
+          .demo-27-6 .reordered .item:nth-child(2) { order: 1; }
+          .demo-27-6 .reordered .item:nth-child(3) { order: 4; }
+          .demo-27-6 .reordered .item:nth-child(4) { order: 2; }
+          .demo-27-6 .pinned .item:last-child { order: -1; background: oklch(60% 0.22 25); }
+        </style>
+        <div class="demo-27-6">
+          <h3>Default order (DOM order)</h3>
+          <div class="row">
+            <div class="item">A (1st)</div>
+            <div class="item">B (2nd)</div>
+            <div class="item">C (3rd)</div>
+            <div class="item">D (4th)</div>
+          </div>
+          <h3>Custom order (B=1, D=2, A=3, C=4)</h3>
+          <div class="row reordered">
+            <div class="item">A (order:3)</div>
+            <div class="item">B (order:1)</div>
+            <div class="item">C (order:4)</div>
+            <div class="item">D (order:2)</div>
+          </div>
+          <h3>Pinned item (last child gets order:-1)</h3>
+          <div class="row pinned">
+            <div class="item">Normal</div>
+            <div class="item">Normal</div>
+            <div class="item">Normal</div>
+            <div class="item">Pinned!</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="mobile-nav"&gt;
+  &lt;a href="#" class="nav-item"&gt;Home&lt;/a&gt;
+  &lt;a href="#" class="nav-item"&gt;Search&lt;/a&gt;
+  &lt;a href="#" class="nav-item active"&gt;Profile&lt;/a&gt;
+  &lt;a href="#" class="nav-item"&gt;Settings&lt;/a&gt;
+&lt;/nav&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.mobile-nav {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: oklch(95% 0.02 275);
+  border-radius: 0.75rem;
+  reading-flow: flex-visual;
+}
+
+.nav-item {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  text-decoration: none;
+  color: oklch(40% 0.1 275);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Active item appears first visually */
+.nav-item.active {
+  order: -1;
+  background: oklch(55% 0.2 275);
+  color: white;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a card grid with 6 cards. Use <code>order</code> to make the "featured" card (3rd in DOM) appear first. Add <code>reading-flow: flex-visual</code> to the container. Test with keyboard Tab: does focus follow visual order? Now remove <code>reading-flow</code> and Tab again — notice focus jumps to the 3rd DOM position, not the visual first.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-27.5-flex-wrapping-patterns.html">← Lesson 27.5</a>
+      <a href="./lesson-27.7-margin-auto-tricks.html">Lesson 27.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

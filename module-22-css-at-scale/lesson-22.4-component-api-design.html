@@ -54,6 +54,17 @@
 
       <h2>Documentation patterns</h2>
       <p>Every component API needs documentation showing: the property name, its type (color, length, number), its default value, and an example of usage. This is the CSS equivalent of a TypeScript interface — it defines the shape of what consumers can control.</p>
+
+      <h2>The inheritance chain</h2>
+      <p>Custom properties inherit by default. A <code>--btn-bg</code> set on a parent container flows into all button descendants. This is both power and danger. Power: theme a section by setting properties on a wrapper. Danger: unintended leakage into nested components. Use <code>@property</code> registration with <code>inherits: false</code> to block inheritance when needed.</p>
+
+      <h2>Versioning component APIs</h2>
+      <p>Adding a new custom property to the API is a minor version bump (non-breaking — existing consumers are unaffected). Removing or renaming a property is a major version bump (breaking — existing consumers will lose their customization). Changing a default value is a patch if the visual difference is negligible, or a major if it significantly alters the component's appearance.</p>
+
+      <h2>Anti-patterns</h2>
+      <p><strong>Exposing everything</strong>: If every internal value is a custom property, the API is too large to document and impossible to maintain. Internal padding ratios, computed hover colors, and animation timing curves should remain private.</p>
+      <p><strong>Conflicting properties</strong>: Exposing both <code>--btn-padding</code> (shorthand) and <code>--btn-padding-block</code> / <code>--btn-padding-inline</code> (longhands) creates ambiguity. Pick one level of granularity. If you expose longhands, do not also expose the shorthand.</p>
+      <p><strong>No defaults</strong>: A component that requires consumers to set custom properties to function is broken out of the box. Every API property must have a sensible default via the <code>var(--prop, fallback)</code> pattern.</p>
     </section>
 
     <section class="demo">
