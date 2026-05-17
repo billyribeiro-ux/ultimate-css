@@ -221,6 +221,20 @@ grid-column: 2 / span 3;  /* start at line 2, take 3 columns */</code></pre>
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Make the sidebar span 2 rows using <code>grid-row: 2 / span 2</code>. Then try making the content area span from <code>content-start</code> all the way to <code>aside-end</code> (removing the aside). Experiment with <code>grid-column: 2 / -1</code> as an alternative way to achieve full remaining width.</p>
+      <p>Next, add a banner element after the header that spans the full width using named lines: <code>grid-column: sidebar-start / aside-end</code>. Compare this with <code>grid-column: 1 / -1</code> — both achieve the same result here, but named lines are more readable.</p>
+      <p>Finally, try placing an item at <code>grid-column: 2 / span 2</code> — it starts at line 2 and spans 2 columns. Notice how span and line numbers can be combined for flexible placement.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li>Grid lines are numbered starting at 1 (not 0)</li>
+        <li><code>-1</code> refers to the last line of the explicit grid</li>
+        <li><code>span N</code> takes N tracks from the current position</li>
+        <li>Named lines make layouts self-documenting</li>
+        <li>Multiple items can occupy the same cell (they overlap)</li>
+        <li><code>grid-area</code> is the shorthand for all four placement properties</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

@@ -91,6 +91,19 @@
 
       <h2>When to use this pattern</h2>
       <p>Use state machines when a component has 3+ visual states that affect multiple properties simultaneously. For simple hover/active effects, direct pseudo-class rules are clearer. The state machine shines when states are toggled by JS, when multiple visual properties change together, and when you want DevTools inspection to reveal the current state at a glance.</p>
+
+      <h2>State machine vs. modifier classes</h2>
+      <p>Compare the traditional approach with the state machine:</p>
+      <pre><code>/* Traditional: repeat every property per modifier */
+.btn.loading { background: grey; cursor: wait; opacity: 0.7; }
+.btn.success { background: green; }
+.btn.error   { background: red; }
+
+/* State machine: set tokens, consume once */
+.btn.loading { --bg: oklch(70% 0.05 0); --cursor: wait; --opacity: 0.7; }
+.btn.success { --bg: oklch(52% 0.18 150); }
+.btn.error   { --bg: oklch(55% 0.2 25); }</code></pre>
+      <p>The state machine version keeps the property-to-visual mapping in one place (the base rule). Modifiers only declare intent, not implementation. This inversion makes maintenance trivial: change how <code>--bg</code> is consumed once, and all states benefit.</p>
     </section>
 
     <section class="demo">

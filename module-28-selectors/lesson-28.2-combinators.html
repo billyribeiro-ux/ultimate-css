@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.2 — Combinator Selectors · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.2 · Reference</p>
+      <h1>Combinator Selectors: descendant, child, sibling</h1>
+      <p class="lead">Combinators express relationships between elements — parent-child, ancestor-descendant, and sibling adjacency. The four combinators (space, <code>&gt;</code>, <code>+</code>, <code>~</code>) let you target elements based on their position in the DOM tree without adding extra classes.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Descendant combinator (space)</h2>
+      <p>Matches any element that is a descendant (at any depth) of another:</p>
+      <pre><code>/* Any &lt;a&gt; inside .nav, at any nesting level */
+.nav a { color: oklch(55% 0.2 275); }
+
+/* Any &lt;p&gt; inside article, however deep */
+article p { line-height: 1.7; }</code></pre>
+      <p><strong>Performance note:</strong> The browser matches selectors right-to-left. <code>.nav a</code> first finds ALL <code>&lt;a&gt;</code> elements, then walks up the tree to check if any ancestor is <code>.nav</code>. Deep descendant selectors in large DOMs can be slower than direct child selectors.</p>
+
+      <h2>Child combinator (&gt;)</h2>
+      <p>Matches only direct children — one level deep:</p>
+      <pre><code>/* Only direct &lt;li&gt; children of .menu, not nested lists */
+.menu > li { padding: 0.5rem 1rem; }
+
+/* Only direct children, not deeper elements */
+.card > .title { font-size: 1.25rem; }</code></pre>
+      <p>Use <code>&gt;</code> when you need to avoid styling nested elements. A <code>.menu > li</code> won't accidentally style list items inside a dropdown submenu.</p>
+
+      <h2>Adjacent sibling combinator (+)</h2>
+      <p>Matches the element immediately following another (same parent):</p>
+      <pre><code>/* The paragraph right after an h2 */
+h2 + p { font-size: 1.1rem; color: oklch(45% 0.05 275); }
+
+/* Input immediately after a label */
+label + input { margin-block-start: 0.25rem; }</code></pre>
+      <p>Only the <em>first</em> matching sibling after the target is selected. If there are two paragraphs after an h2, only the first gets styled.</p>
+
+      <h2>General sibling combinator (~)</h2>
+      <p>Matches ALL siblings following an element (same parent):</p>
+      <pre><code>/* All paragraphs after an h2 (same parent level) */
+h2 ~ p { margin-inline-start: 1rem; }
+
+/* All siblings after .active */
+.active ~ .item { opacity: 0.5; }</code></pre>
+      <p>Unlike <code>+</code>, the <code>~</code> combinator matches multiple elements and they don't need to be immediately adjacent.</p>
+
+      <h2>Combining combinators</h2>
+      <pre><code>/* Direct child ul's li that follows another li */
+.nav > ul > li + li { border-inline-start: 1px solid oklch(80% 0 0); }
+
+/* First paragraph directly inside a section */
+section > p:first-child { font-weight: 600; }</code></pre>
+
+      <h2>Performance implications</h2>
+      <ul>
+        <li><strong>Worst:</strong> <code>div a span</code> — deep descendant with generic elements. The browser must check many ancestors.</li>
+        <li><strong>Better:</strong> <code>.card > .title</code> — direct child with classes. Only one level to check.</li>
+        <li><strong>Best:</strong> <code>.card-title</code> — flat class selector. No relationship checks needed.</li>
+      </ul>
+      <p>In practice, selector performance rarely matters unless you have thousands of elements. But keeping selectors flat is still good practice for maintainability.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — combinator comparison</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-2 { padding: 1.5rem; font-family: system-ui; font-size: 0.85rem; }
+          .demo-28-2 .tree {
+            padding: 1rem;
+            border: 2px dashed oklch(70% 0.1 275 / 0.4);
+            border-radius: 0.5rem;
+          }
+          .demo-28-2 .tree .parent { padding: 0.5rem; background: oklch(95% 0.02 275); border-radius: 0.25rem; margin: 0.25rem 0; }
+          .demo-28-2 .tree .child { padding: 0.4rem 0.75rem; margin: 0.25rem 0 0.25rem 1rem; background: oklch(90% 0.05 275); border-radius: 0.25rem; }
+          .demo-28-2 .tree .grandchild { padding: 0.4rem 0.75rem; margin: 0.25rem 0 0.25rem 2rem; background: oklch(85% 0.08 275); border-radius: 0.25rem; }
+          .demo-28-2 .siblings { padding: 1rem; margin-top: 1rem; border: 2px dashed oklch(70% 0.1 275 / 0.4); border-radius: 0.5rem; }
+          .demo-28-2 .siblings .item { padding: 0.4rem 0.75rem; margin: 0.25rem 0; background: oklch(92% 0.03 275); border-radius: 0.25rem; }
+          .demo-28-2 .siblings .trigger { background: oklch(55% 0.2 275); color: white; }
+          .demo-28-2 .siblings .trigger + .item { background: oklch(85% 0.1 200); font-weight: 600; }
+          .demo-28-2 .siblings .trigger ~ .item { border-inline-start: 3px solid oklch(55% 0.15 200); }
+        </style>
+        <div class="demo-28-2">
+          <div class="tree">
+            <div class="parent">parent
+              <div class="child">child (direct)</div>
+              <div class="child">child (direct)
+                <div class="grandchild">grandchild (descendant but not direct child)</div>
+              </div>
+            </div>
+          </div>
+          <div class="siblings">
+            <div class="item">Before trigger</div>
+            <div class="item trigger">Trigger (.trigger)</div>
+            <div class="item">Adjacent sibling (+) gets green bg</div>
+            <div class="item">General sibling (~) gets left border</div>
+            <div class="item">General sibling (~) gets left border</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;nav class="menu"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Home&lt;/li&gt;
+    &lt;li&gt;Products
+      &lt;ul&gt;
+        &lt;li&gt;Widget A&lt;/li&gt;
+        &lt;li&gt;Widget B&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+    &lt;li&gt;About&lt;/li&gt;
+    &lt;li&gt;Contact&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+/* Descendant: ALL li inside .menu */
+.menu li {
+  padding: 0.4rem 0.75rem;
+  margin: 0.25rem 0;
+  background: oklch(92% 0.05 275);
+  border-radius: 0.25rem;
+  list-style: none;
+}
+
+/* Child: only DIRECT ul children of .menu */
+.menu > ul {
+  padding: 0;
+  margin: 0;
+}
+
+/* Direct li children of the top ul only */
+.menu > ul > li {
+  background: oklch(85% 0.08 275);
+  font-weight: 600;
+}
+
+/* Adjacent sibling: separator between top items */
+.menu > ul > li + li {
+  border-block-start: 2px solid oklch(55% 0.2 275);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a FAQ accordion where each question (<code>h3</code>) is followed by an answer (<code>p</code>). Use <code>h3 + p</code> to style the first answer paragraph differently (larger text, different color). Then use <code>h3 ~ p</code> to add a left border to ALL answer paragraphs. Notice how <code>+</code> targets just the first while <code>~</code> targets all.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-28.1-type-class-id-universal.html">← Lesson 28.1</a>
+      <a href="./lesson-28.3-attribute-selectors.html">Lesson 28.3 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -93,6 +93,21 @@
 
       <h2>Practical implications</h2>
       <p>The inheritance model means custom properties are "opt-out" rather than "opt-in." Every descendant receives the value unless it explicitly overrides. This makes them ideal for theming (colors cascade to all children) but potentially surprising for tightly scoped values. The rule of thumb: use inheritance for tokens (colors, spacing scales, type sizes) and register with <code>inherits: false</code> for component internals.</p>
+
+      <h2>Debugging inheritance in DevTools</h2>
+      <p>Both Chrome and Firefox show inherited custom properties in the Computed panel. Look for the "inherited from" label to trace where a value originates. You can also use <code>getComputedStyle(el).getPropertyValue('--color')</code> in the console to check the resolved value at any element in the tree. This makes inheritance chains fully inspectable at runtime.</p>
+
+      <h2>Naming conventions for scope</h2>
+      <p>Teams often use naming prefixes to signal scope:</p>
+      <pre><code>/* Global tokens — no prefix */
+:root { --color-primary: oklch(55% 0.22 275); }
+
+/* Component tokens — component prefix */
+.card { --card-padding: 1.5rem; }
+
+/* Private/internal — underscore prefix */
+.card { --_computed-gap: calc(var(--card-padding) * 0.5); }</code></pre>
+      <p>Private properties (prefixed with <code>--_</code>) signal "do not use from outside this component." This is a convention, not enforcement — CSS has no true encapsulation for custom properties outside Shadow DOM.</p>
     </section>
 
     <section class="demo">
