@@ -145,6 +145,63 @@ nav ul li a { color: oklch(50% 0.2 275); }
         <li><strong>Measure before optimizing:</strong> Use DevTools Performance panel. If style recalc is under 5ms, selectors are not your bottleneck.</li>
       </ol>
 
+      <h2>Avoiding specificity inflation</h2>
+      <p>Common anti-patterns that inflate specificity unnecessarily:</p>
+      <pre><code>/* Anti-pattern: qualifying classes with elements */
+div.card { ... }      /* (0,1,1) — gains nothing over .card (0,1,0) */
+a.nav-link { ... }   /* unnecessary — .nav-link is already specific enough */
+
+/* Anti-pattern: nesting for "safety" */
+.header .nav .nav-link { ... }   /* (0,3,0) — hard to override */
+.nav-link { ... }                /* (0,1,0) — same result, easier to work with */
+
+/* Anti-pattern: doubling for specificity bump */
+.card.card { ... }               /* (0,2,0) — hack to override */
+@layer components { .card { ... } }  /* Better: use layers */
+
+/* Anti-pattern: ID selectors for styling */
+#main-nav a { ... }             /* (1,0,1) — nearly impossible to override */
+.main-nav-link { ... }          /* (0,1,0) — predictable, overridable */</code></pre>
+
+      <h2>Selector patterns that scale</h2>
+      <p>These patterns work well from small sites to enterprise applications:</p>
+      <pre><code>/* Component root */
+.card { ... }
+
+/* Component child — one level of nesting max */
+.card-title { ... }
+.card-body { ... }
+.card-footer { ... }
+
+/* State modifiers */
+.card--featured { ... }
+.card--compact { ... }
+
+/* With @scope — no naming convention needed */
+@scope (.card) {
+  :scope { border-radius: 0.75rem; }
+  h2 { font-size: 1.25rem; }
+  p { color: oklch(45% 0.05 275); }
+}
+
+/* Utility overrides in utilities layer */
+@layer utilities {
+  .mt-0 { margin-top: 0; }
+  .hidden { display: none; }
+}</code></pre>
+
+      <h2>Common mistakes and fixes</h2>
+      <table>
+        <thead><tr><th>Mistake</th><th>Problem</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td><code>* { transition: all 300ms; }</code></td><td>Expensive on every element</td><td>Scope to specific components</td></tr>
+          <tr><td><code>body *:has(.tooltip)</code></td><td>Evaluates all elements</td><td><code>.trigger:has(.tooltip)</code></td></tr>
+          <tr><td><code>[class*="btn"]</code></td><td>String scan on every element</td><td>Use a shared <code>.btn</code> class</td></tr>
+          <tr><td><code>.a .b .c .d .e { }</code></td><td>Five ancestor checks</td><td>Single meaningful class</td></tr>
+          <tr><td><code>:not(:not(.x))</code></td><td>Confusing double negation</td><td>Just use <code>.x</code></td></tr>
+        </tbody>
+      </table>
+
       <h2>DevTools: measuring selector performance</h2>
       <p>Chrome DevTools Performance panel shows "Recalculate Style" events. Click one to see:</p>
       <ul>
@@ -153,6 +210,30 @@ nav ul li a { color: oklch(50% 0.2 275); }
         <li>Which selectors were slowest (enable "Selector Stats" in experiments)</li>
       </ul>
       <p>Firefox DevTools has a similar "Restyle" indicator in the Performance tool. If style recalculation is consistently over 10ms per frame, investigate your selector complexity.</p>
+
+      <h2>Performance audit checklist</h2>
+      <ol>
+        <li>Open DevTools Performance panel and record a user interaction.</li>
+        <li>Look for "Recalculate Style" blocks exceeding 5ms.</li>
+        <li>Enable Selector Stats (Chrome: Settings > Experiments) to see individual selector timings.</li>
+        <li>Identify the key selector (rightmost) — is it a class or something broader?</li>
+        <li>Check for <code>:has()</code> on broad selectors or deep descendant chains.</li>
+        <li>Verify <code>@scope</code> boundaries are helping the engine prune irrelevant subtrees.</li>
+        <li>Confirm <code>@layer</code> order is resolving conflicts instead of specificity hacks.</li>
+        <li>Look for forced style recalculations caused by JavaScript reading layout properties.</li>
+      </ol>
+
+      <h2>Real-world selector budgets</h2>
+      <p>Approximate guidelines for selector complexity in different contexts:</p>
+      <table>
+        <thead><tr><th>Context</th><th>Max DOM nodes</th><th>Selector guidance</th></tr></thead>
+        <tbody>
+          <tr><td>Marketing page</td><td>~500</td><td>Any selectors fine; focus on clarity</td></tr>
+          <tr><td>Web app dashboard</td><td>~2,000</td><td>Prefer classes; limit :has() depth</td></tr>
+          <tr><td>Data-heavy table</td><td>~10,000</td><td>Flat classes only; avoid descendant combinators</td></tr>
+          <tr><td>Infinite scroll feed</td><td>~50,000</td><td>Minimal selectors; virtualize DOM</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="callout">
