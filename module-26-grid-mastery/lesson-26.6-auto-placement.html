@@ -110,6 +110,27 @@ grid-auto-rows: minmax(6rem, auto);
 grid-auto-rows: 4rem 8rem;
 /* Rows alternate: 4rem, 8rem, 4rem, 8rem... */</code></pre>
       <p>You can provide multiple values to <code>grid-auto-rows</code> — they cycle for each new implicit row created.</p>
+
+      <h2>Real-world example: photo gallery</h2>
+      <pre><code>.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  grid-auto-rows: 10rem;
+  grid-auto-flow: dense;
+}
+.gallery .landscape { grid-column: span 2; }
+.gallery .portrait  { grid-row: span 2; }
+.gallery .featured  { grid-column: span 2; grid-row: span 2; }</code></pre>
+      <p>This creates a responsive photo grid where landscape images span 2 columns, portrait images span 2 rows, and featured images take a 2x2 area. Dense packing ensures minimal gaps.</p>
+
+      <h2>Debugging auto-placement</h2>
+      <p>When items end up in unexpected positions:</p>
+      <ul>
+        <li>Enable the grid overlay in DevTools to see cell boundaries</li>
+        <li>Check if any item has explicit placement that displaces others</li>
+        <li>Remember that <code>dense</code> backtracks — earlier DOM items may appear after later ones visually</li>
+        <li>Use <code>grid-auto-flow: row</code> (without dense) first to verify basic flow, then add <code>dense</code></li>
+      </ul>
     </section>
 
     <section class="demo">

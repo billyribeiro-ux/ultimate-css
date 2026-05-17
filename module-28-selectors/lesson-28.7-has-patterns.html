@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.7 — :has() Patterns Encyclopedia · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.7 · Reference</p>
+      <h1>:has() Patterns Encyclopedia</h1>
+      <p class="lead">The <code>:has()</code> pseudo-class is CSS's most powerful addition in a decade. It selects an element based on what it <em>contains</em> or what <em>follows</em> it. Here are 20 real-world patterns that replace JavaScript with pure CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>1. Parent styling based on children</h2>
+      <pre><code>/* Card with image gets no padding on top */
+.card:has(> img:first-child) { padding-top: 0; }
+
+/* Card without image gets extra top padding */
+.card:not(:has(img)) { padding-top: 2rem; }</code></pre>
+
+      <h2>2. Form validation on the parent</h2>
+      <pre><code>/* Form turns red-bordered when it has invalid inputs */
+form:has(:invalid) { border: 2px solid oklch(55% 0.22 25); }
+
+/* Submit button disabled-looking when form is invalid */
+form:has(:invalid) button[type="submit"] { opacity: 0.5; pointer-events: none; }</code></pre>
+
+      <h2>3. Sibling detection (previous sibling styling)</h2>
+      <pre><code>/* Style a label when its adjacent input is focused */
+label:has(+ input:focus) { color: oklch(50% 0.2 275); }
+
+/* Style the heading before an expanded details */
+h2:has(+ details[open]) { color: oklch(50% 0.2 275); }</code></pre>
+
+      <h2>4. Empty state</h2>
+      <pre><code>/* Show empty state when list has no items */
+.list:not(:has(.item)) .empty-state { display: block; }
+.list:has(.item) .empty-state { display: none; }</code></pre>
+
+      <h2>5. Content-aware layouts</h2>
+      <pre><code>/* Switch to 2-column layout when card has both image and text */
+.card:has(img):has(.text) { display: grid; grid-template-columns: 1fr 1fr; }
+
+/* Full-width when only text */
+.card:not(:has(img)) { max-width: 60ch; }</code></pre>
+
+      <h2>6. Image detection</h2>
+      <pre><code>/* Figure with image gets aspect-ratio container */
+figure:has(img) { aspect-ratio: 16/9; overflow: hidden; }
+
+/* Article with hero image gets different layout */
+article:has(> .hero-img) { padding-top: 0; }</code></pre>
+
+      <h2>7. Checkbox-driven UI (no JavaScript)</h2>
+      <pre><code>/* Dark mode toggle */
+body:has(#dark-toggle:checked) { background: oklch(15% 0.02 275); color: oklch(90% 0 0); }
+
+/* Show/hide sidebar */
+.layout:has(#sidebar-toggle:checked) .sidebar { display: block; }</code></pre>
+
+      <h2>8. Quantity queries</h2>
+      <pre><code>/* List with more than 3 items gets compact style */
+.list:has(:nth-child(4)) { font-size: 0.85rem; gap: 0.25rem; }
+
+/* Grid changes columns based on item count */
+.grid:has(:nth-child(7)) { grid-template-columns: repeat(4, 1fr); }</code></pre>
+
+      <h2>9. Focus-within alternative</h2>
+      <pre><code>/* Container reacts to focused input inside */
+.search-box:has(input:focus) { box-shadow: 0 0 0 3px oklch(55% 0.2 275 / 0.2); }</code></pre>
+
+      <h2>10. Conditional decorations</h2>
+      <pre><code>/* Add separator only between sections that both exist */
+section:has(+ section)::after { content: ""; display: block; border-bottom: 1px solid oklch(90% 0 0); }</code></pre>
+
+      <h2>11-20: More patterns</h2>
+      <pre><code>/* 11. Style nav differently when page has a banner */
+body:has(.banner) .nav { position: absolute; }
+
+/* 12. Highlight table row with checked checkbox */
+tr:has(input:checked) { background: oklch(92% 0.06 275); }
+
+/* 13. Adjust grid when aside is present */
+main:has(+ aside) { grid-column: span 2; }
+
+/* 14. Show tooltip only when content overflows (with resize observer) */
+.cell:has(.truncated) .tooltip { display: block; }
+
+/* 15. Different heading style when followed by subtitle */
+h1:has(+ .subtitle) { margin-bottom: 0.25rem; }
+
+/* 16. Card footer only when actions exist */
+.card:has(.card-actions) { padding-bottom: 0; }
+
+/* 17. Style based on media inside */
+.post:has(video) { border-color: oklch(55% 0.2 275); }
+.post:has(audio) { border-color: oklch(55% 0.2 150); }
+
+/* 18. Required field group styling */
+fieldset:has(:required) legend::after { content: " (required)"; }
+
+/* 19. Pagination hides when single page */
+.pagination:not(:has(:nth-child(2))) { display: none; }
+
+/* 20. Auto-apply grid to containers with many children */
+.auto-layout:has(:nth-child(3)) { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — :has() in action</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-7 { padding: 1.5rem; font-family: system-ui; }
+          .demo-28-7 .card-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+          .demo-28-7 .card {
+            flex: 1 1 180px;
+            padding: 1rem;
+            border: 2px solid oklch(88% 0.04 275);
+            border-radius: 0.75rem;
+            font-size: 0.85rem;
+          }
+          .demo-28-7 .card:has(img) { padding: 0; overflow: hidden; }
+          .demo-28-7 .card:has(img) .card-body { padding: 1rem; }
+          .demo-28-7 .card img { width: 100%; height: 80px; object-fit: cover; background: oklch(85% 0.1 200); display: block; }
+          .demo-28-7 .card:has(.badge) { border-color: oklch(55% 0.2 275); }
+          .demo-28-7 .badge { display: inline-block; padding: 0.15rem 0.5rem; background: oklch(55% 0.2 275); color: white; border-radius: 9999px; font-size: 0.7rem; margin-bottom: 0.5rem; }
+          .demo-28-7 .form-demo { margin-top: 1.5rem; padding: 1rem; border: 2px solid oklch(88% 0.04 275); border-radius: 0.5rem; max-width: 300px; transition: border-color 200ms; }
+          .demo-28-7 .form-demo:has(:focus) { border-color: oklch(55% 0.2 275); box-shadow: 0 0 0 4px oklch(55% 0.2 275 / 0.1); }
+          .demo-28-7 .form-demo:has(:invalid:not(:placeholder-shown)) { border-color: oklch(55% 0.22 25); box-shadow: 0 0 0 4px oklch(55% 0.22 25 / 0.1); }
+          .demo-28-7 .form-demo input { display: block; width: 100%; padding: 0.5rem; border: 1px solid oklch(85% 0.04 275); border-radius: 0.375rem; font-size: 0.85rem; margin-top: 0.5rem; box-sizing: border-box; }
+          .demo-28-7 .form-demo label { font-size: 0.8rem; font-weight: 500; }
+        </style>
+        <div class="demo-28-7">
+          <div class="card-group">
+            <div class="card">
+              <img src="" alt="placeholder">
+              <div class="card-body">Card with image (no top padding)</div>
+            </div>
+            <div class="card">
+              <span class="badge">Featured</span>
+              <div>Card with badge (purple border via :has)</div>
+            </div>
+            <div class="card">
+              <div>Plain card (default styling)</div>
+            </div>
+          </div>
+          <div class="form-demo">
+            <label>Email <input type="email" placeholder="Type to test..." required></label>
+            <p style="font-size:0.75rem; color: oklch(55% 0 0); margin: 0.5rem 0 0;">Border reacts to focus and validation via :has()</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="toggle-demo"&gt;
+  &lt;label&gt;
+    &lt;input type="checkbox" id="dark-mode"&gt;
+    Dark mode
+  &lt;/label&gt;
+&lt;/div&gt;
+
+&lt;div class="content-area"&gt;
+  &lt;h2&gt;Hello World&lt;/h2&gt;
+  &lt;p&gt;This section responds to the checkbox above using :has() — no JavaScript needed.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; transition: background 300ms, color 300ms; }
+
+/* Dark mode via :has() */
+body:has(#dark-mode:checked) {
+  background: oklch(15% 0.02 275);
+  color: oklch(90% 0 0);
+}
+
+body:has(#dark-mode:checked) .content-area {
+  background: oklch(22% 0.03 275);
+  border-color: oklch(35% 0.08 275);
+}
+
+.toggle-demo { margin-bottom: 1.5rem; }
+.toggle-demo label { cursor: pointer; font-weight: 500; }
+
+.content-area {
+  padding: 1.5rem;
+  border: 2px solid oklch(88% 0.04 275);
+  border-radius: 0.75rem;
+  transition: all 300ms;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a table where rows with a checked checkbox get highlighted (pattern 12). Then add a "select all" checkbox in the header that, when checked, highlights the entire table body (using <code>table:has(thead input:checked) tbody tr</code>). Finally, add quantity-query styling: if the table has more than 5 rows, reduce the font size.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-28.6-pseudo-elements.html">← Lesson 28.6</a>
+      <a href="./lesson-28.8-nth-child-advanced.html">Lesson 28.8 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

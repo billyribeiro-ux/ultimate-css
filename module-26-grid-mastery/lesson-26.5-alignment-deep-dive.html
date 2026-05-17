@@ -115,6 +115,24 @@ place-self: end center;        /* align-self: end; justify-self: center */</code
 
 /* margin: auto still works for absorbing space: */
 .item { margin-inline-start: auto; } /* push to end */</code></pre>
+
+      <h2>Baseline alignment</h2>
+      <p>Grid also supports <code>align-items: baseline</code> and <code>align-self: baseline</code>. Items align so their first text baseline lines up — useful for cells with different font sizes or padding that still need text alignment.</p>
+      <pre><code>.grid {
+  align-items: baseline;
+}
+/* All items' first text lines align horizontally */</code></pre>
+      <p>You can also use <code>last baseline</code> to align on the last line of text in each cell.</p>
+
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>-items</code> properties align children within their cells</li>
+        <li><code>-content</code> properties align the entire grid within its container</li>
+        <li><code>-self</code> properties override alignment on individual items</li>
+        <li><code>place-*</code> shorthands combine align and justify (block first, inline second)</li>
+        <li><code>stretch</code> is the default for items — they fill their cells</li>
+        <li><code>place-items: center</code> is the simplest centering technique in CSS</li>
+      </ul>
     </section>
 
     <section class="demo">

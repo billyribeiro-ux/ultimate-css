@@ -238,6 +238,32 @@
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>Remove <code>grid-template-rows: subgrid</code> from <code>.card</code> and watch the buttons misalign. Add it back. Then add a 4th row to the parent (<code>grid-template-rows: auto auto 1fr auto</code>), add an image placeholder <code>&lt;div&gt;</code> to each card, update <code>grid-row: span 4</code>, and see how all 4 rows now align across cards.</p>
+      <p>Try subgrid on the column axis instead: create a form where each row has a label and input, and use <code>grid-template-columns: subgrid</code> on each row to align labels and inputs across all rows.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Subgrid vs nested grid</h2>
+      <p>A nested grid (regular <code>display: grid</code>) creates its own independent track system. A subgrid inherits the parent's tracks. Use subgrid when siblings need to share alignment; use a regular nested grid when the child's internal layout is independent.</p>
+
+      <h2>Browser support</h2>
+      <p>Subgrid is supported in all modern browsers since 2023. For older browsers, the fallback is a regular grid with fixed row heights — less elegant but functional.</p>
+
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>grid-template-rows: subgrid</code> inherits parent row tracks</li>
+        <li>The subgrid item must span multiple parent tracks to be useful</li>
+        <li>You can subgrid one axis and define the other independently</li>
+        <li>Subgrid solves cross-sibling alignment (cards, forms, pricing tables)</li>
+        <li>Subgrid items still participate in the parent's gap</li>
+        <li>Subgrid can be nested: a subgrid's child can also be a subgrid, propagating tracks down multiple levels</li>
+      </ul>
+
+      <h2>Named lines in subgrid</h2>
+      <p>You can add local named lines to a subgrid for convenience:</p>
+      <pre><code>.card {
+  grid-template-rows: subgrid [card-top] [card-mid] [card-bottom];
+}
+/* These names only exist within the card's context */</code></pre>
     </section>
 
     <nav class="lesson-nav cluster">

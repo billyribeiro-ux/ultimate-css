@@ -124,6 +124,16 @@ grid-template-areas:
     / 16rem 1fr;
 }</code></pre>
       <p>Each line defines a row's area names and height, and the <code>/</code> section defines columns. Most developers prefer the explicit properties for clarity.</p>
+
+      <h2>Debugging areas</h2>
+      <p>The browser DevTools grid overlay shows named areas as labeled regions. If your areas don't appear:</p>
+      <ul>
+        <li>Check that area names form valid rectangles</li>
+        <li>Ensure every row string has the same number of cell names</li>
+        <li>Verify child elements use <code>grid-area: name</code> (not <code>grid-template-areas</code>)</li>
+        <li>Confirm the grid container has <code>display: grid</code> set</li>
+      </ul>
+      <p>A powerful debugging technique: temporarily add a colored background to each area element. This makes the layout structure immediately visible without DevTools.</p>
     </section>
 
     <section class="demo">

@@ -100,6 +100,10 @@ grid-template-columns: minmax(200px, 1fr);
       <h2>Common mistakes</h2>
       <p>Setting <code>display: grid</code> on an element does NOT make its grandchildren grid items. Only direct children participate in the grid layout. Nested elements need their own grid or flex context.</p>
       <p>Using percentage-based gaps can cause overflow. Prefer <code>rem</code> or <code>em</code> for gap values. The <code>fr</code> unit accounts for gaps automatically — percentages don't.</p>
+      <p>Another common mistake: using <code>grid-template-columns: 1fr 1fr 1fr</code> and expecting items to wrap. Grid does NOT wrap — all items stay in defined tracks. For wrapping, use <code>repeat(auto-fit, minmax(...))</code> (covered in Lesson 26.4) or use flexbox with <code>flex-wrap: wrap</code>.</p>
+
+      <h2>Grid vs block layout</h2>
+      <p>When you set <code>display: grid</code>, all direct children become grid items regardless of their original display value. Inline elements, spans, and text nodes all participate in the grid. Floats and <code>vertical-align</code> have no effect on grid items. <code>clear</code> is also ignored. This is a clean break from traditional layout.</p>
 
       <h2>The grid inspector</h2>
       <p>Every modern browser has a grid inspector in DevTools. It overlays line numbers, track sizes, and area names directly on the page. Always use it when debugging grid layouts — it makes invisible track boundaries visible.</p>
@@ -112,6 +116,9 @@ grid-template-columns: minmax(200px, 1fr);
       <pre><code>.page { display: grid; grid-template-columns: 1fr 3fr; }
 .page .sidebar { display: grid; grid-template-rows: auto 1fr auto; }
 .page .content { display: grid; grid-template-columns: repeat(3, 1fr); }</code></pre>
+
+      <h2>When to use grid vs other layout methods</h2>
+      <p>If you need a two-dimensional layout (control of both rows and columns simultaneously), grid is the answer. For one-dimensional layouts (a single row or column of items), flexbox is often simpler. For flowing text around elements, float still has its place. Grid doesn't replace everything — it excels at structural, geometric layouts.</p>
     </section>
 
     <section class="demo">

@@ -257,6 +257,19 @@
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>The demo uses CSS columns as a fallback. Open the browser DevTools and force the <code>@supports</code> block to apply (if your browser supports it). Notice the items may reorder differently between columns and masonry. Try adding more items with varying heights to see how both approaches handle them.</p>
+      <p>Change the column width in the fallback from <code>12rem</code> to <code>8rem</code> and observe more columns appear. Then try giving one item <code>grid-column: span 2</code> inside the <code>@supports</code> block — it should span two columns in the masonry layout.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Key takeaways</h2>
+      <ul>
+        <li><code>grid-template-rows: masonry</code> enables Pinterest-style packing</li>
+        <li>Items fill the shortest column automatically — no JS needed</li>
+        <li>Use <code>@supports</code> for progressive enhancement with CSS columns fallback</li>
+        <li>Masonry works with grid features: spans, gap, auto-fill/fit, alignment</li>
+        <li>Browser support is growing — ship with fallback, upgrade when available</li>
+        <li>Reading order follows source order (not visual column order)</li>
+      </ul>
     </section>
 
     <nav class="lesson-nav cluster">

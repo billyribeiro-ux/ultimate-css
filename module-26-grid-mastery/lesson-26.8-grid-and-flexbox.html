@@ -238,6 +238,40 @@
     <section class="callout">
       <h2>Mini-exercise</h2>
       <p>In the editor above, the page uses grid for layout and flexbox for the nav. Try converting the nav to grid — you'll find it's more verbose and less flexible. Then try converting the page layout to flexbox only — you'll need nested flex containers and it won't align both axes cleanly. This demonstrates the complementary strengths.</p>
+      <p>Add a card section inside the main content area using <code>display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr))</code>. Inside each card, use <code>display: flex; flex-direction: column</code> with <code>margin-top: auto</code> on the button. This is the composition pattern in action.</p>
+    </section>
+
+    <section class="lesson-body stack">
+      <h2>Decision framework</h2>
+      <ul>
+        <li>Need rows AND columns aligned? Grid.</li>
+        <li>Need items to wrap based on their own size? Flexbox.</li>
+        <li>Fixed structure known ahead of time? Grid.</li>
+        <li>Dynamic number of items in a single row/column? Flexbox.</li>
+        <li>Need overlap without absolute positioning? Grid.</li>
+        <li>Need one item to push to the end (margin-auto)? Either works (both support it).</li>
+      </ul>
+
+      <h2>Key takeaways</h2>
+      <ul>
+        <li>Grid is 2D (controls both axes simultaneously); Flexbox is 1D</li>
+        <li>Grid is container-driven; Flexbox is content-driven</li>
+        <li>Compose them: grid for layout structure, flexbox for component internals</li>
+        <li>When either works, grid often results in less code (layout defined on parent only)</li>
+        <li>Both support gap, alignment, and order — they share the same alignment spec</li>
+      </ul>
+
+      <h2>The hybrid pattern in production</h2>
+      <pre><code>/* Page: grid for structure */
+.app { display: grid; grid-template: "nav main" / 16rem 1fr; }
+
+/* Section: grid for card layout */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+
+/* Component: flex for internal layout */
+.card { display: flex; flex-direction: column; }
+.card .actions { margin-top: auto; display: flex; gap: 0.5rem; }</code></pre>
+      <p>This three-level composition (grid > grid > flex) is the standard architecture for modern web applications.</p>
     </section>
 
     <nav class="lesson-nav cluster">

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.6 — Pseudo-Elements · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.6 · Reference</p>
+      <h1>Pseudo-Elements</h1>
+      <p class="lead">Pseudo-elements create virtual sub-parts of elements that you can style independently. From the classic <code>::before</code> and <code>::after</code> to modern additions like <code>::marker</code>, <code>::backdrop</code>, and <code>::view-transition-*</code>, they extend what CSS can target without extra HTML.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>::before and ::after</h2>
+      <p>Insert generated content before or after an element's real content:</p>
+      <pre><code>.required-label::after {
+  content: " *";
+  color: oklch(55% 0.22 25);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, oklch(0% 0 0 / 0.6));
+}</code></pre>
+      <p>Key rule: <code>content</code> is required (even if empty string). Without it, the pseudo-element doesn't render.</p>
+
+      <h2>::first-line and ::first-letter</h2>
+      <pre><code>::first-line {
+  font-weight: 600;
+  color: oklch(35% 0.15 275);
+}
+
+::first-letter {
+  font-size: 3em;
+  float: inline-start;
+  line-height: 0.8;
+  margin-inline-end: 0.1em;
+  color: oklch(50% 0.2 275);
+}</code></pre>
+      <p>Only a limited subset of CSS properties work on these (mainly font, color, background, and margin for <code>::first-letter</code>).</p>
+
+      <h2>::marker</h2>
+      <p>Styles the bullet or number of list items:</p>
+      <pre><code>li::marker {
+  color: oklch(55% 0.2 275);
+  font-weight: 700;
+  font-size: 1.2em;
+}
+
+/* Custom counter markers */
+ol li::marker {
+  content: counters(list-item, ".") ". ";
+}</code></pre>
+
+      <h2>::placeholder</h2>
+      <pre><code>input::placeholder {
+  color: oklch(65% 0.05 275);
+  font-style: italic;
+}</code></pre>
+
+      <h2>::selection</h2>
+      <pre><code>::selection {
+  background: oklch(55% 0.2 275 / 0.3);
+  color: oklch(20% 0.1 275);
+}</code></pre>
+
+      <h2>::backdrop</h2>
+      <p>The layer behind a <code>&lt;dialog&gt;</code> or fullscreen element:</p>
+      <pre><code>dialog::backdrop {
+  background: oklch(0% 0 0 / 0.6);
+  backdrop-filter: blur(4px);
+}</code></pre>
+
+      <h2>::file-selector-button</h2>
+      <pre><code>input[type="file"]::file-selector-button {
+  padding: 0.5rem 1rem;
+  background: oklch(55% 0.2 275);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}</code></pre>
+
+      <h2>::details-content</h2>
+      <p>Styles the content area of a <code>&lt;details&gt;</code> element (the part that expands):</p>
+      <pre><code>details::details-content {
+  padding: 1rem;
+  background: oklch(97% 0.02 275);
+  border-radius: 0 0 0.5rem 0.5rem;
+}</code></pre>
+
+      <h2>::view-transition-* pseudo-elements</h2>
+      <pre><code>::view-transition-old(root) { animation: fade-out 200ms; }
+::view-transition-new(root) { animation: fade-in 200ms; }
+::view-transition-group(card) { animation-duration: 300ms; }
+::view-transition-image-pair(card) { isolation: auto; }</code></pre>
+
+      <h2>Specificity</h2>
+      <p>Pseudo-elements add <strong>(0, 0, 1)</strong> to specificity — same weight as a type selector.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — pseudo-elements showcase</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-6 { padding: 1.5rem; font-family: system-ui; }
+          .demo-28-6 .drop-cap p::first-letter {
+            font-size: 3.5em;
+            float: inline-start;
+            line-height: 0.75;
+            margin-inline-end: 0.1em;
+            color: oklch(50% 0.2 275);
+            font-weight: 700;
+          }
+          .demo-28-6 .drop-cap p { font-size: 0.9rem; line-height: 1.6; margin: 0; }
+          .demo-28-6 .custom-list { list-style: none; padding: 0; margin: 1.5rem 0 0; }
+          .demo-28-6 .custom-list li { padding: 0.3rem 0; font-size: 0.85rem; }
+          .demo-28-6 .custom-list li::marker { content: "→ "; color: oklch(55% 0.2 275); }
+          .demo-28-6 .tooltip {
+            position: relative;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: oklch(55% 0.2 275);
+            color: white;
+            border-radius: 0.375rem;
+            font-size: 0.85rem;
+            margin-top: 1.5rem;
+          }
+          .demo-28-6 .tooltip::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            translate: -50% 0;
+            border: 6px solid transparent;
+            border-bottom-color: oklch(55% 0.2 275);
+          }
+          .demo-28-6 ::selection { background: oklch(55% 0.2 275 / 0.3); }
+        </style>
+        <div class="demo-28-6">
+          <div class="drop-cap">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Structural pseudo-elements like first-letter create rich typographic effects without extra markup. Select this text to see the ::selection styling.</p>
+          </div>
+          <ul class="custom-list">
+            <li>Custom ::marker arrows</li>
+            <li>No extra HTML needed</li>
+            <li>Just CSS pseudo-elements</li>
+          </ul>
+          <div class="tooltip">Tooltip with ::after triangle</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;blockquote class="fancy-quote"&gt;
+  &lt;p&gt;Design is not just what it looks like. Design is how it works.&lt;/p&gt;
+  &lt;cite&gt;Steve Jobs&lt;/cite&gt;
+&lt;/blockquote&gt;
+
+&lt;label class="required"&gt;Email address&lt;/label&gt;
+&lt;input type="email" placeholder="Enter email..."&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.fancy-quote {
+  position: relative;
+  padding: 2rem 2rem 2rem 3rem;
+  margin: 0;
+  background: oklch(97% 0.02 275);
+  border-radius: 0.75rem;
+}
+
+/* Big quotation mark */
+.fancy-quote::before {
+  content: "\201C";
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  font-size: 4rem;
+  color: oklch(55% 0.2 275 / 0.3);
+  line-height: 1;
+}
+
+.fancy-quote p { margin: 0; font-size: 1.1rem; font-style: italic; }
+.fancy-quote cite { display: block; margin-top: 0.75rem; font-size: 0.85rem; color: oklch(50% 0 0); }
+
+/* Required field indicator */
+.required::after {
+  content: " *";
+  color: oklch(55% 0.22 25);
+  font-weight: 700;
+}
+
+.required { display: block; font-size: 0.85rem; font-weight: 500; margin-top: 1.5rem; }
+input { margin-top: 0.25rem; padding: 0.5rem; border: 1px solid oklch(80% 0.05 275); border-radius: 0.375rem; width: 100%; max-width: 300px; box-sizing: border-box; }
+input::placeholder { color: oklch(65% 0.05 275); font-style: italic; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a numbered list using CSS counters and <code>::before</code> instead of the native <code>&lt;ol&gt;</code>. Each item gets a colored circle with the number inside. Then add <code>::after</code> as a decorative underline on the active item. Combine with <code>::selection</code> in your brand color for the full effect.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-28.5-pseudo-classes-structural.html">← Lesson 28.5</a>
+      <a href="./lesson-28.7-has-patterns.html">Lesson 28.7 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

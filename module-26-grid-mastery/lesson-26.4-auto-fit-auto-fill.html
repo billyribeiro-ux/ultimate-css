@@ -108,6 +108,19 @@
     grid-template-columns: 1fr; /* force single column */
   }
 }</code></pre>
+
+      <h2>auto-fit/fill with named lines</h2>
+      <p>You can name the lines inside repeat with auto-fit/fill:</p>
+      <pre><code>grid-template-columns: repeat(auto-fit, [card-start] minmax(15rem, 1fr) [card-end]);</code></pre>
+      <p>Each generated track has named start and end lines. Reference them with <code>card-start 2</code> for the second instance.</p>
+
+      <h2>Real-world sizing recommendations</h2>
+      <ul>
+        <li>Cards: <code>minmax(min(18rem, 100%), 1fr)</code> — readable width, responsive</li>
+        <li>Thumbnails: <code>minmax(8rem, 1fr)</code> — compact, many columns</li>
+        <li>Form fields: <code>minmax(20rem, 30rem)</code> — capped max for input readability</li>
+        <li>Dashboard widgets: <code>minmax(15rem, 1fr)</code> — flexible but usable</li>
+      </ul>
     </section>
 
     <section class="demo">
