@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25.9 — Cross-Component Communication · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 25</a>
+      <span>Lesson 25.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 25.9 · Custom Properties</p>
+      <h1>Cross-Component Communication</h1>
+      <p class="lead">A parent sets a custom property, children read it — no classes, no JS events, no data attributes. This inheritance-based communication lets components coordinate visuals without knowing about each other.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The slot pattern</h2>
+      <p>A wrapper provides a color or size property. Any child that uses that property inherits it automatically:</p>
+      <pre><code>.hero-section {
+  --slot-accent: oklch(55% 0.22 275);
+  --slot-radius: 0.75rem;
+}
+
+/* These components know nothing about .hero-section */
+.btn   { background: var(--slot-accent, oklch(50% 0.2 0)); }
+.badge { border-color: var(--slot-accent, oklch(50% 0.2 0)); }
+.link  { color: var(--slot-accent, oklch(50% 0.2 0)); }</code></pre>
+      <p>Drop these components inside any wrapper that sets <code>--slot-accent</code> and they adapt.</p>
+
+      <h2>The layout intent pattern</h2>
+      <p>A layout wrapper communicates its intent via a custom property. Children adjust their styles based on context:</p>
+      <pre><code>.sidebar-layout { --layout-context: sidebar; }
+.main-content   { --layout-context: main; }
+
+/* Card adapts to its context */
+.card {
+  padding: 1.5rem;
+}
+@container style(--layout-context: sidebar) {
+  .card { padding: 0.75rem; font-size: 0.85rem; }
+}</code></pre>
+
+      <h2>Nested theming</h2>
+      <p>Override surface colors at any nesting level. A dark card inside a light page overrides <code>--surface</code> for its descendants:</p>
+      <pre><code>body {
+  --surface: oklch(98% 0.01 275);
+  --on-surface: oklch(20% 0 0);
+}
+
+.dark-card {
+  --surface: oklch(20% 0.02 275);
+  --on-surface: oklch(92% 0.01 275);
+  background: var(--surface);
+  color: var(--on-surface);
+}
+
+/* Any child inside .dark-card inherits the dark tokens */
+.dark-card .badge {
+  background: var(--on-surface);
+  color: var(--surface);
+}</code></pre>
+
+      <h2>One property, four components</h2>
+      <p>The power of this pattern: change one property on the wrapper, and every child component that consumes it reacts. No event system, no prop drilling, no selectors reaching into children.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Accent color cascading to children</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-25-9 {
+            --accent: oklch(55% 0.22 275);
+            padding: 1.5rem;
+            font-family: system-ui;
+          }
+          .demo-25-9 .accent-picker {
+            display: flex;
+            gap: 0.5rem;
+            margin-block-end: 1.25rem;
+            align-items: center;
+          }
+          .demo-25-9 .accent-picker span {
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+          .demo-25-9 .accent-btn {
+            inline-size: 2rem;
+            block-size: 2rem;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.15s;
+          }
+          .demo-25-9 .accent-btn:hover { transform: scale(1.15); }
+          .demo-25-9 .accent-btn.active { border-color: oklch(30% 0 0); }
+          .demo-25-9 .component-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+          .demo-25-9 .comp-card {
+            background: oklch(97% 0.01 0);
+            border: 1px solid oklch(90% 0.02 0);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border-inline-start: 4px solid var(--accent);
+          }
+          .demo-25-9 .comp-card h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.85rem;
+            color: var(--accent);
+          }
+          .demo-25-9 .comp-card p {
+            margin: 0 0 0.75rem;
+            font-size: 0.78rem;
+            color: oklch(40% 0 0);
+          }
+          .demo-25-9 .comp-btn {
+            background: var(--accent);
+            color: oklch(100% 0 0);
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+          .demo-25-9 .comp-badge {
+            display: inline-block;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+          }
+          .demo-25-9 .comp-bar {
+            block-size: 0.4rem;
+            background: oklch(90% 0.02 0);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-block-start: 0.5rem;
+          }
+          .demo-25-9 .comp-bar-fill {
+            block-size: 100%;
+            inline-size: 65%;
+            background: var(--accent);
+            border-radius: 1rem;
+          }
+          .demo-25-9 .comp-avatar {
+            inline-size: 2.5rem;
+            block-size: 2.5rem;
+            border-radius: 50%;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            color: oklch(100% 0 0);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-block-end: 0.5rem;
+          }
+        </style>
+        <div class="demo-25-9" id="cross-comp-demo">
+          <div class="accent-picker">
+            <span>--accent:</span>
+            <button class="accent-btn active" style="background:oklch(55% 0.22 275)"
+              onclick="this.closest('.demo-25-9').style.setProperty('--accent','oklch(55% 0.22 275)');this.closest('.accent-picker').querySelectorAll('.accent-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"></button>
+            <button class="accent-btn" style="background:oklch(55% 0.2 150)"
+              onclick="this.closest('.demo-25-9').style.setProperty('--accent','oklch(55% 0.2 150)');this.closest('.accent-picker').querySelectorAll('.accent-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"></button>
+            <button class="accent-btn" style="background:oklch(55% 0.2 25)"
+              onclick="this.closest('.demo-25-9').style.setProperty('--accent','oklch(55% 0.2 25)');this.closest('.accent-picker').querySelectorAll('.accent-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"></button>
+            <button class="accent-btn" style="background:oklch(55% 0.18 80)"
+              onclick="this.closest('.demo-25-9').style.setProperty('--accent','oklch(55% 0.18 80)');this.closest('.accent-picker').querySelectorAll('.accent-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')"></button>
+          </div>
+          <div class="component-grid">
+            <div class="comp-card">
+              <h3>Nav Item</h3>
+              <p>Header color and left border use --accent.</p>
+              <button class="comp-btn">Action</button>
+            </div>
+            <div class="comp-card">
+              <h3>Progress</h3>
+              <p>Bar fill color derives from the parent --accent.</p>
+              <div class="comp-bar"><div class="comp-bar-fill"></div></div>
+            </div>
+            <div class="comp-card">
+              <div class="comp-avatar">A</div>
+              <h3>Avatar</h3>
+              <p>Background inherits --accent from wrapper.</p>
+            </div>
+            <div class="comp-card">
+              <h3>Status</h3>
+              <p>Badge border and text color from --accent.</p>
+              <span class="comp-badge">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="wrapper"&gt;
+  &lt;div class="child-a"&gt;Button: &lt;button class="btn"&gt;Click&lt;/button&gt;&lt;/div&gt;
+  &lt;div class="child-b"&gt;Badge: &lt;span class="badge"&gt;New&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="child-c"&gt;Border card&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="wrapper alt"&gt;
+  &lt;div class="child-a"&gt;Button: &lt;button class="btn"&gt;Click&lt;/button&gt;&lt;/div&gt;
+  &lt;div class="child-b"&gt;Badge: &lt;span class="badge"&gt;New&lt;/span&gt;&lt;/div&gt;
+  &lt;div class="child-c"&gt;Border card&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: grid; gap: 1.5rem; }
+
+.wrapper {
+  --slot-accent: oklch(55% 0.22 275);
+  display: flex; gap: 1rem; align-items: center;
+  padding: 1rem; border-radius: 0.5rem;
+  border: 1px solid oklch(90% 0.02 0);
+}
+.wrapper.alt {
+  --slot-accent: oklch(55% 0.2 150);
+}
+
+/* Children read from parent — no knowledge of wrapper */
+.btn {
+  background: var(--slot-accent);
+  color: white;
+  border: none;
+  padding: .4rem 1rem;
+  border-radius: .3rem;
+  font-weight: 600;
+}
+.badge {
+  border: 2px solid var(--slot-accent);
+  color: var(--slot-accent);
+  padding: .2rem .6rem;
+  border-radius: 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+}
+.child-c {
+  border-inline-start: 4px solid var(--slot-accent);
+  padding-inline-start: .75rem;
+  font-size: .85rem;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a third <code>.wrapper</code> with <code>--slot-accent: oklch(55% 0.2 25)</code>. Then nest a dark wrapper inside the first wrapper: give it <code>--slot-accent: oklch(75% 0.15 275)</code> and <code>background: oklch(20% 0.02 275)</code>. The children inside should automatically adapt to the dark context through inheritance alone.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-25.8-computed-layouts.html">← Lesson 25.8</a>
+      <a href="./lesson-25.10-anti-patterns.html">Lesson 25.10 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

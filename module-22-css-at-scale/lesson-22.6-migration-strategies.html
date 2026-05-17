@@ -41,19 +41,35 @@
 
     <section class="lesson-body stack">
       <h2>The incremental approach</h2>
-      <p>Step 1: Declare your layer order at the top of your entry point. Step 2: Wrap all existing CSS in a single <code>@layer legacy</code>. This changes nothing visually — unlayered CSS beats layered CSS, but since everything is now layered, the existing specificity relationships are preserved within that layer. Step 3: Write all new CSS in the appropriate PE7 layer. Step 4: Migrate one component at a time from <code>legacy</code> to the correct layer.</p>
+      <p>The key insight: you do not need to rewrite everything at once. The migration is four steps, each independently deployable.</p>
+      <p><strong>Step 1</strong>: Declare your layer order at the top of your entry point. This single line establishes the architecture.</p>
+      <p><strong>Step 2</strong>: Wrap all existing CSS in a single <code>@layer legacy</code>. This changes nothing visually because specificity relationships within the layer are preserved. The entire existing codebase continues to work identically.</p>
+      <p><strong>Step 3</strong>: Write all new CSS in the appropriate PE7 layer. New features get proper architecture from day one. Old code remains untouched in the legacy layer.</p>
+      <p><strong>Step 4</strong>: Migrate one component at a time from <code>legacy</code> to the correct layer. Each migration is a small, reviewable PR that can be tested independently.</p>
 
       <h2>The @import layer() technique</h2>
       <p>Third-party CSS can be wrapped in a layer at import time: <code>@import url("vendor.css") layer(vendor)</code>. This gives you architectural control over CSS you do not own. The vendor layer sits below your layers, so your overrides always win without <code>!important</code>.</p>
+      <p>This technique works for any external CSS: design system packages, CSS resets, icon libraries, or component frameworks. The layer wrapper is invisible to the library itself — it does not require forking or modifying the source.</p>
+      <pre><code>/* Wrapping third-party CSS in layers */
+@import url("normalize.css") layer(vendor.reset);
+@import url("component-lib.css") layer(vendor.components);
+
+/* Your layers always win */
+@layer vendor, tokens, base, components, utilities;</code></pre>
 
       <h2>Handling !important during migration</h2>
-      <p>Legacy codebases often have <code>!important</code> scattered throughout. During migration, these become problematic because <code>!important</code> reverses layer order (lower layers win). The strategy: remove <code>!important</code> as you migrate each component. It is temporary — the goal is zero <code>!important</code> usage in the final architecture.</p>
+      <p>Legacy codebases often have <code>!important</code> scattered throughout. During migration, these become problematic because <code>!important</code> reverses layer order — in the important origin, lower layers take priority over higher layers. This means an <code>!important</code> in your legacy layer would beat an <code>!important</code> in your components layer.</p>
+      <p>The strategy: as you migrate each component, remove its <code>!important</code> declarations. Replace them with proper layer ordering. Track progress: count remaining <code>!important</code> instances weekly. The goal is zero <code>!important</code> usage in the final architecture. During the transition period, some <code>!important</code> may be temporarily necessary — document each one with a comment explaining why and when it can be removed.</p>
 
       <h2>The test strategy: visual regression</h2>
-      <p>Before migrating any component, capture screenshots of every state (default, hover, focus, active, disabled, error). After migration, compare screenshots pixel-by-pixel. Any visual difference is a regression that must be resolved before merging. Tools like Playwright's screenshot comparison make this automated.</p>
+      <p>Before migrating any component, capture screenshots of every state (default, hover, focus, active, disabled, error). After migration, compare screenshots pixel-by-pixel. Any visual difference is a regression that must be resolved before merging. Tools like Playwright's screenshot comparison make this automated and repeatable.</p>
+      <p>The golden rule: migration must be invisible to users. If a single pixel changes, the migration introduced a bug. Capture screenshots at multiple viewport widths (375px, 768px, 1280px) and in both light and dark themes if applicable.</p>
 
       <h2>A realistic 6-month migration plan</h2>
-      <p><strong>Month 1</strong>: Declare layers, wrap all existing CSS in <code>@layer legacy</code>, set up visual regression testing. <strong>Month 2-3</strong>: Extract tokens from hard-coded values, build the token layer. <strong>Month 4-5</strong>: Migrate components one at a time (highest-traffic pages first). <strong>Month 6</strong>: Remove the legacy layer, delete <code>!important</code> usage, audit for completeness.</p>
+      <p><strong>Month 1</strong>: Declare layers, wrap all existing CSS in <code>@layer legacy</code>, set up visual regression testing infrastructure. Audit the codebase: count components, count <code>!important</code> instances, identify hard-coded values. This month produces zero visual changes but establishes the foundation.</p>
+      <p><strong>Month 2-3</strong>: Extract tokens from hard-coded values, build the token layer. Create the design token file with all colors, spacing, typography, and radii. Update components to reference tokens — this can be done within the legacy layer as an intermediate step.</p>
+      <p><strong>Month 4-5</strong>: Migrate components one at a time (highest-traffic pages first, simplest components first). Each component migration is a single PR: move from legacy layer to components layer, replace BEM classes with @scope where appropriate, remove <code>!important</code>. Target 3-5 components per sprint.</p>
+      <p><strong>Month 6</strong>: Remove the legacy layer (should be empty or nearly empty by now), delete remaining <code>!important</code> usage, run full audit for completeness. Celebrate with the team — the migration is complete.</p>
     </section>
 
     <section class="demo">
