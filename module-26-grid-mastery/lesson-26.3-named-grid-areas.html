@@ -113,6 +113,17 @@ grid-template-areas:
     "footer  footer  footer";
 }</code></pre>
       <p>The column and row definitions control sizing; the areas map names to the resulting cells.</p>
+
+      <h2>The grid shorthand</h2>
+      <p>You can combine rows, columns, and areas into the <code>grid</code> shorthand, though it's rarely used due to complexity:</p>
+      <pre><code>.page {
+  grid:
+    "header  header" auto
+    "sidebar content" 1fr
+    "footer  footer" auto
+    / 16rem 1fr;
+}</code></pre>
+      <p>Each line defines a row's area names and height, and the <code>/</code> section defines columns. Most developers prefer the explicit properties for clarity.</p>
     </section>
 
     <section class="demo">

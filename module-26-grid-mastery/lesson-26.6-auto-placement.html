@@ -91,6 +91,25 @@
         <li>Any interactive content where tab order matters</li>
       </ul>
       <p>Dense is perfect for decorative grids: photo galleries, dashboards with independent widgets, product thumbnails, or any layout where items have no sequential relationship.</p>
+
+      <h2>Auto-placement algorithm steps</h2>
+      <p>The browser follows this process for each item:</p>
+      <ol>
+        <li>Place all explicitly positioned items first</li>
+        <li>For auto-placed items, scan from the current cursor position (or row 1 with <code>dense</code>)</li>
+        <li>Find the first available cell that fits the item's span</li>
+        <li>Place the item and advance the cursor</li>
+      </ol>
+      <p>Understanding this helps predict where items end up — especially when mixing explicit and auto placement.</p>
+
+      <h2>Sizing implicit tracks</h2>
+      <pre><code>/* All implicit rows are at least 6rem */
+grid-auto-rows: minmax(6rem, auto);
+
+/* Alternating implicit row sizes */
+grid-auto-rows: 4rem 8rem;
+/* Rows alternate: 4rem, 8rem, 4rem, 8rem... */</code></pre>
+      <p>You can provide multiple values to <code>grid-auto-rows</code> — they cycle for each new implicit row created.</p>
     </section>
 
     <section class="demo">
@@ -193,6 +212,10 @@
 }
 
 /* Remove "dense" and see the gaps appear */
+
+/* Try: grid-auto-flow: column dense; */
+/* Try: .item:nth-child(7) { grid-column: span 2; } */
+/* Try: .item:nth-child(6) { order: -1; } */
 </textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>

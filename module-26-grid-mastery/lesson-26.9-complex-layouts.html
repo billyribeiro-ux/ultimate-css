@@ -114,6 +114,29 @@
 
       <h2>Why "only grid"?</h2>
       <p>These layouts require simultaneous control of both axes, overlapping without removing elements from flow, or spanning items across tracks. Flexbox cannot overlap items in flow, cannot do full-bleed without negative margins, and cannot align items across both axes simultaneously.</p>
+
+      <h2>The sticky sidebar in grid</h2>
+      <pre><code>.layout {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  align-items: start;
+}
+.sidebar {
+  position: sticky;
+  top: 1rem;
+}</code></pre>
+      <p>Grid makes the sidebar match content height (stretch is default). Override with <code>align-items: start</code> on the container, then use <code>position: sticky</code> on the sidebar. It sticks while the main content scrolls — a common dashboard pattern.</p>
+
+      <h2>Full viewport layouts</h2>
+      <pre><code>.app {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  overflow: hidden;
+}
+.app .content { overflow-y: auto; }</code></pre>
+      <p>The app fills the viewport exactly. The content area scrolls independently. No need for <code>position: fixed</code> on the header or sidebar. Grid handles all sizing constraints in one declaration.</p>
     </section>
 
     <section class="demo">

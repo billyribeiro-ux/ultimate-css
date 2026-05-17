@@ -33,8 +33,8 @@ Module 23 — CSS Beyond the Browser: Print & Email
 Module 24 — CSS Challenges: Test Your Mastery (12 challenges)
 ```
 
-- **Total modules:** 24
-- **Total lessons:** 230+
+- **Total modules:** 28
+- **Total lessons:** 280+
 - **Total projects:** 12 (one per module) + 80 mini-exercises
 - **Open** `index.html` in the repo root to start.
 

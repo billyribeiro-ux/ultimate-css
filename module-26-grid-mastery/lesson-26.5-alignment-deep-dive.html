@@ -107,6 +107,14 @@ place-self: end center;        /* align-self: end; justify-self: center */</code
 
 /* One item overrides */
 .special { place-self: end center; }</code></pre>
+
+      <h2>Alignment vs margins</h2>
+      <p>In grid layouts, prefer alignment properties over margins for positioning. Margins on grid items push them away from cell edges but don't participate in the grid's alignment system. <code>margin: auto</code> on a grid item absorbs available space (similar to flexbox), which can be useful for one-off positioning — but alignment properties are more predictable and maintainable.</p>
+      <pre><code>/* Instead of margin: auto, prefer: */
+.item { justify-self: end; align-self: center; }
+
+/* margin: auto still works for absorbing space: */
+.item { margin-inline-start: auto; } /* push to end */</code></pre>
     </section>
 
     <section class="demo">
@@ -218,6 +226,14 @@ place-self: end center;        /* align-self: end; justify-self: center */</code
   display: grid;
   place-items: center;
 }
+
+/* Experiments to try:
+   justify-items: stretch (default — items fill horizontally)
+   align-items: start (items shrink to content height)
+   justify-content: space-between (tracks spread out)
+   align-content: space-evenly (rows distribute evenly)
+   .special { place-self: end start; }
+*/
 </textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>

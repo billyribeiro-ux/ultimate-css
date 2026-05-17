@@ -103,6 +103,15 @@ grid-template-columns: minmax(200px, 1fr);
 
       <h2>The grid inspector</h2>
       <p>Every modern browser has a grid inspector in DevTools. It overlays line numbers, track sizes, and area names directly on the page. Always use it when debugging grid layouts — it makes invisible track boundaries visible.</p>
+
+      <h2>display: grid vs display: inline-grid</h2>
+      <p><code>display: grid</code> creates a block-level grid container (takes full width). <code>display: inline-grid</code> creates an inline-level grid container (shrinks to content width, sits alongside other inline elements). Use inline-grid for small UI components embedded in text flow.</p>
+
+      <h2>Nesting grids</h2>
+      <p>Grid items can themselves be grid containers. This is how you build complex layouts: the page is a grid, each section is a grid, components within sections have their own grids. Each grid is independent unless you use subgrid (covered in Lesson 26.7).</p>
+      <pre><code>.page { display: grid; grid-template-columns: 1fr 3fr; }
+.page .sidebar { display: grid; grid-template-rows: auto 1fr auto; }
+.page .content { display: grid; grid-template-columns: repeat(3, 1fr); }</code></pre>
     </section>
 
     <section class="demo">
@@ -131,6 +140,17 @@ grid-template-columns: minmax(200px, 1fr);
           .demo-26-1 .cell:nth-child(4) { background: oklch(75% 0.12 30); color: oklch(20% 0.05 30); }
           .demo-26-1 .cell:nth-child(5) { background: oklch(75% 0.12 60); color: oklch(20% 0.05 60); }
           .demo-26-1 .cell:nth-child(6) { background: oklch(75% 0.12 90); color: oklch(20% 0.05 90); }
+          .demo-26-1 .cell:nth-child(7) { background: oklch(70% 0.12 130); color: oklch(20% 0.05 130); }
+          .demo-26-1 .cell:nth-child(8) { background: oklch(70% 0.12 170); color: oklch(20% 0.05 170); }
+          .demo-26-1 .cell:nth-child(9) { background: oklch(70% 0.12 210); color: oklch(20% 0.05 210); }
+          .demo-26-1 .label {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 0.7rem;
+            color: oklch(50% 0 0);
+            padding: 0.25rem;
+            border-top: 1px dashed oklch(80% 0 0);
+          }
         </style>
         <div class="demo-26-1">
           <div class="cell">10rem fixed</div>
@@ -142,6 +162,7 @@ grid-template-columns: minmax(200px, 1fr);
           <div class="cell">Implicit row 4</div>
           <div class="cell">Implicit row 5</div>
           <div class="cell">Implicit row 6</div>
+          <div class="label">Row 1 is explicit (defined). Rows 2 and 3 are implicit (auto-created by the browser).</div>
         </div>
       </div>
     </section>
@@ -180,8 +201,19 @@ grid-template-columns: minmax(200px, 1fr);
   font-weight: 600;
 }
 
-/* Try changing to: repeat(4, 1fr) */
-/* Try adding: grid-template-rows: 4rem 8rem; */
+/* Try these variations: */
+/* grid-template-columns: repeat(4, 1fr); */
+/* grid-template-columns: 200px 2fr 1fr; */
+/* grid-template-rows: 4rem 8rem; */
+/* grid-auto-rows: 10rem; */
+/* gap: 0.5rem 2rem; */
+
+.cell:first-child {
+  background: oklch(65% 0.15 160);
+  color: white;
+}
+.cell:nth-child(2) { background: oklch(75% 0.12 220); }
+.cell:nth-child(3) { background: oklch(75% 0.12 280); }
 </textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>

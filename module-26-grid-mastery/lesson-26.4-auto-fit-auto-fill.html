@@ -88,6 +88,26 @@
 
       <h2>Performance note</h2>
       <p><code>auto-fit</code> and <code>auto-fill</code> are calculated once per layout pass. They don't cause layout thrashing — the browser determines the column count from the container width and minmax values in a single calculation.</p>
+
+      <h2>Debugging auto-fit/auto-fill</h2>
+      <p>When your grid doesn't behave as expected:</p>
+      <ul>
+        <li>Open DevTools grid inspector — it shows empty tracks (visible with auto-fill, collapsed with auto-fit)</li>
+        <li>Check if your container has a constrained width — auto-fit/fill need a definite width to calculate column count</li>
+        <li>Ensure the minmax minimum isn't larger than the container — items will overflow</li>
+        <li>Remember: <code>auto-fit</code> and <code>auto-fill</code> cannot be combined with explicit track counts like <code>repeat(3, ...)</code> — use one or the other</li>
+      </ul>
+
+      <h2>Container queries + auto-fit</h2>
+      <p>For fine-tuned control, combine auto-fit with container queries to adjust the minimum size at different container widths:</p>
+      <pre><code>.cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+}
+@container (max-width: 30rem) {
+  .cards {
+    grid-template-columns: 1fr; /* force single column */
+  }
+}</code></pre>
     </section>
 
     <section class="demo">
@@ -189,6 +209,10 @@ h3 { color: oklch(50% 0 0); font-size: 0.9rem; }
 }
 
 /* Resize the preview to see the difference! */
+
+/* Try: minmax(min(8rem, 100%), 1fr) for small screens */
+/* Try: minmax(8rem, 12rem) for capped item width */
+/* Try adding more items to see identical behavior */
 </textarea>
         </label>
         <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
