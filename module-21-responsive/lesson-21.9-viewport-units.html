@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.9 — Viewport Units: The Complete Reference · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.9 · Fluid Systems</p>
+      <h1>Viewport Units: The Complete Reference</h1>
+      <p class="lead">vw, vh, svh, lvh, dvh, vi, vb, and why 100vh is wrong on mobile. The definitive guide to viewport units including the new dynamic viewport units that account for mobile browser chrome.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Classic units: vw and vh</h2>
+      <p><code>1vw</code> = 1% of the viewport width. <code>1vh</code> = 1% of the viewport height. These are the original viewport units and they have a critical flaw on mobile: <code>100vh</code> includes the area behind the browser's URL bar, creating overflow.</p>
+      <pre><code>/* This creates overflow on mobile! */
+.hero { height: 100vh; }
+
+/* The URL bar takes ~60-80px on mobile.
+   100vh = viewport height INCLUDING the URL bar area.
+   The element extends behind/below the URL bar. */</code></pre>
+
+      <h2>New viewport units: svh, lvh, dvh</h2>
+      <p>Three new variants solve the mobile browser chrome problem:</p>
+      <pre><code>/* svh — Small Viewport Height
+   The viewport with browser chrome FULLY visible.
+   This is the smallest the viewport can be. SAFE choice. */
+.hero { height: 100svh; }
+
+/* lvh — Large Viewport Height
+   The viewport with browser chrome FULLY hidden.
+   This is the largest the viewport can be. */
+.bg { min-height: 100lvh; }
+
+/* dvh — Dynamic Viewport Height
+   Tracks the CURRENT viewport height as chrome appears/disappears.
+   Updates live — can cause reflows! Use cautiously. */
+.section { height: 100dvh; }</code></pre>
+
+      <h2>When to use which</h2>
+      <pre><code>/* Full-screen hero: use svh (safe, no overflow) */
+.hero { min-block-size: 100svh; }
+
+/* Sticky footer layout: use dvh for smooth updates */
+body { min-block-size: 100dvh; }
+
+/* Background positioning: use lvh (largest area) */
+.bg-fill { block-size: 100lvh; }
+
+/* General rule: default to svh unless you need dynamic */</code></pre>
+
+      <h2>Writing-mode-aware: vi and vb</h2>
+      <p>For layouts that must work in both horizontal and vertical writing modes:</p>
+      <pre><code>/* vi = viewport inline axis (width in horizontal, height in vertical)
+   vb = viewport block axis (height in horizontal, width in vertical) */
+
+.container {
+  max-inline-size: 90vi;  /* 90% of inline viewport axis */
+  min-block-size: 50vb;   /* 50% of block viewport axis */
+}
+/* These adapt to writing-mode: vertical-rl automatically */</code></pre>
+
+      <h2>svmin and svmax</h2>
+      <p>Small viewport versions of vmin/vmax — the smaller or larger of svw and svh:</p>
+      <pre><code>/* svmin: the smaller of svw and svh
+   Perfect for elements that must fit within the viewport */
+.modal {
+  inline-size: min(90svmin, 600px);
+  block-size: min(80svmin, 500px);
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Viewport units comparison</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-9 {
+            font-family: system-ui, sans-serif;
+            background: oklch(12% 0.02 280);
+            border-radius: 0.5rem;
+            padding: clamp(1rem, 0.5rem + 2vw, 2rem);
+            color: oklch(88% 0.01 280);
+          }
+          .demo-21-9 .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: 1rem;
+            margin-block-end: 2rem;
+          }
+          .demo-21-9 .unit-card {
+            padding: 1rem;
+            background: oklch(18% 0.03 280);
+            border-radius: 0.5rem;
+            border: 1px solid oklch(25% 0.03 280);
+          }
+          .demo-21-9 .unit-name {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: oklch(75% 0.15 270);
+            margin-block-end: 0.5rem;
+          }
+          .demo-21-9 .unit-desc {
+            font-size: 0.75rem;
+            color: oklch(60% 0.02 280);
+            line-height: 1.5;
+          }
+          .demo-21-9 .unit-use {
+            font-size: 0.7rem;
+            margin-block-start: 0.5rem;
+            padding-block-start: 0.5rem;
+            border-block-start: 1px solid oklch(22% 0.02 280);
+            color: oklch(65% 0.08 160);
+            font-style: italic;
+          }
+          .demo-21-9 .hero-sim {
+            background: linear-gradient(180deg, oklch(25% 0.08 270) 0%, oklch(15% 0.05 280) 100%);
+            border-radius: 0.5rem;
+            border: 1px solid oklch(30% 0.05 270);
+            min-block-size: min(40svh, 250px);
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 2rem;
+          }
+          .demo-21-9 .hero-sim h3 {
+            font-size: clamp(1.2rem, 0.8rem + 2vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, oklch(80% 0.15 270), oklch(70% 0.2 200));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-block-end: 0.5rem;
+          }
+          .demo-21-9 .hero-sim p {
+            font-size: 0.85rem;
+            color: oklch(60% 0.03 280);
+          }
+          .demo-21-9 .hero-sim code {
+            display: inline-block;
+            margin-block-start: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            background: oklch(10% 0.02 280);
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: oklch(75% 0.1 160);
+          }
+        </style>
+        <div class="demo-21-9">
+          <div class="unit-grid">
+            <div class="unit-card">
+              <div class="unit-name">svh</div>
+              <div class="unit-desc">Small viewport height. Chrome fully visible. Never overflows.</div>
+              <div class="unit-use">Use for: full-screen heroes, safe default</div>
+            </div>
+            <div class="unit-card">
+              <div class="unit-name">lvh</div>
+              <div class="unit-desc">Large viewport height. Chrome fully hidden. Maximum available.</div>
+              <div class="unit-use">Use for: background fills, maximum coverage</div>
+            </div>
+            <div class="unit-card">
+              <div class="unit-name">dvh</div>
+              <div class="unit-desc">Dynamic viewport height. Updates live as chrome toggles.</div>
+              <div class="unit-use">Use for: sticky footers, interactive layouts</div>
+            </div>
+            <div class="unit-card">
+              <div class="unit-name">vi / vb</div>
+              <div class="unit-desc">Viewport inline/block. Writing-mode aware viewport units.</div>
+              <div class="unit-use">Use for: i18n-ready layouts, logical sizing</div>
+            </div>
+          </div>
+          <div class="hero-sim">
+            <div>
+              <h3>Full-Screen Hero</h3>
+              <p>This uses min-block-size: 100svh on mobile to avoid the URL bar overflow bug</p>
+              <code>min-block-size: 100svh;</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;section class="hero"&gt;
+  &lt;h1&gt;Full-Screen Section&lt;/h1&gt;
+  &lt;p&gt;Uses svh for mobile-safe full viewport height&lt;/p&gt;
+&lt;/section&gt;
+&lt;section class="content"&gt;
+  &lt;p&gt;Scroll down from the hero...&lt;/p&gt;
+&lt;/section&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">* { margin: 0; box-sizing: border-box; }
+body { font-family: system-ui; }
+
+.hero {
+  /* Mobile-safe full screen */
+  min-block-size: 100svh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(180deg, oklch(20% 0.1 270), oklch(10% 0.05 250));
+  color: white;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 1rem + 4vw, 4rem);
+  margin-block-end: 1rem;
+}
+
+.content {
+  min-block-size: 50svh;
+  padding: 3rem;
+  background: oklch(95% 0.02 270);
+  color: oklch(20% 0.02 270);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a three-section page where each section takes exactly <code>100svh</code> in height. The first section should use a centered hero layout, the second a two-column layout, and the third a centered call-to-action. Ensure none of them overflow on mobile by using <code>svh</code> instead of <code>vh</code>. Add a <code>min-block-size</code> fallback for browsers that don't support svh.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.8-responsive-navigation.html">&larr; Lesson 21.8</a>
+      <a href="./lesson-21.10-no-breakpoint-layouts.html">Lesson 21.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

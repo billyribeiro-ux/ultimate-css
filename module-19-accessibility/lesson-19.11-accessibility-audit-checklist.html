@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.11 — The CSS Accessibility Audit Checklist · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.11 · Inclusive Design</p>
+      <h1>The CSS Accessibility Audit Checklist</h1>
+      <p class="lead">A comprehensive, actionable checklist for auditing the CSS accessibility of any web page. Each item maps to a WCAG success criterion. Run through this list before shipping, and you will catch the vast majority of CSS-related accessibility failures.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The checklist</h2>
+
+      <h3>1. Focus indicators (WCAG 2.4.7, 2.4.11)</h3>
+      <ul>
+        <li>Every interactive element has a visible focus indicator when navigated via keyboard.</li>
+        <li>Custom focus rings use <code>:focus-visible</code> (not <code>:focus</code> alone) to avoid showing rings on mouse click.</li>
+        <li>Focus ring has at least 3:1 contrast against the adjacent background.</li>
+        <li>Focus ring is at least 2px thick with appropriate <code>outline-offset</code>.</li>
+        <li>Skip link exists and becomes visible on focus.</li>
+      </ul>
+
+      <h3>2. Color contrast (WCAG 1.4.3, 1.4.6)</h3>
+      <ul>
+        <li>Normal text: 4.5:1 minimum against its background.</li>
+        <li>Large text (18pt+, or 14pt bold): 3:1 minimum.</li>
+        <li>UI components and graphical objects: 3:1 minimum.</li>
+        <li>Placeholder text meets 4.5:1 (not just the default browser gray).</li>
+        <li>Contrast verified in BOTH light and dark mode.</li>
+      </ul>
+
+      <h3>3. Reduced motion (WCAG 2.3.3)</h3>
+      <ul>
+        <li><code>@media (prefers-reduced-motion: reduce)</code> is implemented.</li>
+        <li>Non-essential animations are disabled or replaced with opacity-only transitions.</li>
+        <li>No auto-playing animations that cannot be paused.</li>
+        <li>Parallax effects are disabled in reduced-motion mode.</li>
+      </ul>
+
+      <h3>4. Content reflow (WCAG 1.4.10)</h3>
+      <ul>
+        <li>At 320px viewport width, no horizontal scrollbar appears.</li>
+        <li>At 200% browser zoom, all content remains accessible without horizontal scrolling.</li>
+        <li>Text containers use <code>max-inline-size</code> not fixed pixel widths.</li>
+        <li>Grid/flex layouts use <code>auto-fit</code> or <code>flex-wrap</code> for natural reflow.</li>
+      </ul>
+
+      <h3>5. Text sizing (WCAG 1.4.4)</h3>
+      <ul>
+        <li>Font sizes use <code>rem</code> or <code>em</code>, not <code>px</code>.</li>
+        <li>Text can be resized to 200% without loss of content or functionality.</li>
+        <li>Line heights are unitless (e.g., <code>1.5</code> not <code>24px</code>).</li>
+        <li><code>clamp()</code> patterns include a <code>rem</code> minimum.</li>
+      </ul>
+
+      <h3>6. Forced colors (WCAG 1.4.11)</h3>
+      <ul>
+        <li>Tested in Windows High Contrast Mode (or emulated via DevTools).</li>
+        <li>Elements that rely on background for boundaries have border fallbacks in <code>@media (forced-colors: active)</code>.</li>
+        <li>Buttons have visible borders in forced-colors mode.</li>
+        <li>Custom controls use system colors where appropriate.</li>
+      </ul>
+
+      <h3>7. Touch targets (WCAG 2.5.8)</h3>
+      <ul>
+        <li>All interactive elements are at least 44x44px (recommended) or 24x24px (minimum AA).</li>
+        <li>Adjacent targets have at least 8px gap between them.</li>
+        <li>Small visual elements use <code>::after</code> stretch pattern for larger hit areas.</li>
+        <li><code>min-block-size</code> used instead of fixed <code>height</code>.</li>
+      </ul>
+
+      <h3>8. Screen reader content</h3>
+      <ul>
+        <li>No content hidden from screen readers unintentionally (check for <code>display: none</code> on needed content).</li>
+        <li><code>.sr-only</code> class available for visually-hidden-but-accessible text.</li>
+        <li>Decorative pseudo-element content does not confuse screen readers.</li>
+        <li>Icon-only buttons have accessible labels (via <code>.sr-only</code> or <code>aria-label</code>).</li>
+      </ul>
+
+      <h3>9. ARIA states styled</h3>
+      <ul>
+        <li>Interactive components use ARIA attributes as CSS selectors (not separate classes).</li>
+        <li><code>[aria-expanded]</code> drives open/closed visual states.</li>
+        <li><code>[aria-current="page"]</code> styles the active navigation item.</li>
+        <li><code>[aria-invalid="true"]</code> drives error styling on form fields.</li>
+      </ul>
+
+      <h3>10. Logical properties and RTL</h3>
+      <ul>
+        <li>Layout uses <code>inline-start/end</code> and <code>block-start/end</code> instead of left/right/top/bottom where appropriate.</li>
+        <li>Page tested in RTL mode (<code>dir="rtl"</code> on html) to verify correct mirroring.</li>
+        <li>Icons and directional elements flip correctly with writing direction.</li>
+      </ul>
+
+      <h2>How to run the audit</h2>
+
+      <h3>Browser DevTools Accessibility Panel</h3>
+      <p>Chrome, Firefox, and Edge all have built-in accessibility inspectors. Open DevTools, go to the Accessibility tab (Chrome) or Accessibility Properties panel (Firefox). This shows the computed accessible name, role, and state for every element.</p>
+
+      <h3>Automated tools</h3>
+      <p><strong>Chrome Lighthouse:</strong> Run an accessibility audit from the DevTools Audits/Lighthouse panel. It catches many contrast failures, missing labels, and focus issues. <strong>axe DevTools extension:</strong> More thorough automated testing with clear fix suggestions. <strong>WAVE browser extension:</strong> Visual overlay showing errors directly on the page.</p>
+
+      <h3>Manual testing</h3>
+      <p>Automated tools catch only ~30-50% of accessibility issues. Manual testing is required for: keyboard navigation flow, logical reading order, reduced-motion behavior, forced-colors appearance, and screen reader announcements. Tab through the entire page. Use VoiceOver (macOS), NVDA (Windows), or Orca (Linux) for screen reader testing.</p>
+    </section>
+
+    <section class="callout">
+      <h2>Using this checklist</h2>
+      <p>Print this page or save it as a reference. Before shipping any component, page, or design system update, run through each section. The items are ordered by frequency of failure — focus and contrast issues are the most common, followed by reflow and touch target problems. Catching these in development is 10x cheaper than fixing them after deployment.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.10-aria-css-patterns.html">&larr; Lesson 19.10</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

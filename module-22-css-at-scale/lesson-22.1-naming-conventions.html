@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.1 — Naming Conventions: BEM, CUBE, PE7 · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 22.1 · Enterprise Architecture</p>
+      <h1>Naming Conventions: BEM, CUBE, PE7 Compared</h1>
+      <p class="lead">Every naming convention is a contract between developers. BEM encodes structure in the name itself. CUBE embraces the cascade. PE7 replaces naming conventions entirely with architectural layers. Understanding all three helps you choose the right tool for your team.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>BEM: Block, Element, Modifier</h2>
+      <p>BEM encodes the component hierarchy directly in class names. A <code>.card__title--featured</code> tells you the block (card), the element (title), and the modifier (featured) at a glance. The contract: every class is self-documenting.</p>
+      <h3>Strengths</h3>
+      <p>Explicit relationships. Zero cascade dependency. Grep-friendly. Easy onboarding for new developers. Works without any build tool or modern CSS feature.</p>
+      <h3>Weaknesses</h3>
+      <p>Verbose HTML. No cascade awareness means duplication. Modifier explosion for complex states. The naming becomes the architecture rather than the architecture informing the naming.</p>
+
+      <h2>CUBE CSS: Composition, Utility, Block, Exception</h2>
+      <p>Andy Bell's CUBE CSS embraces the cascade instead of fighting it. Composition classes handle layout (<code>.flow</code>, <code>.cluster</code>). Utility classes handle single-purpose overrides. Block classes handle component-specific styling. Exceptions handle state with data attributes.</p>
+      <h3>Strengths</h3>
+      <p>Cascade-friendly. Less HTML markup. Leverages browser defaults. Encourages design tokens via utilities.</p>
+      <h3>Weaknesses</h3>
+      <p>Utility class proliferation. Less explicit than BEM for large teams. Requires cascade understanding that junior developers may lack.</p>
+
+      <h2>PE7: Layers + @scope + Custom Properties</h2>
+      <p>PE7 eliminates naming conventions as a concern. With <code>@layer</code> controlling specificity order, <code>@scope</code> controlling reach, and custom properties providing the API, the architecture itself prevents conflicts. You name things descriptively without encoding hierarchy.</p>
+      <h3>Strengths</h3>
+      <p>Zero naming convention overhead. Architecture replaces discipline. Cascade is controlled by the browser, not by developer agreement. Scales infinitely without naming collisions.</p>
+      <h3>Weaknesses</h3>
+      <p>Requires modern browser support. Steeper learning curve for the architecture itself. Less established community consensus.</p>
+
+      <h2>When each is appropriate</h2>
+      <p><strong>BEM</strong>: Legacy codebases, teams with mixed CSS skill levels, projects requiring IE11 support. <strong>CUBE</strong>: Small-to-medium teams that understand the cascade, projects with a strong design token system. <strong>PE7</strong>: New projects targeting modern browsers, teams ready to invest in architectural understanding over naming discipline.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Same card in BEM vs PE7 @scope</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-22-1 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 1.5rem;
+            font-family: system-ui;
+          }
+          .demo-22-1 h3 {
+            margin-block-end: 0.75rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: oklch(60% 0 0);
+          }
+          /* BEM approach */
+          .demo-22-1 .card { background: oklch(97% 0.01 275); border-radius: 0.75rem; padding: 1.25rem; }
+          .demo-22-1 .card__header { margin-block-end: 0.75rem; }
+          .demo-22-1 .card__title { font-size: 1.1rem; font-weight: 600; color: oklch(25% 0.05 275); }
+          .demo-22-1 .card__body { font-size: 0.9rem; color: oklch(40% 0.02 275); line-height: 1.5; }
+          .demo-22-1 .card__footer { margin-block-start: 1rem; padding-block-start: 0.75rem; border-top: 1px solid oklch(90% 0.02 275); }
+          .demo-22-1 .card__action { background: oklch(48% 0.18 275); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.8rem; cursor: pointer; }
+          .demo-22-1 .card__action--secondary { background: transparent; color: oklch(48% 0.18 275); border: 1px solid oklch(48% 0.18 275); }
+          /* PE7 @scope approach */
+          @scope (.demo-22-1 .pe7-card) {
+            :scope { background: oklch(97% 0.01 275); border-radius: 0.75rem; padding: 1.25rem; }
+            header { margin-block-end: 0.75rem; }
+            h4 { font-size: 1.1rem; font-weight: 600; color: oklch(25% 0.05 275); }
+            p { font-size: 0.9rem; color: oklch(40% 0.02 275); line-height: 1.5; }
+            footer { margin-block-start: 1rem; padding-block-start: 0.75rem; border-top: 1px solid oklch(90% 0.02 275); }
+            button { background: oklch(48% 0.18 275); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.8rem; cursor: pointer; }
+            .secondary { background: transparent; color: oklch(48% 0.18 275); border: 1px solid oklch(48% 0.18 275); }
+          }
+        </style>
+        <div class="demo-22-1">
+          <div>
+            <h3>BEM Approach</h3>
+            <div class="card">
+              <div class="card__header"><span class="card__title">Card Title</span></div>
+              <div class="card__body">Content styled with explicit BEM classes encoding hierarchy.</div>
+              <div class="card__footer">
+                <button class="card__action">Primary</button>
+                <button class="card__action card__action--secondary">Secondary</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3>PE7 @scope Approach</h3>
+            <article class="pe7-card">
+              <header><h4>Card Title</h4></header>
+              <p>Content styled with semantic elements scoped by architecture.</p>
+              <footer>
+                <button>Primary</button>
+                <button class="secondary">Secondary</button>
+              </footer>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- BEM version --&gt;
+&lt;article class="card"&gt;
+  &lt;div class="card__header"&gt;
+    &lt;h2 class="card__title"&gt;BEM Card&lt;/h2&gt;
+  &lt;/div&gt;
+  &lt;div class="card__body"&gt;
+    &lt;p class="card__text"&gt;Every element needs a class.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class="card__footer"&gt;
+    &lt;button class="card__btn card__btn--primary"&gt;Action&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/article&gt;
+
+&lt;!-- PE7 version --&gt;
+&lt;article class="pe7-card"&gt;
+  &lt;header&gt;
+    &lt;h2&gt;PE7 Card&lt;/h2&gt;
+  &lt;/header&gt;
+  &lt;p&gt;Semantic elements, scoped by architecture.&lt;/p&gt;
+  &lt;footer&gt;
+    &lt;button&gt;Action&lt;/button&gt;
+  &lt;/footer&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+/* BEM */
+.card { background: oklch(97% 0.01 275); border-radius: 0.75rem; padding: 1.25rem; }
+.card__header { margin-block-end: 0.5rem; }
+.card__title { font-size: 1.2rem; color: oklch(25% 0.05 275); }
+.card__text { font-size: 0.9rem; color: oklch(40% 0.02 275); }
+.card__footer { margin-block-start: 1rem; }
+.card__btn { border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+.card__btn--primary { background: oklch(48% 0.18 275); color: white; }
+
+/* PE7 @scope */
+@scope (.pe7-card) {
+  :scope { background: oklch(97% 0.01 275); border-radius: 0.75rem; padding: 1.25rem; }
+  header { margin-block-end: 0.5rem; }
+  h2 { font-size: 1.2rem; color: oklch(25% 0.05 275); }
+  p { font-size: 0.9rem; color: oklch(40% 0.02 275); }
+  footer { margin-block-start: 1rem; }
+  button { background: oklch(48% 0.18 275); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a "featured" state to both cards. In BEM, add a <code>.card--featured</code> modifier with a colored left border. In PE7, add a <code>[data-featured]</code> attribute and style it within the @scope block. Notice how the PE7 version requires zero new class names.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 22</a>
+      <a href="./lesson-22.2-design-token-governance.html">Lesson 22.2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

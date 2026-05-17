@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.9 — Reducing CSS File Size · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.9 · File Size</p>
+      <h1>Reducing CSS File Size</h1>
+      <p class="lead">Every kilobyte of CSS blocks rendering. From dead code elimination to custom property deduplication to compression algorithms — here are the techniques that take a 45KB stylesheet down to 12KB without losing a single feature.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Audit with DevTools Coverage</h2>
+      <p>Open DevTools, press Ctrl+Shift+P, type "coverage", start recording, reload the page. The Coverage panel shows exactly which CSS rules are used on the current page. Red = unused. On most sites, 60-80% of CSS is unused on any given page.</p>
+
+      <h2>@layer helps removal</h2>
+      <p>With PE7's layered architecture, you can remove entire layers without cascade fear. If a page doesn't use animations, remove the animations layer. If it doesn't have components of a certain type, remove that component file. Layers make CSS modular and safely removable.</p>
+
+      <h2>Dead CSS detection patterns</h2>
+      <ul>
+        <li>Search for class names in CSS that don't appear in any HTML/JS file</li>
+        <li>Look for vendor-prefixed properties that are no longer needed (<code>-webkit-transform</code> when you only support modern browsers)</li>
+        <li>Find duplicate selectors with identical rules</li>
+        <li>Remove commented-out CSS (it still adds bytes)</li>
+      </ul>
+
+      <h2>Custom property deduplication</h2>
+      <p>Before: 20 places using <code>oklch(55% 0.22 265)</code> directly. After: one token <code>--color-brand: oklch(55% 0.22 265)</code> referenced 20 times. This saves bytes AND improves maintainability.</p>
+      <pre><code>/* Before: 45 bytes per usage x 20 = 900 bytes */
+.hero { background: oklch(55% 0.22 265); }
+.btn  { background: oklch(55% 0.22 265); }
+
+/* After: 45 bytes once + 20 bytes per usage x 20 = 445 bytes */
+:root { --brand: oklch(55% 0.22 265); }
+.hero { background: var(--brand); }
+.btn  { background: var(--brand); }</code></pre>
+
+      <h2>Shorthand vs longhand</h2>
+      <pre><code>/* Longhand: 82 bytes */
+margin-top: 1rem;
+margin-right: 2rem;
+margin-bottom: 1rem;
+margin-left: 2rem;
+
+/* Shorthand: 22 bytes */
+margin: 1rem 2rem;</code></pre>
+      <p>Use shorthands when all sides are set. Use longhands when you need to override only one side (avoids resetting the others).</p>
+
+      <h2>Compression: Brotli vs Gzip</h2>
+      <p>CSS compresses exceptionally well due to repetitive patterns. Typical results:</p>
+      <ul>
+        <li><strong>Gzip:</strong> 60-70% reduction (45KB becomes ~15KB over the wire)</li>
+        <li><strong>Brotli:</strong> 70-80% reduction (45KB becomes ~10KB over the wire)</li>
+      </ul>
+      <p>Brotli is supported by all modern browsers. Configure your server to serve <code>.css</code> files with <code>Content-Encoding: br</code>.</p>
+
+      <h2>The 14KB target</h2>
+      <p>Critical CSS should fit in 14KB compressed (the first TCP congestion window). Total CSS for a page should target under 50KB compressed. If you're over these numbers, audit and reduce.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Before and after: 45KB to 12KB</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-9 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-20-9 .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+          }
+          .demo-20-9 .panel {
+            border: 2px solid oklch(85% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-9 .panel h3 {
+            margin: 0 0 0.75rem;
+            font-size: 0.85rem;
+            color: oklch(40% 0.05 260);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .demo-20-9 .size-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+          }
+          .demo-20-9 .badge-large { background: oklch(90% 0.06 25); color: oklch(40% 0.15 25); }
+          .demo-20-9 .badge-small { background: oklch(90% 0.06 150); color: oklch(35% 0.15 150); }
+          .demo-20-9 .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.75rem;
+          }
+          .demo-20-9 .file-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid oklch(92% 0.01 260);
+            color: oklch(40% 0 0);
+          }
+          .demo-20-9 .file-list .size {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+          }
+          .demo-20-9 .file-list .removed {
+            text-decoration: line-through;
+            opacity: 0.5;
+          }
+          .demo-20-9 .savings {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: oklch(92% 0.05 150);
+            text-align: center;
+          }
+          .demo-20-9 .savings .big-num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: oklch(40% 0.18 150);
+            margin: 0;
+          }
+          .demo-20-9 .savings p {
+            font-size: 0.8rem;
+            margin: 0.25rem 0 0;
+            color: oklch(35% 0.1 150);
+          }
+          .demo-20-9 .techniques {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+            gap: 0.5rem;
+          }
+          .demo-20-9 .tech-chip {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            background: oklch(95% 0.02 260);
+            font-size: 0.7rem;
+            text-align: center;
+          }
+          .demo-20-9 .tech-chip strong {
+            display: block;
+            color: oklch(35% 0.1 260);
+          }
+          .demo-20-9 .tech-chip span {
+            color: oklch(50% 0 0);
+          }
+        </style>
+        <div class="demo-20-9">
+          <div class="comparison">
+            <div class="panel">
+              <h3>Before <span class="size-badge badge-large">45KB</span></h3>
+              <ul class="file-list">
+                <li><span>reset.css</span><span class="size">3KB</span></li>
+                <li><span>base.css</span><span class="size">4KB</span></li>
+                <li class="removed"><span>legacy-compat.css</span><span class="size">6KB</span></li>
+                <li><span>layout.css</span><span class="size">5KB</span></li>
+                <li><span>components.css</span><span class="size">15KB</span></li>
+                <li class="removed"><span>unused-components.css</span><span class="size">8KB</span></li>
+                <li><span>animations.css</span><span class="size">3KB</span></li>
+                <li class="removed"><span>vendor-prefixes.css</span><span class="size">1KB</span></li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>After <span class="size-badge badge-small">12KB</span></h3>
+              <ul class="file-list">
+                <li><span>tokens.css</span><span class="size">1.5KB</span></li>
+                <li><span>reset.css</span><span class="size">1.2KB</span></li>
+                <li><span>base.css</span><span class="size">2KB</span></li>
+                <li><span>layout.css</span><span class="size">2.5KB</span></li>
+                <li><span>components.css</span><span class="size">3.5KB</span></li>
+                <li><span>animations.css</span><span class="size">1.3KB</span></li>
+                <li><span>Total (Brotli)</span><span class="size">~4KB wire</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="savings">
+            <p class="big-num">73% smaller</p>
+            <p>45KB raw &rarr; 12KB minified &rarr; ~4KB over the wire (Brotli)</p>
+          </div>
+          <div class="techniques">
+            <div class="tech-chip"><strong>-15KB</strong><span>Dead code removal</span></div>
+            <div class="tech-chip"><strong>-8KB</strong><span>Token deduplication</span></div>
+            <div class="tech-chip"><strong>-5KB</strong><span>Shorthand conversion</span></div>
+            <div class="tech-chip"><strong>-3KB</strong><span>Vendor prefix removal</span></div>
+            <div class="tech-chip"><strong>-2KB</strong><span>Minification</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="page"&gt;
+  &lt;header class="hero"&gt;
+    &lt;h1&gt;Optimized Page&lt;/h1&gt;
+  &lt;/header&gt;
+  &lt;main class="content"&gt;
+    &lt;div class="card"&gt;Card 1&lt;/div&gt;
+    &lt;div class="card"&gt;Card 2&lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* === BEFORE: Bloated (count the bytes) === */
+
+/* Duplicated color values: */
+.hero { background: oklch(55% 0.22 265); }
+.card { border-color: oklch(55% 0.22 265); }
+h1    { color: oklch(55% 0.22 265); }
+
+/* Longhand waste: */
+.card {
+  margin-top: 1rem;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+  padding-top: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+/* === AFTER: Optimized === */
+/*
+:root { --brand: oklch(55% 0.22 265); }
+.hero { background: var(--brand); }
+.card { border-color: var(--brand); }
+h1    { color: var(--brand); }
+
+.card {
+  margin: 1rem;
+  padding: 1.5rem;
+}
+*/
+
+/* Dead CSS (never used on this page): */
+.sidebar { width: 300px; }
+.footer-nav { display: flex; }
+.modal-overlay { position: fixed; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take a real stylesheet from a project you're working on. Run DevTools Coverage panel and note the percentage of unused CSS. Then: (1) Extract repeated color values into custom properties, (2) convert longhands to shorthands where possible, (3) remove any CSS rules not used on any page. Measure the file size before and after. Target: at least 30% reduction.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.8-css-containment.html">&larr; Lesson 20.8</a>
+      <a href="./lesson-20.10-performance-budget.html">Lesson 20.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
