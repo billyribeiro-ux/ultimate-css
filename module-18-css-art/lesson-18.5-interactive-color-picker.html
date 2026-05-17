@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.5 — CSS-Only Color Picker · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.5 · Color Picker</p>
+      <h1>CSS-Only Color Picker</h1>
+      <p class="lead">Three range inputs control Hue, Saturation, and Lightness via custom properties. The selected color renders in a preview swatch using <code>oklch()</code>, while complementary, analogous, and triadic harmonies are generated with <code>calc()</code> on the hue value.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Range inputs as CSS controllers</h2>
+      <p>HTML range inputs with <code>min</code>, <code>max</code>, and <code>value</code> attributes can drive CSS custom properties when combined with the <code>@property</code> rule. The trick is using the input's value directly in a style attribute that sets a custom property, which CSS then picks up for calculations.</p>
+
+      <h2>The OKLCH color model</h2>
+      <p>OKLCH separates color into Lightness (0-100%), Chroma (0-0.4), and Hue (0-360). This perceptual model means equal lightness steps look equally bright, making it ideal for generating harmonious palettes.</p>
+
+      <h2>Color harmonies via calc()</h2>
+      <p>A complementary color is the base hue + 180 degrees. Analogous colors are +/- 30 degrees. Triadic colors are +/- 120 degrees. All achieved with simple <code>calc(var(--hue) + 180)</code> expressions.</p>
+
+      <h2>The hue spectrum strip</h2>
+      <p>Behind the hue slider, a <code>conic-gradient</code> (or linear-gradient with multiple color stops at hue intervals) creates a full spectrum, giving the user visual feedback about which hue they are selecting.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Interactive Color Picker</h2>
+      <div class="demo-frame">
+        <style>
+          @property --hue {
+            syntax: "<number>";
+            initial-value: 240;
+            inherits: true;
+          }
+          @property --sat {
+            syntax: "<number>";
+            initial-value: 70;
+            inherits: true;
+          }
+          @property --lit {
+            syntax: "<number>";
+            initial-value: 65;
+            inherits: true;
+          }
+
+          .demo-18-5 {
+            font-family: system-ui, sans-serif;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+          }
+
+          .demo-18-5 .picker-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: oklch(35% 0.05 270);
+            text-align: center;
+          }
+
+          .demo-18-5 .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+
+          .demo-18-5 .slider-row {
+            display: grid;
+            grid-template-columns: 3rem 1fr 3rem;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          .demo-18-5 .slider-row label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: oklch(40% 0.05 270);
+          }
+
+          .demo-18-5 .slider-row output {
+            font-size: 0.8rem;
+            text-align: right;
+            color: oklch(50% 0.03 270);
+            font-variant-numeric: tabular-nums;
+          }
+
+          .demo-18-5 input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+          }
+
+          .demo-18-5 input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: oklch(98% 0 0);
+            border: 3px solid oklch(40% 0.1 270);
+            cursor: pointer;
+            box-shadow: 0 2px 4px oklch(20% 0 0 / 0.2);
+          }
+
+          .demo-18-5 .hue-slider {
+            background: linear-gradient(
+              to right,
+              oklch(65% 0.25 0),
+              oklch(65% 0.25 60),
+              oklch(65% 0.25 120),
+              oklch(65% 0.25 180),
+              oklch(65% 0.25 240),
+              oklch(65% 0.25 300),
+              oklch(65% 0.25 360)
+            );
+          }
+
+          .demo-18-5 .sat-slider {
+            background: linear-gradient(
+              to right,
+              oklch(65% 0 var(--hue)),
+              oklch(65% 0.3 var(--hue))
+            );
+          }
+
+          .demo-18-5 .lit-slider {
+            background: linear-gradient(
+              to right,
+              oklch(0% 0.15 var(--hue)),
+              oklch(50% 0.15 var(--hue)),
+              oklch(100% 0.15 var(--hue))
+            );
+          }
+
+          .demo-18-5 .preview-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+          }
+
+          .demo-18-5 .main-swatch {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            background: oklch(
+              calc(var(--lit) * 1%)
+              calc(var(--sat) * 0.004)
+              var(--hue)
+            );
+            box-shadow: 0 8px 24px oklch(20% 0 0 / 0.15);
+            transition: background 0.1s;
+          }
+
+          .demo-18-5 .harmonies {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            width: 100%;
+          }
+
+          .demo-18-5 .harmony-swatch {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: end;
+            padding-bottom: 0.5rem;
+            box-shadow: 0 2px 8px oklch(20% 0 0 / 0.1);
+          }
+
+          .demo-18-5 .harmony-swatch span {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: oklch(98% 0 0);
+            text-shadow: 0 1px 3px oklch(0% 0 0 / 0.5);
+          }
+
+          .demo-18-5 .h-complement {
+            background: oklch(
+              calc(var(--lit) * 1%)
+              calc(var(--sat) * 0.004)
+              calc(var(--hue) + 180)
+            );
+          }
+          .demo-18-5 .h-analogous1 {
+            background: oklch(
+              calc(var(--lit) * 1%)
+              calc(var(--sat) * 0.004)
+              calc(var(--hue) + 30)
+            );
+          }
+          .demo-18-5 .h-analogous2 {
+            background: oklch(
+              calc(var(--lit) * 1%)
+              calc(var(--sat) * 0.004)
+              calc(var(--hue) - 30)
+            );
+          }
+          .demo-18-5 .h-triadic {
+            background: oklch(
+              calc(var(--lit) * 1%)
+              calc(var(--sat) * 0.004)
+              calc(var(--hue) + 120)
+            );
+          }
+
+          .demo-18-5 .harmony-label {
+            text-align: center;
+            font-size: 0.75rem;
+            color: oklch(50% 0.03 270);
+            font-weight: 500;
+          }
+        </style>
+        <div class="demo-18-5" style="--hue: 240; --sat: 70; --lit: 65;">
+          <p class="picker-title">Color Picker</p>
+          <div class="slider-group">
+            <div class="slider-row">
+              <label>Hue</label>
+              <input type="range" class="hue-slider" min="0" max="360" value="240"
+                oninput="this.closest('.demo-18-5').style.setProperty('--hue', this.value); this.nextElementSibling.textContent = this.value">
+              <output>240</output>
+            </div>
+            <div class="slider-row">
+              <label>Sat</label>
+              <input type="range" class="sat-slider" min="0" max="100" value="70"
+                oninput="this.closest('.demo-18-5').style.setProperty('--sat', this.value); this.nextElementSibling.textContent = this.value">
+              <output>70</output>
+            </div>
+            <div class="slider-row">
+              <label>Light</label>
+              <input type="range" class="lit-slider" min="0" max="100" value="65"
+                oninput="this.closest('.demo-18-5').style.setProperty('--lit', this.value); this.nextElementSibling.textContent = this.value">
+              <output>65</output>
+            </div>
+          </div>
+          <div class="preview-area">
+            <div class="main-swatch"></div>
+            <div class="harmonies">
+              <div class="harmony-swatch h-complement"><span>Complement</span></div>
+              <div class="harmony-swatch h-analogous1"><span>Analog +</span></div>
+              <div class="harmony-swatch h-analogous2"><span>Analog -</span></div>
+              <div class="harmony-swatch h-triadic"><span>Triadic</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="picker" style="--hue:180; --sat:80; --lit:60"&gt;
+  &lt;input type="range" class="hue" min="0" max="360" value="180"&gt;
+  &lt;input type="range" class="sat" min="0" max="100" value="80"&gt;
+  &lt;input type="range" class="lit" min="0" max="100" value="60"&gt;
+  &lt;div class="swatch"&gt;&lt;/div&gt;
+  &lt;div class="harmonies"&gt;
+    &lt;div class="complement"&gt;&lt;/div&gt;
+    &lt;div class="triadic"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+.swatch {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  background: oklch(
+    calc(var(--lit) * 1%)
+    calc(var(--sat) * 0.004)
+    var(--hue)
+  );
+}
+.complement {
+  width: 60px; height: 60px;
+  border-radius: 8px;
+  background: oklch(
+    calc(var(--lit) * 1%)
+    calc(var(--sat) * 0.004)
+    calc(var(--hue) + 180)
+  );
+}
+.triadic {
+  width: 60px; height: 60px;
+  border-radius: 8px;
+  background: oklch(
+    calc(var(--lit) * 1%)
+    calc(var(--sat) * 0.004)
+    calc(var(--hue) + 120)
+  );
+}
+.hue {
+  background: linear-gradient(to right,
+    oklch(65% 0.25 0), oklch(65% 0.25 60),
+    oklch(65% 0.25 120), oklch(65% 0.25 180),
+    oklch(65% 0.25 240), oklch(65% 0.25 300),
+    oklch(65% 0.25 360)
+  );
+  -webkit-appearance: none;
+  height: 8px; border-radius: 4px;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Add a fourth slider for Chroma (0 to 0.4) and switch the output to true OKLCH notation. Then add a "split-complementary" row showing hue+150 and hue+210 swatches. Finally, display the computed color value as text using a CSS <code>counter()</code> trick or simply show the custom property values.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.4-pure-css-clock.html">&larr; Lesson 18.4</a>
+      <a href="./lesson-18.6-css-landscape-animation.html">Lesson 18.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

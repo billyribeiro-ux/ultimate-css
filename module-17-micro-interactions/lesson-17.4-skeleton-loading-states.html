@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.4 — Production Skeleton Loading · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.4 · Micro-Interactions</p>
+      <h1>Production Skeleton Loading</h1>
+      <p class="lead">Skeleton screens reduce perceived load time by showing the shape of content before it arrives. We build card, list, profile header, table, and form skeletons with a diagonal shimmer sweep, light/dark variants, and a crossfade reveal when the real content lands.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why skeletons beat spinners</h2>
+      <p>A spinner says "wait." A skeleton says "content is coming, and here's roughly what it looks like." Users perceive skeleton-loaded pages as 15-20% faster than spinner-loaded pages in A/B tests. The key is matching the skeleton dimensions to the real component so there is no layout shift when content arrives.</p>
+
+      <h2>The shimmer technique</h2>
+      <p>The shimmer effect is a diagonal linear gradient sweeping across the skeleton. The gradient is placed in <code>background-image</code> on top of the base color, sized at 200% width, then animated from <code>background-position: -100% 0</code> to <code>100% 0</code>. The gradient itself is transparent at the edges and a lighter tone in the center, creating the "shine" that moves across the surface.</p>
+
+      <h3>Light and dark variants</h3>
+      <p>Using <code>light-dark()</code> we set the skeleton base to a light gray in light mode and a dark gray in dark mode. The shimmer highlight adapts too: white at 10% opacity in light mode, white at 5% opacity in dark mode. No duplicate rules needed.</p>
+
+      <h3>Crossfade reveal</h3>
+      <p>When real content replaces the skeleton, we use <code>@starting-style</code> to define the initial opacity as 0. The content fades in over 300ms while the skeleton simultaneously fades out. This prevents the jarring snap that makes loading states feel broken.</p>
+
+      <h3>Component-matched dimensions</h3>
+      <p>Each skeleton variant uses the exact dimensions of the component it represents. A card skeleton has the same border-radius, padding, and height as a real card. A table skeleton matches row heights and column widths. This zero-layout-shift approach is what separates production skeletons from generic placeholder boxes.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Skeleton variants</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-4 {
+            padding: 2rem; font-family: system-ui;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            display: grid; gap: 2rem;
+          }
+          .demo-17-4 .skel {
+            --skel-base: light-dark(oklch(92% 0 0), oklch(22% 0 0));
+            --skel-shine: light-dark(oklch(100% 0 0 / 0.4), oklch(100% 0 0 / 0.08));
+            background: var(--skel-base);
+            background-image: linear-gradient(
+              110deg,
+              transparent 25%,
+              var(--skel-shine) 50%,
+              transparent 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 0.375rem;
+          }
+          @keyframes shimmer {
+            from { background-position: -100% 0; }
+            to { background-position: 100% 0; }
+          }
+
+          /* Card skeleton */
+          .demo-17-4 .skel-card {
+            display: grid; gap: 0.75rem; padding: 1rem;
+            border: 1px solid light-dark(oklch(90% 0 0), oklch(25% 0 0));
+            border-radius: 0.75rem; max-width: 20rem;
+          }
+          .demo-17-4 .skel-card__img { height: 8rem; border-radius: 0.5rem; }
+          .demo-17-4 .skel-card__title { height: 1.25rem; width: 70%; }
+          .demo-17-4 .skel-card__text { height: 0.875rem; width: 100%; }
+          .demo-17-4 .skel-card__text:last-child { width: 60%; }
+
+          /* List skeleton */
+          .demo-17-4 .skel-list { display: grid; gap: 0.75rem; max-width: 24rem; }
+          .demo-17-4 .skel-list__item {
+            display: flex; align-items: center; gap: 0.75rem;
+          }
+          .demo-17-4 .skel-list__avatar {
+            width: 2.5rem; height: 2.5rem; border-radius: 50%; flex-shrink: 0;
+          }
+          .demo-17-4 .skel-list__lines { flex: 1; display: grid; gap: 0.375rem; }
+          .demo-17-4 .skel-list__line { height: 0.75rem; }
+          .demo-17-4 .skel-list__line:first-child { width: 50%; }
+
+          /* Profile header skeleton */
+          .demo-17-4 .skel-profile {
+            display: flex; align-items: center; gap: 1rem; max-width: 20rem;
+          }
+          .demo-17-4 .skel-profile__avatar {
+            width: 4rem; height: 4rem; border-radius: 50%; flex-shrink: 0;
+          }
+          .demo-17-4 .skel-profile__info { flex: 1; display: grid; gap: 0.5rem; }
+          .demo-17-4 .skel-profile__name { height: 1rem; width: 60%; }
+          .demo-17-4 .skel-profile__bio { height: 0.75rem; width: 90%; }
+
+          /* Table skeleton */
+          .demo-17-4 .skel-table { display: grid; gap: 0.5rem; max-width: 100%; }
+          .demo-17-4 .skel-table__row {
+            display: grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap: 0.5rem;
+          }
+          .demo-17-4 .skel-table__cell { height: 1rem; }
+
+          /* Form skeleton */
+          .demo-17-4 .skel-form { display: grid; gap: 1rem; max-width: 18rem; }
+          .demo-17-4 .skel-form__label { height: 0.75rem; width: 30%; }
+          .demo-17-4 .skel-form__input { height: 2.25rem; border-radius: 0.375rem; }
+          .demo-17-4 .skel-form__btn { height: 2.5rem; width: 50%; border-radius: 0.5rem; }
+
+          /* Crossfade reveal */
+          .demo-17-4 .reveal {
+            opacity: 1;
+            transition: opacity 300ms ease;
+          }
+          @supports (transition-behavior: allow-discrete) {
+            .demo-17-4 .reveal {
+              @starting-style { opacity: 0; }
+            }
+          }
+
+          .demo-17-4 h3 {
+            font-size: 0.875rem; font-weight: 600;
+            color: light-dark(oklch(40% 0 0), oklch(70% 0 0));
+            margin: 0;
+          }
+        </style>
+        <div class="demo-17-4">
+          <h3>Card skeleton</h3>
+          <div class="skel-card">
+            <div class="skel skel-card__img"></div>
+            <div class="skel skel-card__title"></div>
+            <div class="skel skel-card__text"></div>
+            <div class="skel skel-card__text"></div>
+          </div>
+
+          <h3>List skeleton</h3>
+          <div class="skel-list">
+            <div class="skel-list__item">
+              <div class="skel skel-list__avatar"></div>
+              <div class="skel-list__lines">
+                <div class="skel skel-list__line"></div>
+                <div class="skel skel-list__line"></div>
+              </div>
+            </div>
+            <div class="skel-list__item">
+              <div class="skel skel-list__avatar"></div>
+              <div class="skel-list__lines">
+                <div class="skel skel-list__line"></div>
+                <div class="skel skel-list__line"></div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Profile header</h3>
+          <div class="skel-profile">
+            <div class="skel skel-profile__avatar"></div>
+            <div class="skel-profile__info">
+              <div class="skel skel-profile__name"></div>
+              <div class="skel skel-profile__bio"></div>
+            </div>
+          </div>
+
+          <h3>Table skeleton</h3>
+          <div class="skel-table">
+            <div class="skel-table__row">
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+            </div>
+            <div class="skel-table__row">
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+            </div>
+            <div class="skel-table__row">
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+              <div class="skel skel-table__cell"></div>
+            </div>
+          </div>
+
+          <h3>Form skeleton</h3>
+          <div class="skel-form">
+            <div class="skel skel-form__label"></div>
+            <div class="skel skel-form__input"></div>
+            <div class="skel skel-form__label"></div>
+            <div class="skel skel-form__input"></div>
+            <div class="skel skel-form__btn"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="skeleton-card"&gt;
+  &lt;div class="skel skel-img"&gt;&lt;/div&gt;
+  &lt;div class="skel skel-title"&gt;&lt;/div&gt;
+  &lt;div class="skel skel-line"&gt;&lt;/div&gt;
+  &lt;div class="skel skel-line short"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  background: #f8f8fa;
+}
+
+.skeleton-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  max-width: 18rem;
+  border-radius: 0.75rem;
+  border: 1px solid oklch(90% 0 0);
+}
+
+.skel {
+  background: oklch(92% 0 0);
+  background-image: linear-gradient(
+    110deg,
+    transparent 25%,
+    oklch(100% 0 0 / 0.4) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.375rem;
+}
+
+@keyframes shimmer {
+  from { background-position: -100% 0; }
+  to { background-position: 100% 0; }
+}
+
+.skel-img { height: 8rem; border-radius: 0.5rem; }
+.skel-title { height: 1.25rem; width: 65%; }
+.skel-line { height: 0.75rem; }
+.skel-line.short { width: 50%; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a "media card" skeleton that includes a 16:9 aspect-ratio image placeholder, a two-line title area, and a row of three small pill-shaped tag placeholders. Add a staggered animation delay so each skeleton element shimmers 100ms after the previous one, creating a wave effect across the card.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.3-notification-badges.html">&larr; Lesson 17.3</a>
+      <a href="./lesson-17.5-progress-indicators.html">Lesson 17.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

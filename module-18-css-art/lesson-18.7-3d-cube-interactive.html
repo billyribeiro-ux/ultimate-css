@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.7 — Interactive 3D CSS Cube · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.7 · 3D Transforms</p>
+      <h1>Interactive 3D CSS Cube</h1>
+      <p class="lead">Six faces positioned with <code>rotateX/Y/Z</code> and <code>translateZ</code> inside a <code>preserve-3d</code> container. Auto-rotation keyframes spin the cube continuously, while checkbox controls toggle rotation, explode the faces outward, and switch to wireframe mode.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Setting up 3D space</h2>
+      <p>The parent container needs <code>perspective: 800px</code> to create depth. The cube wrapper uses <code>transform-style: preserve-3d</code> so child elements exist in true 3D space rather than being flattened.</p>
+
+      <h2>Positioning six faces</h2>
+      <p>Each face starts as a square, then is rotated to its position: front (no rotation), back (rotateY 180deg), left (rotateY -90deg), right (rotateY 90deg), top (rotateX 90deg), bottom (rotateX -90deg). Each also gets <code>translateZ(half-width)</code> to push it outward from the center.</p>
+
+      <h2>Auto-rotation</h2>
+      <p>A keyframe animates <code>rotateX</code> and <code>rotateY</code> through 360 degrees. The animation duration controls speed (8-12s is visually pleasing). A checkbox with <code>:checked</code> can toggle <code>animation-play-state</code> between running and paused.</p>
+
+      <h2>Explode and wireframe modes</h2>
+      <p>Explode view increases <code>translateZ</code> on each face via a transition. Wireframe mode sets <code>background: transparent</code> and adds a visible <code>border</code>. Both are toggled with CSS-only checkboxes.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Interactive 3D Cube</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-18-7 {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            gap: 1.5rem;
+          }
+
+          .demo-18-7 .controls {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+          }
+
+          .demo-18-7 .controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: oklch(40% 0.05 270);
+            cursor: pointer;
+          }
+
+          .demo-18-7 .controls input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: oklch(55% 0.2 270);
+          }
+
+          .demo-18-7 .scene {
+            width: 250px;
+            height: 250px;
+            perspective: 800px;
+            perspective-origin: 50% 50%;
+          }
+
+          .demo-18-7 .cube {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 50px auto;
+            transform-style: preserve-3d;
+            animation: spin-18-7 10s linear infinite;
+          }
+
+          .demo-18-7 .face {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: oklch(98% 0 0);
+            backface-visibility: visible;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.4s, border 0.4s;
+            border: 2px solid transparent;
+          }
+
+          .demo-18-7 .front {
+            background: oklch(60% 0.2 270 / 0.85);
+            transform: rotateY(0deg) translateZ(75px);
+          }
+          .demo-18-7 .back {
+            background: oklch(60% 0.2 30 / 0.85);
+            transform: rotateY(180deg) translateZ(75px);
+          }
+          .demo-18-7 .left {
+            background: oklch(60% 0.2 150 / 0.85);
+            transform: rotateY(-90deg) translateZ(75px);
+          }
+          .demo-18-7 .right {
+            background: oklch(60% 0.2 330 / 0.85);
+            transform: rotateY(90deg) translateZ(75px);
+          }
+          .demo-18-7 .top {
+            background: oklch(60% 0.2 90 / 0.85);
+            transform: rotateX(90deg) translateZ(75px);
+          }
+          .demo-18-7 .bottom {
+            background: oklch(60% 0.2 210 / 0.85);
+            transform: rotateX(-90deg) translateZ(75px);
+          }
+
+          @keyframes spin-18-7 {
+            0% { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+          }
+
+          /* Pause rotation */
+          .demo-18-7:has(#ctrl-pause:checked) .cube {
+            animation-play-state: paused;
+          }
+
+          /* Explode */
+          .demo-18-7:has(#ctrl-explode:checked) .front {
+            transform: rotateY(0deg) translateZ(130px);
+          }
+          .demo-18-7:has(#ctrl-explode:checked) .back {
+            transform: rotateY(180deg) translateZ(130px);
+          }
+          .demo-18-7:has(#ctrl-explode:checked) .left {
+            transform: rotateY(-90deg) translateZ(130px);
+          }
+          .demo-18-7:has(#ctrl-explode:checked) .right {
+            transform: rotateY(90deg) translateZ(130px);
+          }
+          .demo-18-7:has(#ctrl-explode:checked) .top {
+            transform: rotateX(90deg) translateZ(130px);
+          }
+          .demo-18-7:has(#ctrl-explode:checked) .bottom {
+            transform: rotateX(-90deg) translateZ(130px);
+          }
+
+          /* Wireframe */
+          .demo-18-7:has(#ctrl-wireframe:checked) .face {
+            background: transparent;
+            border: 2px solid oklch(70% 0.2 270);
+            color: oklch(70% 0.2 270);
+          }
+          .demo-18-7:has(#ctrl-wireframe:checked) .back {
+            border-color: oklch(70% 0.2 30);
+            color: oklch(70% 0.2 30);
+          }
+          .demo-18-7:has(#ctrl-wireframe:checked) .left {
+            border-color: oklch(70% 0.2 150);
+            color: oklch(70% 0.2 150);
+          }
+          .demo-18-7:has(#ctrl-wireframe:checked) .right {
+            border-color: oklch(70% 0.2 330);
+            color: oklch(70% 0.2 330);
+          }
+          .demo-18-7:has(#ctrl-wireframe:checked) .top {
+            border-color: oklch(70% 0.2 90);
+            color: oklch(70% 0.2 90);
+          }
+          .demo-18-7:has(#ctrl-wireframe:checked) .bottom {
+            border-color: oklch(70% 0.2 210);
+            color: oklch(70% 0.2 210);
+          }
+        </style>
+        <div class="demo-18-7">
+          <div class="controls">
+            <label><input type="checkbox" id="ctrl-pause"> Pause rotation</label>
+            <label><input type="checkbox" id="ctrl-explode"> Explode view</label>
+            <label><input type="checkbox" id="ctrl-wireframe"> Wireframe</label>
+          </div>
+          <div class="scene">
+            <div class="cube">
+              <div class="face front">Front</div>
+              <div class="face back">Back</div>
+              <div class="face left">Left</div>
+              <div class="face right">Right</div>
+              <div class="face top">Top</div>
+              <div class="face bottom">Bottom</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;div class="cube"&gt;
+    &lt;div class="face front"&gt;Front&lt;/div&gt;
+    &lt;div class="face back"&gt;Back&lt;/div&gt;
+    &lt;div class="face left"&gt;Left&lt;/div&gt;
+    &lt;div class="face right"&gt;Right&lt;/div&gt;
+    &lt;div class="face top"&gt;Top&lt;/div&gt;
+    &lt;div class="face bottom"&gt;Bottom&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.scene {
+  width: 200px; height: 200px;
+  perspective: 800px;
+}
+.cube {
+  position: relative;
+  width: 120px; height: 120px;
+  margin: 40px auto;
+  transform-style: preserve-3d;
+  animation: spin 8s linear infinite;
+}
+.face {
+  position: absolute;
+  width: 120px; height: 120px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+}
+.front  { background: oklch(60% 0.2 270 / 0.85); transform: rotateY(0) translateZ(60px); }
+.back   { background: oklch(60% 0.2 30 / 0.85); transform: rotateY(180deg) translateZ(60px); }
+.left   { background: oklch(60% 0.2 150 / 0.85); transform: rotateY(-90deg) translateZ(60px); }
+.right  { background: oklch(60% 0.2 330 / 0.85); transform: rotateY(90deg) translateZ(60px); }
+.top    { background: oklch(60% 0.2 90 / 0.85); transform: rotateX(90deg) translateZ(60px); }
+.bottom { background: oklch(60% 0.2 210 / 0.85); transform: rotateX(-90deg) translateZ(60px); }
+@keyframes spin {
+  to { transform: rotateX(360deg) rotateY(360deg); }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Transform the cube into a dodecahedron (12 pentagonal faces). You will need to calculate the rotation angles for each face using the golden ratio. Alternatively, make a simpler octahedron (8 triangular faces) using clip-path to create the triangles. Add a fourth checkbox that switches between cube/octahedron shapes by transitioning all face transforms simultaneously.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.6-css-landscape-animation.html">&larr; Lesson 18.6</a>
+      <a href="./lesson-18.8-particle-effects.html">Lesson 18.8 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

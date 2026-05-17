@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.8 — The Email Client · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.8 · Real-World Layout</p>
+      <h1>The Email Client (Gmail/Outlook Style)</h1>
+      <p class="lead">A three-column email client with a folder sidebar, email list, and reading pane. Read/unread states via <code>:has(input:checked)</code>, star toggles via checkbox with <code>clip-path</code>, a compose modal using the Popover API, and responsive collapse via container queries. The full Gmail layout in pure CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Anatomy of the layout</h2>
+      <p>The email client uses a three-column grid: a narrow folder sidebar, a scrollable message list, and a wider reading pane. The message list items are selectable via hidden checkboxes. When a message checkbox is checked, <code>:has(input:checked)</code> on the reading pane shows the corresponding email content.</p>
+
+      <h2>Read/unread states</h2>
+      <p>Unread messages use <code>font-weight: 700</code> and a left border accent. Once "read" (simulated by checking a checkbox), the style shifts to normal weight. The <code>:has()</code> selector on the list item detects whether its internal checkbox is in a read state.</p>
+
+      <h2>Star toggle via clip-path</h2>
+      <p>The star is a <code>label</code> element styled with a five-pointed <code>clip-path: polygon()</code>. Its associated checkbox toggles between filled (gold) and outline (gray) states. No SVG, no icon font, just geometry.</p>
+
+      <h2>Compose modal via Popover</h2>
+      <p>The compose button triggers a <code>[popover]</code> element styled as a floating compose window. It includes To, Subject, and Body fields, positioned at the bottom-right like Gmail. The popover API handles dismiss-on-escape and backdrop stacking.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full email client</h2>
+      <div class="demo-frame" style="padding:0; background:oklch(8% 0.02 264); overflow-y:auto; max-block-size:80vh;">
+        <style>
+          .demo-16-8 { font-family: system-ui, -apple-system, sans-serif; color: light-dark(oklch(20% 0.01 264), oklch(90% 0.01 264)); background: light-dark(oklch(98% 0.005 264), oklch(8% 0.02 264)); line-height: 1.5; display: grid; grid-template-columns: 10rem 18rem 1fr; block-size: 36rem; overflow: hidden; border-radius: 0.75rem; border: 1px solid light-dark(oklch(90% 0.01 264), oklch(16% 0.01 264)); }
+          .demo-16-8 *, .demo-16-8 *::before, .demo-16-8 *::after { box-sizing: border-box; margin: 0; }
+
+          /* Folder sidebar */
+          .demo-16-8 .folder-sidebar { background: light-dark(oklch(96% 0.005 264), oklch(9% 0.015 264)); border-inline-end: 1px solid light-dark(oklch(90% 0.01 264), oklch(16% 0.01 264)); padding: 1rem 0; overflow-y: auto; }
+          .demo-16-8 .compose-btn { display: block; margin: 0 0.75rem 1.25rem; padding: 0.625rem 1rem; border-radius: 2rem; background: oklch(48% 0.2 275); color: white; border: none; font-weight: 600; font-size: 0.8125rem; cursor: pointer; text-align: center; inline-size: calc(100% - 1.5rem); }
+          .demo-16-8 .folder-list { list-style: none; padding: 0; }
+          .demo-16-8 .folder-list li { padding: 0.5rem 1rem; font-size: 0.8125rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 150ms; }
+          .demo-16-8 .folder-list li:hover { background: light-dark(oklch(93% 0.01 264), oklch(14% 0.02 264)); }
+          .demo-16-8 .folder-list li.active { background: light-dark(oklch(90% 0.03 275), oklch(14% 0.04 275)); color: oklch(50% 0.18 275); font-weight: 600; }
+          .demo-16-8 .folder-list .badge-count { font-size: 0.6875rem; background: oklch(48% 0.2 275); color: white; padding: 0.1rem 0.4rem; border-radius: 1rem; }
+
+          /* Email list */
+          .demo-16-8 .email-list { border-inline-end: 1px solid light-dark(oklch(90% 0.01 264), oklch(16% 0.01 264)); overflow-y: auto; }
+          .demo-16-8 .list-header { padding: 0.75rem 1rem; font-weight: 700; font-size: 0.9375rem; border-block-end: 1px solid light-dark(oklch(92% 0.01 264), oklch(16% 0.01 264)); display: flex; align-items: center; justify-content: space-between; position: sticky; inset-block-start: 0; background: light-dark(oklch(98% 0.005 264), oklch(8% 0.02 264)); z-index: 5; }
+          .demo-16-8 .email-item { padding: 0.75rem 1rem; border-block-end: 1px solid light-dark(oklch(95% 0.005 264), oklch(13% 0.01 264)); cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; gap: 0.5rem; align-items: start; transition: background 150ms; }
+          .demo-16-8 .email-item:hover { background: light-dark(oklch(96% 0.005 264), oklch(12% 0.02 264)); }
+          .demo-16-8 .email-item.unread { border-inline-start: 3px solid oklch(48% 0.2 275); }
+          .demo-16-8 .email-item.unread .email-sender { font-weight: 700; }
+          .demo-16-8 .email-item.unread .email-subject { font-weight: 600; }
+
+          /* Star */
+          .demo-16-8 .star-toggle { position: relative; }
+          .demo-16-8 .star-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+          .demo-16-8 .star-toggle label { display: block; inline-size: 1rem; block-size: 1rem; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: light-dark(oklch(82% 0.01 264), oklch(30% 0.01 264)); cursor: pointer; transition: background 200ms; }
+          .demo-16-8 .star-toggle input:checked + label { background: oklch(75% 0.18 85); }
+
+          .demo-16-8 .email-content { min-inline-size: 0; }
+          .demo-16-8 .email-sender { font-size: 0.8125rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .demo-16-8 .email-subject { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .demo-16-8 .email-preview { font-size: 0.6875rem; color: light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .demo-16-8 .email-time { font-size: 0.625rem; color: light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264)); white-space: nowrap; }
+
+          /* Reading pane */
+          .demo-16-8 .reading-pane { overflow-y: auto; padding: 1.5rem; }
+          .demo-16-8 .reading-pane .rp-header { margin-block-end: 1.5rem; padding-block-end: 1rem; border-block-end: 1px solid light-dark(oklch(92% 0.01 264), oklch(16% 0.01 264)); }
+          .demo-16-8 .rp-header h2 { font-size: 1.125rem; font-weight: 700; margin-block-end: 0.5rem; }
+          .demo-16-8 .rp-meta { display: flex; align-items: center; gap: 0.75rem; font-size: 0.75rem; color: light-dark(oklch(50% 0.01 264), oklch(55% 0.01 264)); }
+          .demo-16-8 .rp-meta .rp-avatar { inline-size: 2rem; block-size: 2rem; border-radius: 50%; background: linear-gradient(135deg, oklch(55% 0.18 275), oklch(50% 0.15 250)); }
+          .demo-16-8 .rp-body { font-size: 0.8125rem; line-height: 1.7; color: light-dark(oklch(30% 0.01 264), oklch(75% 0.01 264)); }
+          .demo-16-8 .rp-body p { margin-block-end: 1rem; }
+
+          /* Compose popover */
+          .demo-16-8 [popover] { border: none; padding: 0; inset: auto 1rem 1rem auto; inline-size: 20rem; border-radius: 0.75rem; background: light-dark(oklch(99% 0.005 264), oklch(12% 0.015 264)); box-shadow: 0 8px 32px oklch(0% 0 0 / 0.3); overflow: hidden; }
+          .demo-16-8 [popover]::backdrop { background: oklch(0% 0 0 / 0.3); }
+          .demo-16-8 .compose-header { padding: 0.75rem 1rem; background: oklch(48% 0.2 275); color: white; font-weight: 600; font-size: 0.8125rem; }
+          .demo-16-8 .compose-body { padding: 0.75rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+          .demo-16-8 .compose-body input, .demo-16-8 .compose-body textarea { border: 1px solid light-dark(oklch(88% 0.01 264), oklch(24% 0.01 264)); border-radius: 0.375rem; padding: 0.5rem; font-size: 0.75rem; font-family: inherit; background: light-dark(oklch(97% 0.005 264), oklch(14% 0.015 264)); color: inherit; }
+          .demo-16-8 .compose-body textarea { min-block-size: 6rem; resize: vertical; }
+          .demo-16-8 .compose-send { padding: 0.5rem 1.25rem; border-radius: 0.375rem; background: oklch(48% 0.2 275); color: white; border: none; font-weight: 600; font-size: 0.75rem; cursor: pointer; align-self: flex-start; }
+        </style>
+        <div class="demo-16-8">
+          <aside class="folder-sidebar">
+            <button class="compose-btn" popovertarget="compose-16-8">Compose</button>
+            <ul class="folder-list">
+              <li class="active">Inbox <span class="badge-count">12</span></li>
+              <li>Starred</li>
+              <li>Sent</li>
+              <li>Drafts <span class="badge-count">3</span></li>
+              <li>Archive</li>
+              <li>Spam</li>
+              <li>Trash</li>
+            </ul>
+          </aside>
+
+          <div class="email-list">
+            <div class="list-header">
+              <span>Inbox</span>
+              <span style="font-size:0.6875rem; font-weight:400; color:light-dark(oklch(55% 0.01 264), oklch(50% 0.01 264))">12 messages</span>
+            </div>
+            <div class="email-item unread">
+              <div class="star-toggle"><input type="checkbox" id="star1-16-8" checked><label for="star1-16-8"></label></div>
+              <div class="email-content"><div class="email-sender">Alex Thompson</div><div class="email-subject">Q4 Planning Document</div><div class="email-preview">Hey team, I have attached the Q4 planning doc for review...</div></div>
+              <div class="email-time">10:23 AM</div>
+            </div>
+            <div class="email-item unread">
+              <div class="star-toggle"><input type="checkbox" id="star2-16-8"><label for="star2-16-8"></label></div>
+              <div class="email-content"><div class="email-sender">Design System Bot</div><div class="email-subject">New components published</div><div class="email-preview">Version 4.2.0 of the design system has been released with...</div></div>
+              <div class="email-time">9:45 AM</div>
+            </div>
+            <div class="email-item">
+              <div class="star-toggle"><input type="checkbox" id="star3-16-8"><label for="star3-16-8"></label></div>
+              <div class="email-content"><div class="email-sender">Maria Garcia</div><div class="email-subject">Lunch tomorrow?</div><div class="email-preview">Would love to catch up. Are you free around noon?</div></div>
+              <div class="email-time">Yesterday</div>
+            </div>
+            <div class="email-item">
+              <div class="star-toggle"><input type="checkbox" id="star4-16-8" checked><label for="star4-16-8"></label></div>
+              <div class="email-content"><div class="email-sender">CI Pipeline</div><div class="email-subject">Build #1847 passed</div><div class="email-preview">All 342 tests passed. Coverage: 94.2%.</div></div>
+              <div class="email-time">Yesterday</div>
+            </div>
+            <div class="email-item">
+              <div class="star-toggle"><input type="checkbox" id="star5-16-8"><label for="star5-16-8"></label></div>
+              <div class="email-content"><div class="email-sender">James Wilson</div><div class="email-subject">Conference tickets confirmed</div><div class="email-preview">Great news, we got all five tickets for the team...</div></div>
+              <div class="email-time">Mon</div>
+            </div>
+            <div class="email-item">
+              <div class="star-toggle"><input type="checkbox" id="star6-16-8"><label for="star6-16-8"></label></div>
+              <div class="email-content"><div class="email-sender">Newsletter</div><div class="email-subject">This week in CSS</div><div class="email-preview">Baseline updates, new features shipping in browsers...</div></div>
+              <div class="email-time">Mon</div>
+            </div>
+          </div>
+
+          <div class="reading-pane">
+            <div class="rp-header">
+              <h2>Q4 Planning Document</h2>
+              <div class="rp-meta">
+                <div class="rp-avatar"></div>
+                <div><strong>Alex Thompson</strong> to me<br>Today at 10:23 AM</div>
+              </div>
+            </div>
+            <div class="rp-body">
+              <p>Hey team,</p>
+              <p>I have attached the Q4 planning document for everyone to review. The key priorities this quarter are shipping the new design system, migrating to the updated infrastructure, and launching the mobile app beta.</p>
+              <p>Please add your comments directly to the doc by end of week. We will discuss in our Monday sync.</p>
+              <p>A few things to note:</p>
+              <p>1. The design system timeline is aggressive but achievable if we start the token migration this week.<br>2. Infrastructure migration has a hard deadline of November 15th.<br>3. Mobile beta invites go out December 1st.</p>
+              <p>Let me know if you have questions.</p>
+              <p>Best,<br>Alex</p>
+            </div>
+          </div>
+
+          <div id="compose-16-8" popover>
+            <div class="compose-header">New Message</div>
+            <div class="compose-body">
+              <input type="text" placeholder="To">
+              <input type="text" placeholder="Subject">
+              <textarea placeholder="Write your message..."></textarea>
+              <button class="compose-send">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — star toggle with clip-path</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="star-demo"&gt;
+  &lt;div class="star-item"&gt;
+    &lt;input type="checkbox" id="s1"&gt;
+    &lt;label for="s1"&gt;&lt;/label&gt;
+    &lt;span&gt;Important email about Q4 planning&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="star-item"&gt;
+    &lt;input type="checkbox" id="s2" checked&gt;
+    &lt;label for="s2"&gt;&lt;/label&gt;
+    &lt;span&gt;Conference ticket confirmation&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="star-item"&gt;
+    &lt;input type="checkbox" id="s3"&gt;
+    &lt;label for="s3"&gt;&lt;/label&gt;
+    &lt;span&gt;Weekly newsletter digest&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.star-demo { display: flex; flex-direction: column; gap: 0.75rem; }
+.star-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid oklch(90% 0.01 264); }
+.star-item input { position: absolute; opacity: 0; }
+.star-item label {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%,
+    68% 57%, 79% 91%, 50% 70%,
+    21% 91%, 32% 57%, 2% 35%, 39% 35%
+  );
+  background: oklch(85% 0.01 264);
+  cursor: pointer;
+  transition: background 200ms;
+  flex-shrink: 0;
+}
+.star-item input:checked + label {
+  background: oklch(75% 0.18 85);
+}
+.star-item span { font-size: 0.875rem; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>The email client demonstrates CSS as a full UI state layer. Star toggles are checkboxes with <code>clip-path</code> geometry. Read/unread states derive from <code>:has()</code>. The compose window is a native <code>[popover]</code>. Three-column layouts with scrollable panes are a simple grid declaration. The browser is the framework.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.7-music-player.html">&larr; Lesson 16.7</a>
+      <a href="./lesson-16.9-social-feed.html">Lesson 16.9 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

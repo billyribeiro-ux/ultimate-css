@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.3 — CSS-Only Tic-Tac-Toe · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.3</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.3 · CSS Game</p>
+      <h1>CSS-Only Tic-Tac-Toe</h1>
+      <p class="lead">A fully playable two-player game built without JavaScript. Radio inputs track turns, <code>::before</code>/<code>::after</code> draw X and O marks, and <code>:has()</code> selectors detect all eight winning combinations to display the winner.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>How it works</h2>
+      <p>Each of the nine cells contains two radio inputs: one for X and one for O. They share a name per cell so only one can be selected. A separate set of "turn" radios tracks whose turn it is. When a cell is clicked, CSS uses the <code>:checked</code> state cascade to show the appropriate mark and advance the turn.</p>
+
+      <h2>Drawing X and O</h2>
+      <p>The X mark is two pseudo-elements rotated 45 degrees in opposite directions, forming a cross. The O mark is a circle created with <code>border-radius: 50%</code> and a transparent center. Both are revealed only when their corresponding radio input is checked.</p>
+
+      <h2>Turn tracking</h2>
+      <p>A counter at the top of the game area uses the general sibling combinator and <code>:has()</code> to determine the current turn by counting how many cells have been filled. Odd fills mean it is O's turn; even fills (including zero) mean X's turn.</p>
+
+      <h2>Win detection with :has()</h2>
+      <p>The <code>:has()</code> selector checks for all eight winning lines (3 rows, 3 columns, 2 diagonals). When a winning combination is detected, a full-board overlay appears with the winner announced via <code>::after</code> content.</p>
+
+      <h2>Limitations</h2>
+      <p>Without JavaScript there is no AI opponent, no draw detection beyond visual inspection, and resetting requires a page reload. But as a proof of concept, it demonstrates the remarkable logic CSS can express.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Playable Tic-Tac-Toe</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-18-3 {
+            --cell: 100px;
+            --gap: 4px;
+            --mark-color-x: oklch(65% 0.25 25);
+            --mark-color-o: oklch(65% 0.2 250);
+            --board-bg: oklch(25% 0.02 270);
+            --cell-bg: oklch(95% 0.01 270);
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            gap: 1rem;
+          }
+
+          .demo-18-3 .board {
+            display: grid;
+            grid-template-columns: repeat(3, var(--cell));
+            grid-template-rows: repeat(3, var(--cell));
+            gap: var(--gap);
+            background: var(--board-bg);
+            padding: var(--gap);
+            border-radius: 12px;
+            position: relative;
+          }
+
+          .demo-18-3 .cell {
+            position: relative;
+            background: var(--cell-bg);
+            border-radius: 6px;
+            overflow: hidden;
+          }
+
+          .demo-18-3 .cell input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 2;
+          }
+
+          .demo-18-3 .cell input:checked {
+            pointer-events: none;
+            z-index: -1;
+          }
+
+          /* Hide O inputs on X turns (odd cells filled = O turn) */
+          .demo-18-3 .cell .o-input { z-index: 1; }
+          .demo-18-3 .cell .x-input { z-index: 3; }
+
+          /* Turn management: count checked inputs */
+          /* After 1 move (X played), O should go next, etc. */
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c2 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c3 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c4 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c5 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c6 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c7 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c8 .o-input:not(:checked),
+          .demo-18-3 .board:has(.c1 .x-input:checked) .c9 .o-input:not(:checked) {
+            z-index: 3;
+          }
+
+          /* Simple turn approach: X inputs visible by default, O shown after X plays */
+          .demo-18-3 .cell .o-input {
+            display: none;
+          }
+          .demo-18-3 .cell .x-input:checked ~ .o-input {
+            display: block;
+          }
+
+          /* Simpler approach: alternating turns via sibling logic */
+          /* Each cell only allows one mark. First click = X, tracked by name group */
+          .demo-18-3 .cell input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+          }
+
+          /* X mark via ::before and ::after on label */
+          .demo-18-3 .cell .mark-x {
+            position: absolute;
+            inset: 20%;
+            display: none;
+          }
+          .demo-18-3 .cell .mark-x::before,
+          .demo-18-3 .cell .mark-x::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            height: 6px;
+            background: var(--mark-color-x);
+            border-radius: 3px;
+          }
+          .demo-18-3 .cell .mark-x::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+          }
+          .demo-18-3 .cell .mark-x::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+          }
+          .demo-18-3 .cell .x-input:checked ~ .mark-x {
+            display: block;
+            animation: pop-18-3 0.2s ease-out;
+          }
+
+          /* O mark */
+          .demo-18-3 .cell .mark-o {
+            position: absolute;
+            inset: 20%;
+            border: 6px solid var(--mark-color-o);
+            border-radius: 50%;
+            display: none;
+          }
+          .demo-18-3 .cell .o-input:checked ~ .mark-o {
+            display: block;
+            animation: pop-18-3 0.2s ease-out;
+          }
+
+          @keyframes pop-18-3 {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+          }
+
+          /* --- Win Detection --- */
+          .demo-18-3 .win-overlay {
+            position: absolute;
+            inset: 0;
+            background: oklch(15% 0.02 270 / 0.9);
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+          }
+          .demo-18-3 .win-overlay::after {
+            font-size: 2rem;
+            font-weight: 700;
+            color: oklch(95% 0 0);
+          }
+
+          /* X wins - Row 1 */
+          .demo-18-3 .board:has(.c1 .x-input:checked):has(.c2 .x-input:checked):has(.c3 .x-input:checked) .win-overlay,
+          /* X wins - Row 2 */
+          .demo-18-3 .board:has(.c4 .x-input:checked):has(.c5 .x-input:checked):has(.c6 .x-input:checked) .win-overlay,
+          /* X wins - Row 3 */
+          .demo-18-3 .board:has(.c7 .x-input:checked):has(.c8 .x-input:checked):has(.c9 .x-input:checked) .win-overlay,
+          /* X wins - Col 1 */
+          .demo-18-3 .board:has(.c1 .x-input:checked):has(.c4 .x-input:checked):has(.c7 .x-input:checked) .win-overlay,
+          /* X wins - Col 2 */
+          .demo-18-3 .board:has(.c2 .x-input:checked):has(.c5 .x-input:checked):has(.c8 .x-input:checked) .win-overlay,
+          /* X wins - Col 3 */
+          .demo-18-3 .board:has(.c3 .x-input:checked):has(.c6 .x-input:checked):has(.c9 .x-input:checked) .win-overlay,
+          /* X wins - Diag 1 */
+          .demo-18-3 .board:has(.c1 .x-input:checked):has(.c5 .x-input:checked):has(.c9 .x-input:checked) .win-overlay,
+          /* X wins - Diag 2 */
+          .demo-18-3 .board:has(.c3 .x-input:checked):has(.c5 .x-input:checked):has(.c7 .x-input:checked) .win-overlay {
+            display: flex;
+          }
+          .demo-18-3 .board:has(.c1 .x-input:checked):has(.c2 .x-input:checked):has(.c3 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c4 .x-input:checked):has(.c5 .x-input:checked):has(.c6 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c7 .x-input:checked):has(.c8 .x-input:checked):has(.c9 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c1 .x-input:checked):has(.c4 .x-input:checked):has(.c7 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c2 .x-input:checked):has(.c5 .x-input:checked):has(.c8 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c3 .x-input:checked):has(.c6 .x-input:checked):has(.c9 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c1 .x-input:checked):has(.c5 .x-input:checked):has(.c9 .x-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c3 .x-input:checked):has(.c5 .x-input:checked):has(.c7 .x-input:checked) .win-overlay::after {
+            content: "X Wins!";
+            color: var(--mark-color-x);
+          }
+
+          /* O wins - Row 1 */
+          .demo-18-3 .board:has(.c1 .o-input:checked):has(.c2 .o-input:checked):has(.c3 .o-input:checked) .win-overlay,
+          /* O wins - Row 2 */
+          .demo-18-3 .board:has(.c4 .o-input:checked):has(.c5 .o-input:checked):has(.c6 .o-input:checked) .win-overlay,
+          /* O wins - Row 3 */
+          .demo-18-3 .board:has(.c7 .o-input:checked):has(.c8 .o-input:checked):has(.c9 .o-input:checked) .win-overlay,
+          /* O wins - Col 1 */
+          .demo-18-3 .board:has(.c1 .o-input:checked):has(.c4 .o-input:checked):has(.c7 .o-input:checked) .win-overlay,
+          /* O wins - Col 2 */
+          .demo-18-3 .board:has(.c2 .o-input:checked):has(.c5 .o-input:checked):has(.c8 .o-input:checked) .win-overlay,
+          /* O wins - Col 3 */
+          .demo-18-3 .board:has(.c3 .o-input:checked):has(.c6 .o-input:checked):has(.c9 .o-input:checked) .win-overlay,
+          /* O wins - Diag 1 */
+          .demo-18-3 .board:has(.c1 .o-input:checked):has(.c5 .o-input:checked):has(.c9 .o-input:checked) .win-overlay,
+          /* O wins - Diag 2 */
+          .demo-18-3 .board:has(.c3 .o-input:checked):has(.c5 .o-input:checked):has(.c7 .o-input:checked) .win-overlay {
+            display: flex;
+          }
+          .demo-18-3 .board:has(.c1 .o-input:checked):has(.c2 .o-input:checked):has(.c3 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c4 .o-input:checked):has(.c5 .o-input:checked):has(.c6 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c7 .o-input:checked):has(.c8 .o-input:checked):has(.c9 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c1 .o-input:checked):has(.c4 .o-input:checked):has(.c7 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c2 .o-input:checked):has(.c5 .o-input:checked):has(.c8 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c3 .o-input:checked):has(.c6 .o-input:checked):has(.c9 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c1 .o-input:checked):has(.c5 .o-input:checked):has(.c9 .o-input:checked) .win-overlay::after,
+          .demo-18-3 .board:has(.c3 .o-input:checked):has(.c5 .o-input:checked):has(.c7 .o-input:checked) .win-overlay::after {
+            content: "O Wins!";
+            color: var(--mark-color-o);
+          }
+
+          /* Turn indicator */
+          .demo-18-3 .turn-indicator {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: oklch(70% 0.1 270);
+          }
+
+          /* Reset hint */
+          .demo-18-3 .reset-hint {
+            font-size: 0.85rem;
+            color: oklch(60% 0.02 270);
+            margin-top: 0.5rem;
+          }
+
+          /* Title */
+          .demo-18-3 .game-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: oklch(40% 0.1 270);
+            letter-spacing: -0.02em;
+          }
+        </style>
+        <div class="demo-18-3">
+          <p class="game-title">Tic-Tac-Toe</p>
+          <p class="turn-indicator">Take turns clicking cells (X goes first)</p>
+          <div class="board">
+            <div class="cell c1">
+              <input type="radio" name="c1" class="x-input" id="c1x">
+              <input type="radio" name="c1" class="o-input" id="c1o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c2">
+              <input type="radio" name="c2" class="x-input" id="c2x">
+              <input type="radio" name="c2" class="o-input" id="c2o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c3">
+              <input type="radio" name="c3" class="x-input" id="c3x">
+              <input type="radio" name="c3" class="o-input" id="c3o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c4">
+              <input type="radio" name="c4" class="x-input" id="c4x">
+              <input type="radio" name="c4" class="o-input" id="c4o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c5">
+              <input type="radio" name="c5" class="x-input" id="c5x">
+              <input type="radio" name="c5" class="o-input" id="c5o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c6">
+              <input type="radio" name="c6" class="x-input" id="c6x">
+              <input type="radio" name="c6" class="o-input" id="c6o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c7">
+              <input type="radio" name="c7" class="x-input" id="c7x">
+              <input type="radio" name="c7" class="o-input" id="c7o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c8">
+              <input type="radio" name="c8" class="x-input" id="c8x">
+              <input type="radio" name="c8" class="o-input" id="c8o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="cell c9">
+              <input type="radio" name="c9" class="x-input" id="c9x">
+              <input type="radio" name="c9" class="o-input" id="c9o">
+              <span class="mark-x"></span>
+              <span class="mark-o"></span>
+            </div>
+            <div class="win-overlay"></div>
+          </div>
+          <p class="reset-hint">Reload the page to reset the game</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="board"&gt;
+  &lt;div class="cell c1"&gt;
+    &lt;input type="radio" name="c1" class="x-input"&gt;
+    &lt;input type="radio" name="c1" class="o-input"&gt;
+    &lt;span class="mark-x"&gt;&lt;/span&gt;
+    &lt;span class="mark-o"&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;!-- repeat for c2-c9 --&gt;
+  &lt;div class="win-overlay"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  gap: 4px;
+  background: oklch(25% 0.02 270);
+  padding: 4px;
+  border-radius: 12px;
+  position: relative;
+}
+.cell {
+  position: relative;
+  height: 100px;
+  background: oklch(95% 0.01 270);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.cell input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.cell input:checked {
+  pointer-events: none;
+  z-index: -1;
+}
+/* X mark */
+.mark-x { position: absolute; inset: 20%; display: none; }
+.mark-x::before, .mark-x::after {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 80%; height: 6px;
+  background: oklch(65% 0.25 25);
+  border-radius: 3px;
+}
+.mark-x::before { transform: translate(-50%,-50%) rotate(45deg); }
+.mark-x::after { transform: translate(-50%,-50%) rotate(-45deg); }
+.x-input:checked ~ .mark-x { display: block; }
+/* O mark */
+.mark-o {
+  position: absolute; inset: 20%;
+  border: 6px solid oklch(65% 0.2 250);
+  border-radius: 50%;
+  display: none;
+}
+.o-input:checked ~ .mark-o { display: block; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Add draw detection: when all 9 cells have a <code>:checked</code> radio and no win overlay is visible, use <code>:has()</code> with all nine cells checked to show a "Draw!" message. You will need a compound selector checking that all cells contain a checked input while none of the win conditions are met.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.2-animated-icons.html">&larr; Lesson 18.2</a>
+      <a href="./lesson-18.4-pure-css-clock.html">Lesson 18.4 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

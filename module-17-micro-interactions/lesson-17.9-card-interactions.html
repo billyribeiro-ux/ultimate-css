@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.9 — Card Hover, Press & Drag Feedback · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.9 · Micro-Interactions</p>
+      <h1>Card Hover, Press & Drag Feedback</h1>
+      <p class="lead">Cards that lift on hover with <code>translateY(-2px)</code> and a growing shadow, press down on <code>:active</code> with <code>scale(0.98)</code>, zoom their image inside <code>overflow: hidden</code>, reveal content with a slide-up, and use the card-link pattern with a stretched <code>::after</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The lift effect</h2>
+      <p>On hover, the card lifts 2px (using <code>translateY(-2px)</code>) and its box-shadow grows. The shadow transitions from a tight, subtle shadow to a larger, softer one. This creates the illusion of the card "floating" off the page. The transition uses 200ms ease for both transform and shadow.</p>
+
+      <h2>Press feedback</h2>
+      <p>On <code>:active</code>, the card scales to 0.98 and the shadow shrinks back. This gives tactile feedback that the card has been "pushed down." The transition for active is shorter (100ms) to feel snappy and responsive.</p>
+
+      <h3>Image zoom</h3>
+      <p>The card image wrapper has <code>overflow: hidden</code>. On card hover, the image inside scales to 1.05 with a 400ms ease transition. This slow zoom creates a cinematic parallax feel. The overflow clipping prevents the image from breaking out of its container.</p>
+
+      <h3>Content reveal</h3>
+      <p>A description or action row below the card content slides up from <code>translateY(0.5rem)</code> and fades in on hover. This progressive disclosure shows more detail only when the user signals interest. It uses a 200ms ease with a 50ms delay to sequence after the lift.</p>
+
+      <h3>The card-link pattern</h3>
+      <p>The card's primary link gets a <code>::after</code> pseudo-element with <code>position: absolute; inset: 0</code>, making the entire card surface clickable. This avoids wrapping the whole card in an anchor (which creates accessibility issues with nested interactive elements). Secondary actions get <code>position: relative; z-index: 1</code> to sit above the stretched link.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Card interactions</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-9 {
+            padding: 2rem; font-family: system-ui;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+            gap: 1.5rem;
+          }
+
+          .demo-17-9 .card {
+            position: relative;
+            background: light-dark(oklch(100% 0 0), oklch(18% 0 0));
+            border: 1px solid light-dark(oklch(92% 0 0), oklch(25% 0 0));
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.06);
+            transition: transform 200ms ease, box-shadow 200ms ease;
+          }
+          .demo-17-9 .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px oklch(0% 0 0 / 0.1);
+          }
+          .demo-17-9 .card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.06);
+            transition-duration: 100ms;
+          }
+
+          /* Image zoom */
+          .demo-17-9 .card__img {
+            overflow: hidden; aspect-ratio: 16/9;
+            background: light-dark(oklch(93% 0.02 260), oklch(25% 0.02 260));
+          }
+          .demo-17-9 .card__img-inner {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg,
+              oklch(70% 0.15 260),
+              oklch(60% 0.15 300)
+            );
+            transition: scale 400ms ease;
+          }
+          .demo-17-9 .card:hover .card__img-inner {
+            scale: 1.05;
+          }
+
+          /* Content */
+          .demo-17-9 .card__body {
+            padding: 1rem; display: grid; gap: 0.5rem;
+          }
+          .demo-17-9 .card__title {
+            font-size: 1rem; font-weight: 700; margin: 0;
+          }
+          .demo-17-9 .card__desc {
+            font-size: 0.8rem; margin: 0;
+            color: light-dark(oklch(45% 0 0), oklch(60% 0 0));
+          }
+
+          /* Reveal content on hover */
+          .demo-17-9 .card__reveal {
+            font-size: 0.75rem; font-weight: 600;
+            color: oklch(55% 0.2 260);
+            opacity: 0; transform: translateY(0.5rem);
+            transition: opacity 200ms ease 50ms, transform 200ms ease 50ms;
+          }
+          .demo-17-9 .card:hover .card__reveal {
+            opacity: 1; transform: translateY(0);
+          }
+
+          /* Card-link pattern */
+          .demo-17-9 .card__link {
+            text-decoration: none; color: inherit;
+          }
+          .demo-17-9 .card__link::after {
+            content: "";
+            position: absolute; inset: 0;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-17-9 .card { transition-duration: 0ms; }
+            .demo-17-9 .card__img-inner { transition-duration: 0ms; }
+            .demo-17-9 .card__reveal { transition-duration: 0ms; }
+          }
+        </style>
+        <div class="demo-17-9">
+          <article class="card">
+            <div class="card__img">
+              <div class="card__img-inner"></div>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">
+                <a href="#" class="card__link">Lift & Shadow</a>
+              </h3>
+              <p class="card__desc">Hover to see the lift effect with growing shadow. Press to feel the scale feedback.</p>
+              <span class="card__reveal">Read more</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__img">
+              <div class="card__img-inner" style="background: linear-gradient(135deg, oklch(65% 0.15 145), oklch(55% 0.15 180))"></div>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">
+                <a href="#" class="card__link">Image Zoom</a>
+              </h3>
+              <p class="card__desc">The image scales up inside its overflow-hidden container on hover.</p>
+              <span class="card__reveal">Explore</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__img">
+              <div class="card__img-inner" style="background: linear-gradient(135deg, oklch(70% 0.15 50), oklch(60% 0.15 25))"></div>
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">
+                <a href="#" class="card__link">Content Reveal</a>
+              </h3>
+              <p class="card__desc">The "View project" text slides up and fades in when you hover.</p>
+              <span class="card__reveal">View project</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="card"&gt;
+  &lt;div class="card-img"&gt;
+    &lt;div class="card-img-inner"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="card-body"&gt;
+    &lt;h3&gt;&lt;a href="#" class="card-link"&gt;Card Title&lt;/a&gt;&lt;/h3&gt;
+    &lt;p&gt;Card description text here.&lt;/p&gt;
+    &lt;span class="card-reveal"&gt;Read more&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+.card {
+  position: relative;
+  max-width: 18rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid oklch(90% 0 0);
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.05);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px oklch(0% 0 0 / 0.1);
+}
+.card:active {
+  transform: scale(0.98);
+  transition-duration: 100ms;
+}
+
+.card-img { overflow: hidden; aspect-ratio: 16/9; }
+.card-img-inner {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, oklch(70% 0.15 260), oklch(55% 0.15 300));
+  transition: scale 400ms ease;
+}
+.card:hover .card-img-inner { scale: 1.05; }
+
+.card-body { padding: 1rem; }
+.card-body h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+.card-body p { margin: 0; font-size: 0.8rem; color: oklch(45% 0 0); }
+
+.card-link { color: inherit; text-decoration: none; }
+.card-link::after { content: ""; position: absolute; inset: 0; }
+
+.card-reveal {
+  display: block; margin-top: 0.5rem;
+  font-size: 0.75rem; font-weight: 600;
+  color: oklch(55% 0.2 260);
+  opacity: 0; transform: translateY(0.5rem);
+  transition: opacity 200ms 50ms, transform 200ms 50ms;
+}
+.card:hover .card-reveal { opacity: 1; transform: translateY(0); }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a "bookmark" icon button in the top-right corner of the card that sits above the card-link (using <code>position: relative; z-index: 1</code>). Give it a scale bounce on click. Then create a "horizontal card" variant where the image is on the left (using <code>grid-template-columns: 8rem 1fr</code>) and the hover effects still work identically.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.8-button-states.html">&larr; Lesson 17.8</a>
+      <a href="./lesson-17.10-page-transitions.html">Lesson 17.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

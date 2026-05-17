@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.10 — Smooth Page-Level Transitions · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.10 · Micro-Interactions</p>
+      <h1>Smooth Page-Level Transitions</h1>
+      <p class="lead">Four transition patterns — crossfade, slide left/right, scale zoom, and shared-element morph — using the View Transitions API. A mini 3-view "app" demonstrates each pattern with pure CSS animation control.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The View Transitions API</h2>
+      <p>The View Transitions API captures a screenshot of the current state, updates the DOM, then animates between old and new states. In CSS, we define <code>::view-transition-old(root)</code> and <code>::view-transition-new(root)</code> animations. No JavaScript animation logic needed — just declare how old exits and new enters.</p>
+
+      <h2>Pattern 1: Crossfade</h2>
+      <p>The simplest transition. The old view fades out while the new view fades in. This is the browser's default view transition behavior. We can customize the duration and easing: <code>::view-transition-old(root) { animation: fade-out 250ms ease; }</code></p>
+
+      <h3>Pattern 2: Slide</h3>
+      <p>For forward navigation, the old view slides left while the new slides in from the right. For backward navigation, the reverse. We use <code>view-transition-name</code> and custom animations with <code>translateX(-100%)</code> and <code>translateX(100%)</code>.</p>
+
+      <h3>Pattern 3: Scale zoom</h3>
+      <p>The old view scales down and fades while the new view scales up from a smaller size. This creates a "zoom into content" feel, common in master-detail patterns. The old gets <code>scale(0.9); opacity: 0</code> and the new starts at <code>scale(1.1); opacity: 0</code>.</p>
+
+      <h3>Pattern 4: Shared-element morph</h3>
+      <p>Give matching elements the same <code>view-transition-name</code> value. The browser automatically morphs position, size, and appearance between them. A card thumbnail can morph into a full-width hero image. This is the most powerful pattern and requires the least CSS.</p>
+
+      <h3>The @view-transition at-rule</h3>
+      <p>For same-document transitions, we use <code>@view-transition { navigation: auto; }</code>. For cross-document (MPA), this enables transitions between page loads. We wrap in <code>@supports</code> for graceful degradation.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Page transition patterns</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-10 {
+            padding: 2rem; font-family: system-ui;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            display: grid; gap: 1.5rem;
+          }
+          .demo-17-10 h3 {
+            font-size: 0.875rem; font-weight: 600; margin: 0;
+            color: light-dark(oklch(40% 0 0), oklch(70% 0 0));
+          }
+
+          /* Mini app container */
+          .demo-17-10 .app {
+            border: 1px solid light-dark(oklch(90% 0 0), oklch(25% 0 0));
+            border-radius: 0.75rem; overflow: hidden;
+            max-width: 24rem;
+          }
+          .demo-17-10 .app__nav {
+            display: flex; border-bottom: 1px solid light-dark(oklch(90% 0 0), oklch(25% 0 0));
+          }
+          .demo-17-10 .app__nav label {
+            flex: 1; padding: 0.5rem; text-align: center;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer;
+            background: light-dark(oklch(97% 0 0), oklch(20% 0 0));
+            transition: background 150ms ease;
+          }
+          .demo-17-10 .app__nav label:hover {
+            background: light-dark(oklch(94% 0 0), oklch(25% 0 0));
+          }
+          .demo-17-10 .app__nav input { display: none; }
+          .demo-17-10 .app__nav input:checked + label {
+            background: oklch(55% 0.2 260);
+            color: oklch(100% 0 0);
+          }
+
+          .demo-17-10 .app__views {
+            position: relative; height: 10rem; overflow: hidden;
+          }
+          .demo-17-10 .app__view {
+            position: absolute; inset: 0;
+            display: grid; place-items: center;
+            padding: 1.5rem;
+            opacity: 0; transform: translateX(100%);
+            transition: opacity 250ms ease, transform 250ms ease;
+          }
+          .demo-17-10 .app__view--active {
+            opacity: 1; transform: translateX(0);
+          }
+
+          /* Transition pattern demos */
+          .demo-17-10 .patterns {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+            gap: 1rem;
+          }
+          .demo-17-10 .pattern {
+            padding: 1rem; border-radius: 0.5rem;
+            border: 1px solid light-dark(oklch(90% 0 0), oklch(28% 0 0));
+            display: grid; place-items: center; gap: 0.5rem;
+            text-align: center; font-size: 0.75rem;
+            cursor: pointer;
+            transition: border-color 150ms ease;
+          }
+          .demo-17-10 .pattern:hover {
+            border-color: oklch(55% 0.2 260);
+          }
+          .demo-17-10 .pattern__icon {
+            width: 2.5rem; height: 2.5rem; border-radius: 0.375rem;
+            background: oklch(55% 0.2 260 / 0.1);
+            display: grid; place-items: center;
+          }
+          .demo-17-10 .pattern__icon::after {
+            content: "";
+            width: 1rem; height: 1rem;
+            background: oklch(55% 0.2 260);
+            border-radius: 2px;
+            transition: transform 300ms ease, opacity 300ms ease;
+          }
+          .demo-17-10 .pattern:hover .pattern__icon::after {
+            transform: scale(0.8);
+            opacity: 0.6;
+          }
+          .demo-17-10 .pattern:nth-child(2):hover .pattern__icon::after {
+            transform: translateX(-4px);
+          }
+          .demo-17-10 .pattern:nth-child(3):hover .pattern__icon::after {
+            transform: scale(1.2);
+          }
+          .demo-17-10 .pattern:nth-child(4):hover .pattern__icon::after {
+            border-radius: 50%;
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-17-10 .app__view { transition-duration: 0ms; }
+            .demo-17-10 .pattern__icon::after { transition-duration: 0ms; }
+          }
+        </style>
+        <div class="demo-17-10">
+          <h3>Transition patterns</h3>
+          <div class="patterns">
+            <div class="pattern">
+              <div class="pattern__icon"></div>
+              Crossfade
+            </div>
+            <div class="pattern">
+              <div class="pattern__icon"></div>
+              Slide
+            </div>
+            <div class="pattern">
+              <div class="pattern__icon"></div>
+              Scale zoom
+            </div>
+            <div class="pattern">
+              <div class="pattern__icon"></div>
+              Morph
+            </div>
+          </div>
+
+          <h3>Mini 3-view app</h3>
+          <div class="app">
+            <div class="app__nav">
+              <input type="radio" name="view" id="v1" checked>
+              <label for="v1">Home</label>
+              <input type="radio" name="view" id="v2">
+              <label for="v2">Products</label>
+              <input type="radio" name="view" id="v3">
+              <label for="v3">About</label>
+            </div>
+            <div class="app__views">
+              <div class="app__view app__view--active" id="view-home">
+                <p style="margin:0; font-weight:600">Home View</p>
+              </div>
+              <div class="app__view" id="view-products">
+                <p style="margin:0; font-weight:600">Products View</p>
+              </div>
+              <div class="app__view" id="view-about">
+                <p style="margin:0; font-weight:600">About View</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="app"&gt;
+  &lt;nav class="tabs"&gt;
+    &lt;input type="radio" name="tab" id="t1" checked&gt;
+    &lt;label for="t1"&gt;Page A&lt;/label&gt;
+    &lt;input type="radio" name="tab" id="t2"&gt;
+    &lt;label for="t2"&gt;Page B&lt;/label&gt;
+  &lt;/nav&gt;
+  &lt;div class="pages"&gt;
+    &lt;div class="page page-a"&gt;Page A content&lt;/div&gt;
+    &lt;div class="page page-b"&gt;Page B content&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.app {
+  max-width: 20rem;
+  border: 1px solid oklch(90% 0 0);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.tabs { display: flex; }
+.tabs input { display: none; }
+.tabs label {
+  flex: 1; padding: 0.6rem;
+  text-align: center; font-size: 0.8rem;
+  font-weight: 600; cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.tabs input:checked + label {
+  border-bottom-color: oklch(55% 0.2 260);
+  color: oklch(55% 0.2 260);
+}
+
+.pages { position: relative; height: 8rem; }
+.page {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(2rem);
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+
+/* Show page A by default */
+#t1:checked ~ .pages .page-a,
+#t2:checked ~ .pages .page-b {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@supports (view-transition-name: page) {
+  .page { view-transition-name: page-content; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a "direction-aware" slide: when navigating forward (tab 1 to tab 2), the old page exits left and new enters from right. When navigating backward (tab 2 to tab 1), the old exits right and new enters from left. Use sibling combinators and the order of radio buttons to determine direction.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.9-card-interactions.html">&larr; Lesson 17.9</a>
+      <a href="./lesson-17.11-scroll-animations.html">Lesson 17.11 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.6 — Animated Landscape Scene · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.6</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.6 · Animated Scene</p>
+      <h1>Animated Landscape Scene</h1>
+      <p class="lead">A continuously animated landscape that cycles through dawn, day, and dusk. The sky gradient shifts hue using <code>@property</code>, a sun arcs across the sky, clouds drift at parallax speeds, birds fly in V-formation, and stars fade in as darkness falls.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>@property for animated gradients</h2>
+      <p>Standard CSS cannot animate gradient color stops. But by registering a custom property with <code>@property</code> and a specific syntax (like <code>&lt;number&gt;</code>), we can animate that property and use it inside gradient functions. This is how the sky smoothly transitions from warm dawn hues to cool blue daylight to deep dusk tones.</p>
+
+      <h2>Parallax with staggered speeds</h2>
+      <p>Clouds at different "distances" move at different speeds. Far clouds drift slowly with lower opacity; near clouds move faster with full opacity. This creates depth without any 3D transforms.</p>
+
+      <h2>Clip-path for terrain</h2>
+      <p>Rolling hills are <code>polygon()</code> clip-paths applied to solid-colored divs layered from back to front with slight vertical offsets. Each layer uses a slightly different green shade for depth.</p>
+
+      <h2>Water reflections</h2>
+      <p>A semi-transparent gradient over a repeated wave pattern (via alternating <code>border-radius</code> on a repeating element or a gradient trick) simulates water. The wave animation is a horizontal shift of the background position.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Animated Landscape</h2>
+      <div class="demo-frame">
+        <style>
+          @property --sky-hue {
+            syntax: "<number>";
+            initial-value: 220;
+            inherits: true;
+          }
+          @property --sky-light {
+            syntax: "<number>";
+            initial-value: 70;
+            inherits: true;
+          }
+
+          .demo-18-6 {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 12px;
+            font-family: system-ui, sans-serif;
+          }
+
+          /* Sky */
+          .demo-18-6 .sky {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+              to bottom,
+              oklch(calc(var(--sky-light) * 1%) 0.1 var(--sky-hue)) 0%,
+              oklch(calc((var(--sky-light) + 15) * 1%) 0.08 calc(var(--sky-hue) + 20)) 60%,
+              oklch(calc((var(--sky-light) + 5) * 1%) 0.15 calc(var(--sky-hue) - 40)) 100%
+            );
+            animation: sky-cycle-18-6 20s ease-in-out infinite;
+          }
+
+          @keyframes sky-cycle-18-6 {
+            0%, 100% { --sky-hue: 40; --sky-light: 75; }
+            25% { --sky-hue: 220; --sky-light: 72; }
+            50% { --sky-hue: 230; --sky-light: 70; }
+            75% { --sky-hue: 20; --sky-light: 55; }
+          }
+
+          /* Stars */
+          .demo-18-6 .stars {
+            position: absolute;
+            inset: 0;
+            background:
+              radial-gradient(1px 1px at 10% 15%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1.5px 1.5px at 25% 8%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 40% 20%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 55% 12%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1.5px 1.5px at 70% 18%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 80% 5%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 90% 22%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1.5px 1.5px at 15% 25%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 60% 28%, oklch(95% 0 0) 50%, transparent 50%),
+              radial-gradient(1px 1px at 35% 5%, oklch(95% 0 0) 50%, transparent 50%);
+            animation: stars-fade-18-6 20s ease-in-out infinite;
+          }
+
+          @keyframes stars-fade-18-6 {
+            0%, 20% { opacity: 0; }
+            75% { opacity: 0; }
+            85% { opacity: 0.9; }
+            95% { opacity: 0.7; }
+            100% { opacity: 0; }
+          }
+
+          /* Sun */
+          .demo-18-6 .sun {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: oklch(92% 0.18 80);
+            box-shadow: 0 0 30px oklch(90% 0.2 70 / 0.6), 0 0 60px oklch(85% 0.15 60 / 0.3);
+            animation: sun-arc-18-6 20s ease-in-out infinite;
+          }
+
+          @keyframes sun-arc-18-6 {
+            0% { left: -60px; top: 55%; }
+            15% { left: 15%; top: 20%; }
+            50% { left: 50%; top: 10%; }
+            85% { left: 85%; top: 20%; }
+            100% { left: calc(100% + 60px); top: 55%; }
+          }
+
+          /* Clouds */
+          .demo-18-6 .cloud {
+            position: absolute;
+            width: 80px;
+            height: 30px;
+            background: oklch(98% 0 0 / 0.8);
+            border-radius: 30px;
+          }
+          .demo-18-6 .cloud::before {
+            content: "";
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            width: 35px;
+            height: 35px;
+            background: oklch(98% 0 0 / 0.8);
+            border-radius: 50%;
+          }
+          .demo-18-6 .cloud::after {
+            content: "";
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            width: 25px;
+            height: 25px;
+            background: oklch(98% 0 0 / 0.8);
+            border-radius: 50%;
+          }
+
+          .demo-18-6 .cloud-1 {
+            top: 15%;
+            animation: drift-18-6 15s linear infinite;
+            opacity: 0.9;
+          }
+          .demo-18-6 .cloud-2 {
+            top: 25%;
+            width: 60px;
+            height: 22px;
+            animation: drift-18-6 22s linear infinite;
+            animation-delay: -8s;
+            opacity: 0.6;
+          }
+          .demo-18-6 .cloud-3 {
+            top: 10%;
+            width: 100px;
+            height: 35px;
+            animation: drift-18-6 18s linear infinite;
+            animation-delay: -3s;
+            opacity: 0.75;
+          }
+
+          @keyframes drift-18-6 {
+            from { left: -150px; }
+            to { left: calc(100% + 150px); }
+          }
+
+          /* Hills */
+          .demo-18-6 .hills {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+          }
+          .demo-18-6 .hill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+          }
+          .demo-18-6 .hill-back {
+            height: 70%;
+            background: oklch(40% 0.12 145);
+            clip-path: polygon(0% 60%, 15% 30%, 30% 50%, 50% 15%, 70% 40%, 85% 20%, 100% 45%, 100% 100%, 0% 100%);
+          }
+          .demo-18-6 .hill-mid {
+            height: 55%;
+            background: oklch(48% 0.15 140);
+            clip-path: polygon(0% 50%, 20% 25%, 40% 45%, 55% 20%, 75% 40%, 90% 30%, 100% 55%, 100% 100%, 0% 100%);
+          }
+          .demo-18-6 .hill-front {
+            height: 40%;
+            background: oklch(55% 0.18 138);
+            clip-path: polygon(0% 55%, 25% 35%, 45% 50%, 65% 30%, 85% 45%, 100% 35%, 100% 100%, 0% 100%);
+          }
+
+          /* Water */
+          .demo-18-6 .water {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15%;
+            background:
+              repeating-linear-gradient(
+                to right,
+                oklch(50% 0.08 230 / 0.3) 0px,
+                oklch(55% 0.1 220 / 0.1) 20px,
+                oklch(50% 0.08 230 / 0.3) 40px
+              ),
+              linear-gradient(to bottom, oklch(45% 0.1 230 / 0.8), oklch(35% 0.08 240 / 0.9));
+            animation: wave-18-6 3s linear infinite;
+          }
+
+          @keyframes wave-18-6 {
+            from { background-position: 0 0, 0 0; }
+            to { background-position: 40px 0, 0 0; }
+          }
+
+          /* Birds */
+          .demo-18-6 .bird {
+            position: absolute;
+            width: 12px;
+            height: 4px;
+            border-top: 2px solid oklch(25% 0.05 270);
+            border-left: 2px solid oklch(25% 0.05 270);
+            border-right: 2px solid oklch(25% 0.05 270);
+            border-bottom: none;
+            border-radius: 50% 50% 0 0;
+            animation: fly-18-6 12s linear infinite;
+          }
+          .demo-18-6 .bird:nth-child(1) { top: 18%; animation-delay: 0s; }
+          .demo-18-6 .bird:nth-child(2) { top: 22%; animation-delay: -2s; width: 10px; }
+          .demo-18-6 .bird:nth-child(3) { top: 20%; animation-delay: -5s; width: 8px; }
+          .demo-18-6 .bird:nth-child(4) { top: 15%; animation-delay: -8s; }
+
+          @keyframes fly-18-6 {
+            0% { left: -20px; transform: translateY(0); }
+            25% { transform: translateY(-8px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(-5px); }
+            100% { left: calc(100% + 20px); transform: translateY(0); }
+          }
+        </style>
+        <div class="demo-18-6">
+          <div class="sky"></div>
+          <div class="stars"></div>
+          <div class="sun"></div>
+          <div class="cloud cloud-1"></div>
+          <div class="cloud cloud-2"></div>
+          <div class="cloud cloud-3"></div>
+          <span class="bird"></span>
+          <span class="bird"></span>
+          <span class="bird"></span>
+          <span class="bird"></span>
+          <div class="hills">
+            <div class="hill hill-back"></div>
+            <div class="hill hill-mid"></div>
+            <div class="hill hill-front"></div>
+          </div>
+          <div class="water"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="scene"&gt;
+  &lt;div class="sky"&gt;&lt;/div&gt;
+  &lt;div class="sun"&gt;&lt;/div&gt;
+  &lt;div class="cloud"&gt;&lt;/div&gt;
+  &lt;div class="hills"&gt;
+    &lt;div class="hill hill-back"&gt;&lt;/div&gt;
+    &lt;div class="hill hill-front"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">@property --sky-hue {
+  syntax: "<number>";
+  initial-value: 220;
+  inherits: true;
+}
+.scene {
+  position: relative;
+  width: 400px; height: 250px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.sky {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    oklch(70% 0.1 var(--sky-hue)),
+    oklch(85% 0.08 calc(var(--sky-hue)+20))
+  );
+  animation: sky 20s ease-in-out infinite;
+}
+@keyframes sky {
+  0%, 100% { --sky-hue: 40; }
+  50% { --sky-hue: 220; }
+}
+.sun {
+  position: absolute;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: oklch(92% 0.18 80);
+  animation: arc 20s ease-in-out infinite;
+}
+@keyframes arc {
+  0% { left: -50px; top: 60%; }
+  50% { left: 50%; top: 10%; }
+  100% { left: 110%; top: 60%; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Add a moon that appears as the sky darkens (opposite timing to the sun). Use <code>box-shadow</code> with an inset shadow offset to create a crescent shape. Also add fireflies (small glowing dots) that appear during the dusk phase, flickering with staggered <code>animation-delay</code> values.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.5-interactive-color-picker.html">&larr; Lesson 18.5</a>
+      <a href="./lesson-18.7-3d-cube-interactive.html">Lesson 18.7 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

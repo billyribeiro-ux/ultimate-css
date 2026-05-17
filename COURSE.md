@@ -25,10 +25,13 @@ Module 15 — Spectacular Effects: Pushing CSS to Its Limits (Showstopper)
 Module 16 — Real-World Page Layouts: Famous Sites Rebuilt
 Module 17 — Micro-Interactions: The Details That Ship Quality
 Module 18 — CSS Art & Creative Experiments: Total Platform Mastery
+Module 19 — CSS Accessibility: Building for Everyone
+Module 20 — CSS Performance: Making It Fast
+Module 21 — Advanced Responsive Design: Beyond Breakpoints
 ```
 
-- **Total modules:** 18
-- **Total lessons:** 169+
+- **Total modules:** 21
+- **Total lessons:** 200+
 - **Total projects:** 12 (one per module) + 80 mini-exercises
 - **Open** `index.html` in the repo root to start.
 

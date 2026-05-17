@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17.5 — Progress Bars, Rings & Steps · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 17</a>
+      <span>Lesson 17.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 17.5 · Micro-Interactions</p>
+      <h1>Progress Bars, Rings & Steps</h1>
+      <p class="lead">Three progress patterns driven by a single <code>--progress</code> custom property: a linear bar with striped and indeterminate variants, a circular ring using conic-gradient, and a multi-step indicator with connecting lines. Change one value, everything updates.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The custom property approach</h2>
+      <p>Every progress component reads <code>--progress</code> as a value from 0 to 100. The linear bar sets its width as <code>calc(var(--progress) * 1%)</code>. The ring uses <code>conic-gradient(oklch(55% 0.2 260) calc(var(--progress) * 1%), transparent 0)</code>. The step indicator checks thresholds. One property, three visualizations.</p>
+
+      <h2>Linear bar</h2>
+      <p>The bar track is a rounded container with a nested fill element. The fill transitions its width with a 300ms ease. A striped variant overlays a repeating-linear-gradient at 45 degrees with alternating semi-transparent stripes. The indeterminate variant uses an infinite sliding animation since progress is unknown.</p>
+
+      <h3>Circular ring</h3>
+      <p>The ring is a single element with a conic-gradient background, masked by a radial-gradient to punch out the center (creating the "ring" shape). A <code>::after</code> pseudo-element displays the percentage text. The gradient rotates from the top using <code>from 0deg at 50% 50%</code>.</p>
+
+      <h3>Step indicator</h3>
+      <p>Steps are a flex row of numbered circles connected by lines. The line and circle colors change based on whether the step is completed (progress past its threshold). Each step is 25% of the total, so step 2 activates at <code>--progress: 50</code>. The connecting line fills progressively using a scaleX transform anchored from the left.</p>
+
+      <h3>Accessibility</h3>
+      <p>All progress indicators use <code>role="progressbar"</code> with <code>aria-valuenow</code>, <code>aria-valuemin="0"</code>, and <code>aria-valuemax="100"</code>. The indeterminate variant omits <code>aria-valuenow</code> entirely, signaling "progress unknown" to assistive technology.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Progress variants</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-17-5 {
+            --progress: 65;
+            padding: 2rem; font-family: system-ui;
+            color: light-dark(oklch(20% 0 0), oklch(90% 0 0));
+            display: grid; gap: 2rem;
+          }
+          .demo-17-5 h3 {
+            font-size: 0.875rem; font-weight: 600; margin: 0;
+            color: light-dark(oklch(40% 0 0), oklch(70% 0 0));
+          }
+
+          /* Linear bar */
+          .demo-17-5 .bar-track {
+            height: 0.5rem; border-radius: 0.25rem;
+            background: light-dark(oklch(92% 0 0), oklch(25% 0 0));
+            overflow: hidden;
+          }
+          .demo-17-5 .bar-fill {
+            height: 100%; border-radius: 0.25rem;
+            width: calc(var(--progress) * 1%);
+            background: oklch(55% 0.2 260);
+            transition: width 300ms ease;
+          }
+
+          /* Striped variant */
+          .demo-17-5 .bar-fill--striped {
+            background-image: repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 8px,
+              oklch(100% 0 0 / 0.15) 8px,
+              oklch(100% 0 0 / 0.15) 16px
+            );
+            background-size: 200% 100%;
+            animation: stripe-move 1s linear infinite;
+          }
+          @keyframes stripe-move {
+            to { background-position: -32px 0; }
+          }
+
+          /* Indeterminate */
+          .demo-17-5 .bar-fill--indeterminate {
+            width: 40%;
+            animation: indeterminate 1.5s ease-in-out infinite;
+          }
+          @keyframes indeterminate {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+          }
+
+          /* Circular ring */
+          .demo-17-5 .ring-wrap { display: flex; gap: 2rem; align-items: center; }
+          .demo-17-5 .ring {
+            width: 5rem; height: 5rem; border-radius: 50%;
+            background: conic-gradient(
+              oklch(55% 0.2 260) calc(var(--progress) * 1%),
+              light-dark(oklch(92% 0 0), oklch(25% 0 0)) 0
+            );
+            display: grid; place-items: center;
+            mask: radial-gradient(circle, transparent 55%, black 56%);
+            -webkit-mask: radial-gradient(circle, transparent 55%, black 56%);
+            position: relative;
+          }
+          .demo-17-5 .ring::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+          }
+          .demo-17-5 .ring-label {
+            font-size: 1.125rem; font-weight: 700;
+          }
+
+          /* Step indicator */
+          .demo-17-5 .steps {
+            display: flex; align-items: center; gap: 0;
+            max-width: 20rem;
+          }
+          .demo-17-5 .step {
+            display: flex; align-items: center; flex: 1;
+          }
+          .demo-17-5 .step__circle {
+            width: 2rem; height: 2rem; border-radius: 50%;
+            display: grid; place-items: center;
+            font-size: 0.75rem; font-weight: 700;
+            background: light-dark(oklch(92% 0 0), oklch(25% 0 0));
+            color: light-dark(oklch(50% 0 0), oklch(60% 0 0));
+            flex-shrink: 0;
+            transition: background 300ms ease, color 300ms ease;
+          }
+          .demo-17-5 .step--done .step__circle {
+            background: oklch(55% 0.2 260);
+            color: oklch(100% 0 0);
+          }
+          .demo-17-5 .step__line {
+            flex: 1; height: 2px;
+            background: light-dark(oklch(88% 0 0), oklch(30% 0 0));
+            margin: 0 0.25rem;
+            position: relative; overflow: hidden;
+          }
+          .demo-17-5 .step--done + .step .step__line::before,
+          .demo-17-5 .step--done .step__line::before {
+            content: ""; position: absolute; inset: 0;
+            background: oklch(55% 0.2 260);
+            transform: scaleX(1); transform-origin: left;
+          }
+          .demo-17-5 .step:first-child .step__line { display: none; }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-17-5 .bar-fill { transition-duration: 0ms; }
+            .demo-17-5 .bar-fill--striped { animation: none; }
+            .demo-17-5 .bar-fill--indeterminate { animation: none; width: 100%; }
+          }
+        </style>
+        <div class="demo-17-5">
+          <h3>Linear bar (65%)</h3>
+          <div class="bar-track" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">
+            <div class="bar-fill"></div>
+          </div>
+
+          <h3>Striped variant (65%)</h3>
+          <div class="bar-track" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">
+            <div class="bar-fill bar-fill--striped"></div>
+          </div>
+
+          <h3>Indeterminate</h3>
+          <div class="bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div class="bar-fill bar-fill--indeterminate"></div>
+          </div>
+
+          <h3>Circular ring</h3>
+          <div class="ring-wrap">
+            <div class="ring" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+            <span class="ring-label">65%</span>
+          </div>
+
+          <h3>Step indicator (step 3 of 4)</h3>
+          <div class="steps" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+            <div class="step step--done">
+              <span class="step__line"></span>
+              <span class="step__circle">1</span>
+            </div>
+            <div class="step step--done">
+              <span class="step__line"></span>
+              <span class="step__circle">2</span>
+            </div>
+            <div class="step step--done">
+              <span class="step__line"></span>
+              <span class="step__circle">3</span>
+            </div>
+            <div class="step">
+              <span class="step__line"></span>
+              <span class="step__circle">4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="progress-demo"&gt;
+  &lt;div class="bar-track" role="progressbar"
+       aria-valuenow="70" aria-valuemin="0"
+       aria-valuemax="100"&gt;
+    &lt;div class="bar-fill"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class="ring" role="progressbar"
+       aria-valuenow="70" aria-valuemin="0"
+       aria-valuemax="100"&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+}
+
+.progress-demo {
+  --progress: 70;
+  display: grid;
+  gap: 2rem;
+  max-width: 20rem;
+}
+
+/* Linear bar */
+.bar-track {
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  background: oklch(92% 0 0);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 0.25rem;
+  width: calc(var(--progress) * 1%);
+  background: oklch(55% 0.2 260);
+  transition: width 300ms ease;
+}
+
+/* Circular ring */
+.ring {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: conic-gradient(
+    oklch(55% 0.2 260) calc(var(--progress) * 1%),
+    oklch(92% 0 0) 0
+  );
+  mask: radial-gradient(
+    circle, transparent 58%, black 59%
+  );
+  -webkit-mask: radial-gradient(
+    circle, transparent 58%, black 59%
+  );
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Add a color threshold system: when <code>--progress</code> is below 33, the fill is red (<code>oklch(55% 0.2 25)</code>); between 33-66, yellow (<code>oklch(75% 0.15 85)</code>); above 66, green (<code>oklch(55% 0.18 145)</code>). Use <code>style</code> queries or gradient stops to achieve this. Also add a label inside the bar that shows the percentage text, positioned absolutely over the fill.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-17.4-skeleton-loading-states.html">&larr; Lesson 17.4</a>
+      <a href="./lesson-17.6-tooltip-system.html">Lesson 17.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.5 — The Portfolio Gallery · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.5</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.5 · Real-World Layout</p>
+      <h1>The Portfolio Gallery (Behance/Dribbble Style)</h1>
+      <p class="lead">A masonry-like gallery with hover overlays, category filtering via <code>:has()</code> and radio buttons, a lightbox powered by the Popover API, and staggered reveal animations. The CSS <code>columns</code> property creates the masonry effect, with a <code>@supports</code> fallback for future <code>grid-template-rows: masonry</code>.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Masonry with CSS columns</h2>
+      <p>True CSS masonry (via Grid) is still experimental. The most robust approach today is <code>columns: 3</code> with <code>break-inside: avoid</code> on each card. This creates the staggered-height effect Behance and Dribbble use. A <code>@supports (grid-template-rows: masonry)</code> block provides a progressive enhancement path.</p>
+
+      <h2>Category filtering with :has()</h2>
+      <p>Radio buttons at the top represent categories (All, Branding, Web, Illustration). When a category is selected, <code>:has(input[value="branding"]:checked)</code> on the wrapper hides non-matching cards with <code>display: none</code>. The "All" radio resets visibility. No JavaScript filtering logic needed.</p>
+
+      <h2>Lightbox via Popover API</h2>
+      <p>Each gallery card wraps a button that triggers a <code>[popover]</code> element. The popover covers the viewport with a backdrop blur and centers the enlarged image. Pressing Escape or clicking outside dismisses it. The API handles focus trapping and accessibility automatically.</p>
+
+      <h2>Staggered reveal animations</h2>
+      <p>Cards use <code>animation-delay</code> calculated from a CSS custom property <code>--i</code> set inline. Combined with <code>animation-timeline: view()</code>, each card fades and scales in with a slight offset, creating the signature portfolio reveal.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full portfolio gallery</h2>
+      <div class="demo-frame" style="padding:0; background:oklch(8% 0.02 264); overflow-y:auto; max-block-size:80vh;">
+        <style>
+          .demo-16-5 { font-family: system-ui, -apple-system, sans-serif; color: light-dark(oklch(20% 0.01 264), oklch(90% 0.01 264)); background: light-dark(oklch(98% 0.005 264), oklch(8% 0.02 264)); line-height: 1.6; padding: 2rem 1.5rem; }
+          .demo-16-5 *, .demo-16-5 *::before, .demo-16-5 *::after { box-sizing: border-box; margin: 0; }
+
+          /* Header */
+          .demo-16-5 .port-header { text-align: center; margin-block-end: 2rem; }
+          .demo-16-5 .port-header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin-block-end: 0.5rem; }
+          .demo-16-5 .port-header p { color: light-dark(oklch(50% 0.01 264), oklch(55% 0.01 264)); font-size: 0.9375rem; }
+
+          /* Filter bar */
+          .demo-16-5 .filter-bar { display: flex; justify-content: center; gap: 0.5rem; margin-block-end: 2rem; flex-wrap: wrap; }
+          .demo-16-5 .filter-bar input { position: absolute; opacity: 0; pointer-events: none; }
+          .demo-16-5 .filter-bar label { padding: 0.5rem 1.25rem; border-radius: 2rem; font-size: 0.8125rem; font-weight: 500; cursor: pointer; border: 1px solid light-dark(oklch(88% 0.01 264), oklch(22% 0.01 264)); color: light-dark(oklch(45% 0.01 264), oklch(60% 0.01 264)); transition: all 200ms; }
+          .demo-16-5 .filter-bar input:checked + label { background: oklch(48% 0.2 275); color: white; border-color: oklch(48% 0.2 275); }
+
+          /* Masonry grid */
+          .demo-16-5 .masonry { columns: 3; column-gap: 1rem; max-inline-size: 60rem; margin-inline: auto; }
+          @media (max-width: 48rem) { .demo-16-5 .masonry { columns: 2; } }
+          @media (max-width: 30rem) { .demo-16-5 .masonry { columns: 1; } }
+
+          /* Cards */
+          .demo-16-5 .port-card { break-inside: avoid; margin-block-end: 1rem; border-radius: 0.75rem; overflow: hidden; position: relative; cursor: pointer; }
+          .demo-16-5 .port-card .card-img { inline-size: 100%; display: block; border-radius: 0.75rem; }
+          .demo-16-5 .port-card .placeholder { display: block; inline-size: 100%; border-radius: 0.75rem; }
+
+          /* Different heights for masonry effect */
+          .demo-16-5 .port-card:nth-child(odd) .placeholder { aspect-ratio: 3/4; background: linear-gradient(135deg, oklch(55% 0.18 275), oklch(65% 0.12 230)); }
+          .demo-16-5 .port-card:nth-child(even) .placeholder { aspect-ratio: 4/3; background: linear-gradient(135deg, oklch(60% 0.15 160), oklch(50% 0.18 200)); }
+          .demo-16-5 .port-card:nth-child(3n) .placeholder { aspect-ratio: 1; background: linear-gradient(135deg, oklch(55% 0.2 25), oklch(65% 0.15 50)); }
+          .demo-16-5 .port-card:nth-child(4n) .placeholder { aspect-ratio: 5/7; background: linear-gradient(135deg, oklch(50% 0.18 310), oklch(60% 0.12 340)); }
+
+          /* Hover overlay */
+          .demo-16-5 .port-card .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 1.25rem; background: linear-gradient(to top, oklch(10% 0.02 264 / 0.85) 0%, transparent 60%); border-radius: 0.75rem; translate: 0 100%; transition: translate 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+          .demo-16-5 .port-card:hover .overlay { translate: 0 0; }
+          .demo-16-5 .overlay h3 { font-size: 0.9375rem; font-weight: 600; color: white; margin-block-end: 0.25rem; }
+          .demo-16-5 .overlay .tags { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+          .demo-16-5 .overlay .tag { font-size: 0.6875rem; padding: 0.2rem 0.5rem; border-radius: 1rem; background: oklch(90% 0 0 / 0.2); color: oklch(90% 0.01 264); }
+
+          /* Filter logic via :has() */
+          .demo-16-5:has(input[value="branding"]:checked) .port-card:not([data-cat="branding"]) { display: none; }
+          .demo-16-5:has(input[value="web"]:checked) .port-card:not([data-cat="web"]) { display: none; }
+          .demo-16-5:has(input[value="illustration"]:checked) .port-card:not([data-cat="illustration"]) { display: none; }
+          .demo-16-5:has(input[value="photo"]:checked) .port-card:not([data-cat="photo"]) { display: none; }
+
+          /* Popover lightbox */
+          .demo-16-5 [popover] { border: none; padding: 0; max-inline-size: 90vw; max-block-size: 90vh; border-radius: 1rem; overflow: hidden; background: transparent; }
+          .demo-16-5 [popover]::backdrop { background: oklch(5% 0.02 264 / 0.85); backdrop-filter: blur(8px); }
+          .demo-16-5 [popover] .lightbox-content { inline-size: min(40rem, 90vw); aspect-ratio: 4/3; border-radius: 1rem; background: linear-gradient(135deg, oklch(50% 0.2 275), oklch(65% 0.15 200)); display: grid; place-items: center; color: white; font-weight: 600; font-size: 1.25rem; }
+
+          /* Stagger animation */
+          .demo-16-5 .port-card { animation: card-stagger 500ms both; animation-delay: calc(var(--i, 0) * 80ms); }
+          @keyframes card-stagger { from { opacity: 0; scale: 0.95; translate: 0 1rem; } to { opacity: 1; scale: 1; translate: 0 0; } }
+        </style>
+        <div class="demo-16-5">
+          <div class="port-header">
+            <h1>Portfolio</h1>
+            <p>Selected works across branding, web, and illustration.</p>
+          </div>
+
+          <div class="filter-bar">
+            <input type="radio" name="filter-16-5" id="f-all" value="all" checked>
+            <label for="f-all">All</label>
+            <input type="radio" name="filter-16-5" id="f-branding" value="branding">
+            <label for="f-branding">Branding</label>
+            <input type="radio" name="filter-16-5" id="f-web" value="web">
+            <label for="f-web">Web</label>
+            <input type="radio" name="filter-16-5" id="f-illustration" value="illustration">
+            <label for="f-illustration">Illustration</label>
+            <input type="radio" name="filter-16-5" id="f-photo" value="photo">
+            <label for="f-photo">Photography</label>
+          </div>
+
+          <div class="masonry">
+            <div class="port-card" data-cat="branding" style="--i:0" popoverTarget="lb-1">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Nordic Brand System</h3><div class="tags"><span class="tag">Branding</span><span class="tag">Identity</span></div></div>
+            </div>
+            <div class="port-card" data-cat="web" style="--i:1" popoverTarget="lb-2">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>SaaS Dashboard</h3><div class="tags"><span class="tag">Web</span><span class="tag">UI Design</span></div></div>
+            </div>
+            <div class="port-card" data-cat="illustration" style="--i:2" popoverTarget="lb-3">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Botanical Series</h3><div class="tags"><span class="tag">Illustration</span></div></div>
+            </div>
+            <div class="port-card" data-cat="photo" style="--i:3" popoverTarget="lb-4">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Urban Geometry</h3><div class="tags"><span class="tag">Photography</span><span class="tag">Architecture</span></div></div>
+            </div>
+            <div class="port-card" data-cat="web" style="--i:4" popoverTarget="lb-5">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>E-commerce Redesign</h3><div class="tags"><span class="tag">Web</span><span class="tag">E-commerce</span></div></div>
+            </div>
+            <div class="port-card" data-cat="branding" style="--i:5" popoverTarget="lb-6">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Craft Brewery Identity</h3><div class="tags"><span class="tag">Branding</span><span class="tag">Packaging</span></div></div>
+            </div>
+            <div class="port-card" data-cat="illustration" style="--i:6" popoverTarget="lb-7">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Character Design</h3><div class="tags"><span class="tag">Illustration</span><span class="tag">3D</span></div></div>
+            </div>
+            <div class="port-card" data-cat="photo" style="--i:7" popoverTarget="lb-8">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Mountain Landscapes</h3><div class="tags"><span class="tag">Photography</span><span class="tag">Nature</span></div></div>
+            </div>
+            <div class="port-card" data-cat="web" style="--i:8" popoverTarget="lb-9">
+              <div class="placeholder"></div>
+              <div class="overlay"><h3>Portfolio Template</h3><div class="tags"><span class="tag">Web</span><span class="tag">Template</span></div></div>
+            </div>
+          </div>
+
+          <div id="lb-1" popover><div class="lightbox-content">Nordic Brand System</div></div>
+          <div id="lb-2" popover><div class="lightbox-content">SaaS Dashboard</div></div>
+          <div id="lb-3" popover><div class="lightbox-content">Botanical Series</div></div>
+          <div id="lb-4" popover><div class="lightbox-content">Urban Geometry</div></div>
+          <div id="lb-5" popover><div class="lightbox-content">E-commerce Redesign</div></div>
+          <div id="lb-6" popover><div class="lightbox-content">Craft Brewery Identity</div></div>
+          <div id="lb-7" popover><div class="lightbox-content">Character Design</div></div>
+          <div id="lb-8" popover><div class="lightbox-content">Mountain Landscapes</div></div>
+          <div id="lb-9" popover><div class="lightbox-content">Portfolio Template</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — category filtering with :has()</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="gallery-demo"&gt;
+  &lt;div class="filters"&gt;
+    &lt;input type="radio" name="cat" id="all" value="all" checked&gt;
+    &lt;label for="all"&gt;All&lt;/label&gt;
+    &lt;input type="radio" name="cat" id="brand" value="brand"&gt;
+    &lt;label for="brand"&gt;Branding&lt;/label&gt;
+    &lt;input type="radio" name="cat" id="web" value="web"&gt;
+    &lt;label for="web"&gt;Web&lt;/label&gt;
+  &lt;/div&gt;
+  &lt;div class="grid"&gt;
+    &lt;div class="item" data-cat="brand"&gt;Brand A&lt;/div&gt;
+    &lt;div class="item" data-cat="web"&gt;Web B&lt;/div&gt;
+    &lt;div class="item" data-cat="brand"&gt;Brand C&lt;/div&gt;
+    &lt;div class="item" data-cat="web"&gt;Web D&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.filters { display: flex; gap: 0.5rem; margin-block-end: 1.5rem; justify-content: center; }
+.filters input { position: absolute; opacity: 0; }
+.filters label {
+  padding: 0.4rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  border: 1px solid oklch(80% 0.02 264);
+}
+.filters input:checked + label {
+  background: oklch(48% 0.2 275);
+  color: white;
+  border-color: oklch(48% 0.2 275);
+}
+
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.item {
+  padding: 2rem;
+  border-radius: 0.75rem;
+  background: oklch(90% 0.05 275);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Filter logic */
+.gallery-demo:has(input[value="brand"]:checked) .item:not([data-cat="brand"]) { display: none; }
+.gallery-demo:has(input[value="web"]:checked) .item:not([data-cat="web"]) { display: none; }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>CSS filtering with <code>:has()</code> eliminates the need for JavaScript filtering libraries. Radio buttons serve as state, the wrapper's <code>:has()</code> selector reads which category is active, and non-matching cards get <code>display: none</code>. The masonry layout via <code>columns</code> automatically reflows when cards disappear. Zero JavaScript, zero layout shifts, zero complexity.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.4-ecommerce-product.html">&larr; Lesson 16.4</a>
+      <a href="./lesson-16.6-messaging-app.html">Lesson 16.6 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16.4 — The Product Page · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 16</a>
+      <span>Lesson 16.4</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 16.4 · Real-World Layout</p>
+      <h1>The Product Page (Apple Store Style)</h1>
+      <p class="lead">The premium product page is designed to sell one thing beautifully. A large hero image area, a scroll-snap gallery with indicator dots, color swatches that change a CSS custom property, a spec table, star ratings via <code>clip-path</code>, and a sticky add-to-cart bar that appears on scroll. All pure CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Anatomy of the layout</h2>
+      <p>Apple-style product pages follow a strict hierarchy: massive product imagery dominates the top half, while purchase details (price, color, storage, CTA) live in a sticky sidebar. As the user scrolls, a compact add-to-cart bar appears at the top. The image gallery uses <code>scroll-snap-type: x mandatory</code> for swipe navigation, with <code>::scroll-marker</code> dots providing visual pagination in supporting browsers.</p>
+
+      <h2>Color swatches via custom properties</h2>
+      <p>Each color swatch is a radio button. When checked, the <code>:has()</code> selector on the product wrapper updates <code>--product-color</code>, which the hero gradient reads. This creates a live color preview without JavaScript. The technique scales to any number of variants.</p>
+
+      <h2>Star ratings with clip-path</h2>
+      <p>Each star is a single element with a polygon <code>clip-path</code> defining the five-pointed shape. Fill state is controlled by width percentage on a child element, allowing fractional ratings (e.g., 4.3 stars). The approach is accessible when paired with proper <code>aria-label</code> text.</p>
+
+      <h2>The sticky add-to-cart bar</h2>
+      <p>Using <code>animation-timeline: scroll()</code>, the bar transitions from <code>translate: 0 -100%</code> to <code>translate: 0 0</code> once the user has scrolled past the hero. No intersection observer needed.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Full product page</h2>
+      <div class="demo-frame" style="padding:0; background:oklch(8% 0.02 264); overflow-y:auto; max-block-size:80vh;">
+        <style>
+          .demo-16-4 { font-family: system-ui, -apple-system, sans-serif; color: light-dark(oklch(20% 0.01 264), oklch(90% 0.01 264)); background: light-dark(oklch(99% 0.005 264), oklch(8% 0.02 264)); line-height: 1.6; --product-color: oklch(55% 0.15 264); }
+          .demo-16-4 *, .demo-16-4 *::before, .demo-16-4 *::after { box-sizing: border-box; margin: 0; }
+
+          /* Color swatch state */
+          .demo-16-4:has(input[value="midnight"]:checked) { --product-color: oklch(25% 0.05 264); }
+          .demo-16-4:has(input[value="starlight"]:checked) { --product-color: oklch(88% 0.03 80); }
+          .demo-16-4:has(input[value="blue"]:checked) { --product-color: oklch(55% 0.15 250); }
+          .demo-16-4:has(input[value="purple"]:checked) { --product-color: oklch(50% 0.18 300); }
+          .demo-16-4:has(input[value="red"]:checked) { --product-color: oklch(55% 0.2 25); }
+
+          /* Sticky cart bar */
+          .demo-16-4 .sticky-bar { position: sticky; inset-block-start: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; background: light-dark(oklch(99% 0.005 264 / 0.92), oklch(10% 0.02 264 / 0.92)); backdrop-filter: blur(12px); border-block-end: 1px solid light-dark(oklch(90% 0.01 264), oklch(20% 0.01 264)); transform: translateY(-100%); }
+          @supports (animation-timeline: scroll()) {
+            .demo-16-4 .sticky-bar { animation: sticky-reveal linear both; animation-timeline: scroll(nearest); animation-range: 100px 200px; }
+            @keyframes sticky-reveal { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+          }
+          @supports not (animation-timeline: scroll()) {
+            .demo-16-4 .sticky-bar { transform: translateY(0); }
+          }
+          .demo-16-4 .sticky-bar .bar-title { font-weight: 600; font-size: 0.875rem; }
+          .demo-16-4 .sticky-bar .bar-price { font-weight: 700; font-size: 0.875rem; color: light-dark(oklch(40% 0.01 264), oklch(65% 0.01 264)); }
+          .demo-16-4 .sticky-bar .bar-btn { padding: 0.5rem 1.25rem; border-radius: 2rem; background: oklch(48% 0.2 264); color: white; border: none; font-weight: 600; font-size: 0.8125rem; cursor: pointer; }
+
+          /* Product layout */
+          .demo-16-4 .product-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; padding: 2rem 1.5rem; max-inline-size: 72rem; margin-inline: auto; }
+          @media (max-width: 48rem) { .demo-16-4 .product-layout { grid-template-columns: 1fr; } }
+
+          /* Gallery */
+          .demo-16-4 .gallery { position: relative; }
+          .demo-16-4 .gallery-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 1rem; gap: 0; scrollbar-width: none; }
+          .demo-16-4 .gallery-track::-webkit-scrollbar { display: none; }
+          .demo-16-4 .gallery-slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1; display: grid; place-items: center; background: linear-gradient(135deg, var(--product-color), oklch(from var(--product-color) calc(l + 0.2) calc(c * 0.5) h)); border-radius: 1rem; transition: background 400ms; }
+          .demo-16-4 .gallery-slide .product-shape { inline-size: 60%; block-size: 60%; border-radius: 1.5rem; background: light-dark(oklch(99% 0 0 / 0.9), oklch(15% 0 0 / 0.8)); box-shadow: 0 20px 60px oklch(0% 0 0 / 0.3); }
+          @supports (::scroll-marker) {
+            .demo-16-4 .gallery-track::scroll-marker-group { display: flex; justify-content: center; gap: 0.5rem; padding-block-start: 1rem; }
+            .demo-16-4 .gallery-slide::scroll-marker { content: ""; display: inline-block; inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: light-dark(oklch(75% 0.01 264), oklch(35% 0.01 264)); }
+            .demo-16-4 .gallery-slide::scroll-marker:target-current { background: var(--product-color); }
+          }
+          .demo-16-4 .gallery-dots { display: flex; justify-content: center; gap: 0.5rem; padding-block-start: 1rem; }
+          .demo-16-4 .gallery-dots span { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: light-dark(oklch(75% 0.01 264), oklch(35% 0.01 264)); }
+          .demo-16-4 .gallery-dots span:first-child { background: var(--product-color); }
+
+          /* Product info sidebar */
+          .demo-16-4 .product-info { padding-block-start: 1rem; }
+          .demo-16-4 .product-info h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; margin-block-end: 0.25rem; }
+          .demo-16-4 .product-info .subtitle { color: light-dark(oklch(50% 0.01 264), oklch(55% 0.01 264)); margin-block-end: 1rem; }
+          .demo-16-4 .product-info .price { font-size: 1.5rem; font-weight: 700; margin-block-end: 1.5rem; }
+
+          /* Stars */
+          .demo-16-4 .stars { display: flex; gap: 0.2rem; margin-block-end: 1.5rem; align-items: center; }
+          .demo-16-4 .star { inline-size: 1.25rem; block-size: 1.25rem; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); background: oklch(75% 0.15 85); }
+          .demo-16-4 .star.filled { background: oklch(75% 0.18 85); }
+          .demo-16-4 .star.half { background: linear-gradient(90deg, oklch(75% 0.18 85) 50%, oklch(75% 0.03 264) 50%); }
+          .demo-16-4 .star.empty { background: oklch(75% 0.03 264); }
+          .demo-16-4 .stars .count { font-size: 0.8125rem; color: light-dark(oklch(50% 0.01 264), oklch(55% 0.01 264)); margin-inline-start: 0.5rem; }
+
+          /* Swatches */
+          .demo-16-4 .swatches { margin-block-end: 1.5rem; }
+          .demo-16-4 .swatches p { font-size: 0.875rem; font-weight: 600; margin-block-end: 0.5rem; }
+          .demo-16-4 .swatch-group { display: flex; gap: 0.75rem; }
+          .demo-16-4 .swatch-group input { position: absolute; opacity: 0; pointer-events: none; }
+          .demo-16-4 .swatch-group label { inline-size: 2rem; block-size: 2rem; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 200ms; }
+          .demo-16-4 .swatch-group label[for="sw-midnight"] { background: oklch(25% 0.05 264); }
+          .demo-16-4 .swatch-group label[for="sw-starlight"] { background: oklch(88% 0.03 80); }
+          .demo-16-4 .swatch-group label[for="sw-blue"] { background: oklch(55% 0.15 250); }
+          .demo-16-4 .swatch-group label[for="sw-purple"] { background: oklch(50% 0.18 300); }
+          .demo-16-4 .swatch-group label[for="sw-red"] { background: oklch(55% 0.2 25); }
+          .demo-16-4 .swatch-group input:checked + label { border-color: light-dark(oklch(30% 0.01 264), oklch(80% 0.01 264)); outline: 2px solid light-dark(oklch(30% 0.01 264), oklch(80% 0.01 264)); outline-offset: 2px; }
+
+          /* Add to cart button */
+          .demo-16-4 .add-cart { position: relative; display: block; inline-size: 100%; padding: 1rem; border-radius: 0.75rem; background: oklch(48% 0.2 264); color: white; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; overflow: hidden; margin-block-end: 1.5rem; }
+          .demo-16-4 .add-cart::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), oklch(70% 0.15 264 / 0.4) 0%, transparent 60%); opacity: 0; transition: opacity 300ms; }
+          .demo-16-4 .add-cart:hover::after { opacity: 1; }
+
+          /* Spec table */
+          .demo-16-4 .specs { margin-block-start: 1.5rem; }
+          .demo-16-4 .specs h3 { font-size: 1rem; font-weight: 600; margin-block-end: 0.75rem; }
+          .demo-16-4 .spec-table { inline-size: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+          .demo-16-4 .spec-table tr { border-block-end: 1px solid light-dark(oklch(92% 0.01 264), oklch(18% 0.01 264)); }
+          .demo-16-4 .spec-table td { padding: 0.625rem 0; }
+          .demo-16-4 .spec-table td:first-child { font-weight: 600; color: light-dark(oklch(35% 0.01 264), oklch(70% 0.01 264)); inline-size: 40%; }
+          .demo-16-4 .spec-table td:last-child { color: light-dark(oklch(45% 0.01 264), oklch(58% 0.01 264)); }
+
+          /* Scroll reveal */
+          @supports (animation-timeline: view()) {
+            .demo-16-4 .specs, .demo-16-4 .related { animation: prod-reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 25%; }
+            @keyframes prod-reveal { from { opacity: 0; translate: 0 1.5rem; } to { opacity: 1; translate: 0 0; } }
+          }
+
+          /* Related products */
+          .demo-16-4 .related { padding: 3rem 1.5rem; max-inline-size: 72rem; margin-inline: auto; }
+          .demo-16-4 .related h2 { font-size: 1.25rem; font-weight: 700; margin-block-end: 1.5rem; }
+          .demo-16-4 .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; }
+          .demo-16-4 .related-card { padding: 1.5rem; border-radius: 0.75rem; background: light-dark(oklch(97% 0.005 264), oklch(12% 0.015 264)); border: 1px solid light-dark(oklch(92% 0.01 264), oklch(20% 0.01 264)); text-align: center; }
+          .demo-16-4 .related-card .thumb { aspect-ratio: 1; border-radius: 0.5rem; margin-block-end: 0.75rem; background: linear-gradient(135deg, oklch(60% 0.12 200), oklch(70% 0.08 250)); }
+          .demo-16-4 .related-card h4 { font-size: 0.8125rem; font-weight: 600; margin-block-end: 0.25rem; }
+          .demo-16-4 .related-card .rel-price { font-size: 0.8125rem; color: light-dark(oklch(45% 0.01 264), oklch(58% 0.01 264)); }
+        </style>
+        <div class="demo-16-4">
+          <div class="sticky-bar">
+            <span class="bar-title">MacBook Air 15"</span>
+            <span class="bar-price">From $1,299</span>
+            <button class="bar-btn">Add to Bag</button>
+          </div>
+
+          <div class="product-layout">
+            <div class="gallery">
+              <div class="gallery-track">
+                <div class="gallery-slide"><div class="product-shape"></div></div>
+                <div class="gallery-slide"><div class="product-shape"></div></div>
+                <div class="gallery-slide"><div class="product-shape"></div></div>
+                <div class="gallery-slide"><div class="product-shape"></div></div>
+              </div>
+              <div class="gallery-dots">
+                <span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="product-info">
+              <h1>MacBook Air 15"</h1>
+              <p class="subtitle">Impressively big. Impossibly thin.</p>
+              <div class="price">From $1,299</div>
+
+              <div class="stars" aria-label="4.5 out of 5 stars">
+                <span class="star filled"></span>
+                <span class="star filled"></span>
+                <span class="star filled"></span>
+                <span class="star filled"></span>
+                <span class="star half"></span>
+                <span class="count">(2,847 reviews)</span>
+              </div>
+
+              <div class="swatches">
+                <p>Color</p>
+                <div class="swatch-group">
+                  <input type="radio" name="color-16-4" id="sw-midnight" value="midnight" checked>
+                  <label for="sw-midnight" title="Midnight"></label>
+                  <input type="radio" name="color-16-4" id="sw-starlight" value="starlight">
+                  <label for="sw-starlight" title="Starlight"></label>
+                  <input type="radio" name="color-16-4" id="sw-blue" value="blue">
+                  <label for="sw-blue" title="Blue"></label>
+                  <input type="radio" name="color-16-4" id="sw-purple" value="purple">
+                  <label for="sw-purple" title="Purple"></label>
+                  <input type="radio" name="color-16-4" id="sw-red" value="red">
+                  <label for="sw-red" title="Red"></label>
+                </div>
+              </div>
+
+              <button class="add-cart">Add to Bag</button>
+
+              <div class="specs">
+                <h3>Technical Specifications</h3>
+                <table class="spec-table">
+                  <tr><td>Display</td><td>15.3" Liquid Retina, 2880x1864</td></tr>
+                  <tr><td>Chip</td><td>Apple M3, 8-core CPU, 10-core GPU</td></tr>
+                  <tr><td>Memory</td><td>8GB unified memory</td></tr>
+                  <tr><td>Storage</td><td>256GB SSD</td></tr>
+                  <tr><td>Battery</td><td>Up to 18 hours</td></tr>
+                  <tr><td>Weight</td><td>1.51 kg (3.3 pounds)</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <section class="related">
+            <h2>You might also like</h2>
+            <div class="related-grid">
+              <div class="related-card"><div class="thumb"></div><h4>MacBook Pro 14"</h4><span class="rel-price">From $1,599</span></div>
+              <div class="related-card"><div class="thumb"></div><h4>iPad Pro</h4><span class="rel-price">From $1,099</span></div>
+              <div class="related-card"><div class="thumb"></div><h4>Studio Display</h4><span class="rel-price">From $1,599</span></div>
+              <div class="related-card"><div class="thumb"></div><h4>Magic Keyboard</h4><span class="rel-price">From $199</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself — color swatches with custom properties</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="product-demo"&gt;
+  &lt;div class="swatches"&gt;
+    &lt;input type="radio" name="clr" id="c1" value="midnight" checked&gt;
+    &lt;label for="c1"&gt;&lt;/label&gt;
+    &lt;input type="radio" name="clr" id="c2" value="ocean"&gt;
+    &lt;label for="c2"&gt;&lt;/label&gt;
+    &lt;input type="radio" name="clr" id="c3" value="sunset"&gt;
+    &lt;label for="c3"&gt;&lt;/label&gt;
+  &lt;/div&gt;
+  &lt;div class="preview"&gt;
+    &lt;div class="device"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: grid; place-items: center; }
+.product-demo { --product-color: oklch(25% 0.05 264); text-align: center; }
+
+/* Update custom property based on selection */
+.product-demo:has(input[value="midnight"]:checked) { --product-color: oklch(25% 0.05 264); }
+.product-demo:has(input[value="ocean"]:checked)    { --product-color: oklch(55% 0.18 230); }
+.product-demo:has(input[value="sunset"]:checked)   { --product-color: oklch(60% 0.2 25); }
+
+.swatches { display: flex; gap: 0.75rem; justify-content: center; margin-block-end: 2rem; }
+.swatches input { position: absolute; opacity: 0; }
+.swatches label {
+  inline-size: 2rem; block-size: 2rem;
+  border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent;
+}
+.swatches label[for="c1"] { background: oklch(25% 0.05 264); }
+.swatches label[for="c2"] { background: oklch(55% 0.18 230); }
+.swatches label[for="c3"] { background: oklch(60% 0.2 25); }
+.swatches input:checked + label {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.preview {
+  inline-size: 16rem; aspect-ratio: 1;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--product-color), oklch(80% 0.05 264));
+  display: grid; place-items: center;
+  transition: background 400ms;
+}
+.device {
+  inline-size: 60%; block-size: 60%;
+  background: oklch(95% 0 0 / 0.9);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px oklch(0% 0 0 / 0.2);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Key takeaway</h2>
+      <p>A single <code>--product-color</code> custom property, toggled by <code>:has(input[value]:checked)</code>, can repaint an entire product page. The gallery gradient, the sticky bar accent, and even the swatch highlight all read from the same variable. This is CSS-as-state-management: radio buttons hold the state, custom properties distribute it, and the browser does the rest.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-16.3-blog-article.html">&larr; Lesson 16.3</a>
+      <a href="./lesson-16.5-portfolio-gallery.html">Lesson 16.5 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

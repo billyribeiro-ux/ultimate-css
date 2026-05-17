@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.1 — The Browser Rendering Pipeline · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.1</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.1 · Rendering</p>
+      <h1>The Browser Rendering Pipeline</h1>
+      <p class="lead">Every pixel on screen passes through a five-stage pipeline: Parse, Style, Layout, Paint, Composite. Understanding this pipeline is the foundation of CSS performance — it tells you exactly why some property changes are free and others cost 16ms of jank.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The five stages</h2>
+      <p>When the browser receives HTML and CSS, it transforms them into pixels through a strict sequence:</p>
+      <ol>
+        <li><strong>Parse</strong> — HTML becomes the DOM tree, CSS becomes the CSSOM tree. These two trees are built in parallel.</li>
+        <li><strong>Style</strong> — The browser merges DOM + CSSOM to compute the final styles for every element (the "render tree"). Selectors are matched, specificity is resolved, inheritance is applied.</li>
+        <li><strong>Layout</strong> — The browser calculates the exact position and size of every element. This is where <code>width</code>, <code>height</code>, <code>margin</code>, <code>padding</code>, <code>top</code>, <code>left</code>, and <code>font-size</code> are resolved into pixel coordinates.</li>
+        <li><strong>Paint</strong> — Each element is drawn into layers: backgrounds, borders, text, shadows. The output is a list of "paint commands" (like a GPU instruction set).</li>
+        <li><strong>Composite</strong> — The painted layers are assembled in the correct stacking order and sent to the GPU for final rendering to the screen.</li>
+      </ol>
+
+      <h2>Why this matters for performance</h2>
+      <p>Changing a CSS property forces the browser to redo <em>every stage after the one you triggered</em>. This is the key insight:</p>
+      <ul>
+        <li>Changing <code>width</code> triggers: Layout + Paint + Composite (expensive)</li>
+        <li>Changing <code>background-color</code> triggers: Paint + Composite (moderate)</li>
+        <li>Changing <code>transform</code> or <code>opacity</code> triggers: Composite only (cheap)</li>
+      </ul>
+      <p>At 60fps, you have 16.67ms per frame. Layout can easily take 5-10ms on a complex page. Paint can take 3-8ms. Composite typically takes under 1ms. This is why compositor-only properties are the gold standard for animation.</p>
+
+      <h2>The compositor thread</h2>
+      <p>Modern browsers run compositing on a separate thread from the main thread. This means <code>transform</code> and <code>opacity</code> animations can run at 60fps even while JavaScript is executing on the main thread. This is the single most important performance fact in CSS: <strong>compositor-only animations cannot be janked by JavaScript</strong>.</p>
+
+      <h2>Property trigger categories</h2>
+      <p>Every CSS property falls into one of three categories:</p>
+      <ul>
+        <li><strong>Layout triggers:</strong> <code>width</code>, <code>height</code>, <code>padding</code>, <code>margin</code>, <code>border-width</code>, <code>top</code>, <code>left</code>, <code>font-size</code>, <code>display</code>, <code>position</code>, <code>float</code></li>
+        <li><strong>Paint triggers:</strong> <code>color</code>, <code>background</code>, <code>box-shadow</code>, <code>text-shadow</code>, <code>border-color</code>, <code>border-radius</code>, <code>outline</code>, <code>visibility</code></li>
+        <li><strong>Composite triggers:</strong> <code>transform</code>, <code>opacity</code>, <code>filter</code>, <code>clip-path</code>, <code>will-change</code></li>
+      </ul>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — The rendering pipeline visualized</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-20-1 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .demo-20-1 .pipeline {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+            flex-wrap: wrap;
+          }
+          .demo-20-1 .stage {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: oklch(98% 0 0);
+            text-align: center;
+            min-width: 5.5rem;
+            transition: opacity 0.3s, transform 0.3s;
+          }
+          .demo-20-1 .stage-parse    { background: oklch(55% 0.18 260); }
+          .demo-20-1 .stage-style    { background: oklch(55% 0.18 290); }
+          .demo-20-1 .stage-layout   { background: oklch(50% 0.2 25); }
+          .demo-20-1 .stage-paint    { background: oklch(55% 0.2 50); }
+          .demo-20-1 .stage-composite{ background: oklch(55% 0.18 150); }
+          .demo-20-1 .arrow {
+            font-size: 1.2rem;
+            color: oklch(60% 0 0);
+            font-weight: bold;
+          }
+          .demo-20-1 .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+            gap: 1rem;
+          }
+          .demo-20-1 .example-card {
+            border: 2px solid oklch(80% 0.02 260);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            background: oklch(97% 0.005 260);
+          }
+          .demo-20-1 .example-card h3 {
+            margin: 0 0 0.5rem;
+            font-size: 0.9rem;
+          }
+          .demo-20-1 .example-card code {
+            background: oklch(92% 0.01 260);
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+          }
+          .demo-20-1 .cost {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+          }
+          .demo-20-1 .cost-pip {
+            width: 2rem;
+            height: 0.5rem;
+            border-radius: 0.25rem;
+          }
+          .demo-20-1 .cost-pip.active-layout   { background: oklch(50% 0.2 25); }
+          .demo-20-1 .cost-pip.active-paint    { background: oklch(55% 0.2 50); }
+          .demo-20-1 .cost-pip.active-comp     { background: oklch(55% 0.18 150); }
+          .demo-20-1 .cost-pip.inactive { background: oklch(90% 0.01 0); }
+          .demo-20-1 .cost-label {
+            font-size: 0.75rem;
+            color: oklch(50% 0 0);
+            margin-top: 0.25rem;
+          }
+          .demo-20-1 .anim-box {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.5rem;
+            margin-top: 0.75rem;
+          }
+          .demo-20-1 .box-layout {
+            background: oklch(50% 0.2 25);
+            animation: demo201-layout 1.5s ease-in-out infinite alternate;
+          }
+          .demo-20-1 .box-paint {
+            background: oklch(55% 0.2 50);
+            animation: demo201-paint 1.5s ease-in-out infinite alternate;
+          }
+          .demo-20-1 .box-comp {
+            background: oklch(55% 0.18 150);
+            animation: demo201-comp 1.5s ease-in-out infinite alternate;
+          }
+          @keyframes demo201-layout {
+            to { width: 7rem; height: 5rem; }
+          }
+          @keyframes demo201-paint {
+            to { background: oklch(80% 0.15 50); box-shadow: 0 4px 16px oklch(55% 0.2 50 / 0.5); }
+          }
+          @keyframes demo201-comp {
+            to { transform: translateX(3rem) scale(1.2); opacity: 0.6; }
+          }
+        </style>
+        <div class="demo-20-1">
+          <div class="pipeline">
+            <div class="stage stage-parse">Parse</div>
+            <span class="arrow">&rarr;</span>
+            <div class="stage stage-style">Style</div>
+            <span class="arrow">&rarr;</span>
+            <div class="stage stage-layout">Layout</div>
+            <span class="arrow">&rarr;</span>
+            <div class="stage stage-paint">Paint</div>
+            <span class="arrow">&rarr;</span>
+            <div class="stage stage-composite">Composite</div>
+          </div>
+          <div class="examples">
+            <div class="example-card">
+              <h3>Layout trigger: <code>width</code></h3>
+              <p style="font-size:0.8rem;margin:0;">Triggers Layout + Paint + Composite</p>
+              <div class="cost">
+                <div class="cost-pip active-layout"></div>
+                <div class="cost-pip active-paint"></div>
+                <div class="cost-pip active-comp"></div>
+              </div>
+              <div class="cost-label">Cost: High</div>
+              <div class="anim-box box-layout"></div>
+            </div>
+            <div class="example-card">
+              <h3>Paint trigger: <code>background</code></h3>
+              <p style="font-size:0.8rem;margin:0;">Triggers Paint + Composite</p>
+              <div class="cost">
+                <div class="cost-pip inactive"></div>
+                <div class="cost-pip active-paint"></div>
+                <div class="cost-pip active-comp"></div>
+              </div>
+              <div class="cost-label">Cost: Medium</div>
+              <div class="anim-box box-paint"></div>
+            </div>
+            <div class="example-card">
+              <h3>Composite trigger: <code>transform</code></h3>
+              <p style="font-size:0.8rem;margin:0;">Triggers Composite only</p>
+              <div class="cost">
+                <div class="cost-pip inactive"></div>
+                <div class="cost-pip inactive"></div>
+                <div class="cost-pip active-comp"></div>
+              </div>
+              <div class="cost-label">Cost: Low</div>
+              <div class="anim-box box-comp"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="pipeline-demo"&gt;
+  &lt;div class="box expensive"&gt;width animation&lt;/div&gt;
+  &lt;div class="box cheap"&gt;transform animation&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+.pipeline-demo { display: flex; gap: 2rem; align-items: start; }
+
+.box {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Expensive: triggers layout every frame */
+.expensive {
+  background: oklch(50% 0.2 25);
+  width: 8rem;
+  animation: grow 1s ease-in-out infinite alternate;
+}
+@keyframes grow {
+  to { width: 14rem; }
+}
+
+/* Cheap: compositor only */
+.cheap {
+  background: oklch(55% 0.18 150);
+  animation: slide 1s ease-in-out infinite alternate;
+}
+@keyframes slide {
+  to { transform: translateX(6rem) scale(1.1); }
+}
+
+/* Open DevTools Performance panel.
+   Record 3 seconds. Compare the
+   layout events between the two. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Open DevTools and go to the Performance panel. Record a 3-second trace while both animations are running. Examine the flame chart: the <code>width</code> animation will show repeated "Layout" and "Paint" blocks on every frame. The <code>transform</code> animation will show only "Composite Layers." Calculate the time spent in layout vs composite. This is why we animate transforms.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./index.html">&larr; Module 20</a>
+      <a href="./lesson-20.2-compositor-animations.html">Lesson 20.2 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

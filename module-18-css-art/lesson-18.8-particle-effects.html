@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18.8 — CSS Particle Systems · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 18</a>
+      <span>Lesson 18.8</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 18.8 · Particles</p>
+      <h1>CSS Particle Systems</h1>
+      <p class="lead">Four distinct particle effects — confetti bursts, fireflies, snowfall, and fireworks — all built with CSS animations, <code>box-shadow</code> multiplication, and staggered delays. Triggered on <code>:hover</code> or <code>:active</code> without JavaScript.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Confetti burst</h2>
+      <p>Multiple <code>box-shadow</code> values on a single element, each offset randomly. On trigger, the shadows animate outward from the center using <code>@keyframes</code> that transition the shadow offsets from (0, 0) to their final positions while fading opacity.</p>
+
+      <h2>Fireflies</h2>
+      <p>Small elements with a <code>box-shadow</code> glow that pulses in opacity. Each firefly has a unique animation delay and slightly different timing, creating an organic flickering effect across the container.</p>
+
+      <h2>Snowfall</h2>
+      <p>Elements falling via <code>translateY</code> from top to bottom, with a gentle horizontal sine-wave drift achieved by combining two animations: one vertical (linear) and one horizontal (ease-in-out alternating).</p>
+
+      <h2>Firework</h2>
+      <p>A central dot that "launches" upward (translateY keyframe), then at the apex spawns a radial burst using <code>box-shadow</code> values that animate outward in a circular pattern while changing color and fading.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Four Particle Effects</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-18-8 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+            font-family: system-ui, sans-serif;
+          }
+
+          .demo-18-8 .effect-box {
+            position: relative;
+            height: 220px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+          }
+
+          .demo-18-8 .effect-label {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            translate: -50% 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: oklch(90% 0 0 / 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+
+          /* --- 1. Confetti --- */
+          .demo-18-8 .confetti-box {
+            background: oklch(25% 0.03 270);
+          }
+          .demo-18-8 .confetti-trigger {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: oklch(70% 0.2 150);
+            position: relative;
+            transition: transform 0.1s;
+          }
+          .demo-18-8 .confetti-trigger:active {
+            transform: scale(0.9);
+          }
+          .demo-18-8 .confetti-trigger::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 2px;
+            translate: -50% -50%;
+            background: transparent;
+            box-shadow: none;
+            transition: none;
+          }
+          .demo-18-8 .confetti-box:active .confetti-trigger::before {
+            animation: confetti-burst-18-8 0.8s ease-out forwards;
+          }
+
+          @keyframes confetti-burst-18-8 {
+            0% {
+              box-shadow:
+                0 0 0 0 oklch(70% 0.25 30),
+                0 0 0 0 oklch(70% 0.25 90),
+                0 0 0 0 oklch(70% 0.25 150),
+                0 0 0 0 oklch(70% 0.25 210),
+                0 0 0 0 oklch(70% 0.25 270),
+                0 0 0 0 oklch(70% 0.25 330),
+                0 0 0 0 oklch(70% 0.25 60),
+                0 0 0 0 oklch(70% 0.25 120);
+            }
+            50% {
+              box-shadow:
+                -40px -50px 0 0 oklch(70% 0.25 30),
+                30px -60px 0 0 oklch(70% 0.25 90),
+                60px -20px 0 0 oklch(70% 0.25 150),
+                50px 40px 0 0 oklch(70% 0.25 210),
+                -20px 55px 0 0 oklch(70% 0.25 270),
+                -55px 30px 0 0 oklch(70% 0.25 330),
+                -60px -10px 0 0 oklch(70% 0.25 60),
+                20px 60px 0 0 oklch(70% 0.25 120);
+            }
+            100% {
+              box-shadow:
+                -60px -80px 0 -3px oklch(70% 0.25 30 / 0),
+                50px -90px 0 -3px oklch(70% 0.25 90 / 0),
+                90px -30px 0 -3px oklch(70% 0.25 150 / 0),
+                75px 60px 0 -3px oklch(70% 0.25 210 / 0),
+                -30px 85px 0 -3px oklch(70% 0.25 270 / 0),
+                -80px 45px 0 -3px oklch(70% 0.25 330 / 0),
+                -90px -15px 0 -3px oklch(70% 0.25 60 / 0),
+                30px 90px 0 -3px oklch(70% 0.25 120 / 0);
+            }
+          }
+
+          /* --- 2. Fireflies --- */
+          .demo-18-8 .fireflies-box {
+            background: oklch(12% 0.04 180);
+          }
+          .demo-18-8 .firefly {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: oklch(85% 0.2 100);
+            box-shadow: 0 0 6px 2px oklch(80% 0.2 100 / 0.6);
+            animation: firefly-glow-18-8 3s ease-in-out infinite alternate;
+          }
+          .demo-18-8 .firefly:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; animation-duration: 2.5s; }
+          .demo-18-8 .firefly:nth-child(2) { top: 60%; left: 70%; animation-delay: -1s; animation-duration: 3.2s; }
+          .demo-18-8 .firefly:nth-child(3) { top: 40%; left: 20%; animation-delay: -0.5s; animation-duration: 2.8s; }
+          .demo-18-8 .firefly:nth-child(4) { top: 75%; left: 45%; animation-delay: -2s; animation-duration: 3.5s; }
+          .demo-18-8 .firefly:nth-child(5) { top: 30%; left: 80%; animation-delay: -1.5s; animation-duration: 2.2s; }
+          .demo-18-8 .firefly:nth-child(6) { top: 55%; left: 50%; animation-delay: -0.8s; animation-duration: 4s; }
+          .demo-18-8 .firefly:nth-child(7) { top: 15%; left: 60%; animation-delay: -2.5s; animation-duration: 3s; }
+          .demo-18-8 .firefly:nth-child(8) { top: 80%; left: 25%; animation-delay: -1.2s; animation-duration: 2.6s; }
+
+          @keyframes firefly-glow-18-8 {
+            0% { opacity: 0; transform: translate(0, 0); }
+            30% { opacity: 1; }
+            60% { opacity: 0.4; }
+            100% { opacity: 0.8; transform: translate(10px, -8px); }
+          }
+
+          /* --- 3. Snow --- */
+          .demo-18-8 .snow-box {
+            background: linear-gradient(to bottom, oklch(30% 0.05 250), oklch(20% 0.03 260));
+          }
+          .demo-18-8 .snowflake {
+            position: absolute;
+            top: -10px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: oklch(97% 0 0 / 0.9);
+            animation: snow-fall-18-8 4s linear infinite, snow-drift-18-8 2s ease-in-out infinite alternate;
+          }
+          .demo-18-8 .snowflake:nth-child(1) { left: 10%; animation-delay: 0s; width: 4px; height: 4px; }
+          .demo-18-8 .snowflake:nth-child(2) { left: 25%; animation-delay: -1s; animation-duration: 5s; }
+          .demo-18-8 .snowflake:nth-child(3) { left: 40%; animation-delay: -2.5s; width: 5px; height: 5px; animation-duration: 4.5s; }
+          .demo-18-8 .snowflake:nth-child(4) { left: 55%; animation-delay: -0.5s; width: 3px; height: 3px; animation-duration: 6s; }
+          .demo-18-8 .snowflake:nth-child(5) { left: 70%; animation-delay: -3s; animation-duration: 3.5s; }
+          .demo-18-8 .snowflake:nth-child(6) { left: 85%; animation-delay: -1.8s; width: 4px; height: 4px; animation-duration: 5.5s; }
+          .demo-18-8 .snowflake:nth-child(7) { left: 50%; animation-delay: -4s; width: 7px; height: 7px; animation-duration: 4.2s; }
+          .demo-18-8 .snowflake:nth-child(8) { left: 15%; animation-delay: -2s; width: 5px; height: 5px; animation-duration: 5.8s; }
+          .demo-18-8 .snowflake:nth-child(9) { left: 65%; animation-delay: -3.5s; width: 4px; height: 4px; }
+          .demo-18-8 .snowflake:nth-child(10) { left: 35%; animation-delay: -0.8s; width: 3px; height: 3px; animation-duration: 6.5s; }
+
+          @keyframes snow-fall-18-8 {
+            from { top: -10px; opacity: 1; }
+            to { top: calc(100% + 10px); opacity: 0.3; }
+          }
+          @keyframes snow-drift-18-8 {
+            from { translate: -8px 0; }
+            to { translate: 8px 0; }
+          }
+
+          /* --- 4. Firework --- */
+          .demo-18-8 .firework-box {
+            background: oklch(10% 0.02 270);
+          }
+          .demo-18-8 .firework-trigger {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: oklch(90% 0.2 50);
+          }
+          .demo-18-8 .firework-box:hover .firework-trigger {
+            animation: firework-launch-18-8 1.5s ease-out forwards;
+          }
+          .demo-18-8 .firework-trigger::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            translate: -50% -50%;
+            box-shadow: none;
+          }
+          .demo-18-8 .firework-box:hover .firework-trigger::after {
+            animation: firework-explode-18-8 1s 0.5s ease-out forwards;
+          }
+
+          @keyframes firework-launch-18-8 {
+            0% { transform: translateY(0); opacity: 1; }
+            40% { transform: translateY(-70px); opacity: 1; }
+            50% { transform: translateY(-70px); opacity: 0; }
+            100% { transform: translateY(-70px); opacity: 0; }
+          }
+
+          @keyframes firework-explode-18-8 {
+            0% {
+              box-shadow:
+                0 0 0 0 oklch(80% 0.25 0),
+                0 0 0 0 oklch(80% 0.25 45),
+                0 0 0 0 oklch(80% 0.25 90),
+                0 0 0 0 oklch(80% 0.25 135),
+                0 0 0 0 oklch(80% 0.25 180),
+                0 0 0 0 oklch(80% 0.25 225),
+                0 0 0 0 oklch(80% 0.25 270),
+                0 0 0 0 oklch(80% 0.25 315);
+              transform: translate(-50%, -50%) translateY(-70px);
+            }
+            60% {
+              box-shadow:
+                0px -40px 0 0 oklch(80% 0.25 0),
+                28px -28px 0 0 oklch(80% 0.25 45),
+                40px 0px 0 0 oklch(80% 0.25 90),
+                28px 28px 0 0 oklch(80% 0.25 135),
+                0px 40px 0 0 oklch(80% 0.25 180),
+                -28px 28px 0 0 oklch(80% 0.25 225),
+                -40px 0px 0 0 oklch(80% 0.25 270),
+                -28px -28px 0 0 oklch(80% 0.25 315);
+            }
+            100% {
+              box-shadow:
+                0px -60px 0 -2px oklch(80% 0.25 0 / 0),
+                42px -42px 0 -2px oklch(80% 0.25 45 / 0),
+                60px 0px 0 -2px oklch(80% 0.25 90 / 0),
+                42px 42px 0 -2px oklch(80% 0.25 135 / 0),
+                0px 60px 0 -2px oklch(80% 0.25 180 / 0),
+                -42px 42px 0 -2px oklch(80% 0.25 225 / 0),
+                -60px 0px 0 -2px oklch(80% 0.25 270 / 0),
+                -42px -42px 0 -2px oklch(80% 0.25 315 / 0);
+              transform: translate(-50%, -50%) translateY(-70px);
+            }
+          }
+        </style>
+        <div class="demo-18-8">
+          <div class="effect-box confetti-box">
+            <div class="confetti-trigger"></div>
+            <span class="effect-label">Click for confetti</span>
+          </div>
+          <div class="effect-box fireflies-box">
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="firefly"></span>
+            <span class="effect-label">Fireflies</span>
+          </div>
+          <div class="effect-box snow-box">
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="snowflake"></span>
+            <span class="effect-label">Snowfall</span>
+          </div>
+          <div class="effect-box firework-box">
+            <div class="firework-trigger"></div>
+            <span class="effect-label">Hover for firework</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="snow-scene"&gt;
+  &lt;span class="flake"&gt;&lt;/span&gt;
+  &lt;span class="flake"&gt;&lt;/span&gt;
+  &lt;span class="flake"&gt;&lt;/span&gt;
+  &lt;span class="flake"&gt;&lt;/span&gt;
+  &lt;span class="flake"&gt;&lt;/span&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">.snow-scene {
+  position: relative;
+  width: 300px; height: 200px;
+  background: oklch(20% 0.03 260);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.flake {
+  position: absolute;
+  top: -10px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: oklch(97% 0 0 / 0.9);
+  animation: fall 4s linear infinite,
+    drift 2s ease-in-out infinite alternate;
+}
+.flake:nth-child(1) { left: 15%; }
+.flake:nth-child(2) { left: 35%; animation-delay: -1s; }
+.flake:nth-child(3) { left: 55%; animation-delay: -2s; }
+.flake:nth-child(4) { left: 75%; animation-delay: -0.5s; }
+.flake:nth-child(5) { left: 90%; animation-delay: -3s; }
+@keyframes fall {
+  to { top: calc(100% + 10px); }
+}
+@keyframes drift {
+  from { translate: -6px 0; }
+  to { translate: 6px 0; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Challenge</h2>
+      <p>Create a "rain" effect: thin vertical lines (2px wide, 15px tall) falling at a slight angle using <code>skewX(-5deg)</code>. Add splash effects at the bottom using small radial <code>box-shadow</code> bursts that trigger on a delayed keyframe. Make the rain responsive to a checkbox that switches between "light drizzle" (fewer, slower particles) and "heavy storm" (more, faster, with wind angle).</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-18.7-3d-cube-interactive.html">&larr; Lesson 18.7</a>
+      <a href="./lesson-18.9-text-effects.html">Lesson 18.9 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
