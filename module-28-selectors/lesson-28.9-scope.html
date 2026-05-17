@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.9 — @scope and :scope · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.9 · Reference</p>
+      <h1>@scope and :scope</h1>
+      <p class="lead"><code>@scope</code> is CSS's native solution for component-scoped styling. It limits where selectors match — both from a root (scope start) and optionally to a boundary (scope end, the "donut scope"). Combined with <code>:scope</code>, it enables truly isolated component styles.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Basic @scope syntax</h2>
+      <pre><code>@scope (.card) {
+  /* These rules only match inside .card elements */
+  h2 { font-size: 1.25rem; }
+  p  { color: oklch(40% 0 0); }
+  a  { color: oklch(50% 0.2 275); }
+}</code></pre>
+      <p>Rules inside <code>@scope (.card)</code> only apply to elements that are descendants of <code>.card</code>. Unlike <code>.card h2</code>, the scope doesn't increase specificity of the inner selectors the same way.</p>
+
+      <h2>Donut scope with to()</h2>
+      <p>The "donut hole" — styles apply between the scope root and the boundary, but NOT inside the boundary:</p>
+      <pre><code>@scope (.card) to (.card-footer) {
+  /* Matches inside .card but NOT inside .card-footer */
+  color: oklch(30% 0 0);
+  a { color: oklch(50% 0.2 275); }
+}
+
+@scope (.layout) to (.sidebar, .modal) {
+  /* Styles the layout area but stops at sidebar and modal */
+  font-size: 1rem;
+}</code></pre>
+      <p>This is invaluable for design systems. You can style a card's body area without accidentally styling nested components like footers, modals, or embedded cards.</p>
+
+      <h2>The :scope pseudo-class</h2>
+      <p>Inside <code>@scope</code>, <code>:scope</code> refers to the scope root element itself:</p>
+      <pre><code>@scope (.card) {
+  :scope {
+    /* Styles the .card element itself */
+    border: 1px solid oklch(88% 0.04 275);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+  :scope > h2 {
+    /* Direct child h2 of the card */
+    margin-top: 0;
+  }
+}</code></pre>
+
+      <h2>Specificity inside @scope</h2>
+      <p>The scope root (<code>.card</code> in the <code>@scope</code> declaration) does NOT add to the specificity of rules inside. A bare <code>h2</code> inside <code>@scope (.card)</code> has specificity (0,0,1), not (0,1,1). However, <code>:scope</code> adds its own specificity when used in a selector.</p>
+      <pre><code>@scope (.card) {
+  h2 { }           /* specificity: (0,0,1) */
+  :scope h2 { }    /* specificity: (0,1,1) — :scope = (0,1,0) */
+  .title { }       /* specificity: (0,1,0) */
+}</code></pre>
+
+      <h2>Nesting @scope blocks</h2>
+      <pre><code>@scope (.page) {
+  @scope (.sidebar) {
+    /* Only matches .sidebar inside .page */
+    nav { padding: 1rem; }
+  }
+  @scope (.main-content) to (.widget) {
+    /* Main content area, stopping at widgets */
+    p { line-height: 1.7; }
+  }
+}</code></pre>
+
+      <h2>@scope vs other approaches</h2>
+      <ul>
+        <li><strong>vs BEM:</strong> @scope provides native scoping without naming conventions. No need for <code>.card__title</code> — just use <code>h2</code> inside the scope.</li>
+        <li><strong>vs Shadow DOM:</strong> @scope is lighter weight, doesn't break inheritance, and works with existing selectors.</li>
+        <li><strong>vs CSS Modules:</strong> @scope works in plain CSS without a build step.</li>
+        <li><strong>vs nesting:</strong> Nesting creates descendant selectors (increases specificity). @scope limits matching without adding specificity from the root.</li>
+      </ul>
+
+      <h2>Inline @scope (in style elements)</h2>
+      <pre><code>&lt;div class="widget"&gt;
+  &lt;style&gt;
+    @scope {
+      /* Implicitly scoped to the parent of this style element */
+      p { color: oklch(45% 0.1 275); }
+    }
+  &lt;/style&gt;
+  &lt;p&gt;This paragraph is styled.&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — @scope with donut</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-28-9 { padding: 1.5rem; font-family: system-ui; }
+          @scope (.demo-28-9 .scoped-card) to (.card-footer) {
+            :scope {
+              border: 2px solid oklch(85% 0.06 275);
+              border-radius: 0.75rem;
+              padding: 1.25rem;
+              max-width: 350px;
+            }
+            h3 { margin: 0 0 0.5rem; color: oklch(35% 0.15 275); font-size: 1.1rem; }
+            p { margin: 0; color: oklch(40% 0 0); font-size: 0.9rem; line-height: 1.5; }
+            a { color: oklch(50% 0.2 275); }
+          }
+          .demo-28-9 .card-footer {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid oklch(90% 0.03 275);
+            font-size: 0.8rem;
+            color: oklch(55% 0 0);
+          }
+          .demo-28-9 .card-footer a { color: oklch(55% 0.15 25); }
+        </style>
+        <div class="demo-28-9">
+          <div class="scoped-card">
+            <h3>Scoped Card</h3>
+            <p>This text is styled by @scope rules. The <a href="#">link is purple</a>.</p>
+            <div class="card-footer">
+              <p>Footer is outside the scope boundary (donut hole). <a href="#">This link is red</a>, not purple — the scope stops here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="post"&gt;
+  &lt;h2&gt;Blog Post Title&lt;/h2&gt;
+  &lt;p&gt;Main content paragraph with a &lt;a href="#"&gt;link&lt;/a&gt;.&lt;/p&gt;
+  &lt;p&gt;Another paragraph of content.&lt;/p&gt;
+  &lt;aside class="related"&gt;
+    &lt;h3&gt;Related Posts&lt;/h3&gt;
+    &lt;p&gt;This is inside the boundary — different styles.&lt;/p&gt;
+    &lt;a href="#"&gt;Related link&lt;/a&gt;
+  &lt;/aside&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; }
+
+/* Scope: styles .post content but stops at .related */
+@scope (.post) to (.related) {
+  :scope {
+    max-width: 50ch;
+    padding: 1.5rem;
+    border: 2px solid oklch(88% 0.05 275);
+    border-radius: 0.75rem;
+  }
+  h2 { margin: 0 0 1rem; color: oklch(30% 0.15 275); }
+  p { line-height: 1.7; color: oklch(25% 0 0); }
+  a { color: oklch(50% 0.2 275); font-weight: 500; }
+}
+
+/* The .related aside has its own styles */
+.related {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: oklch(96% 0.02 200);
+  border-radius: 0.5rem;
+}
+.related h3 { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.related p { font-size: 0.85rem; color: oklch(40% 0 0); }
+.related a { color: oklch(50% 0.15 200); }
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Create a dashboard layout with a <code>.panel</code> component. Use <code>@scope (.panel) to (.panel)</code> to prevent nested panels from inheriting the outer panel's styles (the donut boundary is the same selector as the root — this prevents deep nesting style leaks). Then add <code>:scope</code> to style the panel container itself.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-28.8-nth-child-advanced.html">← Lesson 28.8</a>
+      <a href="./lesson-28.10-performance-best-practices.html">Lesson 28.10 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
