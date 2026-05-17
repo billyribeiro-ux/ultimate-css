@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.2 — Color Contrast: The Math and the Tools · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.2</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.2 · Inclusive Design</p>
+      <h1>Color Contrast: The Math and the Tools</h1>
+      <p class="lead">1 in 12 men and 1 in 200 women have some form of color vision deficiency. Sufficient contrast is not a nicety — it is the difference between readable and invisible. WCAG gives us exact ratios; OKLCH gives us intuitive tools to hit them.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>WCAG contrast levels</h2>
+      <p><strong>AA (minimum):</strong> 4.5:1 for normal text, 3:1 for large text (18pt / 14pt bold) and UI components. <strong>AAA (enhanced):</strong> 7:1 for normal text, 4.5:1 for large text. Most design systems target AA as the baseline and AAA where feasible.</p>
+
+      <h2>How contrast is calculated</h2>
+      <p>The WCAG formula uses relative luminance: <code>(L1 + 0.05) / (L2 + 0.05)</code> where L1 is the lighter color and L2 is the darker. Relative luminance comes from linearized sRGB values. The math is non-trivial in CSS, but OKLCH gives us a shortcut.</p>
+
+      <h2>OKLCH lightness as a proxy</h2>
+      <p>In OKLCH, the L channel (0% to 100%) is perceptually uniform. If your background is <code>oklch(95% ...)</code> and your text is <code>oklch(25% ...)</code>, the 70-point lightness gap almost always exceeds 4.5:1. This is not a formal guarantee, but in practice, a lightness difference of 50+ points passes AA for most hue/chroma combinations, and 60+ points is very safe.</p>
+
+      <h2>contrast-color() — the future</h2>
+      <p>The <code>contrast-color()</code> function (CSS Color Level 5) will automatically choose a text color that meets a target contrast ratio against a given background. Until browser support matures, OKLCH lightness math is the next best approach.</p>
+
+      <h2>Common failures</h2>
+      <p><strong>Light gray on white:</strong> <code>oklch(75% 0 0)</code> on <code>oklch(100% 0 0)</code> — only about 2.5:1. <strong>Colored text on colored backgrounds:</strong> matching hue does not ensure contrast. <strong>Placeholder text:</strong> browsers default to a low-contrast gray that often fails. Always check.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Interactive contrast checker</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-19-2 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .demo-19-2 .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+          }
+          .demo-19-2 label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: oklch(30% 0.05 275);
+          }
+          .demo-19-2 input[type="range"] {
+            width: 100%;
+          }
+          .demo-19-2 .preview-box {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            transition: background 200ms, color 200ms;
+          }
+          .demo-19-2 .result {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+          }
+          .demo-19-2 .ratio-badge {
+            padding: 0.3rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+          }
+          .demo-19-2 .pass { background: oklch(85% 0.15 145); color: oklch(25% 0.1 145); }
+          .demo-19-2 .fail { background: oklch(85% 0.15 25); color: oklch(25% 0.1 25); }
+          .demo-19-2 .swatch-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+          }
+          .demo-19-2 .swatch {
+            padding: 0.75rem 0.5rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+        </style>
+        <div class="demo-19-2">
+          <div class="controls">
+            <label>
+              Background lightness: <span id="bg-val">95%</span>
+              <input type="range" id="bg-l" min="0" max="100" value="95">
+            </label>
+            <label>
+              Text lightness: <span id="fg-val">25%</span>
+              <input type="range" id="fg-l" min="0" max="100" value="25">
+            </label>
+          </div>
+          <div class="preview-box" id="contrast-preview" style="background: oklch(95% 0.02 275); color: oklch(25% 0.02 275);">
+            The quick brown fox jumps over the lazy dog
+          </div>
+          <div class="result">
+            <span id="ratio-display">Approx ratio: ~13.1:1</span>
+            <span class="ratio-badge pass" id="aa-badge">AA Pass</span>
+            <span class="ratio-badge pass" id="aaa-badge">AAA Pass</span>
+          </div>
+          <h3 style="font-size:0.85rem;margin:0.5rem 0 0;">Common contrast pairs</h3>
+          <div class="swatch-row">
+            <div class="swatch" style="background:oklch(100% 0 0);color:oklch(25% 0 0);">Pass 4.5:1+</div>
+            <div class="swatch" style="background:oklch(100% 0 0);color:oklch(75% 0 0);">Fail ~2.5:1</div>
+            <div class="swatch" style="background:oklch(45% 0.2 275);color:oklch(100% 0 0);">Pass 4.5:1+</div>
+            <div class="swatch" style="background:oklch(60% 0.2 145);color:oklch(100% 0 0);">Borderline</div>
+          </div>
+        </div>
+        <script>
+          (function(){
+            const bgSlider = document.getElementById('bg-l');
+            const fgSlider = document.getElementById('fg-l');
+            const bgVal = document.getElementById('bg-val');
+            const fgVal = document.getElementById('fg-val');
+            const preview = document.getElementById('contrast-preview');
+            const ratioDisplay = document.getElementById('ratio-display');
+            const aaBadge = document.getElementById('aa-badge');
+            const aaaBadge = document.getElementById('aaa-badge');
+
+            function sRGBtoLinear(c) {
+              return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            }
+            function relativeLuminance(r, g, b) {
+              return 0.2126 * sRGBtoLinear(r/255) + 0.7152 * sRGBtoLinear(g/255) + 0.0722 * sRGBtoLinear(b/255);
+            }
+            function approxLumFromOklchL(l) {
+              return Math.pow(l / 100, 2.2) * 0.95 + 0.001;
+            }
+            function contrastRatio(l1, l2) {
+              const lighter = Math.max(l1, l2);
+              const darker = Math.min(l1, l2);
+              return (lighter + 0.05) / (darker + 0.05);
+            }
+            function update() {
+              const bgL = parseInt(bgSlider.value);
+              const fgL = parseInt(fgSlider.value);
+              bgVal.textContent = bgL + '%';
+              fgVal.textContent = fgL + '%';
+              preview.style.background = `oklch(${bgL}% 0.02 275)`;
+              preview.style.color = `oklch(${fgL}% 0.02 275)`;
+              const ratio = contrastRatio(approxLumFromOklchL(bgL), approxLumFromOklchL(fgL));
+              ratioDisplay.textContent = `Approx ratio: ~${ratio.toFixed(1)}:1`;
+              aaBadge.textContent = ratio >= 4.5 ? 'AA Pass' : 'AA Fail';
+              aaBadge.className = 'ratio-badge ' + (ratio >= 4.5 ? 'pass' : 'fail');
+              aaaBadge.textContent = ratio >= 7 ? 'AAA Pass' : 'AAA Fail';
+              aaaBadge.className = 'ratio-badge ' + (ratio >= 7 ? 'pass' : 'fail');
+            }
+            bgSlider.addEventListener('input', update);
+            fgSlider.addEventListener('input', update);
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card good"&gt;
+  &lt;h2&gt;Good contrast&lt;/h2&gt;
+  &lt;p&gt;Dark text on a light background. Lightness gap: 70 points.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="card bad"&gt;
+  &lt;h2&gt;Poor contrast&lt;/h2&gt;
+  &lt;p&gt;Light gray on white. Lightness gap: only 20 points.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="card custom"&gt;
+  &lt;h2&gt;Try your own&lt;/h2&gt;
+  &lt;p&gt;Change the OKLCH lightness values below.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+}
+
+/* Good: 95% bg, 25% text = 70pt gap */
+.good {
+  background: oklch(95% 0.02 275);
+  color: oklch(25% 0.05 275);
+}
+
+/* Bad: 100% bg, 80% text = 20pt gap */
+.bad {
+  background: oklch(100% 0 0);
+  color: oklch(80% 0 0);
+}
+
+/* Experiment: change these values */
+.custom {
+  background: oklch(40% 0.18 275);
+  color: oklch(95% 0.03 275);
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Fix the "bad" card. Find the lowest OKLCH lightness value for the text that still passes AA (4.5:1) on a white background. Hint: you need a lightness gap of roughly 50+ points, so try <code>oklch(45% 0 0)</code> and work from there.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.1-focus-management.html">&larr; Lesson 19.1</a>
+      <a href="./lesson-19.3-reduced-motion.html">Lesson 19.3 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
