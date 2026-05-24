@@ -185,144 +185,36 @@
             min-block-size: 400px;
           }
           /* App header */
-          .demo-21-14 .app-bar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: var(--sp);
-            padding: calc(var(--sp) * 0.75) var(--sp);
-            background: oklch(12% 0.03 260);
-            border-block-end: 1px solid oklch(20% 0.03 260);
-          }
-          .demo-21-14 .app-bar .app-title {
-            font-size: clamp(0.85rem, 0.75rem + 0.4vw, 1.1rem);
-            font-weight: 700;
-            margin-inline-end: auto;
-          }
-          .demo-21-14 .app-bar .view-toggle {
-            display: flex;
-            gap: 0.25rem;
-          }
-          .demo-21-14 .app-bar .toggle-btn {
-            padding: 0.25rem 0.6rem;
-            font-size: 0.7rem;
-            background: oklch(18% 0.03 260);
-            color: oklch(65% 0.03 260);
-            border: 1px solid oklch(25% 0.03 260);
-            border-radius: 0.2rem;
-            cursor: pointer;
-            font-family: inherit;
-          }
-          .demo-21-14 .app-bar .toggle-btn.active {
-            background: oklch(40% 0.15 270);
-            color: oklch(95% 0.01 270);
-            border-color: oklch(50% 0.15 270);
-          }
-          /* Two-pane layout */
-          .demo-21-14 .pane-layout {
-            container-type: inline-size;
-            display: grid;
-            grid-template-columns: 1fr;
-            overflow: hidden;
-          }
-          .demo-21-14 .pane-layout.split-view {
-            grid-template-columns: 1fr 1fr;
-          }
-          .demo-21-14 .list-pane {
-            overflow-y: auto;
-            border-inline-end: 1px solid oklch(18% 0.02 260);
-            max-block-size: 350px;
-          }
-          .demo-21-14 .detail-pane {
-            display: none;
-            padding: var(--sp);
-            overflow-y: auto;
-            max-block-size: 350px;
-          }
-          .demo-21-14 .pane-layout.split-view .detail-pane {
-            display: block;
-          }
-          /* List items */
-          .demo-21-14 .list-item {
-            display: flex;
-            gap: 0.75rem;
-            padding: calc(var(--sp) * 0.75) var(--sp);
-            border-block-end: 1px solid oklch(14% 0.02 260);
-            cursor: pointer;
-            transition: background 120ms;
-          }
-          .demo-21-14 .list-item:hover {
-            background: oklch(14% 0.03 260);
-          }
-          .demo-21-14 .list-item.selected {
-            background: oklch(18% 0.05 270);
-          }
-          .demo-21-14 .list-avatar {
-            inline-size: 2rem;
-            block-size: 2rem;
-            border-radius: 50%;
-            flex-shrink: 0;
-          }
+          .demo-21-14 .app-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp); padding: calc(var(--sp) * 0.75) var(--sp); background: oklch(12% 0.03 260); border-block-end: 1px solid oklch(20% 0.03 260); }
+          .demo-21-14 .app-bar .app-title { font-size: clamp(0.85rem, 0.75rem + 0.4vw, 1.1rem); font-weight: 700; margin-inline-end: auto; }
+          .demo-21-14 .app-bar .view-toggle { display: flex; gap: 0.25rem; }
+          .demo-21-14 .app-bar .toggle-btn { padding: 0.25rem 0.6rem; font-size: 0.7rem; background: oklch(18% 0.03 260); color: oklch(65% 0.03 260); border: 1px solid oklch(25% 0.03 260); border-radius: 0.2rem; cursor: pointer; font-family: inherit; }
+          .demo-21-14 .app-bar .toggle-btn.active { background: oklch(40% 0.15 270); color: oklch(95% 0.01 270); border-color: oklch(50% 0.15 270); }
+          .demo-21-14 .pane-layout { container-type: inline-size; display: grid; grid-template-columns: 1fr; overflow: hidden; }
+          .demo-21-14 .pane-layout.split-view { grid-template-columns: 1fr 1fr; }
+          .demo-21-14 .list-pane { overflow-y: auto; border-inline-end: 1px solid oklch(18% 0.02 260); max-block-size: 350px; }
+          .demo-21-14 .detail-pane { display: none; padding: var(--sp); overflow-y: auto; max-block-size: 350px; }
+          .demo-21-14 .pane-layout.split-view .detail-pane { display: block; }
+          .demo-21-14 .list-item { display: flex; gap: 0.75rem; padding: calc(var(--sp) * 0.75) var(--sp); border-block-end: 1px solid oklch(14% 0.02 260); cursor: pointer; transition: background 120ms; }
+          .demo-21-14 .list-item:hover { background: oklch(14% 0.03 260); }
+          .demo-21-14 .list-item.selected { background: oklch(18% 0.05 270); }
+          .demo-21-14 .list-avatar { inline-size: 2rem; block-size: 2rem; border-radius: 50%; flex-shrink: 0; }
           .demo-21-14 .list-avatar.av1 { background: oklch(50% 0.15 270); }
           .demo-21-14 .list-avatar.av2 { background: oklch(50% 0.15 150); }
           .demo-21-14 .list-avatar.av3 { background: oklch(50% 0.15 30); }
           .demo-21-14 .list-avatar.av4 { background: oklch(50% 0.15 200); }
           .demo-21-14 .list-avatar.av5 { background: oklch(50% 0.15 320); }
-          .demo-21-14 .list-content {
-            min-inline-size: 0;
-          }
-          .demo-21-14 .list-name {
-            font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
-            font-weight: 600;
-          }
-          .demo-21-14 .list-preview {
-            font-size: clamp(0.65rem, 0.6rem + 0.15vw, 0.75rem);
-            color: oklch(50% 0.02 260);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-          .demo-21-14 .list-time {
-            font-size: 0.6rem;
-            color: oklch(45% 0.02 260);
-            margin-block-start: 0.15rem;
-          }
-          /* Detail view */
-          .demo-21-14 .detail-header {
-            margin-block-end: var(--sp);
-            padding-block-end: var(--sp);
-            border-block-end: 1px solid oklch(18% 0.02 260);
-          }
-          .demo-21-14 .detail-header h3 {
-            font-size: clamp(0.9rem, 0.8rem + 0.4vw, 1.2rem);
-            font-weight: 700;
-            margin-block-end: 0.3rem;
-          }
-          .demo-21-14 .detail-meta {
-            font-size: 0.7rem;
-            color: oklch(50% 0.03 260);
-          }
-          .demo-21-14 .detail-body {
-            font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
-            line-height: 1.7;
-            color: oklch(70% 0.01 260);
-          }
-          .demo-21-14 .detail-body p + p {
-            margin-block-start: 0.75rem;
-          }
-          /* Fold indicator */
-          .demo-21-14 .fold-indicator {
-            padding: calc(var(--sp) * 0.5) var(--sp);
-            background: oklch(12% 0.03 260);
-            border-block-start: 1px solid oklch(20% 0.03 260);
-            font-size: 0.65rem;
-            color: oklch(50% 0.03 260);
-            text-align: center;
-          }
-          .demo-21-14 .fold-indicator code {
-            color: oklch(65% 0.1 200);
-            font-family: monospace;
-          }
+          .demo-21-14 .list-content { min-inline-size: 0; }
+          .demo-21-14 .list-name { font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem); font-weight: 600; }
+          .demo-21-14 .list-preview { font-size: clamp(0.65rem, 0.6rem + 0.15vw, 0.75rem); color: oklch(50% 0.02 260); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .demo-21-14 .list-time { font-size: 0.6rem; color: oklch(45% 0.02 260); margin-block-start: 0.15rem; }
+          .demo-21-14 .detail-header { margin-block-end: var(--sp); padding-block-end: var(--sp); border-block-end: 1px solid oklch(18% 0.02 260); }
+          .demo-21-14 .detail-header h3 { font-size: clamp(0.9rem, 0.8rem + 0.4vw, 1.2rem); font-weight: 700; margin-block-end: 0.3rem; }
+          .demo-21-14 .detail-meta { font-size: 0.7rem; color: oklch(50% 0.03 260); }
+          .demo-21-14 .detail-body { font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem); line-height: 1.7; color: oklch(70% 0.01 260); }
+          .demo-21-14 .detail-body p + p { margin-block-start: 0.75rem; }
+          .demo-21-14 .fold-indicator { padding: calc(var(--sp) * 0.5) var(--sp); background: oklch(12% 0.03 260); border-block-start: 1px solid oklch(20% 0.03 260); font-size: 0.65rem; color: oklch(50% 0.03 260); text-align: center; }
+          .demo-21-14 .fold-indicator code { color: oklch(65% 0.1 200); font-family: monospace; }
           /* Container query: auto-split when wide enough */
           @container (min-width: 40rem) {
             .demo-21-14 .pane-layout {
@@ -375,14 +267,6 @@
                     <div class="list-name">Alex Rivera</div>
                     <div class="list-preview">The foldable testing results look promising</div>
                     <div class="list-time">3 hr ago</div>
-                  </div>
-                </div>
-                <div class="list-item">
-                  <div class="list-avatar av5"></div>
-                  <div class="list-content">
-                    <div class="list-name">CSS Working Group</div>
-                    <div class="list-preview">New viewport segments spec draft published</div>
-                    <div class="list-time">Yesterday</div>
                   </div>
                 </div>
               </div>

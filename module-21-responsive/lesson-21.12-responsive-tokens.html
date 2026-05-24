@@ -179,97 +179,26 @@ h1 { font-size: var(--size-4xl); }</code></pre>
             border-radius: 0.5rem;
             overflow: hidden;
           }
-          .demo-21-12 .dash-page {
-            inline-size: min(80rem, 100%);
-            margin-inline: auto;
-            padding: var(--space-md);
-          }
-          .demo-21-12 .dash-header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--space-sm);
-            margin-block-end: var(--space-lg);
-          }
-          .demo-21-12 .dash-title {
-            font-size: var(--size-lg);
-            font-weight: 700;
-          }
-          .demo-21-12 .density-controls {
-            display: flex;
-            gap: var(--space-xs);
-          }
-          .demo-21-12 .density-btn {
-            padding: 0.3rem 0.6rem;
-            font-size: var(--size-xs);
-            background: oklch(18% 0.03 260);
-            color: oklch(70% 0.03 260);
-            border: 1px solid oklch(25% 0.03 260);
-            border-radius: 0.25rem;
-            cursor: pointer;
-            font-family: inherit;
-          }
-          .demo-21-12 .density-btn.active {
-            background: oklch(40% 0.15 270);
-            color: oklch(95% 0.01 270);
-            border-color: oklch(50% 0.15 270);
-          }
-          .demo-21-12 .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
-            gap: calc(var(--space-sm) * var(--density));
-            margin-block-end: var(--space-lg);
-          }
-          .demo-21-12 .stat-card {
-            padding: calc(var(--space-md) * var(--density));
-            background: oklch(14% 0.02 260);
-            border: 1px solid oklch(20% 0.03 260);
-            border-radius: 0.5rem;
-          }
-          .demo-21-12 .stat-label {
-            font-size: var(--size-xs);
-            color: oklch(55% 0.03 260);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-block-end: calc(var(--space-xs) * var(--density));
-          }
-          .demo-21-12 .stat-value {
-            font-size: var(--size-xl);
-            font-weight: 700;
-            line-height: 1;
-          }
-          .demo-21-12 .stat-change {
-            font-size: var(--size-xs);
-            color: oklch(65% 0.15 150);
-            margin-block-start: calc(var(--space-xs) * var(--density));
-          }
-          .demo-21-12 .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-            gap: calc(var(--space-md) * var(--density));
-          }
-          .demo-21-12 .content-card {
-            padding: calc(var(--space-md) * var(--density));
-            background: oklch(14% 0.02 260);
-            border: 1px solid oklch(20% 0.03 260);
-            border-radius: 0.5rem;
-          }
+          .demo-21-12 .dash-page { inline-size: min(80rem, 100%); margin-inline: auto; padding: var(--space-md); }
+          .demo-21-12 .dash-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-block-end: var(--space-lg); }
+          .demo-21-12 .dash-title { font-size: var(--size-lg); font-weight: 700; }
+          .demo-21-12 .density-controls { display: flex; gap: var(--space-xs); }
+          .demo-21-12 .density-btn { padding: 0.3rem 0.6rem; font-size: var(--size-xs); background: oklch(18% 0.03 260); color: oklch(70% 0.03 260); border: 1px solid oklch(25% 0.03 260); border-radius: 0.25rem; cursor: pointer; font-family: inherit; }
+          .demo-21-12 .density-btn.active { background: oklch(40% 0.15 270); color: oklch(95% 0.01 270); border-color: oklch(50% 0.15 270); }
+          .demo-21-12 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); gap: calc(var(--space-sm) * var(--density)); margin-block-end: var(--space-lg); }
+          .demo-21-12 .stat-card { padding: calc(var(--space-md) * var(--density)); background: oklch(14% 0.02 260); border: 1px solid oklch(20% 0.03 260); border-radius: 0.5rem; }
+          .demo-21-12 .stat-label { font-size: var(--size-xs); color: oklch(55% 0.03 260); text-transform: uppercase; letter-spacing: 0.04em; margin-block-end: calc(var(--space-xs) * var(--density)); }
+          .demo-21-12 .stat-value { font-size: var(--size-xl); font-weight: 700; line-height: 1; }
+          .demo-21-12 .stat-change { font-size: var(--size-xs); color: oklch(65% 0.15 150); margin-block-start: calc(var(--space-xs) * var(--density)); }
+          .demo-21-12 .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: calc(var(--space-md) * var(--density)); }
+          .demo-21-12 .content-card { padding: calc(var(--space-md) * var(--density)); background: oklch(14% 0.02 260); border: 1px solid oklch(20% 0.03 260); border-radius: 0.5rem; }
           .demo-21-12 .content-card h4 { font-size: var(--size-sm); font-weight: 600; margin-block-end: calc(var(--space-xs) * var(--density)); }
           .demo-21-12 .content-card p { font-size: var(--size-xs); color: oklch(60% 0.02 260); line-height: 1.6; }
           .demo-21-12 .content-card .bar-row { display: flex; align-items: center; gap: var(--space-xs); margin-block-start: calc(var(--space-xs) * var(--density)); }
           .demo-21-12 .content-card .bar-label { font-size: 0.65rem; color: oklch(55% 0.02 260); min-inline-size: 5ch; }
           .demo-21-12 .content-card .bar-track { flex: 1; block-size: 4px; background: oklch(20% 0.02 260); border-radius: 2px; overflow: hidden; }
           .demo-21-12 .content-card .bar-fill { block-size: 100%; border-radius: 2px; background: oklch(55% 0.15 270); }
-          .demo-21-12 .token-note {
-            margin-block-start: var(--space-lg);
-            padding: var(--space-sm) var(--space-md);
-            background: oklch(15% 0.04 200);
-            border-radius: 0.4rem;
-            font-size: var(--size-xs);
-            color: oklch(70% 0.06 200);
-            border-inline-start: 3px solid oklch(55% 0.15 200);
-          }
+          .demo-21-12 .token-note { margin-block-start: var(--space-lg); padding: var(--space-sm) var(--space-md); background: oklch(15% 0.04 200); border-radius: 0.4rem; font-size: var(--size-xs); color: oklch(70% 0.06 200); border-inline-start: 3px solid oklch(55% 0.15 200); }
         </style>
         <div class="demo-21-12" id="tokenDemo">
           <div class="dash-page">
