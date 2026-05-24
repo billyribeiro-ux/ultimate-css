@@ -163,20 +163,7 @@
    - Nothing breaks */</code></pre>
 
       <h2>Testing foldable layouts</h2>
-      <p>Chrome DevTools has a device emulation mode for foldable devices. You can also test with viewport segments in the "Sensors" panel:</p>
-      <pre><code>/* Test matrix for foldable-aware layouts:
-
-   1. Galaxy Z Fold folded (373px) -- normal phone
-   2. Galaxy Z Fold unfolded (884px) -- small tablet
-   3. Dual-screen mode (2 segments) -- fold-aware split
-   4. iPad 1/3 split (341px) -- narrow container
-   5. iPad full (1024px) -- wide container
-   6. Normal phone (393px) -- baseline
-   7. Normal desktop (1440px) -- baseline
-
-   If your layout works at 1, 2, 4, 5, 6, and 7
-   using container queries alone, then step 3
-   is purely additive enhancement. */</code></pre>
+      <p>Chrome DevTools has a device emulation mode for foldable devices. Test at: Galaxy Z Fold folded (373px), unfolded (884px), dual-screen mode (2 segments), iPad 1/3 split (341px), iPad full (1024px), normal phone (393px), and desktop (1440px). If your layout works at all of those using container queries alone, then fold-aware CSS is purely additive enhancement.</p>
     </section>
 
     <section class="demo">
