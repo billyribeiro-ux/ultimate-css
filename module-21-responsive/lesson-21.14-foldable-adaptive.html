@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.14 — Foldable &amp; Adaptive Layouts · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.14</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.14 · Responsive · Progressive enhancement</p>
+      <h1>Foldable &amp; Adaptive Layouts</h1>
+      <p class="lead">CSS for foldable devices, dual-screen layouts, iPad multitasking, and the progressive enhancement approach that makes fold-aware CSS always additive -- never required.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Fold detection</h2>
+      <p>The <code>horizontal-viewport-segments</code> and <code>vertical-viewport-segments</code> media features detect whether the device viewport is split by a physical fold or hinge:</p>
+      <pre><code>/* Detect a device unfolded with two side-by-side screens */
+@media (horizontal-viewport-segments: 2) {
+  /* The viewport has a fold/hinge creating two horizontal segments */
+  .layout {
+    display: grid;
+    grid-template-columns:
+      env(viewport-segment-width 0 0)  /* left panel */
+      env(viewport-segment-width 1 0); /* right panel */
+  }
+}
+
+/* Detect a device with top/bottom fold (laptop/tent mode) */
+@media (vertical-viewport-segments: 2) {
+  .layout {
+    display: grid;
+    grid-template-rows:
+      env(viewport-segment-height 0 0)  /* top panel */
+      env(viewport-segment-height 0 1); /* bottom panel */
+  }
+}</code></pre>
+
+      <h2>The Samsung Fold pattern</h2>
+      <p>The Galaxy Z Fold 6 has two distinct modes: 373px CSS width when folded (a normal phone) and 884px when unfolded (a small tablet). If you designed with container queries, this transition is handled automatically:</p>
+      <pre><code>/* Container queries handle fold/unfold automatically */
+.card-container {
+  container-type: inline-size;
+}
+
+/* Small: single column, stacked */
+.card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* When container has space: side-by-side layout */
+@container (min-width: 30rem) {
+  .card {
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+  }
+}
+
+/* This works for:
+   - Z Fold folded (373px) -> stacked
+   - Z Fold unfolded (884px) -> side-by-side
+   - iPad split view (320px-1024px)
+   - Any container at any width
+   No fold-specific CSS needed! */</code></pre>
+
+      <h2>The iPad multitasking pattern</h2>
+      <p>iPad apps in Stage Manager or Split View can be 1/3, 1/2, 2/3, or full width. Your app might be 320px wide on a device with a 1024px screen. Container queries handle this without knowing the device:</p>
+      <pre><code>/* iPad multitasking widths (iPad Pro 13") */
+/* 1/3 split: ~341px (phone-sized) */
+/* 1/2 split: ~512px */
+/* 2/3 split: ~683px */
+/* Full:      1024px */
+
+/* Container queries adapt to whatever width the app gets */
+.widget-wrapper {
+  container-type: inline-size;
+}
+
+.widget {
+  /* Default: compact layout */
+  padding: 0.75rem;
+}
+
+@container (min-width: 25rem) {
+  .widget {
+    /* More space: expand */
+    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@container (min-width: 45rem) {
+  .widget {
+    /* Lots of space: full layout */
+    padding: 2rem;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}</code></pre>
+
+      <h2>Progressive enhancement for fold-aware CSS</h2>
+      <p>Fold detection features have limited browser support. The golden rule: fold-specific CSS is always additive. The base layout must work without any fold awareness. Then add fold-specific enhancements inside <code>@media</code> and <code>@supports</code>:</p>
+      <pre><code>/* Base layout: works everywhere */
+.email-app {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.email-list { /* full width by default */ }
+.email-detail { /* full width by default, or hidden */ }
+
+/* Enhancement: fold-aware split on dual-screen devices */
+@supports (env(viewport-segment-width 0 0)) {
+  @media (horizontal-viewport-segments: 2) {
+    .email-app {
+      grid-template-columns:
+        env(viewport-segment-width 0 0)
+        env(viewport-segment-width 1 0);
+    }
+    /* List on left screen, detail on right screen */
+    .email-list {
+      grid-column: 1;
+      overflow-y: auto;
+    }
+    .email-detail {
+      grid-column: 2;
+      display: block; /* reveal on unfolded device */
+    }
+  }
+}
+
+/* If fold features aren't supported:
+   - @supports fails, fold CSS is skipped
+   - User gets the normal single-column layout
+   - Nothing breaks */</code></pre>
+
+      <h2>Testing foldable layouts</h2>
+      <p>Chrome DevTools has a device emulation mode for foldable devices. You can also test with viewport segments in the "Sensors" panel:</p>
+      <pre><code>/* Test matrix for foldable-aware layouts:
+
+   1. Galaxy Z Fold folded (373px) -- normal phone
+   2. Galaxy Z Fold unfolded (884px) -- small tablet
+   3. Dual-screen mode (2 segments) -- fold-aware split
+   4. iPad 1/3 split (341px) -- narrow container
+   5. iPad full (1024px) -- wide container
+   6. Normal phone (393px) -- baseline
+   7. Normal desktop (1440px) -- baseline
+
+   If your layout works at 1, 2, 4, 5, 6, and 7
+   using container queries alone, then step 3
+   is purely additive enhancement. */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Adaptive layout with fold enhancement</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-14 {
+            --sp: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+
+            font-family: system-ui, sans-serif;
+            background: oklch(8% 0.02 260);
+            color: oklch(85% 0.01 260);
+            border-radius: 0.5rem;
+            overflow: hidden;
+          }
+          .demo-21-14 .app-shell {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            min-block-size: 400px;
+          }
+          /* App header */
+          .demo-21-14 .app-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--sp);
+            padding: calc(var(--sp) * 0.75) var(--sp);
+            background: oklch(12% 0.03 260);
+            border-block-end: 1px solid oklch(20% 0.03 260);
+          }
+          .demo-21-14 .app-bar .app-title {
+            font-size: clamp(0.85rem, 0.75rem + 0.4vw, 1.1rem);
+            font-weight: 700;
+            margin-inline-end: auto;
+          }
+          .demo-21-14 .app-bar .view-toggle {
+            display: flex;
+            gap: 0.25rem;
+          }
+          .demo-21-14 .app-bar .toggle-btn {
+            padding: 0.25rem 0.6rem;
+            font-size: 0.7rem;
+            background: oklch(18% 0.03 260);
+            color: oklch(65% 0.03 260);
+            border: 1px solid oklch(25% 0.03 260);
+            border-radius: 0.2rem;
+            cursor: pointer;
+            font-family: inherit;
+          }
+          .demo-21-14 .app-bar .toggle-btn.active {
+            background: oklch(40% 0.15 270);
+            color: oklch(95% 0.01 270);
+            border-color: oklch(50% 0.15 270);
+          }
+          /* Two-pane layout */
+          .demo-21-14 .pane-layout {
+            container-type: inline-size;
+            display: grid;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+          }
+          .demo-21-14 .pane-layout.split-view {
+            grid-template-columns: 1fr 1fr;
+          }
+          .demo-21-14 .list-pane {
+            overflow-y: auto;
+            border-inline-end: 1px solid oklch(18% 0.02 260);
+            max-block-size: 350px;
+          }
+          .demo-21-14 .detail-pane {
+            display: none;
+            padding: var(--sp);
+            overflow-y: auto;
+            max-block-size: 350px;
+          }
+          .demo-21-14 .pane-layout.split-view .detail-pane {
+            display: block;
+          }
+          /* List items */
+          .demo-21-14 .list-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: calc(var(--sp) * 0.75) var(--sp);
+            border-block-end: 1px solid oklch(14% 0.02 260);
+            cursor: pointer;
+            transition: background 120ms;
+          }
+          .demo-21-14 .list-item:hover {
+            background: oklch(14% 0.03 260);
+          }
+          .demo-21-14 .list-item.selected {
+            background: oklch(18% 0.05 270);
+          }
+          .demo-21-14 .list-avatar {
+            inline-size: 2rem;
+            block-size: 2rem;
+            border-radius: 50%;
+            flex-shrink: 0;
+          }
+          .demo-21-14 .list-avatar.av1 { background: oklch(50% 0.15 270); }
+          .demo-21-14 .list-avatar.av2 { background: oklch(50% 0.15 150); }
+          .demo-21-14 .list-avatar.av3 { background: oklch(50% 0.15 30); }
+          .demo-21-14 .list-avatar.av4 { background: oklch(50% 0.15 200); }
+          .demo-21-14 .list-avatar.av5 { background: oklch(50% 0.15 320); }
+          .demo-21-14 .list-content {
+            min-inline-size: 0;
+          }
+          .demo-21-14 .list-name {
+            font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
+            font-weight: 600;
+          }
+          .demo-21-14 .list-preview {
+            font-size: clamp(0.65rem, 0.6rem + 0.15vw, 0.75rem);
+            color: oklch(50% 0.02 260);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .demo-21-14 .list-time {
+            font-size: 0.6rem;
+            color: oklch(45% 0.02 260);
+            margin-block-start: 0.15rem;
+          }
+          /* Detail view */
+          .demo-21-14 .detail-header {
+            margin-block-end: var(--sp);
+            padding-block-end: var(--sp);
+            border-block-end: 1px solid oklch(18% 0.02 260);
+          }
+          .demo-21-14 .detail-header h3 {
+            font-size: clamp(0.9rem, 0.8rem + 0.4vw, 1.2rem);
+            font-weight: 700;
+            margin-block-end: 0.3rem;
+          }
+          .demo-21-14 .detail-meta {
+            font-size: 0.7rem;
+            color: oklch(50% 0.03 260);
+          }
+          .demo-21-14 .detail-body {
+            font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
+            line-height: 1.7;
+            color: oklch(70% 0.01 260);
+          }
+          .demo-21-14 .detail-body p + p {
+            margin-block-start: 0.75rem;
+          }
+          /* Fold indicator */
+          .demo-21-14 .fold-indicator {
+            padding: calc(var(--sp) * 0.5) var(--sp);
+            background: oklch(12% 0.03 260);
+            border-block-start: 1px solid oklch(20% 0.03 260);
+            font-size: 0.65rem;
+            color: oklch(50% 0.03 260);
+            text-align: center;
+          }
+          .demo-21-14 .fold-indicator code {
+            color: oklch(65% 0.1 200);
+            font-family: monospace;
+          }
+          /* Container query: auto-split when wide enough */
+          @container (min-width: 40rem) {
+            .demo-21-14 .pane-layout {
+              grid-template-columns: minmax(15rem, 1fr) 2fr;
+            }
+            .demo-21-14 .detail-pane {
+              display: block;
+            }
+          }
+        </style>
+        <div class="demo-21-14" id="foldDemo">
+          <div class="app-shell">
+            <div class="app-bar">
+              <span class="app-title">Messages</span>
+              <div class="view-toggle">
+                <button class="toggle-btn active" data-view="auto" type="button">Auto</button>
+                <button class="toggle-btn" data-view="split" type="button">Split</button>
+                <button class="toggle-btn" data-view="list" type="button">List Only</button>
+              </div>
+            </div>
+            <div class="pane-layout" id="paneLayout">
+              <div class="list-pane">
+                <div class="list-item selected">
+                  <div class="list-avatar av1"></div>
+                  <div class="list-content">
+                    <div class="list-name">Design Team</div>
+                    <div class="list-preview">New mockups for the dashboard redesign are ready</div>
+                    <div class="list-time">2 min ago</div>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <div class="list-avatar av2"></div>
+                  <div class="list-content">
+                    <div class="list-name">Sarah Chen</div>
+                    <div class="list-preview">Can you review the PR for the responsive tokens?</div>
+                    <div class="list-time">15 min ago</div>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <div class="list-avatar av3"></div>
+                  <div class="list-content">
+                    <div class="list-name">Platform Updates</div>
+                    <div class="list-preview">Container query support now at 96% global usage</div>
+                    <div class="list-time">1 hr ago</div>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <div class="list-avatar av4"></div>
+                  <div class="list-content">
+                    <div class="list-name">Alex Rivera</div>
+                    <div class="list-preview">The foldable testing results look promising</div>
+                    <div class="list-time">3 hr ago</div>
+                  </div>
+                </div>
+                <div class="list-item">
+                  <div class="list-avatar av5"></div>
+                  <div class="list-content">
+                    <div class="list-name">CSS Working Group</div>
+                    <div class="list-preview">New viewport segments spec draft published</div>
+                    <div class="list-time">Yesterday</div>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-pane">
+                <div class="detail-header">
+                  <h3>New mockups for the dashboard redesign</h3>
+                  <div class="detail-meta">From Design Team -- 2 min ago</div>
+                </div>
+                <div class="detail-body">
+                  <p>The new dashboard mockups are ready for review. We focused on making the layout work across all device categories: phones, tablets, foldables, and ultrawides.</p>
+                  <p>Key decisions: container queries for all widget panels, fluid tokens for spacing, and a density toggle for compact/spacious modes. The foldable enhancement splits the dashboard at the fold line when a dual-screen device is detected.</p>
+                  <p>On the Galaxy Z Fold, the list and detail views naturally split across the two screens. On iPad in split view, container queries handle the narrow width gracefully.</p>
+                </div>
+              </div>
+            </div>
+            <div class="fold-indicator">Container queries handle fold/unfold automatically. The <code>@container (min-width: 40rem)</code> rule splits the layout when space permits.</div>
+          </div>
+        </div>
+        <script>
+          (function() {
+            var demo = document.getElementById('foldDemo');
+            var layout = document.getElementById('paneLayout');
+            if (!demo || !layout) return;
+            demo.addEventListener('click', function(e) {
+              var btn = e.target.closest('.toggle-btn');
+              if (!btn) return;
+              demo.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+              btn.classList.add('active');
+              var view = btn.dataset.view;
+              layout.classList.remove('split-view');
+              layout.style.gridTemplateColumns = '';
+              if (view === 'split') {
+                layout.classList.add('split-view');
+              } else if (view === 'list') {
+                layout.style.gridTemplateColumns = '1fr';
+                layout.querySelector('.detail-pane').style.display = 'none';
+              } else {
+                layout.querySelector('.detail-pane').style.display = '';
+              }
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="app"&gt;
+  &lt;div class="two-pane"&gt;
+    &lt;nav class="nav-pane"&gt;
+      &lt;div class="nav-item selected"&gt;Inbox (3)&lt;/div&gt;
+      &lt;div class="nav-item"&gt;Drafts&lt;/div&gt;
+      &lt;div class="nav-item"&gt;Sent&lt;/div&gt;
+      &lt;div class="nav-item"&gt;Archive&lt;/div&gt;
+    &lt;/nav&gt;
+    &lt;main class="content-pane"&gt;
+      &lt;h2&gt;Welcome&lt;/h2&gt;
+      &lt;p&gt;Select a folder from the nav. On narrow viewports, only one pane shows. On wide viewports or unfolded devices, both panes appear.&lt;/p&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  margin: 0;
+  background: #0a0a14;
+  color: #ddd;
+}
+
+.app {
+  container-type: inline-size;
+}
+
+/* Default: single pane */
+.two-pane {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-block-size: 300px;
+}
+
+.nav-pane {
+  background: #12121e;
+  border-inline-end: 1px solid #222;
+  padding: 0.5rem;
+}
+
+.nav-item {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.nav-item:hover { background: #1a1a30; }
+.nav-item.selected {
+  background: #2a2a50;
+  font-weight: 600;
+}
+
+.content-pane {
+  padding: 1rem;
+  display: none; /* hidden on narrow */
+}
+
+/* Container query: show both panes */
+@container (min-width: 35rem) {
+  .two-pane {
+    grid-template-columns: 12rem 1fr;
+  }
+  .content-pane {
+    display: block;
+  }
+}
+
+/* Progressive fold enhancement */
+@supports (env(viewport-segment-width 0 0)) {
+  @media (horizontal-viewport-segments: 2) {
+    .two-pane {
+      grid-template-columns:
+        env(viewport-segment-width 0 0)
+        env(viewport-segment-width 1 0);
+    }
+    .content-pane { display: block; }
+  }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build an email client layout with a message list and a reading pane. Requirements: (1) on narrow viewports (phone, folded), only the list shows, (2) on wider viewports, use a container query to split into list + reading pane, (3) add a progressive fold enhancement using <code>@media (horizontal-viewport-segments: 2)</code> that splits at the fold line, wrapped in <code>@supports</code>. Test in Chrome DevTools with the Galaxy Z Fold emulation.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.13-large-screen-design.html">&larr; Lesson 21.13</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

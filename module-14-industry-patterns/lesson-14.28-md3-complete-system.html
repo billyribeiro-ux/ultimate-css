@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.28 — MD3: The Complete Design System in CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.28</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.28 · Google Material Design 3</p>
+      <h1>MD3: The Complete Design System in CSS</h1>
+      <p class="lead">Individual MD3 effects (ripple, elevation, shape morph) are in Lessons 14.17-14.21. This lesson builds the architectural backbone: the color role system, all 15 type scale entries, the shape scale, all 6 motion tokens, and the 5-level elevation system. Together they form a complete, tokenized design system in CSS custom properties.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Color roles</h2>
+      <p>MD3 defines semantic color roles, not raw palette values. Each role has an "on" counterpart for text/icons that must contrast against it:</p>
+      <pre><code>:root {
+  --md3-primary: oklch(50% 0.2 275);
+  --md3-on-primary: oklch(100% 0 0);
+  --md3-secondary: oklch(55% 0.08 275);
+  --md3-on-secondary: oklch(100% 0 0);
+  --md3-tertiary: oklch(55% 0.15 330);
+  --md3-error: oklch(55% 0.22 25);
+  --md3-surface: oklch(98% 0.005 264);
+  --md3-on-surface: oklch(12% 0.01 264);
+  --md3-outline: oklch(52% 0.01 264);
+  --md3-primary-container: oklch(90% 0.06 275);
+  --md3-on-primary-container: oklch(15% 0.08 275);
+}</code></pre>
+      <p>You never use a raw color. You use a role. If the theme changes, only the role values change — every component inherits automatically.</p>
+
+      <h2>Type scale — 15 styles</h2>
+      <p>MD3 defines 5 categories (Display, Headline, Title, Body, Label) at 3 sizes each. Each specifies font-size, line-height, letter-spacing, and font-weight:</p>
+      <pre><code>:root {
+  --md3-display-lg-size: 3.5625rem;  /* 57px */
+  --md3-display-md-size: 2.8125rem;  /* 45px */
+  --md3-display-sm-size: 2.25rem;    /* 36px */
+  --md3-headline-lg-size: 2rem;      /* 32px */
+  --md3-headline-md-size: 1.75rem;   /* 28px */
+  --md3-headline-sm-size: 1.5rem;    /* 24px */
+  --md3-title-lg-size: 1.375rem;     /* 22px */
+  --md3-title-md-size: 1rem;         /* 16px */
+  --md3-title-sm-size: 0.875rem;     /* 14px */
+  --md3-body-lg-size: 1rem;          /* 16px */
+  --md3-body-md-size: 0.875rem;      /* 14px */
+  --md3-body-sm-size: 0.75rem;       /* 12px */
+  --md3-label-lg-size: 0.875rem;     /* 14px */
+  --md3-label-md-size: 0.75rem;      /* 12px */
+  --md3-label-sm-size: 0.6875rem;    /* 11px */
+}</code></pre>
+
+      <h2>Shape scale</h2>
+      <p>MD3 maps semantic meaning to border-radius. Smaller components use smaller radii; pills and circles use "Full":</p>
+      <pre><code>:root {
+  --md3-shape-none: 0;
+  --md3-shape-xs: 0.25rem;     /* 4px — chips, badges */
+  --md3-shape-sm: 0.5rem;      /* 8px — text fields */
+  --md3-shape-md: 0.75rem;     /* 12px — cards, dialogs */
+  --md3-shape-lg: 1rem;        /* 16px — FABs */
+  --md3-shape-xl: 1.75rem;     /* 28px — nav bars */
+  --md3-shape-full: 624.9375rem; /* 9999px — pills */
+}</code></pre>
+
+      <h2>Motion tokens</h2>
+      <p>MD3 defines 6 easing curves and 3 duration tiers. "Emphasized" has longer duration and slight overshoot for hero transitions. "Standard" is for small, frequent interactions:</p>
+      <pre><code>:root {
+  --md3-dur-short: 200ms;
+  --md3-dur-medium: 300ms;
+  --md3-dur-long: 500ms;
+  --md3-ease-standard:     cubic-bezier(0.2, 0, 0, 1);
+  --md3-ease-standard-dc:  cubic-bezier(0, 0, 0, 1);
+  --md3-ease-standard-ac:  cubic-bezier(0.3, 0, 1, 1);
+  --md3-ease-emphasized:   cubic-bezier(0.2, 0, 0, 1);
+  --md3-ease-emphasized-dc:cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md3-ease-emphasized-ac:cubic-bezier(0.3, 0, 0.8, 0.15);
+}</code></pre>
+
+      <h2>Elevation — 5 levels with tonal tinting</h2>
+      <p>MD3 pairs box-shadow with primary-tinted surface overlays. Higher elevation means more tint (see Lesson 14.18):</p>
+      <pre><code>:root {
+  --md3-elev-0: none;
+  --md3-elev-1: 0 1px 2px oklch(0% 0 0 / 0.3), 0 1px 3px 1px oklch(0% 0 0 / 0.15);
+  --md3-elev-2: 0 1px 2px oklch(0% 0 0 / 0.3), 0 2px 6px 2px oklch(0% 0 0 / 0.15);
+  --md3-elev-3: 0 4px 8px 3px oklch(0% 0 0 / 0.15), 0 1px 3px oklch(0% 0 0 / 0.3);
+  --md3-elev-4: 0 6px 10px 4px oklch(0% 0 0 / 0.15), 0 2px 3px oklch(0% 0 0 / 0.3);
+  --md3-tint-1: oklch(50% 0.2 275 / 0.05);
+  --md3-tint-2: oklch(50% 0.2 275 / 0.08);
+  --md3-tint-3: oklch(50% 0.2 275 / 0.11);
+  --md3-tint-4: oklch(50% 0.2 275 / 0.14);
+}</code></pre>
+
+      <h2>Spacing</h2>
+      <p>MD3 uses a 4px base unit. All spacing is a multiple of 4:</p>
+      <pre><code>:root {
+  --md3-space-xs: 0.25rem;   /* 4px */
+  --md3-space-sm: 0.5rem;    /* 8px */
+  --md3-space-md: 0.75rem;   /* 12px */
+  --md3-space-lg: 1rem;      /* 16px */
+  --md3-space-xl: 1.5rem;    /* 24px */
+  --md3-space-xxl: 2rem;     /* 32px */
+}</code></pre>
+
+      <h2>PE7 placement</h2>
+      <p>Every custom property above is a <strong>token</strong>. Components that consume them (cards, FABs, nav bars) live in the <strong>components layer</strong>. Motion tokens are referenced by <strong>animations</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — MD3 token system in action</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-28 {
+            --md3-primary: oklch(50% 0.2 275);
+            --md3-on-primary: oklch(100% 0 0);
+            --md3-primary-container: oklch(90% 0.06 275);
+            --md3-on-primary-container: oklch(15% 0.08 275);
+            --md3-surface: oklch(98% 0.005 264);
+            --md3-on-surface: oklch(12% 0.01 264);
+            --md3-on-surface-variant: oklch(30% 0.02 264);
+            --md3-outline-variant: oklch(78% 0.01 264);
+            --md3-shape-md: 0.75rem; --md3-shape-lg: 1rem; --md3-shape-xl: 1.75rem;
+            --md3-elev-1: 0 1px 2px oklch(0% 0 0 / 0.3), 0 1px 3px 1px oklch(0% 0 0 / 0.15);
+            --md3-elev-2: 0 1px 2px oklch(0% 0 0 / 0.3), 0 2px 6px 2px oklch(0% 0 0 / 0.15);
+            --md3-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+            --md3-dur-medium: 300ms;
+            font-family: system-ui, sans-serif;
+            background: var(--md3-surface); padding: 1.5rem;
+            display: flex; flex-direction: column; gap: 1.5rem;
+          }
+          .demo-14-28 .md3-navbar {
+            display: flex; align-items: center; height: 4rem;
+            padding-inline: 1rem; background: var(--md3-surface);
+            border-radius: var(--md3-shape-xl); box-shadow: var(--md3-elev-2);
+          }
+          .demo-14-28 .nav-title {
+            flex: 1; font-size: 1.5rem; font-weight: 400;
+            color: var(--md3-on-surface); padding-inline-start: 0.5rem;
+          }
+          .demo-14-28 .nav-icon {
+            width: 2.5rem; height: 2.5rem; border-radius: 50%;
+            border: none; background: none; cursor: pointer; display: grid; place-items: center;
+          }
+          .demo-14-28 .nav-icon::before {
+            content: ""; width: 1.25rem; height: 2px;
+            background: var(--md3-on-surface);
+            box-shadow: 0 6px 0 var(--md3-on-surface), 0 -6px 0 var(--md3-on-surface);
+          }
+          .demo-14-28 .md3-card {
+            border-radius: var(--md3-shape-md); background: var(--md3-surface);
+            border: 1px solid var(--md3-outline-variant); overflow: hidden;
+            transition: box-shadow var(--md3-dur-medium) var(--md3-ease-standard);
+          }
+          .demo-14-28 .md3-card:hover { box-shadow: var(--md3-elev-1); }
+          .demo-14-28 .card-media {
+            height: 8rem;
+            background: linear-gradient(135deg, oklch(60% 0.15 275), oklch(45% 0.2 300));
+          }
+          .demo-14-28 .card-content {
+            padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem;
+          }
+          .demo-14-28 .card-headline {
+            font-size: 1.5rem; font-weight: 400; color: var(--md3-on-surface);
+          }
+          .demo-14-28 .card-subhead {
+            font-size: 0.875rem; color: var(--md3-on-surface-variant); line-height: 1.5;
+          }
+          .demo-14-28 .card-actions {
+            padding: 0.5rem 1rem 1rem; display: flex; gap: 0.5rem;
+          }
+          .demo-14-28 .md3-btn-text {
+            padding: 0.625rem 0.75rem; border: none; background: none;
+            color: var(--md3-primary); font-family: system-ui, sans-serif;
+            font-size: 0.875rem; font-weight: 500; letter-spacing: 0.02em;
+            border-radius: 1.25rem; cursor: pointer;
+          }
+          .demo-14-28 .md3-fab {
+            align-self: flex-end; display: flex; align-items: center; gap: 0.75rem;
+            padding: 1rem 1.25rem; border: none; border-radius: var(--md3-shape-lg);
+            background: var(--md3-primary-container); color: var(--md3-on-primary-container);
+            font-family: system-ui, sans-serif; font-size: 0.875rem;
+            font-weight: 500; letter-spacing: 0.02em; cursor: pointer;
+            box-shadow: var(--md3-elev-2);
+            transition: box-shadow var(--md3-dur-medium) var(--md3-ease-standard);
+          }
+          .demo-14-28 .fab-icon {
+            width: 1.5rem; height: 1.5rem; background: var(--md3-on-primary-container);
+            clip-path: polygon(50% 0%, 50% 100%, 50% 50%, 0% 50%, 100% 50%, 50% 50%);
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-14-28 .md3-card, .demo-14-28 .md3-fab { transition: none; }
+          }
+        </style>
+        <div class="demo-14-28">
+          <nav class="md3-navbar">
+            <button class="nav-icon" aria-label="Menu"></button>
+            <span class="nav-title">Material Design 3</span>
+          </nav>
+          <article class="md3-card">
+            <div class="card-media"></div>
+            <div class="card-content">
+              <span class="card-headline">Token System</span>
+              <span class="card-subhead">Color roles, type scale, shape, motion, and elevation defined as CSS custom properties.</span>
+            </div>
+            <div class="card-actions">
+              <button class="md3-btn-text">Learn</button>
+              <button class="md3-btn-text">Explore</button>
+            </div>
+          </article>
+          <button class="md3-fab"><span class="fab-icon"></span>Compose</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="md3-type-demo"&gt;
+  &lt;h2&gt;MD3 Type Scale&lt;/h2&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Display L&lt;/span&gt;
+    &lt;span class="display-lg"&gt;Aa&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Headline L&lt;/span&gt;
+    &lt;span class="headline-lg"&gt;Aa&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Title L&lt;/span&gt;
+    &lt;span class="title-lg"&gt;Aa&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Body L&lt;/span&gt;
+    &lt;span class="body-lg"&gt;The quick brown fox&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Body M&lt;/span&gt;
+    &lt;span class="body-md"&gt;The quick brown fox&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Label L&lt;/span&gt;
+    &lt;span class="label-lg"&gt;BUTTON TEXT&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="type-row"&gt;
+    &lt;span class="type-label"&gt;Label S&lt;/span&gt;
+    &lt;span class="label-sm"&gt;CAPTION&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Build the full MD3 type scale as CSS custom properties. */
+:root {
+  --md3-display-lg-size: 3.5625rem;
+  --md3-display-lg-lh: 1.12;
+  --md3-display-lg-ls: -0.016em;
+  --md3-display-lg-wt: 400;
+  --md3-headline-lg-size: 2rem;
+  --md3-headline-lg-lh: 1.25;
+  --md3-headline-lg-wt: 400;
+  --md3-title-lg-size: 1.375rem;
+  --md3-title-lg-lh: 1.27;
+  --md3-title-lg-wt: 400;
+  --md3-body-lg-size: 1rem;
+  --md3-body-lg-lh: 1.5;
+  --md3-body-lg-ls: 0.03em;
+  --md3-body-md-size: 0.875rem;
+  --md3-body-md-lh: 1.43;
+  --md3-body-md-ls: 0.016em;
+  --md3-label-lg-size: 0.875rem;
+  --md3-label-lg-lh: 1.43;
+  --md3-label-lg-ls: 0.02em;
+  --md3-label-lg-wt: 500;
+  --md3-label-sm-size: 0.6875rem;
+  --md3-label-sm-lh: 1.45;
+  --md3-label-sm-ls: 0.04em;
+  --md3-label-sm-wt: 500;
+  --md3-on-surface: oklch(12% 0.01 264);
+  --md3-on-surface-variant: oklch(30% 0.02 264);
+  --md3-surface: oklch(98% 0.005 264);
+  --md3-outline-variant: oklch(78% 0.01 264);
+}
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0; padding: 2rem;
+  background: var(--md3-surface);
+  color: var(--md3-on-surface);
+}
+.md3-type-demo h2 {
+  font-size: 1.75rem; font-weight: 400; margin: 0 0 1.5rem;
+}
+.type-row {
+  display: flex; align-items: baseline; gap: 1rem;
+  padding: 0.5rem 0;
+  border-block-end: 1px solid var(--md3-outline-variant);
+}
+.type-label {
+  flex: 0 0 5.5rem; font-size: var(--md3-label-lg-size);
+  font-weight: var(--md3-label-lg-wt);
+  letter-spacing: var(--md3-label-lg-ls);
+  color: var(--md3-on-surface-variant);
+}
+.display-lg {
+  font-size: var(--md3-display-lg-size);
+  line-height: var(--md3-display-lg-lh);
+  letter-spacing: var(--md3-display-lg-ls);
+}
+.headline-lg {
+  font-size: var(--md3-headline-lg-size);
+  line-height: var(--md3-headline-lg-lh);
+}
+.title-lg {
+  font-size: var(--md3-title-lg-size);
+  line-height: var(--md3-title-lg-lh);
+}
+.body-lg {
+  font-size: var(--md3-body-lg-size);
+  line-height: var(--md3-body-lg-lh);
+  letter-spacing: var(--md3-body-lg-ls);
+}
+.body-md {
+  font-size: var(--md3-body-md-size);
+  line-height: var(--md3-body-md-lh);
+  letter-spacing: var(--md3-body-md-ls);
+}
+.label-lg {
+  font-size: var(--md3-label-lg-size);
+  letter-spacing: var(--md3-label-lg-ls);
+  font-weight: var(--md3-label-lg-wt);
+}
+.label-sm {
+  font-size: var(--md3-label-sm-size);
+  letter-spacing: var(--md3-label-sm-ls);
+  font-weight: var(--md3-label-sm-wt);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>The editor shows 7 of the 15 type scale entries. Add the remaining 8: Display Medium, Display Small, Headline Medium, Headline Small, Title Medium, Title Small, Body Small, and Label Medium. Each needs size, line-height, letter-spacing, and weight tokens. The goal is a complete, tokenized type ramp where changing a single custom property updates every element that uses that style.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.27-apple-hig-components.html">&larr; Lesson 14.27</a>
+      <a href="./project/index.html">Module 14 Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

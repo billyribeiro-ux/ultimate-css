@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lesson 14.26 — Apple HIG: Design Principles in CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.26</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.26 · Apple Human Interface Guidelines</p>
+      <h1>Apple HIG: Design Principles in CSS</h1>
+      <p class="lead">Apple's Human Interface Guidelines are not just advice — they are a complete spatial and typographic system. The 8pt grid, Dynamic Type scale, safe areas, vibrancy materials, and size classes form an architecture that CSS can express natively through custom properties, clamp(), env(), and container queries.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The 8pt spatial system</h2>
+      <p>Every dimension in Apple's interfaces is a multiple of 8 points. Padding, margins, icon sizes, and component heights all snap to this grid. The half-step (4pt) exists for tight internal spacing only — label-to-icon gaps, separator insets. This creates a vertical rhythm that feels inevitable rather than designed.</p>
+      <p>In CSS, we express this as a token scale where each step doubles the intent, not the value:</p>
+      <pre><code>:root {
+  --hig-space-xxs: 0.25rem;  /* 4px  — tight only */
+  --hig-space-xs:  0.5rem;   /* 8px  — icon gaps */
+  --hig-space-sm:  1rem;     /* 16px — component padding */
+  --hig-space-md:  1.5rem;   /* 24px — section gaps */
+  --hig-space-lg:  2rem;     /* 32px — card padding */
+  --hig-space-xl:  3rem;     /* 48px — section margins */
+  --hig-space-xxl: 4rem;     /* 64px — page-level spacing */
+}</code></pre>
+      <p>The key insight: every value is a multiple of 8 (or 4 for xxs). No 5px, no 10px, no 14px. If something "feels off" in an HIG-compliant layout, check whether any spacing breaks this grid.</p>
+
+      <h2>Safe areas and viewport-fit</h2>
+      <p>Modern iPhones have the Dynamic Island and home indicator. The HIG requires that interactive content avoids these regions. CSS exposes them through environment variables:</p>
+      <pre><code>/* Step 1: opt in to full-viewport rendering */
+&lt;meta name="viewport" content="..., viewport-fit=cover"&gt;
+
+/* Step 2: respect safe areas */
+.app-container {
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+/* Or use logical properties */
+.bottom-bar {
+  padding-block-end:
+    calc(0.75rem + env(safe-area-inset-bottom));
+}</code></pre>
+      <p>Without <code>viewport-fit=cover</code>, these variables resolve to <code>0px</code> and the browser adds its own padding — you lose control of the edge-to-edge experience that HIG expects.</p>
+
+      <h2>Dynamic Type scale</h2>
+      <p>Apple defines 9 named text styles, each with a specific point size, weight, and leading. These scale when the user adjusts their system font size. In CSS, we use <code>clamp()</code> to approximate this scaling:</p>
+      <pre><code>:root {
+  --hig-large-title: clamp(1.75rem, 2vw + 1rem, 2.125rem);
+  --hig-title1:      clamp(1.5rem, 1.5vw + 0.8rem, 1.75rem);
+  --hig-title2:      clamp(1.25rem, 1vw + 0.7rem, 1.375rem);
+  --hig-headline:    clamp(1rem, 0.5vw + 0.8rem, 1.0625rem);
+  --hig-body:        clamp(1rem, 0.5vw + 0.8rem, 1.0625rem);
+  --hig-callout:     clamp(0.9375rem, 0.4vw + 0.75rem, 1rem);
+  --hig-subheadline: clamp(0.875rem, 0.3vw + 0.7rem, 0.9375rem);
+  --hig-footnote:    clamp(0.75rem, 0.2vw + 0.6rem, 0.8125rem);
+  --hig-caption:     clamp(0.6875rem, 0.2vw + 0.55rem, 0.75rem);
+}</code></pre>
+      <p>Headline and Body share the same size (17pt) but Headline is semibold. The type scale is not exponential — it is hand-tuned for readability at each level.</p>
+
+      <h2>Vibrancy and materials</h2>
+      <p>Apple's "materials" are translucent layers that let background content bleed through with varying intensity. The HIG defines four levels:</p>
+      <pre><code>:root {
+  --hig-material-ultra-thin: blur(2px);
+  --hig-material-thin:       blur(8px);
+  --hig-material-regular:    blur(20px);
+  --hig-material-thick:      blur(30px);
+}
+
+.material-regular {
+  backdrop-filter: saturate(180%) var(--hig-material-regular);
+  background: oklch(98% 0.005 264 / 0.72);
+}
+
+@media (prefers-color-scheme: dark) {
+  .material-regular {
+    background: oklch(15% 0.005 264 / 0.72);
+  }
+}</code></pre>
+      <p>The <code>saturate(180%)</code> is critical — Apple boosts saturation behind the blur to maintain color vibrancy. Without it, blurred backgrounds look washed out.</p>
+
+      <h2>Platform-adaptive layouts: size classes</h2>
+      <p>Apple uses two horizontal size classes: Compact (iPhone portrait, ~390px) and Regular (iPad, Mac). In CSS, container queries map more cleanly to this model than media queries because they respond to the component's actual available space, not the viewport:</p>
+      <pre><code>.hig-layout {
+  container-type: inline-size;
+  container-name: hig-root;
+}
+
+/* Compact: single column */
+@container hig-root (max-width: 599px) {
+  .hig-content { grid-template-columns: 1fr; }
+  .hig-sidebar { display: none; }
+}
+
+/* Regular: sidebar + content */
+@container hig-root (min-width: 600px) {
+  .hig-content {
+    grid-template-columns: 280px 1fr;
+  }
+}</code></pre>
+      <p>The 600px breakpoint approximates where iOS shifts from Compact to Regular. Using container queries means nested components adapt to their parent's size, not the window — exactly how SwiftUI's size classes work.</p>
+
+      <h2>PE7 placement</h2>
+      <p>The spacing tokens, type scale tokens, and material definitions all live in the <strong>tokens layer</strong>. Safe area padding is applied in <strong>utilities</strong> or <strong>layouts</strong>. Size-class-adaptive layouts belong in <strong>layouts</strong>. The material's backdrop-filter lives in <strong>components</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — HIG-compliant card</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-26 {
+            --hig-space-xxs: 0.25rem;
+            --hig-space-xs: 0.5rem;
+            --hig-space-sm: 1rem;
+            --hig-space-md: 1.5rem;
+            --hig-space-lg: 2rem;
+            --hig-large-title: 1.75rem;
+            --hig-headline: 1.0625rem;
+            --hig-body: 1.0625rem;
+            --hig-footnote: 0.8125rem;
+            --hig-caption: 0.75rem;
+            font-family: -apple-system, system-ui, sans-serif;
+            padding: var(--hig-space-lg);
+            background: oklch(97% 0.005 264);
+            container-type: inline-size;
+          }
+          .demo-14-26 .hig-card {
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: oklch(100% 0 0);
+            box-shadow: 0 1px 3px oklch(0% 0 0 / 0.08), 0 4px 12px oklch(0% 0 0 / 0.06);
+          }
+          .demo-14-26 .card-header {
+            padding: var(--hig-space-sm) var(--hig-space-sm) var(--hig-space-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--hig-space-xs);
+          }
+          .demo-14-26 .card-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: oklch(85% 0.08 264);
+          }
+          .demo-14-26 .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: var(--hig-space-xxs);
+          }
+          .demo-14-26 .card-name {
+            font-size: var(--hig-headline);
+            font-weight: 600;
+            color: oklch(15% 0.01 264);
+          }
+          .demo-14-26 .card-date {
+            font-size: var(--hig-caption);
+            color: oklch(55% 0.01 264);
+          }
+          .demo-14-26 .card-image {
+            height: 10rem;
+            background: linear-gradient(135deg, oklch(70% 0.15 264), oklch(55% 0.18 290));
+          }
+          .demo-14-26 .card-body {
+            padding: var(--hig-space-sm);
+            display: flex;
+            flex-direction: column;
+            gap: var(--hig-space-xs);
+          }
+          .demo-14-26 .card-title {
+            font-size: var(--hig-large-title);
+            font-weight: 700;
+            color: oklch(10% 0.01 264);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+          }
+          .demo-14-26 .card-text {
+            font-size: var(--hig-body);
+            color: oklch(35% 0.01 264);
+            line-height: 1.5;
+          }
+          .demo-14-26 .card-footer {
+            padding: var(--hig-space-xs) var(--hig-space-sm) var(--hig-space-sm);
+            display: flex;
+            gap: var(--hig-space-sm);
+          }
+          .demo-14-26 .card-action {
+            font-size: var(--hig-footnote);
+            font-weight: 600;
+            color: oklch(50% 0.2 264);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+          }
+          .demo-14-26 .safe-area-label {
+            margin-block-start: var(--hig-space-sm);
+            padding: var(--hig-space-xs) var(--hig-space-sm);
+            font-size: var(--hig-caption);
+            color: oklch(55% 0.01 264);
+            background: oklch(95% 0.005 264);
+            border-radius: 0.5rem;
+            text-align: center;
+          }
+          @container (max-width: 350px) {
+            .demo-14-26 .card-image { height: 7rem; }
+            .demo-14-26 .card-title { font-size: 1.25rem; }
+          }
+        </style>
+        <div class="demo-14-26">
+          <div class="hig-card">
+            <div class="card-header">
+              <div class="card-avatar"></div>
+              <div class="card-meta">
+                <span class="card-name">San Francisco</span>
+                <span class="card-date">Today at 2:30 PM</span>
+              </div>
+            </div>
+            <div class="card-image"></div>
+            <div class="card-body">
+              <span class="card-title">8pt Grid System</span>
+              <span class="card-text">Every spacing value in this card is a multiple of 8px. Padding, gaps, and margins all snap to the HIG spatial grid.</span>
+            </div>
+            <div class="card-footer">
+              <button class="card-action">Like</button>
+              <button class="card-action">Comment</button>
+              <button class="card-action">Share</button>
+            </div>
+          </div>
+          <div class="safe-area-label">Safe area insets applied via env(safe-area-inset-*) with viewport-fit=cover</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="hig-app"&gt;
+  &lt;header class="hig-header"&gt;
+    &lt;h1&gt;Settings&lt;/h1&gt;
+  &lt;/header&gt;
+  &lt;main class="hig-content"&gt;
+    &lt;section class="hig-group"&gt;
+      &lt;div class="hig-row"&gt;
+        &lt;span class="row-label"&gt;Wi-Fi&lt;/span&gt;
+        &lt;span class="row-value"&gt;Home Network&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="hig-row"&gt;
+        &lt;span class="row-label"&gt;Bluetooth&lt;/span&gt;
+        &lt;span class="row-value"&gt;On&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="hig-row"&gt;
+        &lt;span class="row-label"&gt;Cellular&lt;/span&gt;
+        &lt;span class="row-value"&gt;5G&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+    &lt;section class="hig-group"&gt;
+      &lt;div class="hig-row"&gt;
+        &lt;span class="row-label"&gt;Notifications&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="hig-row"&gt;
+        &lt;span class="row-label"&gt;Sounds&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="hig-row"&gt;
+        &lt;span class="row-label"&gt;Focus&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* Build an HIG spacing token system from scratch.
+   Every value must be a multiple of 8px (4px for tight). */
+:root {
+  /* Step 1: Define the 8pt grid tokens */
+  --hig-space-xxs: 0.25rem;  /* 4px */
+  --hig-space-xs:  0.5rem;   /* 8px */
+  --hig-space-sm:  1rem;     /* 16px */
+  --hig-space-md:  1.5rem;   /* 24px */
+  --hig-space-lg:  2rem;     /* 32px */
+  --hig-space-xl:  3rem;     /* 48px */
+
+  /* Step 2: Define the type scale */
+  --hig-large-title: 2.125rem;
+  --hig-title1: 1.75rem;
+  --hig-headline: 1.0625rem;
+  --hig-body: 1.0625rem;
+  --hig-footnote: 0.8125rem;
+  --hig-caption: 0.75rem;
+}
+
+body {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 0;
+  background: oklch(95% 0.005 264);
+  color: oklch(15% 0.01 264);
+}
+
+.hig-app {
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+/* Large Title header */
+.hig-header {
+  padding: var(--hig-space-xl) var(--hig-space-sm) var(--hig-space-xs);
+}
+.hig-header h1 {
+  font-size: var(--hig-large-title);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+/* Grouped rows (iOS Settings style) */
+.hig-content {
+  padding: 0 var(--hig-space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--hig-space-lg);
+}
+.hig-group {
+  background: oklch(100% 0 0);
+  border-radius: 0.625rem;
+  overflow: hidden;
+}
+.hig-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--hig-space-xs) var(--hig-space-sm);
+  min-height: 2.75rem;  /* 44px — HIG minimum tap target */
+}
+.hig-row + .hig-row {
+  border-top: 0.5px solid oklch(88% 0.005 264);
+}
+.row-label {
+  font-size: var(--hig-body);
+}
+.row-value {
+  font-size: var(--hig-body);
+  color: oklch(55% 0.01 264);
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Inspect every spacing value in the editor's Settings screen. Confirm that every padding, gap, and margin is a multiple of 8px (or 4px for tight gaps). Now try changing <code>--hig-space-sm</code> from <code>1rem</code> to <code>0.875rem</code> (14px) — notice how the layout immediately feels "off" even though the change is only 2px. The 8pt grid's power is in its consistency: break one value and the entire rhythm collapses.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.25-fluent-mica.html">&larr; Lesson 14.25</a>
+      <a href="./lesson-14.27-apple-hig-components.html">Lesson 14.27 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

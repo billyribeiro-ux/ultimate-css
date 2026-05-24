@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.12 — Responsive Token Systems: Fluid Design Decisions · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.12 · Responsive · Tokenization</p>
+      <h1>Responsive Token Systems: Fluid Design Decisions</h1>
+      <p class="lead">How to tokenize responsive behavior itself -- not just static values. Fluid spacing, fluid type, container-responsive tokens, density modes, and device-adaptive safe areas, all in one coherent system.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Fluid spacing tokens</h2>
+      <p>Static spacing tokens like <code>--space-md: 1rem</code> force you to override at breakpoints. Fluid spacing tokens adapt continuously:</p>
+      <pre><code>:root {
+  --space-xs:  clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+  --space-sm:  clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+  --space-md:  clamp(0.75rem, 0.6rem + 0.75vw, 1.25rem);
+  --space-lg:  clamp(1rem, 0.8rem + 1vw, 2rem);
+  --space-xl:  clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
+  --space-2xl: clamp(2rem, 1.5rem + 2.5vw, 5rem);
+}
+
+/* Usage: spacing is now responsive by default */
+.section { padding-block: var(--space-xl); }
+.card    { padding: var(--space-md); gap: var(--space-sm); }</code></pre>
+
+      <h2>Fluid type tokens</h2>
+      <p>Type tokens follow the same pattern. Larger sizes scale more aggressively, smaller sizes barely change:</p>
+      <pre><code>:root {
+  --size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --size-lg:   clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+  --size-xl:   clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+  --size-2xl:  clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+  --size-4xl:  clamp(2.5rem, 1.5rem + 5vw, 5rem);
+}
+
+/* Body text barely changes (1rem to 1.125rem) */
+/* Hero headings scale dramatically (2.5rem to 5rem) */
+p  { font-size: var(--size-base); }
+h1 { font-size: var(--size-4xl); }</code></pre>
+
+      <h2>Container-responsive tokens</h2>
+      <p>Fluid tokens respond to the viewport. But what about components that live inside containers of varying widths? Container-responsive tokens change at the container level:</p>
+      <pre><code>.card-wrapper {
+  container-type: inline-size;
+  --card-padding: var(--space-md);
+  --card-gap: var(--space-sm);
+  --card-font-size: var(--size-base);
+}
+
+@container (min-width: 30rem) {
+  .card-wrapper {
+    --card-padding: var(--space-lg);
+    --card-gap: var(--space-md);
+    --card-font-size: var(--size-lg);
+  }
+}
+
+@container (min-width: 50rem) {
+  .card-wrapper {
+    --card-padding: var(--space-xl);
+    --card-gap: var(--space-lg);
+    --card-font-size: var(--size-xl);
+  }
+}
+
+/* The card uses these tokens -- it doesn't know
+   whether it's in a sidebar or the main content area */
+.card {
+  padding: var(--card-padding);
+  gap: var(--card-gap);
+  font-size: var(--card-font-size);
+}</code></pre>
+
+      <h2>Density tokens</h2>
+      <p>Density controls how compact or spacious the UI feels. Instead of creating separate compact/default/spacious token sets, use a single multiplier:</p>
+      <pre><code>:root {
+  --density: 1; /* 1 = default, 0.75 = compact, 1.25 = spacious */
+}
+
+.card {
+  padding: calc(var(--space-md) * var(--density));
+  gap: calc(var(--space-sm) * var(--density));
+}
+
+.table td {
+  padding: calc(var(--space-xs) * var(--density))
+           calc(var(--space-sm) * var(--density));
+}
+
+/* Compact mode: tighter data tables, denser dashboards */
+.dashboard { --density: 0.75; }
+
+/* Spacious mode: marketing pages, reading experiences */
+.marketing { --density: 1.25; }</code></pre>
+
+      <h2>Device-adaptive tokens with safe areas</h2>
+      <p>Modern phones with notches, Dynamic Islands, and rounded corners expose safe area insets. Tokenize them so components can consume them without knowing the device:</p>
+      <pre><code>:root {
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}
+
+.app-header {
+  padding-block-start: calc(var(--space-sm) + var(--safe-top));
+  padding-inline: calc(var(--space-md) + max(var(--safe-left), var(--safe-right)));
+}
+
+.bottom-nav {
+  padding-block-end: calc(var(--space-sm) + var(--safe-bottom));
+}
+
+/* On devices without notches, env() returns 0px (the fallback).
+   On iPhone 16 Pro, --safe-top is 59px.
+   The layout adapts automatically. */</code></pre>
+
+      <h2>Combining all token layers</h2>
+      <p>A production token system stacks these layers: fluid viewport tokens at the root, container-responsive overrides at the component level, density as a multiplier, and safe areas as additive offsets. Each layer is independent -- fluid tokens scale with the viewport, container tokens adapt to local space, density adjusts compactness, and safe areas handle device chrome.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Token-driven fluid dashboard</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-12 {
+            /* Fluid spacing tokens */
+            --space-xs:  clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+            --space-sm:  clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+            --space-md:  clamp(0.75rem, 0.6rem + 0.75vw, 1.25rem);
+            --space-lg:  clamp(1rem, 0.8rem + 1vw, 2rem);
+            --space-xl:  clamp(1.5rem, 1.2rem + 1.5vw, 3rem);
+
+            /* Fluid type tokens */
+            --size-xs:   clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+            --size-sm:   clamp(0.8rem, 0.75rem + 0.25vw, 0.95rem);
+            --size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+            --size-lg:   clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+            --size-xl:   clamp(1.5rem, 1.2rem + 1.5vw, 2.5rem);
+            --size-2xl:  clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+
+            --density: 1;
+
+            font-family: system-ui, sans-serif;
+            background: oklch(8% 0.02 260);
+            color: oklch(85% 0.01 260);
+            border-radius: 0.5rem;
+            overflow: hidden;
+          }
+          .demo-21-12 .dash-page {
+            inline-size: min(80rem, 100%);
+            margin-inline: auto;
+            padding: var(--space-md);
+          }
+          .demo-21-12 .dash-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-sm);
+            margin-block-end: var(--space-lg);
+          }
+          .demo-21-12 .dash-title {
+            font-size: var(--size-lg);
+            font-weight: 700;
+          }
+          .demo-21-12 .density-controls {
+            display: flex;
+            gap: var(--space-xs);
+          }
+          .demo-21-12 .density-btn {
+            padding: 0.3rem 0.6rem;
+            font-size: var(--size-xs);
+            background: oklch(18% 0.03 260);
+            color: oklch(70% 0.03 260);
+            border: 1px solid oklch(25% 0.03 260);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-family: inherit;
+          }
+          .demo-21-12 .density-btn.active {
+            background: oklch(40% 0.15 270);
+            color: oklch(95% 0.01 270);
+            border-color: oklch(50% 0.15 270);
+          }
+          .demo-21-12 .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+            gap: calc(var(--space-sm) * var(--density));
+            margin-block-end: var(--space-lg);
+          }
+          .demo-21-12 .stat-card {
+            padding: calc(var(--space-md) * var(--density));
+            background: oklch(14% 0.02 260);
+            border: 1px solid oklch(20% 0.03 260);
+            border-radius: 0.5rem;
+          }
+          .demo-21-12 .stat-label {
+            font-size: var(--size-xs);
+            color: oklch(55% 0.03 260);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-block-end: calc(var(--space-xs) * var(--density));
+          }
+          .demo-21-12 .stat-value {
+            font-size: var(--size-xl);
+            font-weight: 700;
+            line-height: 1;
+          }
+          .demo-21-12 .stat-change {
+            font-size: var(--size-xs);
+            color: oklch(65% 0.15 150);
+            margin-block-start: calc(var(--space-xs) * var(--density));
+          }
+          .demo-21-12 .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: calc(var(--space-md) * var(--density));
+          }
+          .demo-21-12 .content-card {
+            padding: calc(var(--space-md) * var(--density));
+            background: oklch(14% 0.02 260);
+            border: 1px solid oklch(20% 0.03 260);
+            border-radius: 0.5rem;
+          }
+          .demo-21-12 .content-card h4 { font-size: var(--size-sm); font-weight: 600; margin-block-end: calc(var(--space-xs) * var(--density)); }
+          .demo-21-12 .content-card p { font-size: var(--size-xs); color: oklch(60% 0.02 260); line-height: 1.6; }
+          .demo-21-12 .content-card .bar-row { display: flex; align-items: center; gap: var(--space-xs); margin-block-start: calc(var(--space-xs) * var(--density)); }
+          .demo-21-12 .content-card .bar-label { font-size: 0.65rem; color: oklch(55% 0.02 260); min-inline-size: 5ch; }
+          .demo-21-12 .content-card .bar-track { flex: 1; block-size: 4px; background: oklch(20% 0.02 260); border-radius: 2px; overflow: hidden; }
+          .demo-21-12 .content-card .bar-fill { block-size: 100%; border-radius: 2px; background: oklch(55% 0.15 270); }
+          .demo-21-12 .token-note {
+            margin-block-start: var(--space-lg);
+            padding: var(--space-sm) var(--space-md);
+            background: oklch(15% 0.04 200);
+            border-radius: 0.4rem;
+            font-size: var(--size-xs);
+            color: oklch(70% 0.06 200);
+            border-inline-start: 3px solid oklch(55% 0.15 200);
+          }
+        </style>
+        <div class="demo-21-12" id="tokenDemo">
+          <div class="dash-page">
+            <div class="dash-header">
+              <span class="dash-title">Token Dashboard</span>
+              <div class="density-controls">
+                <button class="density-btn" data-density="0.75" type="button">Compact</button>
+                <button class="density-btn active" data-density="1" type="button">Default</button>
+                <button class="density-btn" data-density="1.25" type="button">Spacious</button>
+              </div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat-card">
+                <div class="stat-label">Revenue</div>
+                <div class="stat-value">$94.2k</div>
+                <div class="stat-change">+12.4%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Users</div>
+                <div class="stat-value">31,847</div>
+                <div class="stat-change">+8.1%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Sessions</div>
+                <div class="stat-value">142k</div>
+                <div class="stat-change">+5.7%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Bounce</div>
+                <div class="stat-value">24.3%</div>
+                <div class="stat-change">-2.1%</div>
+              </div>
+            </div>
+            <div class="content-grid">
+              <div class="content-card">
+                <h4>Traffic Sources</h4>
+                <p>Top channels driving engagement this month.</p>
+                <div class="bar-row"><span class="bar-label">Direct</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div></div>
+                <div class="bar-row"><span class="bar-label">Search</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div></div>
+                <div class="bar-row"><span class="bar-label">Social</span><div class="bar-track"><div class="bar-fill" style="width:35%"></div></div></div>
+                <div class="bar-row"><span class="bar-label">Email</span><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div></div>
+              </div>
+              <div class="content-card">
+                <h4>Performance</h4>
+                <p>Core metrics across all pages.</p>
+                <div class="bar-row"><span class="bar-label">LCP</span><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div></div>
+                <div class="bar-row"><span class="bar-label">FID</span><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div></div>
+                <div class="bar-row"><span class="bar-label">CLS</span><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div></div>
+                <div class="bar-row"><span class="bar-label">INP</span><div class="bar-track"><div class="bar-fill" style="width:64%"></div></div></div>
+              </div>
+            </div>
+            <div class="token-note">Every measurement in this dashboard comes from fluid tokens. Resize the browser and toggle the density buttons -- no media queries, no breakpoints. Spacing, type, and gaps all respond to both viewport width and density setting.</div>
+          </div>
+        </div>
+        <script>
+          (function() {
+            const demo = document.getElementById('tokenDemo');
+            if (!demo) return;
+            demo.addEventListener('click', function(e) {
+              const btn = e.target.closest('.density-btn');
+              if (!btn) return;
+              demo.querySelectorAll('.density-btn').forEach(function(b) { b.classList.remove('active'); });
+              btn.classList.add('active');
+              demo.style.setProperty('--density', btn.dataset.density);
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="app" id="app"&gt;
+  &lt;div class="controls"&gt;
+    &lt;button onclick="setDensity(0.75)"&gt;Compact&lt;/button&gt;
+    &lt;button onclick="setDensity(1)"&gt;Default&lt;/button&gt;
+    &lt;button onclick="setDensity(1.25)"&gt;Spacious&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="grid"&gt;
+    &lt;div class="card"&gt;
+      &lt;h3&gt;Card One&lt;/h3&gt;
+      &lt;p&gt;Spacing adapts to density.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="card"&gt;
+      &lt;h3&gt;Card Two&lt;/h3&gt;
+      &lt;p&gt;Try compact and spacious.&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class="card"&gt;
+      &lt;h3&gt;Card Three&lt;/h3&gt;
+      &lt;p&gt;Resize the viewport too.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function setDensity(v) {
+  document.getElementById('app')
+    .style.setProperty('--density', v);
+}
+&lt;/script&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
+  --space-md: clamp(0.75rem, 0.6rem + 0.75vw, 1.25rem);
+  --space-lg: clamp(1rem, 0.8rem + 1vw, 2rem);
+  --density: 1;
+}
+
+body {
+  font-family: system-ui;
+  padding: var(--space-lg);
+  background: #0a0a14;
+  color: #ddd;
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-sm);
+  margin-block-end: var(--space-lg);
+}
+
+.controls button {
+  padding: 0.3rem 0.8rem;
+  background: #222;
+  color: #aaa;
+  border: 1px solid #333;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: calc(var(--space-md) * var(--density));
+}
+
+.card {
+  padding: calc(var(--space-md) * var(--density));
+  background: #161628;
+  border: 1px solid #252540;
+  border-radius: 0.5rem;
+}
+
+.card h3 {
+  margin-block-end:
+    calc(var(--space-sm) * var(--density));
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a complete fluid spacing scale with at least 5 sizes (xs through xl) using <code>clamp()</code>. Then add a density toggle with three modes: compact (0.75), default (1), and spacious (1.25). Apply the density multiplier to all padding and gap values in a card layout. Verify that resizing the browser AND toggling density both produce smooth, readable results.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.11-2026-device-breakpoints.html">&larr; Lesson 21.11</a>
+      <a href="./lesson-21.13-large-screen-design.html">Lesson 21.13 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

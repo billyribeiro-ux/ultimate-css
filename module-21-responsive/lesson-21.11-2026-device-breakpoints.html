@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.11 — 2026 Device Landscape: Every Breakpoint That Matters · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.11 · Responsive · Updated May 2026</p>
+      <h1>2026 Device Landscape: Every Breakpoint That Matters</h1>
+      <p class="lead">The complete reference of CSS viewport widths, pixel ratios, and safe-area insets across every major device category in 2026. Then: why you should ignore most of them.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Phone (compact): 360-440px CSS width</h2>
+      <p>The compact phone tier has settled into a narrow range. All modern phones ship with CSS widths between 360px and 440px, regardless of their physical resolution.</p>
+      <pre><code>/* 2026 phone CSS widths */
+/* iPhone 16 / 16 Pro:    393 x 852  (2x / 3x DPR) */
+/* iPhone 16 Pro Max:     440 x 956  (3x DPR) */
+/* Samsung Galaxy S25:    412 x 915  (3x DPR) */
+/* Google Pixel 9:        412 x 924  (2.625x DPR) */
+
+/* Dynamic Island safe area */
+/* iPhone 16 Pro: safe-area-inset-top: 59px */
+/* Usage: */
+.app-header {
+  padding-block-start: env(safe-area-inset-top, 0px);
+}</code></pre>
+
+      <h2>Tablet: 768-1024px</h2>
+      <p>Tablets occupy a wide band. iPad models cluster around 820px, while the largest iPad Pro reaches 1024px in portrait. Samsung tablets sit at 800px.</p>
+      <pre><code>/* 2026 tablet CSS widths */
+/* iPad (10th gen):       820 x 1180  (2x DPR) */
+/* iPad Air M3:           820 x 1180  (2x DPR) */
+/* iPad Pro 11":          834 x 1194  (2x DPR) */
+/* iPad Pro 13":         1024 x 1366  (2x DPR) */
+/* Samsung Tab S10:       800 x 1280  (2x DPR) */
+
+/* iPad multitasking splits: 1/3, 1/2, 2/3, full */
+/* A "tablet" can be 320px wide in split view */</code></pre>
+
+      <h2>Laptop: 1024-1920px</h2>
+      <p>Laptop viewports vary dramatically. A MacBook Air at default scaling is 1470px, but a budget Windows laptop may show 1366px. All are "laptop" but the CSS width range spans nearly 600px.</p>
+      <pre><code>/* 2026 laptop CSS widths */
+/* MacBook Air 13":      1470 x 956   (2x DPR) */
+/* MacBook Pro 14":      1512 x 982   (2x DPR) */
+/* MacBook Pro 16":      1728 x 1117  (2x DPR) */
+/* Typical Windows:      1366 x 768   (1x DPR) */
+/* Common Windows:       1536 x 864   (1.25x DPR) */
+/* Full HD:              1920 x 1080  (1x DPR) */</code></pre>
+
+      <h2>Desktop / External: 1920px+</h2>
+      <p>External monitors start where laptops leave off. The range stretches from 1920px all the way to 5120px on ultrawide displays.</p>
+      <pre><code>/* 2026 desktop / external CSS widths */
+/* 1440p:    2560 x 1440 */
+/* 4K:       3840 x 2160 */
+/* Ultrawide: 3440 x 1440 */
+/* Super UW: 5120 x 2160 */
+
+/* At 2x scaling, a 4K monitor shows 1920 CSS pixels */
+/* At "default" (no scaling), it shows 3840 CSS pixels */
+/* Always design for CSS pixels, not physical pixels */</code></pre>
+
+      <h2>Foldable: two widths per device</h2>
+      <p>Foldable phones have two distinct CSS widths. The Samsung Galaxy Z Fold 6 is 373px when folded (a normal phone) and 884px when unfolded (a small tablet). This is a device that changes breakpoint tier by physically opening.</p>
+      <pre><code>/* Samsung Galaxy Z Fold 6 */
+/* Folded (cover):  373 x 832  (phone) */
+/* Unfolded (main): 884 x 832  (tablet) */
+
+/* Fold detection media features */
+@media (horizontal-viewport-segments: 2) {
+  /* Device has two horizontal viewport segments (unfolded, dual-screen) */
+  .layout {
+    display: grid;
+    grid-template-columns:
+      env(viewport-segment-width 0 0)
+      env(viewport-segment-width 1 0);
+  }
+}
+
+@media (vertical-viewport-segments: 2) {
+  /* Device has two vertical viewport segments (e.g. laptop/tent mode) */
+}</code></pre>
+
+      <h2>The PE7 recommendation: stop targeting devices</h2>
+      <p>The device list above is a reference, not a prescription. If your layout uses media queries at 375px, 768px, 1024px, and 1440px, you are designing for exactly four sizes. Every width between those breakpoints is an afterthought.</p>
+
+      <h3>Continuous adaptation beats discrete breakpoints</h3>
+      <p>The modern CSS toolkit gives you tools for continuous adaptation. Use them instead of device-specific breakpoints:</p>
+      <pre><code>/* Instead of media queries at device widths... */
+/* Use auto-fit for grids: */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+}
+
+/* Use clamp() for typography: */
+h1 { font-size: clamp(1.5rem, 1rem + 2.5vw, 3.5rem); }
+
+/* Use container queries for component adaptation: */
+.card-container { container-type: inline-size; }
+@container (min-width: 25rem) {
+  .card { flex-direction: row; }
+}
+
+/* These work at EVERY width, not just 4 breakpoints */</code></pre>
+
+      <h3>When breakpoints are still useful</h3>
+      <p>Breakpoints remain appropriate for <strong>major layout shifts</strong> that cannot be expressed intrinsically: switching from a bottom tab bar to a side nav, hiding a desktop-only sidebar, or changing interaction patterns. These are UX decisions, not CSS sizing decisions.</p>
+      <pre><code>/* Acceptable: UX pattern change */
+@media (max-width: 48rem) {
+  .desktop-sidebar { display: none; }
+  .mobile-tab-bar  { display: flex; }
+}
+
+/* Avoid: CSS sizing at device widths */
+@media (min-width: 375px) { .card { width: 50%; } }
+@media (min-width: 768px) { .card { width: 33%; } }
+/* Use auto-fit instead */</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — 2026 device width chart</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-21-11 {
+            padding: clamp(1rem, 0.5rem + 2vw, 3rem);
+            font-family: system-ui, sans-serif;
+            background: oklch(10% 0.02 260);
+            color: oklch(85% 0.01 260);
+            border-radius: 0.5rem;
+          }
+          .demo-21-11 h3 {
+            font-size: clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
+            margin-block-end: 1.5rem;
+            font-weight: 700;
+          }
+          .demo-21-11 .chart {
+            position: relative;
+            padding-block-end: 2.5rem;
+            margin-block-end: 2rem;
+          }
+          .demo-21-11 .chart-track {
+            position: relative;
+            block-size: 2px;
+            background: oklch(25% 0.02 260);
+            border-radius: 1px;
+          }
+          .demo-21-11 .chart-range {
+            position: absolute;
+            block-size: 6px;
+            inset-block-start: -2px;
+            border-radius: 3px;
+          }
+          .demo-21-11 .range-phone   { background: oklch(65% 0.18 150); }
+          .demo-21-11 .range-tablet  { background: oklch(65% 0.18 200); }
+          .demo-21-11 .range-laptop  { background: oklch(65% 0.18 270); }
+          .demo-21-11 .range-desktop { background: oklch(65% 0.18 320); }
+          .demo-21-11 .chart-device {
+            position: absolute;
+            inset-block-start: 12px;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            white-space: nowrap;
+            color: oklch(60% 0.03 260);
+            text-align: center;
+            line-height: 1.3;
+          }
+          .demo-21-11 .chart-device::before {
+            content: '';
+            display: block;
+            inline-size: 1px;
+            block-size: 8px;
+            background: oklch(40% 0.02 260);
+            margin-inline: auto;
+            margin-block-end: 2px;
+          }
+          .demo-21-11 .chart-device strong {
+            display: block;
+            color: oklch(80% 0.02 260);
+            font-weight: 600;
+          }
+          .demo-21-11 .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-block-start: 1rem;
+          }
+          .demo-21-11 .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.7rem;
+            color: oklch(65% 0.02 260);
+          }
+          .demo-21-11 .legend-swatch {
+            inline-size: 12px;
+            block-size: 4px;
+            border-radius: 2px;
+          }
+          /* Adaptive grid demo */
+          .demo-21-11 .adaptive-section {
+            margin-block-start: 2rem;
+            padding-block-start: 1.5rem;
+            border-block-start: 1px solid oklch(20% 0.02 260);
+          }
+          .demo-21-11 .adaptive-section h4 {
+            font-size: clamp(0.85rem, 0.7rem + 0.5vw, 1.1rem);
+            margin-block-end: 1rem;
+            font-weight: 600;
+          }
+          .demo-21-11 .adaptive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+            gap: clamp(0.5rem, 0.3rem + 0.5vw, 1rem);
+          }
+          .demo-21-11 .adaptive-card {
+            padding: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+            background: oklch(15% 0.03 260);
+            border: 1px solid oklch(22% 0.03 260);
+            border-radius: 0.4rem;
+          }
+          .demo-21-11 .adaptive-card h5 {
+            font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
+            font-weight: 600;
+            margin-block-end: 0.3rem;
+          }
+          .demo-21-11 .adaptive-card p {
+            font-size: clamp(0.65rem, 0.6rem + 0.15vw, 0.75rem);
+            color: oklch(55% 0.02 260);
+            line-height: 1.5;
+          }
+          .demo-21-11 .adaptive-note {
+            margin-block-start: 1rem;
+            padding: 0.75rem 1rem;
+            background: oklch(18% 0.04 270);
+            border-radius: 0.4rem;
+            font-size: clamp(0.7rem, 0.65rem + 0.15vw, 0.8rem);
+            color: oklch(70% 0.06 270);
+            border-inline-start: 3px solid oklch(55% 0.15 270);
+          }
+        </style>
+        <div class="demo-21-11">
+          <h3>2026 Device Width Spectrum (CSS Pixels)</h3>
+          <div class="chart">
+            <div class="chart-track">
+              <!-- Phone range: 360-440 of 320-5120 scale = ~0.8% to 2.5% -->
+              <div class="chart-range range-phone" style="left: 0.8%; width: 1.7%;"></div>
+              <!-- Tablet range: 768-1024 -->
+              <div class="chart-range range-tablet" style="left: 9.3%; width: 5.3%;"></div>
+              <!-- Laptop range: 1024-1920 -->
+              <div class="chart-range range-laptop" style="left: 14.7%; width: 18.7%;"></div>
+              <!-- Desktop range: 1920-5120 -->
+              <div class="chart-range range-desktop" style="left: 33.3%; width: 66.7%;"></div>
+            </div>
+            <!-- Device markers -->
+            <div class="chart-device" style="left: 1.5%;"><strong>393px</strong>iPhone 16</div>
+            <div class="chart-device" style="left: 2.5%;"><strong>440px</strong>iPhone 16 PM</div>
+            <div class="chart-device" style="left: 10.4%;"><strong>820px</strong>iPad Air</div>
+            <div class="chart-device" style="left: 14.7%;"><strong>1024px</strong>iPad Pro 13</div>
+            <div class="chart-device" style="left: 24%;"><strong>1470px</strong>MacBook Air</div>
+            <div class="chart-device" style="left: 33.3%;"><strong>1920px</strong>Full HD</div>
+            <div class="chart-device" style="left: 46.7%;"><strong>2560px</strong>1440p</div>
+            <div class="chart-device" style="left: 65%;"><strong>3440px</strong>Ultrawide</div>
+            <div class="chart-device" style="left: 100%;"><strong>5120px</strong>Super UW</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><span class="legend-swatch" style="background: oklch(65% 0.18 150);"></span>Phone (360-440px)</div>
+            <div class="legend-item"><span class="legend-swatch" style="background: oklch(65% 0.18 200);"></span>Tablet (768-1024px)</div>
+            <div class="legend-item"><span class="legend-swatch" style="background: oklch(65% 0.18 270);"></span>Laptop (1024-1920px)</div>
+            <div class="legend-item"><span class="legend-swatch" style="background: oklch(65% 0.18 320);"></span>Desktop (1920px+)</div>
+          </div>
+          <div class="adaptive-section">
+            <h4>This grid adapts at every width -- zero breakpoints</h4>
+            <div class="adaptive-grid">
+              <div class="adaptive-card"><h5>Fluid Type</h5><p>clamp() scales text continuously from 320px to 5120px.</p></div>
+              <div class="adaptive-card"><h5>Auto-fit Grid</h5><p>Cards reflow at any width without media queries.</p></div>
+              <div class="adaptive-card"><h5>Container Queries</h5><p>Components adapt to their own container size.</p></div>
+              <div class="adaptive-card"><h5>Fluid Spacing</h5><p>Gaps and padding scale proportionally with viewport.</p></div>
+              <div class="adaptive-card"><h5>Intrinsic Sizing</h5><p>min(), max(), and fit-content for self-sizing.</p></div>
+              <div class="adaptive-card"><h5>Logical Props</h5><p>Writing-mode agnostic layout with inline/block.</p></div>
+            </div>
+            <div class="adaptive-note">Resize your browser from any width to any other width. The grid above never snaps or breaks -- it flows continuously. This is what replacing breakpoints with intrinsic design looks like.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="showcase"&gt;
+  &lt;h1&gt;Device-Agnostic Grid&lt;/h1&gt;
+  &lt;p class="subtitle"&gt;Works from 320px to 5120px&lt;/p&gt;
+  &lt;div class="grid"&gt;
+    &lt;div class="card"&gt;&lt;h3&gt;Phone&lt;/h3&gt;&lt;p&gt;360-440px&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="card"&gt;&lt;h3&gt;Tablet&lt;/h3&gt;&lt;p&gt;768-1024px&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="card"&gt;&lt;h3&gt;Laptop&lt;/h3&gt;&lt;p&gt;1024-1920px&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="card"&gt;&lt;h3&gt;Desktop&lt;/h3&gt;&lt;p&gt;1920px+&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="card"&gt;&lt;h3&gt;Foldable&lt;/h3&gt;&lt;p&gt;373-884px&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="card"&gt;&lt;h3&gt;Ultrawide&lt;/h3&gt;&lt;p&gt;3440-5120px&lt;/p&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: system-ui;
+  padding: clamp(1rem, 0.5rem + 2vw, 3rem);
+  background: #0a0a14;
+  color: #ddd;
+}
+
+.showcase {
+  max-inline-size: min(90rem, 100%);
+  margin-inline: auto;
+}
+
+h1 {
+  font-size: clamp(1.25rem, 0.8rem + 2vw, 3rem);
+  font-weight: 800;
+}
+
+.subtitle {
+  color: #888;
+  margin-block-end: 1.5rem;
+}
+
+/* No breakpoints -- auto-fit handles everything */
+.grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: clamp(0.5rem, 0.3rem + 0.8vw, 1.5rem);
+}
+
+.card {
+  padding: clamp(0.75rem, 0.5rem + 0.5vw, 1.5rem);
+  background: #161628;
+  border: 1px solid #252540;
+  border-radius: 0.5rem;
+}
+
+.card h3 {
+  font-size: clamp(0.9rem, 0.8rem + 0.3vw, 1.1rem);
+  margin-block-end: 0.25rem;
+}
+
+.card p {
+  font-size: 0.8rem;
+  color: #888;
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a responsive card grid that displays well on every device in the 2026 reference list above. The catch: you cannot use any <code>@media</code> queries. Use <code>auto-fit</code>, <code>minmax()</code>, <code>clamp()</code>, and container queries only. Test at 373px (Z Fold folded), 440px (iPhone 16 Pro Max), 820px (iPad Air), 1470px (MacBook Air), 2560px (1440p monitor), and 3440px (ultrawide). It should look intentional at every width.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.10-no-breakpoint-layouts.html">&larr; Lesson 21.10</a>
+      <a href="./lesson-21.12-responsive-tokens.html">Lesson 21.12 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14.27 — Apple HIG: Component Patterns in CSS · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 14</a>
+      <span>Lesson 14.27</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 14.27 · Apple Human Interface Guidelines</p>
+      <h1>Apple HIG: Component Patterns in CSS</h1>
+      <p class="lead">Apple's UI components have exact dimensions, specific animation curves, and pixel-precise details that make iOS feel like iOS. The navigation bar is exactly 44px. The tab bar is 49px. The toggle is 31x51px. These are not suggestions — they are the system. Here is how to rebuild them in CSS.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Navigation bar</h2>
+      <p>The iOS navigation bar is 44px tall (plus safe area), uses SF Pro at 17px semibold for the inline title, and has a blur background. The "large title" mode starts at 34px bold and collapses on scroll via scroll-driven animation. The <code>0.5px</code> border is the retina hairline — on 2x displays it renders as a true 1-device-pixel line:</p>
+      <pre><code>.hig-navbar {
+  position: sticky;
+  inset-block-start: 0;
+  block-size: 2.75rem; /* 44px */
+  display: flex;
+  align-items: center;
+  padding-inline: 1rem;
+  backdrop-filter: saturate(180%) blur(20px);
+  background: oklch(98% 0.005 264 / 0.72);
+  border-block-end: 0.5px solid oklch(80% 0.01 264 / 0.5);
+}</code></pre>
+
+      <h2>Tab bar</h2>
+      <p>49px tall (plus safe area inset), centered icon-label pairs. Selected tab uses the system tint; unselected tabs are gray:</p>
+      <pre><code>.hig-tabbar {
+  display: flex;
+  justify-content: space-around;
+  block-size: 3.0625rem; /* 49px */
+  padding-block-end: env(safe-area-inset-bottom);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-block-start: 0.5px solid oklch(80% 0.01 264 / 0.5);
+}</code></pre>
+
+      <h2>Action sheet</h2>
+      <p>Slides up from the bottom with <code>@starting-style</code>, rounded top corners, backdrop blur, grouped buttons with hairline separators:</p>
+      <pre><code>[popover].action-sheet {
+  position: fixed;
+  inset: auto 0.5rem 0.5rem;
+  margin: 0 auto;
+  max-inline-size: 24rem;
+  border-radius: 0.875rem;
+  background: oklch(96% 0.005 264 / 0.85);
+  backdrop-filter: saturate(180%) blur(30px);
+  opacity: 1; translate: 0 0;
+  transition: opacity 300ms, translate 300ms,
+              display 300ms allow-discrete;
+}
+[popover].action-sheet:not(:popover-open) {
+  opacity: 0; translate: 0 100%;
+}
+@starting-style {
+  [popover].action-sheet:popover-open {
+    opacity: 0; translate: 0 100%;
+  }
+}</code></pre>
+
+      <h2>Toggle (UISwitch)</h2>
+      <p>Exactly 31px tall and 51px wide. The knob is 27px (2px inset). Green on-state, gray off-state. Apple's standard curve at 200ms:</p>
+      <pre><code>.hig-toggle {
+  appearance: none;
+  width: 3.1875rem;  /* 51px */
+  height: 1.9375rem; /* 31px */
+  border-radius: 1rem;
+  background: oklch(88% 0.01 264);
+  position: relative; cursor: pointer; border: none;
+  transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hig-toggle::before {
+  content: "";
+  position: absolute; top: 0.125rem; left: 0.125rem;
+  width: 1.6875rem; height: 1.6875rem;
+  border-radius: 50%; background: oklch(100% 0 0);
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.15);
+  transition: translate 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hig-toggle:checked { background: oklch(65% 0.2 145); }
+.hig-toggle:checked::before { translate: 1.25rem 0; }</code></pre>
+
+      <h2>Segmented control</h2>
+      <p>Equally sized segments with a pill-shaped sliding indicator. The indicator translates on selection change via a <code>--active</code> custom property:</p>
+      <pre><code>.segmented {
+  display: grid; grid-auto-columns: 1fr; grid-auto-flow: column;
+  position: relative; background: oklch(92% 0.005 264);
+  border-radius: 0.5rem; padding: 0.125rem;
+}
+.segmented::before {
+  content: ""; position: absolute; inset-block: 0.125rem;
+  inline-size: calc(100% / var(--seg-count));
+  border-radius: 0.4375rem; background: oklch(100% 0 0);
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.08);
+  translate: calc(var(--active) * 100%) 0;
+  transition: translate 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}</code></pre>
+
+      <h2>PE7 placement</h2>
+      <p>All five components live in the <strong>components layer</strong>. Their dimensions (44px, 49px, 31x51px) reference <strong>tokens</strong>. The scroll-driven navbar collapse and toggle animation belong in the <strong>animations layer</strong>. The <code>@starting-style</code> entry for the action sheet is also <strong>animations</strong>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Apple HIG components</h2>
+      <div class="demo-frame">
+        <style>
+          .demo-14-27 {
+            font-family: -apple-system, system-ui, sans-serif;
+            background: oklch(95% 0.005 264);
+            border-radius: 0.75rem; overflow: hidden;
+            max-width: 22rem; margin: 0 auto;
+            border: 1px solid oklch(88% 0.005 264);
+          }
+          .demo-14-27 .navbar {
+            height: 2.75rem; display: flex; align-items: center;
+            justify-content: space-between; padding-inline: 1rem;
+            background: oklch(98% 0.005 264 / 0.85);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-block-end: 0.5px solid oklch(80% 0.01 264 / 0.5);
+            font-size: 1.0625rem; font-weight: 600; color: oklch(10% 0.01 264);
+          }
+          .demo-14-27 .nav-back {
+            font-size: 1.0625rem; color: oklch(55% 0.2 264);
+            background: none; border: none; cursor: pointer; font-weight: 400;
+          }
+          .demo-14-27 .phone-content {
+            padding: 1rem; display: flex; flex-direction: column; gap: 1.5rem;
+          }
+          .demo-14-27 .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: oklch(100% 0 0); padding: 0.5rem 1rem; border-radius: 0.625rem;
+          }
+          .demo-14-27 .toggle-label { font-size: 1.0625rem; color: oklch(10% 0.01 264); }
+          .demo-14-27 .hig-toggle {
+            appearance: none; width: 3.1875rem; height: 1.9375rem;
+            border-radius: 1rem; background: oklch(88% 0.01 264);
+            position: relative; cursor: pointer; border: none;
+            transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .demo-14-27 .hig-toggle::before {
+            content: ""; position: absolute; top: 0.125rem; left: 0.125rem;
+            width: 1.6875rem; height: 1.6875rem; border-radius: 50%;
+            background: oklch(100% 0 0); box-shadow: 0 1px 3px oklch(0% 0 0 / 0.15);
+            transition: translate 200ms cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .demo-14-27 .hig-toggle:checked { background: oklch(65% 0.2 145); }
+          .demo-14-27 .hig-toggle:checked::before { translate: 1.25rem 0; }
+          .demo-14-27 .segmented {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            position: relative; background: oklch(92% 0.005 264);
+            border-radius: 0.5rem; padding: 0.125rem;
+          }
+          .demo-14-27 .segmented::before {
+            content: ""; position: absolute; inset-block: 0.125rem;
+            inline-size: calc(100% / 3); border-radius: 0.4375rem;
+            background: oklch(100% 0 0); box-shadow: 0 1px 3px oklch(0% 0 0 / 0.08);
+            translate: calc(var(--active, 0) * 100%) 0;
+            transition: translate 250ms cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .demo-14-27 .seg-btn {
+            position: relative; z-index: 1; padding: 0.4rem 0.75rem;
+            border: none; background: none; font-family: -apple-system, system-ui, sans-serif;
+            font-size: 0.8125rem; font-weight: 500; color: oklch(30% 0.01 264);
+            cursor: pointer; text-align: center;
+          }
+          .demo-14-27 .sheet-btn {
+            width: 100%; padding: 0.75rem; border-radius: 0.625rem;
+            background: oklch(55% 0.2 264); color: oklch(100% 0 0); border: none;
+            font-family: -apple-system, system-ui, sans-serif;
+            font-size: 1.0625rem; font-weight: 500; cursor: pointer;
+          }
+          .demo-14-27 .tabbar {
+            display: flex; justify-content: space-around; height: 3.0625rem;
+            background: oklch(98% 0.005 264 / 0.85);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-block-start: 0.5px solid oklch(80% 0.01 264 / 0.5);
+          }
+          .demo-14-27 .tab-item {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 0.125rem; font-size: 0.625rem;
+            color: oklch(55% 0.01 264); border: none; background: none; cursor: pointer;
+          }
+          .demo-14-27 .tab-item.active { color: oklch(55% 0.2 264); }
+          .demo-14-27 .tab-icon {
+            width: 1.5rem; height: 1.5rem; border-radius: 0.25rem;
+            background: currentColor; opacity: 0.5;
+          }
+          .demo-14-27 .tab-item.active .tab-icon { opacity: 0.8; }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-14-27 .hig-toggle, .demo-14-27 .hig-toggle::before,
+            .demo-14-27 .segmented::before { transition: none; }
+          }
+        </style>
+        <div class="demo-14-27">
+          <div class="navbar">
+            <button class="nav-back">Back</button>
+            <span>Settings</span>
+            <span></span>
+          </div>
+          <div class="phone-content">
+            <div class="toggle-row">
+              <span class="toggle-label">Airplane Mode</span>
+              <input type="checkbox" class="hig-toggle" checked>
+            </div>
+            <div class="segmented" style="--active: 0" id="seg-ctrl">
+              <button class="seg-btn" onclick="this.parentElement.style.setProperty('--active','0')">All</button>
+              <button class="seg-btn" onclick="this.parentElement.style.setProperty('--active','1')">Missed</button>
+              <button class="seg-btn" onclick="this.parentElement.style.setProperty('--active','2')">Voicemail</button>
+            </div>
+            <button class="sheet-btn">Show Action Sheet</button>
+          </div>
+          <div class="tabbar">
+            <button class="tab-item active"><span class="tab-icon"></span>Favorites</button>
+            <button class="tab-item"><span class="tab-icon"></span>Recents</button>
+            <button class="tab-item"><span class="tab-icon"></span>Contacts</button>
+            <button class="tab-item"><span class="tab-icon"></span>Keypad</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="toggle-demo"&gt;
+  &lt;h3&gt;Apple UISwitch in CSS&lt;/h3&gt;
+  &lt;label class="toggle-row"&gt;
+    &lt;span&gt;Wi-Fi&lt;/span&gt;
+    &lt;input type="checkbox" class="hig-toggle" checked&gt;
+  &lt;/label&gt;
+  &lt;label class="toggle-row"&gt;
+    &lt;span&gt;Bluetooth&lt;/span&gt;
+    &lt;input type="checkbox" class="hig-toggle"&gt;
+  &lt;/label&gt;
+  &lt;label class="toggle-row"&gt;
+    &lt;span&gt;Airplane Mode&lt;/span&gt;
+    &lt;input type="checkbox" class="hig-toggle"&gt;
+  &lt;/label&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 0; padding: 2rem;
+  background: oklch(95% 0.005 264);
+}
+.toggle-demo { max-width: 22rem; margin: 0 auto; }
+.toggle-demo h3 {
+  font-size: 1.375rem; font-weight: 700;
+  margin: 0 0 1rem; color: oklch(10% 0.01 264);
+}
+.toggle-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 0.75rem 1rem;
+  background: oklch(100% 0 0); cursor: pointer;
+}
+.toggle-row:first-of-type { border-radius: 0.625rem 0.625rem 0 0; }
+.toggle-row:last-of-type { border-radius: 0 0 0.625rem 0.625rem; }
+.toggle-row + .toggle-row {
+  border-top: 0.5px solid oklch(90% 0.005 264);
+}
+.toggle-row span {
+  font-size: 1.0625rem; color: oklch(10% 0.01 264);
+}
+
+/* --- Build the Apple toggle --- */
+/* Exact HIG dimensions: 51px x 31px */
+.hig-toggle {
+  appearance: none;
+  width: 3.1875rem; height: 1.9375rem;
+  border-radius: 1rem;
+  background: oklch(88% 0.01 264);
+  position: relative; cursor: pointer; border: none;
+  transition: background 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Knob: 27px circle, 2px inset */
+.hig-toggle::before {
+  content: "";
+  position: absolute; top: 0.125rem; left: 0.125rem;
+  width: 1.6875rem; height: 1.6875rem;
+  border-radius: 50%; background: oklch(100% 0 0);
+  box-shadow: 0 1px 3px oklch(0% 0 0 / 0.15);
+  transition: translate 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* On state: green track, knob slides right */
+.hig-toggle:checked { background: oklch(65% 0.2 145); }
+.hig-toggle:checked::before { translate: 1.25rem 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hig-toggle, .hig-toggle::before { transition: none; }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>The toggle in the editor uses the exact HIG dimensions: 51px wide, 31px tall, 27px knob with 2px inset. Try changing the <code>border-radius</code> to <code>0.5rem</code> instead of <code>1rem</code> — it instantly stops looking like an Apple toggle. The pill shape is fundamental to the component's identity. Now add a <code>:focus-visible</code> style with a 3px outline offset in the system tint color. HIG requires that all interactive elements have a visible keyboard focus state.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-14.26-apple-hig-design-principles.html">&larr; Lesson 14.26</a>
+      <a href="./lesson-14.28-md3-complete-system.html">Lesson 14.28 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
