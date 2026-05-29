@@ -47,7 +47,7 @@
       <p>Radio buttons at the top represent categories (All, Branding, Web, Illustration). When a category is selected, <code>:has(input[value="branding"]:checked)</code> on the wrapper hides non-matching cards with <code>display: none</code>. The "All" radio resets visibility. No JavaScript filtering logic needed.</p>
 
       <h2>Lightbox via Popover API</h2>
-      <p>Each gallery card wraps a button that triggers a <code>[popover]</code> element. The popover covers the viewport with a backdrop blur and centers the enlarged image. Pressing Escape or clicking outside dismisses it. The API handles focus trapping and accessibility automatically.</p>
+      <p>Each gallery card is a button that triggers a <code>[popover]</code> element. The popover covers the viewport with a backdrop blur and centers the enlarged image. Pressing Escape or clicking outside dismisses it. The API handles focus trapping and accessibility automatically.</p>
 
       <h2>Staggered reveal animations</h2>
       <p>Cards use <code>animation-delay</code> calculated from a CSS custom property <code>--i</code> set inline. Combined with <code>animation-timeline: view()</code>, each card fades and scales in with a slight offset, creating the signature portfolio reveal.</p>
@@ -130,42 +130,42 @@
           </div>
 
           <div class="masonry">
-            <div class="port-card" data-cat="branding" style="--i:0" popoverTarget="lb-1">
+            <button type="button" class="port-card" data-cat="branding" style="--i:0" popovertarget="lb-1">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Nordic Brand System</h3><div class="tags"><span class="tag">Branding</span><span class="tag">Identity</span></div></div>
-            </div>
-            <div class="port-card" data-cat="web" style="--i:1" popoverTarget="lb-2">
+            </button>
+            <button type="button" class="port-card" data-cat="web" style="--i:1" popovertarget="lb-2">
               <div class="placeholder"></div>
               <div class="overlay"><h3>SaaS Dashboard</h3><div class="tags"><span class="tag">Web</span><span class="tag">UI Design</span></div></div>
-            </div>
-            <div class="port-card" data-cat="illustration" style="--i:2" popoverTarget="lb-3">
+            </button>
+            <button type="button" class="port-card" data-cat="illustration" style="--i:2" popovertarget="lb-3">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Botanical Series</h3><div class="tags"><span class="tag">Illustration</span></div></div>
-            </div>
-            <div class="port-card" data-cat="photo" style="--i:3" popoverTarget="lb-4">
+            </button>
+            <button type="button" class="port-card" data-cat="photo" style="--i:3" popovertarget="lb-4">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Urban Geometry</h3><div class="tags"><span class="tag">Photography</span><span class="tag">Architecture</span></div></div>
-            </div>
-            <div class="port-card" data-cat="web" style="--i:4" popoverTarget="lb-5">
+            </button>
+            <button type="button" class="port-card" data-cat="web" style="--i:4" popovertarget="lb-5">
               <div class="placeholder"></div>
               <div class="overlay"><h3>E-commerce Redesign</h3><div class="tags"><span class="tag">Web</span><span class="tag">E-commerce</span></div></div>
-            </div>
-            <div class="port-card" data-cat="branding" style="--i:5" popoverTarget="lb-6">
+            </button>
+            <button type="button" class="port-card" data-cat="branding" style="--i:5" popovertarget="lb-6">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Craft Brewery Identity</h3><div class="tags"><span class="tag">Branding</span><span class="tag">Packaging</span></div></div>
-            </div>
-            <div class="port-card" data-cat="illustration" style="--i:6" popoverTarget="lb-7">
+            </button>
+            <button type="button" class="port-card" data-cat="illustration" style="--i:6" popovertarget="lb-7">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Character Design</h3><div class="tags"><span class="tag">Illustration</span><span class="tag">3D</span></div></div>
-            </div>
-            <div class="port-card" data-cat="photo" style="--i:7" popoverTarget="lb-8">
+            </button>
+            <button type="button" class="port-card" data-cat="photo" style="--i:7" popovertarget="lb-8">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Mountain Landscapes</h3><div class="tags"><span class="tag">Photography</span><span class="tag">Nature</span></div></div>
-            </div>
-            <div class="port-card" data-cat="web" style="--i:8" popoverTarget="lb-9">
+            </button>
+            <button type="button" class="port-card" data-cat="web" style="--i:8" popovertarget="lb-9">
               <div class="placeholder"></div>
               <div class="overlay"><h3>Portfolio Template</h3><div class="tags"><span class="tag">Web</span><span class="tag">Template</span></div></div>
-            </div>
+            </button>
           </div>
 
           <div id="lb-1" popover><div class="lightbox-content">Nordic Brand System</div></div>

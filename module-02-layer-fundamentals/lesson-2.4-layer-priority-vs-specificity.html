@@ -46,7 +46,7 @@
 
       <h2>Why that fixes everything</h2>
       <p>Remember the Module 1 disaster: a third-party library shipped <code>#site-header .ui-btn { ... !important }</code>, and author code could not override it without escalating to another <code>!important</code>. That was a specificity war.</p>
-      <p>With layers, you put the library in a low layer (<code>vendor</code>) and put your overrides in a higher layer (<code>components</code>). Your <code>.ui-btn</code> class — specificity <code>0,1,0</code> — now beats their <code>#site-header .ui-btn</code> — specificity <code>1,1,0</code>. The ID does not matter. The <code>!important</code> does not matter. The layer does.</p>
+      <p>With layers, you put the library in a low layer (<code>vendor</code>) and put your overrides in a higher layer (<code>components</code>). Your <code>.ui-btn</code> class — specificity <code>0,1,0</code> — now beats their <code>#site-header .ui-btn</code> — specificity <code>1,1,0</code>. The ID does not matter. The layer does. (One caveat for later: this holds for the vendor's <em>normal</em> declarations. An <code>!important</code> declaration inverts layer order and would still win — layers tame specificity, not importance. Lesson 2.6 covers this.)</p>
 
       <h2>The mental shift</h2>
       <p>Stop thinking "what is my specificity score?" Start thinking "what layer is this rule in, and should it be overriding the layer below?" That reframing is the whole product. Every rule below is a corollary.</p>

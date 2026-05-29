@@ -48,7 +48,7 @@
       <p>The file you are importing does not need to know about layers. It can be a ten-year-old vendor stylesheet full of IDs and <code>!important</code>. Wrap it in a layer at import time and it becomes a well-behaved citizen of your cascade.</p>
 
       <h2>Why this is the killer feature</h2>
-      <p>Before layers, the only way to neutralise a misbehaving third-party stylesheet was to match or exceed its specificity, usually with your own <code>!important</code>. That started specificity wars that destroyed codebases. Now, you assign the library to a low layer and forget about it. Your author components in a higher layer always win.</p>
+      <p>Before layers, the only way to neutralise a misbehaving third-party stylesheet was to match or exceed its specificity, usually with your own <code>!important</code>. That started specificity wars that destroyed codebases. Now, you assign the library to a low layer and forget about it. Your author components in a higher layer win against all of the vendor's <em>normal</em> declarations, regardless of their specificity. (Vendor <code>!important</code> declarations are the one exception — see the caveat under the editor below.)</p>
 
       <h2>The strict rule about placement</h2>
       <p><code>@import</code> statements — layered or not — must appear at the top of the stylesheet, before any other rule except <code>@charset</code> and <code>@layer</code> declarations. Put an <code>@import</code> after a regular rule and browsers silently drop it. This bites people. Watch for it.</p>
