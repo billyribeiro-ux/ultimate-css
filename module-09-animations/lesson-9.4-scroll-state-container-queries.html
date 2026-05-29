@@ -48,10 +48,13 @@
   inset-block-start: 0;
 }
 
+/* A container query styles DESCENDANTS of the container,
+   never the container element itself — so style an inner
+   element, not .sticky-header. */
 @container scroll-state(stuck: top) {
-  .sticky-header { box-shadow: 0 4px 14px oklch(0% 0 0 / .08); }
+  .sticky-header__inner { box-shadow: 0 4px 14px oklch(0% 0 0 / .08); }
 }</code></pre>
-      <p><code>container-type: scroll-state</code> turns the element into a container that exposes scroll-state conditions to descendants. <code>stuck: top</code> is true when the element is currently sticky-stuck to the top edge of its scroll container.</p>
+      <p><code>container-type: scroll-state</code> turns the element into a container that exposes scroll-state conditions to its descendants. <code>stuck: top</code> is true when the element is currently sticky-stuck to the top edge of its scroll container. A crucial gotcha: a container query can only style the container's <em>descendants</em>, not the container element itself — so the sticky element holds the <code>container-type</code> and an inner wrapper receives the stuck styling.</p>
 
       <h2>Snap detection</h2>
       <pre><code>.carousel-item { container-type: scroll-state; }
@@ -74,10 +77,13 @@
           .demo-9-4 .scroller { block-size: 12rem; overflow-y: auto; border: 1px solid oklch(85% 0.012 264); border-radius: .5rem; }
           .demo-9-4 header {
             position: sticky; inset-block-start: 0;
+            border-block-end: 1px solid oklch(92% 0.008 264);
+          }
+          .demo-9-4 header .bar {
+            display: block;
             padding: .75rem 1rem;
             background: #fff;
             font-weight: 700;
-            border-block-end: 1px solid oklch(92% 0.008 264);
             transition: box-shadow 200ms, background-color 200ms;
           }
           .demo-9-4 .content { padding: 1rem; display: grid; gap: 1rem; }
@@ -85,7 +91,7 @@
           @supports (container-type: scroll-state) {
             .demo-9-4 header { container-type: scroll-state; }
             @container scroll-state(stuck: top) {
-              .demo-9-4 header { background: oklch(95% 0.04 275); box-shadow: 0 4px 14px oklch(0% 0 0 / .12); }
+              .demo-9-4 header .bar { background: oklch(95% 0.04 275); box-shadow: 0 4px 14px oklch(0% 0 0 / .12); }
             }
           }
         </style>
@@ -94,7 +100,7 @@
             <div class="content">
               <p>Scroll down past the header.</p>
             </div>
-            <header>Sticky header</header>
+            <header><span class="bar">Sticky header</span></header>
             <div class="content">
               <p>When the header sticks, it picks up a shadow and a tint — because a <code>scroll-state(stuck: top)</code> query matched.</p>
               <p>Keep scrolling.</p>
@@ -114,7 +120,7 @@
           <span>HTML</span>
 <textarea data-editor="html" spellcheck="false">&lt;div class="scroller"&gt;
   &lt;div&gt;Padding&lt;/div&gt;
-  &lt;h2 class="sticky"&gt;I detect my own stuck state&lt;/h2&gt;
+  &lt;h2 class="sticky"&gt;&lt;span class="bar"&gt;I detect my own stuck state&lt;/span&gt;&lt;/h2&gt;
   &lt;p&gt;Paragraph one&lt;/p&gt;
   &lt;p&gt;Paragraph two&lt;/p&gt;
   &lt;p&gt;Paragraph three&lt;/p&gt;
@@ -131,16 +137,22 @@
   position: sticky;
   inset-block-start: 0;
   margin: 0;
+}
+.sticky .bar {
+  display: block;
   padding: .5rem 1rem;
   background: #fff;
   border-radius: .5rem;
   transition: box-shadow 200ms, background 200ms;
 }
 
+/* A container query styles DESCENDANTS of the container,
+   not the container itself — so .sticky carries the
+   container-type and .sticky .bar gets the stuck styling. */
 @supports (container-type: scroll-state) {
   .sticky { container-type: scroll-state; }
   @container scroll-state(stuck: top) {
-    .sticky {
+    .sticky .bar {
       background: oklch(48% 0.22 275);
       color: #fff;
       box-shadow: 0 4px 14px oklch(0% 0 0 / .15);

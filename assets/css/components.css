@@ -227,7 +227,7 @@
     inline-size: 100%;
     block-size: 100%;
     border: none;
-    background: #fff;
+    background: var(--color-preview-canvas);
     border-inline-start: 1px solid var(--color-border);
   }
   @container (inline-size < 48rem) {

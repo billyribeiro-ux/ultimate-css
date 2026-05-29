@@ -76,6 +76,10 @@
     --color-code-bg:            light-dark(var(--slate-100), var(--slate-900));
     --color-code-border:        var(--color-border);
 
+    /* Live-preview iframe canvas — always light: editor.js injects
+       light document styles, so the surface stays light in both schemes. */
+    --color-preview-canvas:     oklch(100% 0 0);
+
     /* ---------- Spacing (rem based) ---------- */
     --space-2xs: 0.25rem;
     --space-xs:  0.5rem;

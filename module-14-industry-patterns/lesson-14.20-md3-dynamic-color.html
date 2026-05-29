@@ -54,7 +54,7 @@
       <p>Google's internal algorithm uses HCT (Hue-Chroma-Tone), a color space developed specifically for Material You. OKLCH is the closest CSS-native equivalent: it separates lightness (L), chroma (C), and hue (H) into independent channels. This means we can hold hue constant while sweeping lightness to generate tonal stops — exactly what HCT does.</p>
 
       <h3>The 13 lightness stops</h3>
-      <p>Each palette contains stops at lightness values: 0, 10, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100. In practice, a UI uses about 6 of these. In OKLCH, these map to L values from 0% to 100%.</p>
+      <p>Each palette contains stops at lightness (tone) values: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100. In practice, a UI uses about 6 of these. In OKLCH, these map to L values from 0% to 100%.</p>
 
       <h3>Chroma manipulation</h3>
       <p>The secondary palette uses <code>c * 0.33</code> — one third of the primary chroma. This desaturates the hue enough to be a supporting role rather than competing with the primary. The tertiary palette keeps full chroma but rotates hue by 60 degrees, creating a triadic harmony that feels vibrant without clashing.</p>

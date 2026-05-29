@@ -212,14 +212,12 @@
   display: block;
 }
 
-/* Default: show first panel */
-.panel:first-child {
+/* Default: show first panel when nothing is targeted */
+.panels:not(:has(:target)) .panel:first-child {
   display: block;
 }
-.panel:first-child:not(:target) {
-  display: block;
-}
-.panel:target ~ .panel:first-child {
+/* When any panel is targeted, hide the first-child default */
+.panels:has(:target) .panel:first-child:not(:target) {
   display: none;
 }
 

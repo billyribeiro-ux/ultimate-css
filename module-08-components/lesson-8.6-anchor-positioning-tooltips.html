@@ -54,8 +54,8 @@
 
       <h2>Combined with popover</h2>
       <p>The <code>popover</code> attribute promotes an element to the top layer — it renders above every ancestor's stacking context, is dismissed by ESC and light-dismiss automatically, and is keyboard-accessible for free. Anchor positioning + popover is the complete replacement:</p>
-      <pre><code>&lt;button popovertarget="tip"&gt;Help&lt;/button&gt;
-&lt;div id="tip" popover style="anchor-name: none; position-anchor: --btn"&gt;Tooltip text&lt;/div&gt;</code></pre>
+      <pre><code>&lt;button popovertarget="tip" style="anchor-name: --btn"&gt;Help&lt;/button&gt;
+&lt;div id="tip" popover style="position-anchor: --btn; position-area: top center"&gt;Tooltip text&lt;/div&gt;</code></pre>
 
       <h2>Browser support</h2>
       <p>Chrome 125+, Edge 125+. Safari and Firefox still catching up. Always wrap in <code>@supports (anchor-name: --x)</code> and provide a fixed-position fallback, or fall through to a plain <code>title</code> attribute for non-supporting browsers.</p>

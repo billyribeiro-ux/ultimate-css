@@ -62,8 +62,8 @@
       <h2>Live demo — identical specificity, last one wins</h2>
       <div class="demo-frame">
         <style>
-          .demo-1-4 .tag { color: oklch(55% 0.22 275); }
-          .demo-1-4 .tag { color: oklch(65% 0.17 150); } /* this one wins */
+          .demo-1-4.tag { color: oklch(55% 0.22 275); }
+          .demo-1-4.tag { color: oklch(65% 0.17 150); } /* this one wins */
         </style>
         <p class="tag demo-1-4" style="font-family:inherit;">Two <code>.tag</code> rules, identical specificity. The later rule is green — it wins purely because of source order.</p>
       </div>
