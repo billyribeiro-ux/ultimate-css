@@ -155,9 +155,9 @@
 &lt;hr&gt;
 
 &lt;button popovertarget="modal-demo"&gt;Open dialog&lt;/button&gt;
-&lt;dialog id="modal-demo" popover="auto" closedby="closerequest"&gt;
+&lt;dialog id="modal-demo" popover="manual"&gt;
   &lt;h3&gt;Confirm action&lt;/h3&gt;
-  &lt;p&gt;This dialog uses closedby="closerequest" — click outside does nothing. Press Escape to close.&lt;/p&gt;
+  &lt;p&gt;Opened as popover="manual" — clicking outside does nothing. Use the Close button to dismiss. (A &lt;code&gt;closedby&lt;/code&gt; value only applies when a &lt;dialog&gt; is opened with showModal(), not via the popover API.)&lt;/p&gt;
   &lt;button popovertarget="modal-demo" popovertargetaction="hide"&gt;Close&lt;/button&gt;
 &lt;/dialog&gt;</textarea>
         </label>
@@ -248,7 +248,7 @@ hr {
 
     <section class="callout">
       <h2>Mini-exercise</h2>
-      <p>Click the three toolbar buttons in sequence — notice how only one hint tooltip stays open at a time. Then click "Open dialog" and try clicking outside it — <code>closedby="closerequest"</code> prevents dismissal. Press Escape to close. Now change <code>closedby</code> to <code>"any"</code> and test again — click-outside now works. This is declarative dialog behavior without a single line of JavaScript.</p>
+      <p>Click the three toolbar buttons in sequence — notice how only one hint tooltip stays open at a time. Then click "Open dialog" and try clicking outside it — <code>popover="manual"</code> ignores outside clicks, so it stays open until you press Close. Now change <code>popover="manual"</code> to <code>popover="auto"</code> and test again — click-outside (light dismiss) now closes it. For a true <code>closedby</code> demonstration you would open the element as a modal via <code>showModal()</code>; under the popover API the dismissal rules come from the <code>popover</code> value, not <code>closedby</code>.</p>
     </section>
 
     <nav class="lesson-nav cluster">
