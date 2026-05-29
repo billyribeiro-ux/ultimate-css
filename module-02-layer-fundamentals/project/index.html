@@ -41,7 +41,7 @@
 
     <section class="lesson-body stack">
       <h2>The brief</h2>
-      <p>You are not allowed to change any selector. You are not allowed to add or remove <code>!important</code>. You cannot reorder rules inside the file. The only tool is <code>@layer</code>. By the end, the page renders correctly: brand indigo primary, brand red danger, brand green hero title, slate header button, consistent sidebar background.</p>
+      <p>You are not allowed to change any selector. You cannot reorder rules inside the file. The primary tool is <code>@layer</code>. By the end, the page renders correctly: brand indigo primary, brand red danger, brand green hero title, consistent sidebar background. The one stubborn case — the vendor's <code>!important</code> header button — exposes the single thing layers cannot do, and we call it out explicitly.</p>
 
       <h2>The declared layer order</h2>
       <pre><code>@layer vendor, components, overrides;</code></pre>
@@ -112,7 +112,7 @@
       <h2>Why this works — every outcome mapped</h2>
       <ol>
         <li><strong>Primary button is indigo.</strong> Both <code>.btn</code> rules live in <code>components</code>; source order inside the layer still applies, but all are intentionally set to indigo. The earlier "accidental amber override" is simply removed from the authored code, not fought with specificity.</li>
-        <li><strong>Hero title is green.</strong> <code>#hero .card-title</code> lives in the <code>overrides</code> layer — higher than <code>components</code>. The red <code>!important</code> sits in <code>components</code> and loses. <em>A lower-specificity rule in a higher layer beats an <code>!important</code> in a lower layer.</em> This is the sentence.</li>
+        <li><strong>Hero title is green.</strong> <code>#hero .card-title</code> lives in the <code>overrides</code> layer — higher than <code>components</code>. The dark <code>.card-title</code> rule sits in <code>components</code> and loses. <em>A lower-specificity rule in a higher layer beats a higher-specificity rule in a lower layer.</em> This is the sentence. (Note the limit: this works for normal declarations. An <code>!important</code> declaration would invert the layer order — layers tame specificity, not importance.)</li>
         <li><strong>Header UI button is slate.</strong> The vendor's <code>#site-header .ui-btn !important</code> stays inside the <code>vendor</code> layer. Author <code>.btn</code> rules in <code>components</code> beat it without having to match its specificity or escalate to another <code>!important</code>.</li>
         <li><strong>Sidebar card background is consistent.</strong> Duplicates are gone; the single <code>.card</code> rule lives in <code>components</code> and wins against any vendor background.</li>
         <li><strong>No specificity arms race.</strong> Doubled-class tricks are unnecessary — the layer system made them obsolete.</li>

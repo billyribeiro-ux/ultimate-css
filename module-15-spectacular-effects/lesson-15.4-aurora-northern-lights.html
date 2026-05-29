@@ -63,8 +63,8 @@
       oklch(40% 0.10 260), transparent 60%);
 }
 
-/* Enhanced: animated hue shift when @property is supported */
-@supports (font-tech(color-COLRv1)) {
+/* Enhanced: animated hue shift when oklch (and @property) is supported */
+@supports (background: oklch(50% 0.1 0)) {
   .l1 {
     background:
       radial-gradient(ellipse 80% 50% at 30% 20%,
