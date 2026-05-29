@@ -49,9 +49,9 @@
 
       <h2>What moved where</h2>
       <ul>
-        <li><strong>vendor</strong> — the <code>.ui-card</code> base, <code>.ui-btn</code> base, and the offending <code>#site-header .ui-btn !important</code>. All of it is now sealed inside the vendor layer.</li>
+        <li><strong>vendor</strong> — the <code>.ui-card</code> base, <code>.ui-btn</code> base, and the offending <code>#site-header .ui-btn !important</code>. Their normal declarations are now outranked by any higher layer; the lone <code>!important</code> still escapes (see the outcomes below).</li>
         <li><strong>components</strong> — the author <code>.btn</code>, <code>.btn.primary</code>, <code>.btn.danger</code>, <code>.card</code>, <code>.card-title</code>, and the later author rules that were clobbering them. Because the later rules live in the same layer, source order still decides between them — so we keep only the intended values.</li>
-        <li><strong>overrides</strong> — the <code>#hero .card-title</code> rule that wants to colour the hero title green. This layer sits above <code>components</code>, so even its lower-specificity form wins against the red <code>.card-title !important</code> below.</li>
+        <li><strong>overrides</strong> — the <code>#hero .card-title</code> rule that wants to colour the hero title green. This layer sits above <code>components</code>, so it wins against the dark <code>.card-title</code> rule below regardless of specificity. (This works because neither rule is <code>!important</code>.)</li>
       </ul>
 
       <h2>The fixed page</h2>
@@ -89,7 +89,7 @@
         <div class="refactored">
           <div id="site-header" class="ui-card">
             <h3 class="card-title">Site header</h3>
-            <button class="ui-btn">UI button — vendor slate, no escaped !important</button>
+            <button class="ui-btn">UI button — still green: vendor's <code>!important</code> survives layering</button>
           </div>
 
           <div id="hero" class="card">
@@ -113,10 +113,10 @@
       <ol>
         <li><strong>Primary button is indigo.</strong> Both <code>.btn</code> rules live in <code>components</code>; source order inside the layer still applies, but all are intentionally set to indigo. The earlier "accidental amber override" is simply removed from the authored code, not fought with specificity.</li>
         <li><strong>Hero title is green.</strong> <code>#hero .card-title</code> lives in the <code>overrides</code> layer — higher than <code>components</code>. The dark <code>.card-title</code> rule sits in <code>components</code> and loses. <em>A lower-specificity rule in a higher layer beats a higher-specificity rule in a lower layer.</em> This is the sentence. (Note the limit: this works for normal declarations. An <code>!important</code> declaration would invert the layer order — layers tame specificity, not importance.)</li>
-        <li><strong>Header UI button is slate.</strong> The vendor's <code>#site-header .ui-btn !important</code> stays inside the <code>vendor</code> layer. Author <code>.btn</code> rules in <code>components</code> beat it without having to match its specificity or escalate to another <code>!important</code>.</li>
+        <li><strong>Header UI button stays green — and that is the honest lesson.</strong> The vendor's <code>#site-header .ui-btn !important</code> lives in the <code>vendor</code> layer, but <code>!important</code> inverts layer priority: an important declaration beats every normal declaration in every layer, no matter how high. Layers tame <em>specificity</em>, not <em>importance</em>. To override a vendor <code>!important</code> you still need your own <code>!important</code> (ideally in a dedicated high layer) — or, better, choose a library that does not ship <code>!important</code>.</li>
         <li><strong>Sidebar card background is consistent.</strong> Duplicates are gone; the single <code>.card</code> rule lives in <code>components</code> and wins against any vendor background.</li>
         <li><strong>No specificity arms race.</strong> Doubled-class tricks are unnecessary — the layer system made them obsolete.</li>
-        <li><strong>No <code>!important</code> chain in author code.</strong> The only <code>!important</code> left is the one we imported from vendor, and it is contained.</li>
+        <li><strong>No <code>!important</code> chain in author code.</strong> The only <code>!important</code> left is the one from vendor. Layers stop it from spreading — your author code never needs to answer it with more <code>!important</code> — but they do not neutralise it on the element it targets.</li>
       </ol>
     </section>
 

@@ -69,8 +69,9 @@
     font-weight: inherit;
   }
 
-  /* Lists with role="list" drop their semantics in some screen readers
-     if we strip bullets, so we only strip when role is absent. */
+  /* Strip default list bullets. Note: removing list-style can drop list
+     semantics in some screen readers, so authored lists that must stay
+     announced should carry role="list". Module 5 covers this trade-off. */
   :where(ul, ol) {
     list-style: none;
   }

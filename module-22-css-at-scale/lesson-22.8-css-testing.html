@@ -180,7 +180,7 @@ for (const width of [375, 768, 1280]) {
     "selector-max-specificity": "0,3,0",
     "selector-max-id": 0,
     "custom-property-pattern": "^(color|space|radius|shadow|font)-",
-    "no-unknown-custom-properties": true
+    "custom-property-no-missing-var-function": true
   }
 }</code></pre>
       <p>These rules catch: <code>!important</code> usage (always a red flag), over-specific selectors, ID selectors (forbidden in components), and custom properties that do not follow the naming convention. They run in seconds and catch violations before code is even committed.</p>

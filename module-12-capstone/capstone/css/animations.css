@@ -50,10 +50,13 @@
     }
   }
 
-  /* Sticky nav shadow when stuck — progressive enhancement */
+  /* Sticky nav shadow when stuck — progressive enhancement.
+     A container query styles the container's DESCENDANTS, not the
+     container element itself, so .nav holds the scroll-state container
+     and its child .nav-inner receives the stuck shadow. */
   @supports (container-type: scroll-state) {
     @container nav scroll-state(stuck: top) {
-      .nav {
+      .nav-inner {
         box-shadow: var(--shadow-sm);
       }
     }
@@ -89,6 +92,7 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }

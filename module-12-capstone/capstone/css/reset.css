@@ -11,13 +11,4 @@
   :where(button) { cursor: pointer; background: none; border: none; padding: 0; }
   :where(fieldset) { border: none; padding: 0; margin: 0; }
   :where(body) { min-block-size: 100svh; text-rendering: optimizeLegibility; }
-
-  @media (prefers-reduced-motion: reduce) {
-    :where(*, *::before, *::after) {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
 }
