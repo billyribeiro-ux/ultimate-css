@@ -55,13 +55,14 @@
 @layer reset {
   /* Your own reset rules go here — in the same layer */
 }</code></pre>
-      <p>The <code>layer(reset)</code> argument on <code>@import</code> places the imported file into the <code>reset</code> layer as if you had typed every rule inside an <code>@layer reset { ... }</code> block. Every vendor rule now lives at the bottom of the cascade. Your base layer, your components, your utilities — all of them win, even against the vendor's <code>!important</code>.</p>
+      <p>The <code>layer(reset)</code> argument on <code>@import</code> places the imported file into the <code>reset</code> layer as if you had typed every rule inside an <code>@layer reset { ... }</code> block. Every vendor <em>normal</em> declaration now lives at the bottom of the cascade. Your base layer, your components, your utilities — all of them win against the vendor's normal rules, no matter how high the vendor's specificity. (The vendor's <code>!important</code> declarations are the exception — see the next section.)</p>
 
-      <h2>Wait — !important?</h2>
-      <p>This is the part that surprises people. Inside <code>@layer</code>, the importance ordering flips. For <em>normal</em> declarations, higher layers beat lower layers. For <em>!important</em> declarations, lower layers beat higher layers. That sounds wrong until you think about what it is designed to solve: exactly this case. A third-party rule with <code>!important</code> in a low layer is quietly outranked by your higher-layer rules, <code>!important</code> or not.</p>
+      <h2>The !important catch</h2>
+      <p>This is the part that surprises people. Inside <code>@layer</code>, the importance ordering flips. For <em>normal</em> declarations, higher layers beat lower layers. For <em>!important</em> declarations, lower layers beat higher layers. That means a vendor rule with <code>!important</code> in the low <code>reset</code> layer <strong>still beats</strong> your higher-layer normal rules — the layer trick does <em>not</em> neutralise vendor <code>!important</code>. Layers tame specificity, not importance.</p>
+      <p>So when a vendor ships <code>.thing { color: red !important }</code> and you import it into <code>reset</code>, your <code>components</code> rule will lose unless you escalate. Your options, in order of preference: (1) pick a vendor that does not ship <code>!important</code>; (2) override it with your own <code>!important</code> placed in a layer that is <em>lower</em> than the vendor's, so reversed-important ordering puts you on top; or (3) as a last resort, an unlayered <code>!important</code>, which beats every layered <code>!important</code>.</p>
 
-      <h2>Why this is the right default</h2>
-      <p>You do not trust third-party CSS enough to let it override your design. But you also do not want to fork or patch it, because that creates a maintenance burden at every version bump. Importing into the reset layer is the compromise: you get the vendor's structural CSS for free, and the vendor's opinions are automatically silenced by your own.</p>
+      <h2>Why importing into reset is still the right default</h2>
+      <p>You do not trust third-party CSS enough to let its normal rules override your design. But you also do not want to fork or patch it, because that creates a maintenance burden at every version bump. Importing into the reset layer is the compromise: you get the vendor's structural CSS for free, and the vendor's <em>normal</em> opinions are automatically silenced by your own. The minority of vendor rules that ship <code>!important</code> still need the escalation above — but that is a handful of rules, not the whole stylesheet.</p>
 
       <h2>When to pick a higher layer instead</h2>
       <p>If the vendor stylesheet is genuinely the visual language of the component — a rich-text editor whose toolbar is the product — import it into <code>components</code> instead of <code>reset</code>. The rule of thumb: import into the layer where you would have written the rules yourself if the vendor had handed you a plain list of selectors. Never import into <code>utilities</code> unless you are sure.</p>
@@ -77,7 +78,7 @@
           @layer demo57-vendor, demo57-components;
           .demo-5-7 { font-family: system-ui; }
           @layer demo57-vendor {
-            .demo-5-7 .vendor-button { background: oklch(60% 0.22 25) !important; color: #fff !important; padding: .5rem 1rem; border: 0; border-radius: .25rem; }
+            .demo-5-7 .vendor-button { background: oklch(60% 0.22 25); color: #fff; padding: .5rem 1rem; border: 0; border-radius: .25rem; }
           }
           @layer demo57-components {
             .demo-5-7 .vendor-button { background: oklch(60% 0.18 275); }
@@ -86,7 +87,7 @@
         </style>
         <div class="demo-5-7">
           <button class="vendor-button">Vendor button (indigo wins)</button>
-          <p>The vendor rule uses <code>!important</code> and is in a lower layer. The components layer wins anyway — that is the layer-<code>!important</code> flip.</p>
+          <p>The vendor's <em>normal</em> red rule sits in a lower layer; the components layer overrides it without a fight. Note: this works because the vendor rule is not <code>!important</code> — an <code>!important</code> vendor rule would still win, as the next section explains.</p>
         </div>
       </div>
     </section>
@@ -103,18 +104,23 @@
           <span>CSS</span>
 <textarea data-editor="css" spellcheck="false">@layer reset, base, components;
 
-/* Simulated vendor import: into reset layer */
+/* Simulated vendor import: into reset layer.
+   Normal declarations (no !important) — these are what
+   the low layer tames. */
 @layer reset {
   .vendor-button {
-    background: crimson !important;
-    color: white !important;
+    background: crimson;
+    color: white;
     padding: .5rem 1rem;
     border: 0;
     border-radius: .25rem;
   }
 }
 
-/* Your components layer, no !important needed */
+/* Your components layer wins over the vendor's normal rules,
+   no !important needed. (Try adding !important to the vendor
+   rule above and watch your override LOSE — that is the
+   reversed important-layer ordering.) */
 @layer components {
   .vendor-button {
     background: steelblue;
@@ -134,7 +140,7 @@ body { font-family: system-ui; padding: 1rem; }
 
     <section class="callout">
       <h2>Mini-exercise</h2>
-      <p>Move the vendor block out of <code>@layer reset</code> and into a plain unlayered rule. The button turns red — unlayered <code>!important</code> beats layered normal rules. That is the pre-PE7 world. Move it back. Indigo wins. The architecture did the work, not the developer.</p>
+      <p>Move the vendor block out of <code>@layer reset</code> and into a plain unlayered rule. The button turns red — unlayered rules beat every layered rule. That is the pre-PE7 world. Move it back into <code>reset</code>. Indigo wins. The architecture did the work, not the developer. Then, for the real lesson: add <code>!important</code> to the vendor rule while it is in <code>reset</code>, and watch indigo lose — layers tame specificity, never importance.</p>
     </section>
 
     <nav class="lesson-nav cluster">

@@ -96,10 +96,13 @@ font-size: clamp(1rem, 0.75rem + 1vw, 1.5rem);
 
       <h2>Line-height considerations</h2>
       <p>As font-size scales, line-height should adapt too. Large display text needs tighter leading than body text. Use unitless values that scale with the font-size, or use clamp() for the line-height itself:</p>
-      <pre><code>/* Headings: tight leading that loosens on small screens */
+      <pre><code>/* Headings: tight leading.
+   Note: line-height must stay unitless OR use all-length
+   values inside clamp() — you cannot add a unitless number
+   to a vw length (e.g. 0.9 + 0.5vw is invalid). */
 h1 {
   font-size: var(--text-3xl);
-  line-height: clamp(1.05, 0.9 + 0.5vw, 1.2);
+  line-height: 1.1;
 }
 
 /* Body: comfortable reading line-height */
