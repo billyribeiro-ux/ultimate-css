@@ -129,7 +129,7 @@ body { font-family: system-ui; padding: 1rem; }
 
     <section class="callout">
       <h2>Mini-exercise</h2>
-      <p>The vendor rule in the editor above uses <code>body #root .btn</code> — specificity <code>1,2,1</code>. Your components rule is <code>.btn</code> — <code>0,1,0</code>. Under the classic cascade, yours could never win against that ID-laden selector. Under layers, it wins trivially because <code>components</code> is the higher layer. Delete the <code>@layer components</code> block wrapper and watch what happens without layers. Re-wrap it. Explain the before/after in one sentence.</p>
+      <p>The vendor rule in the editor above uses <code>body #root .btn</code> — specificity <code>1,1,1</code>. Your components rule is <code>.btn</code> — <code>0,1,0</code>. Under the classic cascade, yours could never win against that ID-laden selector. Under layers, it wins trivially because <code>components</code> is the higher layer. Delete the <code>@layer components</code> block wrapper and watch what happens without layers. Re-wrap it. Explain the before/after in one sentence.</p>
       <p><strong>Important caveat:</strong> this only works because the vendor rule is <em>not</em> <code>!important</code>. An <code>!important</code> declaration inverts layer order — a vendor <code>!important</code> would beat your normal <code>components</code> rule. Layers tame specificity, not importance. That is exactly why PE7 forbids <code>!important</code> outside the narrow accessibility cases from Lesson 1.5.</p>
     </section>
 
