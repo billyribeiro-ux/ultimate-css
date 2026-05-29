@@ -52,8 +52,8 @@
 }</code></pre>
       <p>The first rule draws the ring when the user needs it. The second rule explicitly removes the ring when <code>:focus-visible</code> is not active — this is necessary because setting <code>outline: none</code> on everything and then re-adding it for <code>:focus-visible</code> breaks browsers that have not implemented the pseudo-class. The "<code>:not(:focus-visible)</code>" pattern is the safe form.</p>
 
-      <h2>WCAG 2.4.11: focus contrast</h2>
-      <p>WCAG 2.2 requires focus indicators to meet a 3:1 contrast ratio against the adjacent background. A 1px outline in a light-grey color does not pass. The PE7 pattern uses a <code>--color-focus</code> token defined to be high-contrast in both light and dark modes — typically a saturated OKLCH around 55% lightness for light mode and 75% for dark.</p>
+      <h2>WCAG focus contrast (SC 1.4.11)</h2>
+      <p>WCAG SC 1.4.11 (Non-text Contrast) requires focus indicators to meet a 3:1 contrast ratio against the adjacent background; WCAG 2.2's SC 2.4.13 (Focus Appearance, AAA) adds minimum-area requirements. A 1px outline in a light-grey color does not pass. The PE7 pattern uses a <code>--color-focus</code> token defined to be high-contrast in both light and dark modes — typically a saturated OKLCH around 55% lightness for light mode and 75% for dark.</p>
 
       <h2>outline, not box-shadow</h2>
       <p>A common trick is to use <code>box-shadow: 0 0 0 3px</code> as a focus ring because it can have rounded corners and color-mixing. Do not use it in base. <code>box-shadow</code> is part of the element's paint box and is clipped by <code>overflow: hidden</code>; a focus ring on a button inside a rounded-corner card can disappear entirely. <code>outline</code> is drawn outside the box and is never clipped — and as of 2023, <code>outline</code> supports the <code>border-radius</code> of its element, so the ring follows rounded corners natively.</p>
@@ -132,7 +132,7 @@
 
     <section class="callout">
       <h2>Mini-exercise</h2>
-      <p>Tab through the live preview. Every interactive element shows the ring. Click one of the buttons with your mouse. No ring. That is <code>:focus-visible</code> doing exactly the right thing — keyboard users see focus, mouse users do not get visual noise. Now set <code>--color-focus</code> to <code>oklch(85% 0.05 275)</code> and tab again. The ring is barely visible against the white background. That is a WCAG 2.4.11 failure. Restore the saturated value.</p>
+      <p>Tab through the live preview. Every interactive element shows the ring. Click one of the buttons with your mouse. No ring. That is <code>:focus-visible</code> doing exactly the right thing — keyboard users see focus, mouse users do not get visual noise. Now set <code>--color-focus</code> to <code>oklch(85% 0.05 275)</code> and tab again. The ring is barely visible against the white background. That is a WCAG 1.4.11 (Non-text Contrast) failure. Restore the saturated value.</p>
     </section>
 
     <nav class="lesson-nav cluster">

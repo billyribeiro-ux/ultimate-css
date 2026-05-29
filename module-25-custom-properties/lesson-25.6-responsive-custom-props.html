@@ -43,23 +43,24 @@
       <h2>The separation pattern</h2>
       <p>Instead of rewriting component styles inside media or container queries, change only the custom property values:</p>
       <pre><code>.dashboard {
-  --cols: 1;
-  --gap: 0.75rem;
-  container-type: inline-size;
-}
-
-@container (min-width: 30rem) {
-  .dashboard { --cols: 2; --gap: 1rem; }
-}
-@container (min-width: 50rem) {
-  .dashboard { --cols: 3; --gap: 1.5rem; }
+  container-type: inline-size;   /* the container only */
 }
 
 .dashboard-grid {
+  --cols: 1;                      /* a DESCENDANT holds the values */
+  --gap: 0.75rem;
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   gap: var(--gap);
+}
+
+@container (min-width: 30rem) {
+  .dashboard-grid { --cols: 2; --gap: 1rem; }
+}
+@container (min-width: 50rem) {
+  .dashboard-grid { --cols: 3; --gap: 1.5rem; }
 }</code></pre>
+      <p><strong>Important:</strong> the element that declares <code>container-type</code> cannot respond to its own <code>@container</code> query — queries are evaluated against the nearest <em>ancestor</em> container. So the container holds <code>container-type</code> while a <em>descendant</em> consumes the query and carries the responsive custom properties.</p>
 
       <h3>Why this is better</h3>
       <p>The grid component has one definition. It reads its configuration from custom properties. The container queries only set values — they know nothing about how those values are consumed. This clean separation means:</p>
@@ -123,10 +124,7 @@
             font-family: system-ui;
           }
           .demo-25-6 .dashboard {
-            --cols: 1;
-            --gap: 0.75rem;
-            --card-padding: 1rem;
-            container-type: inline-size;
+            container-type: inline-size;   /* container only */
             resize: horizontal;
             overflow: hidden;
             border: 2px dashed oklch(75% 0.05 275);
@@ -134,23 +132,26 @@
             padding: 1rem;
             min-inline-size: 12rem;
           }
+          .demo-25-6 .grid {
+            --cols: 1;                      /* descendant consumes the query */
+            --gap: 0.75rem;
+            --card-padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(var(--cols), 1fr);
+            gap: var(--gap);
+          }
           @container (min-width: 22rem) {
-            .demo-25-6 .dashboard {
+            .demo-25-6 .grid {
               --cols: 2;
               --gap: 1rem;
             }
           }
           @container (min-width: 38rem) {
-            .demo-25-6 .dashboard {
+            .demo-25-6 .grid {
               --cols: 3;
               --gap: 1.25rem;
               --card-padding: 1.25rem;
             }
-          }
-          .demo-25-6 .grid {
-            display: grid;
-            grid-template-columns: repeat(var(--cols), 1fr);
-            gap: var(--gap);
           }
           .demo-25-6 .grid-card {
             background: oklch(95% 0.03 275);
