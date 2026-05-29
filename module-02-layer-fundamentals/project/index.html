@@ -139,7 +139,7 @@
 @layer vendor, components, overrides;
 
 @layer vendor {
-  .card-title { color: oklch(60% 0.22 25) !important; } /* hostile */
+  .card-title { color: oklch(60% 0.22 25); } /* hostile, high-specificity vendor style */
 }
 
 @layer components {
@@ -151,7 +151,7 @@
 }
 
 @layer overrides {
-  #hero .card-title { color: oklch(65% 0.17 150); } /* beats !important above */
+  #hero .card-title { color: oklch(65% 0.17 150); } /* higher layer beats the vendor rule above */
 }
 
 body { font-family: system-ui; padding: 1rem; background: oklch(96% 0.005 264); }

@@ -250,7 +250,7 @@ body {
   transition: background 120ms;
 }
 .nav-item:hover { background: oklch(0% 0 0 / 0.03); }
-.nav-item.active { background: oklch(var(--accent) / 0.08); color: var(--accent); }
+.nav-item.active { background: color-mix(in oklch, var(--accent) 8%, transparent); color: var(--accent); }
 
 /* Content */
 .content {
