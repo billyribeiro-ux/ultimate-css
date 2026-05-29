@@ -123,12 +123,16 @@
           <span>HTML</span>
 <textarea data-editor="html" spellcheck="false">&lt;div class="grid"&gt;
   &lt;article class="card"&gt;
-    &lt;div class="thumb"&gt;&lt;/div&gt;
-    &lt;div&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;p&gt;Component-aware card.&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="body"&gt;
+      &lt;div class="thumb"&gt;&lt;/div&gt;
+      &lt;div&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;p&gt;Component-aware card.&lt;/p&gt;&lt;/div&gt;
+    &lt;/div&gt;
   &lt;/article&gt;
   &lt;article class="card"&gt;
-    &lt;div class="thumb"&gt;&lt;/div&gt;
-    &lt;div&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;p&gt;Same HTML each time.&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="body"&gt;
+      &lt;div class="thumb"&gt;&lt;/div&gt;
+      &lt;div&gt;&lt;h3&gt;Title&lt;/h3&gt;&lt;p&gt;Same HTML each time.&lt;/p&gt;&lt;/div&gt;
+    &lt;/div&gt;
   &lt;/article&gt;
 &lt;/div&gt;</textarea>
         </label>
@@ -139,17 +143,19 @@
 }
 
 @layer components {
+  /* The card declares the containment context... */
   .card {
     container-type: inline-size;
-    display: grid;
-    gap: .5rem;
     padding: .75rem;
     background: oklch(98% 0.005 264);
     border: 1px solid oklch(85% 0.01 264);
     border-radius: .5rem;
   }
+  /* ...and a DESCENDANT is what the @container query restyles.
+     An element can never query its own size — only an ancestor's. */
+  .card .body { display: grid; gap: .5rem; }
   @container (inline-size &gt;= 22rem) {
-    .card { grid-template-columns: 8rem 1fr; align-items: center; }
+    .card .body { grid-template-columns: 8rem 1fr; align-items: center; }
   }
   .thumb { aspect-ratio: 4/3; background: oklch(78% 0.14 220); border-radius: .25rem; }
   h3 { margin: 0; font-size: 1rem; }

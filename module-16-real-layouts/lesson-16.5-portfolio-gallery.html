@@ -77,7 +77,8 @@
           @media (max-width: 30rem) { .demo-16-5 .masonry { columns: 1; } }
 
           /* Cards */
-          .demo-16-5 .port-card { break-inside: avoid; margin-block-end: 1rem; border-radius: 0.75rem; overflow: hidden; position: relative; cursor: pointer; }
+          .demo-16-5 .port-card { break-inside: avoid; margin-block-end: 1rem; border-radius: 0.75rem; overflow: hidden; position: relative; cursor: pointer; border: none; background: none; padding: 0; font: inherit; color: inherit; text-align: start; inline-size: 100%; appearance: none; }
+          .demo-16-5 .port-card:focus-visible { outline: 2px solid oklch(65% 0.2 275); outline-offset: 3px; }
           .demo-16-5 .port-card .card-img { inline-size: 100%; display: block; border-radius: 0.75rem; }
           .demo-16-5 .port-card .placeholder { display: block; inline-size: 100%; border-radius: 0.75rem; }
 

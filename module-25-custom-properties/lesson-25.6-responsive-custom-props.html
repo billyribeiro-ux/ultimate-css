@@ -216,38 +216,44 @@
         <label class="editor-pane">
           <span>HTML</span>
 <textarea data-editor="html" spellcheck="false">&lt;div class="panel"&gt;
-  &lt;div class="item"&gt;A&lt;/div&gt;
-  &lt;div class="item"&gt;B&lt;/div&gt;
-  &lt;div class="item"&gt;C&lt;/div&gt;
-  &lt;div class="item"&gt;D&lt;/div&gt;
-  &lt;div class="item"&gt;E&lt;/div&gt;
-  &lt;div class="item"&gt;F&lt;/div&gt;
+  &lt;div class="grid"&gt;
+    &lt;div class="item"&gt;A&lt;/div&gt;
+    &lt;div class="item"&gt;B&lt;/div&gt;
+    &lt;div class="item"&gt;C&lt;/div&gt;
+    &lt;div class="item"&gt;D&lt;/div&gt;
+    &lt;div class="item"&gt;E&lt;/div&gt;
+    &lt;div class="item"&gt;F&lt;/div&gt;
+  &lt;/div&gt;
 &lt;/div&gt;</textarea>
         </label>
         <label class="editor-pane">
           <span>CSS</span>
 <textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
 
+/* .panel is the container only — it can't query itself */
 .panel {
-  --cols: 1;
-  --gap: 0.5rem;
   container-type: inline-size;
   resize: horizontal;
   overflow: hidden;
   border: 2px dashed oklch(75% 0.1 275);
   padding: 1rem;
   min-width: 10rem;
+}
 
+/* .grid is a DESCENDANT — it consumes the @container query */
+.grid {
+  --cols: 1;
+  --gap: 0.5rem;
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   gap: var(--gap);
 }
 
 @container (min-width: 20rem) {
-  .panel { --cols: 2; --gap: 0.75rem; }
+  .grid { --cols: 2; --gap: 0.75rem; }
 }
 @container (min-width: 35rem) {
-  .panel { --cols: 3; --gap: 1rem; }
+  .grid { --cols: 3; --gap: 1rem; }
 }
 
 .item {
