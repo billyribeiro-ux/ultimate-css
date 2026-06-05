@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20.11 — CSS vs JavaScript for Animation Performance · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 20</a>
+      <span>Lesson 20.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 20.11 · Engineering</p>
+      <h1>CSS vs JavaScript for Animation Performance</h1>
+      <p class="lead">"Which is faster, CSS or JavaScript?" is the wrong question. In the nuanced spirit of Josh Comeau's animation writing, this lesson reframes it: both ultimately feed the same compositor, so the real decision is about <em>who drives the values</em>, <em>which thread does the work</em>, and <em>how much control you need</em>. Here is when each approach wins — and the trade-offs that decide it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The myth: "CSS animations are faster"</h2>
+      <p>It is repeated everywhere, but it is only half true. A CSS transition on <code>transform</code> and a JavaScript loop that sets <code>transform</code> can both run on the GPU compositor at 60fps. The performance of an animation is determined mostly by <em>which property</em> you animate (Lesson 20.2) — not by the language that sets it.</p>
+      <p>The meaningful difference is <strong>where the per-frame work happens</strong>:</p>
+      <ul>
+        <li><strong>CSS transitions &amp; <code>@keyframes</code></strong> can be handed off entirely to the compositor thread. Once started, they keep running smoothly even if the main thread is busy executing JavaScript.</li>
+        <li><strong>JavaScript animations</strong> (via <code>requestAnimationFrame</code>) compute each frame's value <em>on the main thread</em>. If that thread is blocked — a big render, a heavy event handler — the animation stutters, even when it only touches compositor-friendly properties.</li>
+      </ul>
+      <p>So the headline trade-off: CSS can be <em>main-thread-independent</em>; raw rAF JavaScript cannot.</p>
+
+      <h2>When CSS wins</h2>
+      <p>Reach for CSS first. It is declarative, the browser optimizes it, and it survives main-thread jank.</p>
+      <ul>
+        <li><strong>State transitions.</strong> Hover, focus, <code>:checked</code>, a toggled class, <code>@starting-style</code> enter/exit — anything that animates between two known states.</li>
+        <li><strong>Looping ambient motion.</strong> Spinners, pulses, marquees, gradient drifts — <code>@keyframes</code> with <code>animation-iteration-count: infinite</code>.</li>
+        <li><strong>Scroll-driven effects</strong> where supported — <code>animation-timeline: scroll()</code> / <code>view()</code> run off the main thread entirely (Module 9), something JS scroll handlers can never match.</li>
+      </ul>
+      <pre><code>/* Declarative, interruptible, compositor-offloaded */
+.card {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.card:hover { transform: translateY(-4px) scale(1.02); }
+
+/* Ambient loop — zero JS, never blocks */
+@keyframes pulse { 50% { opacity: 0.5; } }
+.dot { animation: pulse 1.5s ease-in-out infinite; }</code></pre>
+
+      <h2>When JavaScript wins</h2>
+      <p>CSS can only interpolate between values you declare ahead of time. The moment the animation depends on <em>runtime</em> information, JavaScript earns its place.</p>
+      <ul>
+        <li><strong>Dynamic targets.</strong> Animate to a position you only learn at runtime — a dragged element's release point, a tooltip anchored to the cursor, a value typed by the user.</li>
+        <li><strong>Physics &amp; springs.</strong> Spring motion has no fixed duration; it settles based on velocity and stiffness. This is intrinsically imperative — the realm of libraries like Framer Motion / Motion One, or hand-rolled springs.</li>
+        <li><strong>Gesture-driven &amp; interruptible-mid-flight.</strong> Swipe-to-dismiss, pull-to-refresh, scrubbing — the user's finger <em>is</em> the timeline, and the animation must track and hand off to inertia.</li>
+        <li><strong>Complex orchestration.</strong> Staggered sequences with branching, conditional steps, or coordination across many elements with precise timing.</li>
+        <li><strong>FLIP layout animations.</strong> Animating a layout change (reorder, expand) by measuring before/after and animating the <em>delta</em> with transforms — measurement requires JS.</li>
+      </ul>
+      <pre><code>// FLIP: measure layout, then animate the delta on the GPU.
+const first = el.getBoundingClientRect();
+reorderTheDOM();                       // layout changes
+const last = el.getBoundingClientRect();
+const dx = first.left - last.left;
+const dy = first.top  - last.top;
+
+el.animate(
+  [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+  { duration: 300, easing: 'ease' }    // WAAPI → compositor
+);</code></pre>
+
+      <h2>The bridge: the Web Animations API (WAAPI)</h2>
+      <p>It is not a binary choice. <code>element.animate()</code> gives you JavaScript's control <em>and</em> CSS's compositor offloading: animations created with WAAPI on <code>transform</code>/<code>opacity</code> can run off the main thread just like CSS, while remaining fully scriptable, pausable, reversible, and composable.</p>
+      <pre><code>const anim = el.animate(
+  [{ transform: 'translateX(0)' }, { transform: 'translateX(300px)' }],
+  { duration: 400, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }
+);
+
+anim.pause();           // imperative control...
+anim.playbackRate = 2;  // ...with compositor performance
+anim.reverse();</code></pre>
+      <p>Rule of thumb: if you need JS control but the animation is just transform/opacity, prefer WAAPI over a <code>requestAnimationFrame</code> loop — you keep the main thread free.</p>
+
+      <h2>The interruption test (a Josh-Comeau favorite)</h2>
+      <p>A great way to choose: <em>what happens if the user interacts mid-animation?</em> CSS transitions interrupt gracefully — change the target state and the browser re-interpolates from the current position. CSS <code>@keyframes</code> do not; they snap or restart. JS/WAAPI give you full control to redirect from the live value. If your animation must be reversible or redirectable at any instant, that pushes you toward WAAPI or a JS library.</p>
+
+      <h2>The cost JavaScript carries</h2>
+      <p>Choosing JS is not free, and the trade-offs are real:</p>
+      <ul>
+        <li><strong>Bundle weight.</strong> A physics library is JS the user must download, parse, and execute — competing with your CSS-free baseline of zero bytes.</li>
+        <li><strong>Main-thread contention.</strong> A <code>requestAnimationFrame</code> loop doing layout reads/writes can trigger forced synchronous reflows ("layout thrashing"). Batch reads, then writes.</li>
+        <li><strong>Reduced-motion duty.</strong> CSS honors <code>prefers-reduced-motion</code> with a media query you already know. In JS you must check it explicitly with <code>matchMedia</code> and provide the reduced path yourself.</li>
+      </ul>
+      <pre><code>// Accessibility is your job in JS:
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+el.animate(keyframes, { duration: reduce ? 0 : 400 });</code></pre>
+
+      <h2>The decision framework</h2>
+      <p>Walk down this list and stop at the first match:</p>
+      <ol>
+        <li>Two known states, triggered by interaction or class change? → <strong>CSS transition.</strong></li>
+        <li>Looping/ambient or scroll-linked motion? → <strong>CSS <code>@keyframes</code> / scroll-driven animations.</strong></li>
+        <li>Need scripted control (pause, reverse, dynamic target) but only animating transform/opacity? → <strong>WAAPI.</strong></li>
+        <li>Spring physics, gestures, FLIP, or complex orchestration? → <strong>JavaScript</strong> (library or hand-rolled), driving transform/opacity.</li>
+      </ol>
+      <p>The through-line: whatever drives the values, <em>animate compositor-friendly properties</em>. The CSS-vs-JS question is about control and the main thread; the fast-vs-janky question is still about <code>transform</code> and <code>opacity</code>.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Same motion, three drivers</h2>
+      <p>All three squares animate <code>transform</code> only, so all three are smooth. The difference is control: the CSS one only moves on hover, while the WAAPI one is pausable and reversible at any moment.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-20-11 {
+            font-family: system-ui, sans-serif;
+            padding: 1.5rem;
+            background: oklch(15% 0.02 270);
+            color: oklch(90% 0.01 270);
+            border-radius: 0.5rem;
+            display: grid;
+            gap: 1.25rem;
+          }
+          .demo-20-11 .row {
+            display: grid;
+            grid-template-columns: 9rem 1fr;
+            align-items: center;
+            gap: 1rem;
+          }
+          .demo-20-11 .row > .label {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: oklch(70% 0.12 300);
+          }
+          .demo-20-11 .track {
+            position: relative;
+            height: 3.25rem;
+            border-radius: 0.5rem;
+            background: oklch(20% 0.03 270);
+            border: 1px solid oklch(32% 0.03 270);
+            overflow: hidden;
+          }
+          .demo-20-11 .box {
+            position: absolute;
+            inset-block: 0.5rem;
+            inset-inline-start: 0.5rem;
+            inline-size: 2.25rem;
+            border-radius: 0.4rem;
+            background: linear-gradient(135deg, oklch(75% 0.18 300), oklch(68% 0.18 230));
+          }
+          /* CSS transition driver — moves on hover */
+          .demo-20-11 .track.css .box {
+            transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+          }
+          .demo-20-11 .track.css:hover .box {
+            transform: translateX(calc(100cqw - 3.25rem));
+          }
+          /* CSS keyframes driver — ambient loop */
+          .demo-20-11 .track.keyframes { container-type: inline-size; }
+          .demo-20-11 .track.keyframes .box {
+            animation: slide2011 2.4s ease-in-out infinite alternate;
+          }
+          @keyframes slide2011 {
+            to { transform: translateX(calc(100cqw - 3.25rem)); }
+          }
+          .demo-20-11 .track.css { container-type: inline-size; }
+          .demo-20-11 .waapi-controls { display: flex; gap: 0.5rem; margin-top: 0.25rem; }
+          .demo-20-11 button {
+            font: inherit;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 0.4rem;
+            border: 1px solid oklch(40% 0.05 270);
+            background: oklch(25% 0.04 270);
+            color: inherit;
+            cursor: pointer;
+          }
+          .demo-20-11 button:hover { background: oklch(32% 0.06 270); }
+          .demo-20-11 .hint { font-size: 0.8rem; color: oklch(60% 0.02 270); }
+        </style>
+        <div class="demo-20-11" id="demo2011">
+          <div class="row">
+            <span class="label">CSS transition<br><span class="hint">(hover the bar)</span></span>
+            <div class="track css"><div class="box"></div></div>
+          </div>
+          <div class="row">
+            <span class="label">CSS @keyframes<br><span class="hint">(ambient loop)</span></span>
+            <div class="track keyframes"><div class="box"></div></div>
+          </div>
+          <div class="row">
+            <span class="label">WAAPI (JS)<br><span class="hint">(scriptable)</span></span>
+            <div>
+              <div class="track waapi" style="container-type: inline-size;"><div class="box" id="waapiBox"></div></div>
+              <div class="waapi-controls">
+                <button type="button" data-act="toggle">Pause</button>
+                <button type="button" data-act="reverse">Reverse</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo2011');
+            if (!root) return;
+            var box = document.getElementById('waapiBox');
+            var track = box.parentElement;
+            var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var distance = track.clientWidth - box.offsetWidth - 16;
+            var anim = box.animate(
+              [{ transform: 'translateX(0)' }, { transform: 'translateX(' + distance + 'px)' }],
+              { duration: reduce ? 0 : 2400, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }
+            );
+            root.addEventListener('click', function (e) {
+              var btn = e.target.closest('button');
+              if (!btn) return;
+              if (btn.dataset.act === 'toggle') {
+                if (anim.playState === 'paused') { anim.play(); btn.textContent = 'Pause'; }
+                else { anim.pause(); btn.textContent = 'Play'; }
+              } else if (btn.dataset.act === 'reverse') {
+                anim.reverse();
+              }
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;p&gt;Hover each card. Both move — only one stays smooth
+when the main thread is busy.&lt;/p&gt;
+&lt;div class="grid"&gt;
+  &lt;div class="card good"&gt;transform&lt;br&gt;(compositor)&lt;/div&gt;
+  &lt;div class="card bad"&gt;left&lt;br&gt;(layout)&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+
+.grid { display: flex; gap: 1rem; margin-top: 1rem; }
+
+.card {
+  position: relative;
+  inset-inline-start: 0;
+  inline-size: 8rem;
+  padding: 1rem;
+  border-radius: 0.6rem;
+  color: #fff;
+  text-align: center;
+  background: #4e38d9;
+}
+
+/* WINS: compositor-only, survives main-thread jank */
+.card.good { transition: transform 0.3s ease; }
+.card.good:hover { transform: translateX(40px); }
+
+/* LOSES: animating 'left' triggers layout every frame */
+.card.bad { transition: left 0.3s ease; }
+.card.bad:hover { left: 40px; }
+
+/* Both look identical here — the difference shows up
+   under load, on low-end devices. Prefer transform. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a swipe-to-dismiss card and justify your tooling. (1) Use a CSS transition for the resting hover lift. (2) Use a pointer-driven JS handler for the drag, setting <code>transform: translateX()</code> live from the finger position. (3) On release, hand off to a WAAPI animation that either snaps back or flings off-screen based on velocity. (4) Gate all motion behind a <code>matchMedia('(prefers-reduced-motion: reduce)')</code> check. Explain, in a comment, why each phase uses the driver it does — that justification is the real deliverable.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-20.10-performance-budget.html">&larr; Lesson 20.10</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
