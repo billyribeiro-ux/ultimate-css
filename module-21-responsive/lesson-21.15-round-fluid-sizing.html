@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.15 — Predictable Fluid Sizing with round() + clamp() · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.15</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.15 · Fluid Systems</p>
+      <h1>Predictable Fluid Sizing with round() + clamp()</h1>
+      <p class="lead">Fluid type and spacing scale beautifully with <code>clamp()</code> — but they also land on arbitrary sub-pixel values like 23.7px that drift off your baseline grid and blur 1px borders. In the spirit of Ahmad Shadeed's visual explainers, this lesson shows how the now well-supported <code>round()</code> function tames that continuous curve into a <em>predictable</em> staircase: fluid where it matters, snapped where it counts.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why "smooth" is not always "predictable"</h2>
+      <p>In Lesson 21.1 we built a continuous fluid type scale. At any given viewport width, <code>clamp(1rem, 0.636rem + 1.818vw, 2rem)</code> resolves to a single value — but that value is almost never a round number. At 911px wide it might compute to 26.74px. The text looks fine, but two problems creep in:</p>
+      <ul>
+        <li><strong>Baseline drift.</strong> A vertical rhythm built on a 4px (or 8px) grid quietly falls apart when every box pads itself to 17.3px instead of 16px.</li>
+        <li><strong>Sub-pixel fuzz.</strong> Hairline borders, icons, and small UI metrics rendered at fractional pixels can blur depending on the device pixel ratio and rasterizer.</li>
+      </ul>
+      <p>The fix is not to abandon fluidity — it is to quantize it. That is exactly what <code>round()</code> does.</p>
+
+      <h2>The round() function, precisely</h2>
+      <p>Shipped across all three engines (Chrome&nbsp;125+, Firefox&nbsp;118+, Safari&nbsp;15.4+), <code>round()</code> snaps a value to the nearest multiple of an interval you choose. It is <strong>production-ready</strong> — no <code>@supports</code> needed.</p>
+      <pre><code>/* round( &lt;strategy&gt;? , valueToRound , roundingInterval ) */
+
+round(23.7px, 4px)        /* → 24px  (nearest, the default) */
+round(up,   23.7px, 4px)  /* → 24px  (ceil toward +∞)       */
+round(down, 23.7px, 4px)  /* → 20px  (floor toward −∞)       */
+round(to-zero, 23.7px, 4px) /* → 20px (truncate toward 0)   */
+
+/* Mental model: interval × round(value ÷ interval) */</code></pre>
+      <p>The two arguments must be <em>type-compatible</em>: round a length by a length, a number by a number, an angle by an angle. You cannot round a length by a unitless number.</p>
+
+      <h2>Pairing round() with clamp()</h2>
+      <p>The core pattern is to wrap a <code>clamp()</code> expression in <code>round()</code>. The clamp computes the continuous fluid value; the round snaps that result to your chosen step. Because both are pure math functions, this is fully composable and resolves at used-value time — no JavaScript, no layout thrash.</p>
+      <pre><code>/* Continuous (Lesson 21.1) — lands on any sub-pixel value */
+font-size: clamp(1rem, 0.636rem + 1.818vw, 2rem);
+
+/* Predictable — snapped to a 2px step as it scales */
+font-size: round(clamp(1rem, 0.636rem + 1.818vw, 2rem), 2px);
+
+/* Spacing snapped to a 4px rhythm grid */
+padding: round(clamp(1rem, 0.5rem + 2vw, 3rem), 0.25rem);</code></pre>
+      <p>The result is a <em>stepped fluid</em> value: it still grows with the viewport, but it climbs in clean increments instead of sliding continuously. Your 4px grid stays intact at every width.</p>
+
+      <h3>nearest vs. down: two different feels</h3>
+      <p>The default <code>nearest</code> strategy keeps the snapped value as close as possible to the ideal curve — best for type, where you want fidelity. The <code>down</code> strategy produces a guaranteed staircase that never overshoots — useful for gaps and column widths where you would rather under-fill than risk an overflow at an awkward width.</p>
+      <pre><code>/* Hugs the ideal curve, snapping either direction */
+--step-near: round(clamp(1rem, 0.5rem + 2vw, 2rem), 0.5rem);
+
+/* Always rounds down — predictable, never exceeds the curve */
+--step-down: round(down, clamp(1rem, 0.5rem + 2vw, 2rem), 0.5rem);</code></pre>
+
+      <h2>A snapped, predictable type scale</h2>
+      <p>Define the snap interval once as a token, then build the whole scale against it. Now every size in the system shares one rhythm — change the interval and the entire scale re-quantizes.</p>
+      <pre><code>:root {
+  --snap: 1px;                 /* one knob controls the whole scale */
+
+  --text-sm:   round(clamp(0.875rem, 0.8rem  + 0.40vw, 1rem),     var(--snap));
+  --text-base: round(clamp(1rem,     0.90rem + 0.50vw, 1.125rem), var(--snap));
+  --text-lg:   round(clamp(1.125rem, 0.95rem + 0.90vw, 1.5rem),   var(--snap));
+  --text-xl:   round(clamp(1.25rem,  0.90rem + 1.50vw, 2rem),     var(--snap));
+  --text-2xl:  round(clamp(1.5rem,   0.80rem + 2.50vw, 2.75rem),  var(--snap));
+}
+
+.card-title { font-size: var(--text-lg); }
+.card-body  { font-size: var(--text-base); }</code></pre>
+
+      <h2>The accessibility nuance (PE7-level)</h2>
+      <p>Snapping <code>font-size</code> to whole pixels has a subtle cost: it can flatten the steps of a user's browser zoom or default-size preference, because <code>rem</code>-based growth gets re-quantized to the same pixel bucket. The principled rule:</p>
+      <ul>
+        <li><strong>Layout metrics</strong> — padding, gap, column widths, border-driven rhythm: snap aggressively to your grid (e.g. <code>0.25rem</code> / 4px). This is where predictability pays off.</li>
+        <li><strong>Type</strong> — prefer a <em>fine</em> interval (<code>0.5px</code>) or leave it continuous. If you must snap to <code>1px</code>, snap in <code>rem</code> units (<code>round(…, 0.0625rem)</code>) so the quantization scales <em>with</em> the user's root size instead of fighting it.</li>
+      </ul>
+      <pre><code>/* Snap relative to the user's root, not absolute device pixels */
+font-size: round(clamp(1rem, 0.9rem + 0.5vw, 1.125rem), 0.0625rem);
+/* 0.0625rem === 1px at the default root, but it grows when the
+   user increases their base font size — accessibility preserved. */</code></pre>
+
+      <h2>Beyond sizing: snapping to an integer count</h2>
+      <p>Because <code>round()</code> returns a value you can divide against, it also expresses "how many whole units fit" — the foundation of self-computing, breakpoint-free grids. Floor the available space by an item size to get an integer track count:</p>
+      <pre><code>/* How many 16rem cards fit in this container, as an integer? */
+--cols: round(down, calc(100cqi / 16rem), 1);
+grid-template-columns: repeat(var(--cols), 1fr);
+/* The grid re-flows continuously with zero @media / @container rules. */</code></pre>
+      <p>This is the same instinct as fluid type — let math, not breakpoints, decide the layout — but applied to <em>structure</em> instead of size.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Continuous vs. snapped, side by side</h2>
+      <p>Resize the browser slowly. The left value slides through every fractional pixel; the right value climbs in clean 4px steps while still tracking the viewport. Same <code>clamp()</code>, one wrapped in <code>round()</code>.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-21-15 {
+            padding: clamp(1rem, 0.5rem + 2vw, 3rem);
+            font-family: system-ui, sans-serif;
+            background: oklch(15% 0.02 270);
+            color: oklch(90% 0.01 270);
+            border-radius: 0.5rem;
+          }
+          .demo-21-15 .compare {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+          }
+          .demo-21-15 .panel {
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            background: oklch(20% 0.03 270);
+            border: 1px solid oklch(32% 0.03 270);
+          }
+          .demo-21-15 .panel h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: oklch(65% 0.12 300);
+            margin: 0 0 0.75rem;
+          }
+          .demo-21-15 .sample-continuous {
+            font-size: clamp(1rem, 0.5rem + 3vw, 3rem);
+            font-weight: 700;
+            line-height: 1.1;
+          }
+          .demo-21-15 .sample-snapped {
+            font-size: round(clamp(1rem, 0.5rem + 3vw, 3rem), 4px);
+            font-weight: 700;
+            line-height: 1.1;
+          }
+          .demo-21-15 .readout {
+            margin-top: 0.6rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: oklch(70% 0.02 270);
+          }
+          .demo-21-15 .readout b { color: oklch(82% 0.16 150); }
+          .demo-21-15 .staircase {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.4rem;
+            min-block-size: 80px;
+          }
+          .demo-21-15 .staircase span {
+            flex: 1;
+            background: linear-gradient(180deg, oklch(72% 0.18 300), oklch(62% 0.18 260));
+            border-radius: 0.25rem 0.25rem 0 0;
+            /* each bar snaps its height to a 8px grid as it grows */
+            block-size: round(down, clamp(12px, 6px + 6vw, 72px), 8px);
+          }
+          .demo-21-15 .staircase span:nth-child(2) { block-size: round(down, clamp(16px, 8px + 6vw, 80px), 8px); }
+          .demo-21-15 .staircase span:nth-child(3) { block-size: round(down, clamp(20px, 10px + 6vw, 88px), 8px); }
+          .demo-21-15 .staircase span:nth-child(4) { block-size: round(down, clamp(24px, 12px + 6vw, 96px), 8px); }
+          .demo-21-15 .note { margin-top: 1rem; font-size: 0.85rem; color: oklch(60% 0.02 270); }
+        </style>
+        <div class="demo-21-15" id="demo2115">
+          <div class="compare">
+            <div class="panel">
+              <h3>Continuous clamp()</h3>
+              <div class="sample-continuous">Fluid 7</div>
+              <div class="readout">computed: <b data-readout="continuous">—</b></div>
+            </div>
+            <div class="panel">
+              <h3>round(clamp(), 4px)</h3>
+              <div class="sample-snapped">Fluid 7</div>
+              <div class="readout">computed: <b data-readout="snapped">—</b></div>
+            </div>
+          </div>
+          <div class="staircase" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <p class="note">Bars snap their height to an 8px grid via <code>round(down, clamp(...), 8px)</code> — predictable rhythm at every width.</p>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo2115');
+            if (!root) return;
+            var cont = root.querySelector('.sample-continuous');
+            var snap = root.querySelector('.sample-snapped');
+            var outC = root.querySelector('[data-readout="continuous"]');
+            var outS = root.querySelector('[data-readout="snapped"]');
+            function update() {
+              outC.textContent = getComputedStyle(cont).fontSize;
+              outS.textContent = getComputedStyle(snap).fontSize;
+            }
+            update();
+            window.addEventListener('resize', update, { passive: true });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;h1&gt;Snapped Heading&lt;/h1&gt;
+  &lt;p&gt;Padding, gap, and type all snap to a 4px grid as
+  the preview resizes — fluid, but never off-grid.&lt;/p&gt;
+  &lt;div class="row"&gt;
+    &lt;span class="chip"&gt;round()&lt;/span&gt;
+    &lt;span class="chip"&gt;clamp()&lt;/span&gt;
+    &lt;span class="chip"&gt;predictable&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">:root {
+  /* one knob: the snap grid */
+  --grid: 0.25rem; /* 4px */
+
+  --space: round(clamp(1rem, 0.5rem + 2vw, 2.5rem), var(--grid));
+  --title: round(clamp(1.5rem, 0.8rem + 3vw, 3rem), var(--grid));
+  --body:  round(clamp(1rem, 0.9rem + 0.5vw, 1.125rem), 0.0625rem);
+}
+
+body { font-family: system-ui; padding: 1rem; }
+
+.card {
+  max-width: 40rem;
+  padding: var(--space);
+  display: grid;
+  gap: round(clamp(0.5rem, 0.25rem + 1vw, 1.25rem), var(--grid));
+  border-radius: var(--grid);
+  background: #14142a;
+  color: #e7e7ff;
+}
+
+h1 { font-size: var(--title); line-height: 1.1; margin: 0; }
+p  { font-size: var(--body); margin: 0; max-width: 50ch; }
+
+.row { display: flex; gap: var(--grid); flex-wrap: wrap; }
+.chip {
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: #2a2a55;
+  font-size: 0.85rem;
+}
+
+/* Try changing --grid to 0.5rem (8px) and watch the
+   whole component re-quantize to the coarser rhythm. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take the fluid type scale you built in Lesson 21.1 and make it predictable. (1) Add a <code>--snap</code> token and wrap every clamp in <code>round()</code> against it. (2) Snap your spacing tokens to a 4px grid using <code>0.25rem</code>, but snap type using a <code>rem</code>-based interval (<code>0.0625rem</code>) so accessibility scaling is preserved. (3) Add one self-computing grid using <code>round(down, calc(100cqi / 16rem), 1)</code> for the column count. Resize and confirm: type and spacing now climb in clean steps, and the grid re-flows with zero breakpoints.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.14-foldable-adaptive.html">&larr; Lesson 21.14</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
