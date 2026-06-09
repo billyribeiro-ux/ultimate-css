@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22.10 — Styling Web Components: ::part(), ::slotted() &amp; :state() · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 22</a>
+      <span>Lesson 22.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Module 22 · Enterprise</p>
+      <h1>Styling Web Components: ::part(), ::slotted() &amp; :state()</h1>
+      <p class="lead">Design systems increasingly ship as custom elements, and shadow DOM is the one boundary in the platform that <code>@layer</code>, <code>@scope</code>, and your token sheet do not cross by default. At scale, that boundary is either a deliberate API surface or a permanent source of "why won't this style apply" tickets. This lesson makes it the former.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The encapsulation model, precisely</h2>
+      <p>Get the mechanics exact, because every pattern below follows from them. Styles defined <em>inside</em> a shadow root cannot leak out. Selectors written on the page cannot reach in — <code>.page .card h2</code> stops dead at the shadow boundary regardless of specificity or layer. But two things pierce the boundary by design: <strong>inherited properties</strong> (<code>color</code>, <code>font-family</code>, <code>line-height</code> flow into the shadow tree like any inheritance) and <strong>custom properties</strong> (they inherit too — types and all). That second fact is the foundation of everything: your token system (Lesson 4.8) crosses the boundary for free, which makes custom properties the natural <em>public styling API</em> of a component — Lesson 22.4's component-API philosophy, extended across the shadow boundary.</p>
+      <pre><code>/* Page (light DOM): set the contract */
+pe-card { --card-surface: var(--color-surface-2); }
+
+/* Inside the shadow root: consume with a documented default */
+.surface { background: var(--card-surface, oklch(98% 0.01 270)); }</code></pre>
+
+      <h2>Inside the shadow: :host, :host(), ::slotted()</h2>
+      <p>Shadow styles address their own element with <code>:host</code>, and conditionally with the functional form. Avoid <code>:host-context()</code> — Firefox resisted it for years on performance and encapsulation grounds; design components to receive context via custom properties instead of sniffing ancestors:</p>
+      <pre><code>:host { display: inline-flex; }            /* custom elements default to inline! */
+:host([variant="danger"]) { --_accent: var(--color-danger); }
+:host(:focus-visible) { outline: 2px solid var(--_accent); }
+/* :host-context(.dark) — avoid: never shipped in Firefox */</code></pre>
+      <p><code>::slotted()</code> styles light-DOM nodes projected through a <code>&lt;slot&gt;</code> — with a hard limit: it matches only the <em>top-level</em> assigned nodes, never their descendants. This is deliberate. Slot assignment is a flat list; allowing <code>::slotted(figure img)</code> would reopen unbounded cross-boundary descendant matching — the exact invalidation cost and coupling that encapsulation exists to close off:</p>
+      <pre><code>::slotted(img) { border-radius: var(--radius-2); }  /* works: assigned node  */
+::slotted(figure img) { /* never matches */ }        /* descendants: off-limits */</code></pre>
+
+      <h2>Outside the shadow: ::part() is the contract</h2>
+      <p>When a component author stamps <code>part="name"</code> on a shadow element, page CSS may style that element — and only that element — via <code>::part(name)</code>. You can attach pseudo-classes and pseudo-elements after it, but you cannot select <em>through</em> it (<code>::part(label) span</code> is invalid): parts expose nodes, not subtrees.</p>
+      <pre><code>/* component template */
+&lt;button part="trigger"&gt;
+  &lt;span part="label"&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/span&gt;
+&lt;/button&gt;
+
+/* page CSS */
+pe-button::part(trigger) { border-radius: var(--radius-2); }
+pe-button::part(trigger):hover { filter: brightness(1.05); }
+
+/* nested components re-export inner parts upward */
+&lt;pe-dialog&gt;
+  &lt;pe-button exportparts="label: confirm-label"&gt;…&lt;/pe-button&gt;
+&lt;/pe-dialog&gt;
+pe-dialog::part(confirm-label) { font-weight: 700; }</code></pre>
+      <p>Treat the part vocabulary as a public API, because it is one: document every part name, version the list, and never rename one in a minor release — consumers' CSS depends on it exactly as their JS depends on your method names. This is Lesson 22.2's token-governance discipline and Lesson 22.4's API-design discipline applied to selectors.</p>
+
+      <h2>Custom states: ElementInternals and :state()</h2>
+      <p>Production-ready (Chrome 125+, Firefox 126+, Safari 17.4+). Components used to reflect internal state as attributes purely so consumers could style it — a hack that pollutes the attribute namespace and invites consumers to <em>write</em> what should be read-only. Custom states fix this: the component adds a state via <code>ElementInternals</code>, and CSS matches it with <code>:state()</code>:</p>
+      <pre><code>class PeChip extends HTMLElement {
+  #internals = this.attachInternals();
+  set loading(on) {
+    on ? this.#internals.states.add('loading')
+       : this.#internals.states.delete('loading');
+  }
+}</code></pre>
+      <pre><code>/* page CSS — state is read-only, set only by the component */
+pe-chip:state(loading) { opacity: 0.6; }
+pe-chip:state(loading)::part(label) { visibility: hidden; }</code></pre>
+      <p>One cascade caveat: a browser that lacks <code>:state()</code> drops any selector <em>list</em> containing it. While you support older browsers, keep a separate <code>[data-loading]</code> rule (set both from the component) rather than comma-joining the two.</p>
+
+      <h2>Sharing stylesheets: adoptedStyleSheets and @layer inside shadows</h2>
+      <p>A design system with 40 components must not parse its token sheet 40 times — or once per component <em>instance</em>. Constructable stylesheets parse once and are adopted by reference into any number of shadow roots: one copy in memory, guaranteed consistency, and updating the sheet updates every adopter:</p>
+      <pre><code>const tokens = new CSSStyleSheet();
+tokens.replaceSync(':host { --space-1: 0.25rem; --radius-2: 0.5rem; }');
+
+class PeCard extends HTMLElement {
+  constructor() {
+    super();
+    const root = this.attachShadow({ mode: 'open' });
+    root.adoptedStyleSheets = [tokens, cardSheet]; // shared by reference
+  }
+}</code></pre>
+      <p>Modern layout CSS works normally inside shadow trees: container queries, <code>:has()</code>, nesting — all of it. And <code>@layer</code> works <em>per root</em>: each shadow root has its own independent layer order, so your component can declare <code>@layer reset, base, component;</code> internally without ever colliding with the page's layer stack. Encapsulated cascade architecture, in miniature.</p>
+
+      <h2>The decision framework: shadow DOM vs light DOM + @scope</h2>
+      <p>Shadow DOM is not the default; it is a tool with a real cost. Lesson 8.2's <code>@scope</code> gives you style isolation without the boundary. The PE7 decision table:</p>
+      <table>
+        <thead>
+          <tr><th>Signal</th><th>Shadow DOM</th><th>Light DOM + @scope</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Distribution</td><td>Cross-team, cross-framework, third-party embeds</td><td>One codebase you control end to end</td></tr>
+          <tr><td>Styling contract</td><td>Explicit and enforced: tokens + parts + states</td><td>Conventional: full cascade available (and abusable)</td></tr>
+          <tr><td>Theming</td><td>Custom properties only — by design</td><td>Anything, including consumer overrides</td></tr>
+          <tr><td>SSR</td><td>Declarative shadow DOM required; heavier</td><td>Plain HTML; trivial</td></tr>
+          <tr><td>Accessibility</td><td>ARIA ID references (<code>aria-labelledby</code>) cannot cross the boundary — plan composition carefully</td><td>No boundary issues</td></tr>
+        </tbody>
+      </table>
+      <p>The accessibility row is the one teams discover too late: an <code>aria-labelledby</code> inside a shadow root cannot point at an ID outside it (or vice versa). If a component's labeling must come from page content, slot the label in, or keep the component in the light DOM. When in doubt at scale: third-party surface area earns shadow DOM; internal components are usually better served by <code>@scope</code> and tokens.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — A real &lt;pe-badge&gt; styled through every channel</h2>
+      <p>The script below defines a genuine custom element with a shadow root, a <code>part="label"</code>, a slot, and a custom <code>active</code> state (with <code>ElementInternals</code> feature detection and a <code>data-active</code> fallback). The page CSS never reaches inside — it styles the component through the three public channels only: custom properties, <code>::part()</code>, and <code>:state()</code>. Click a badge (or press Enter on it) to toggle the state.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-22-10 {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.5rem 0;
+          }
+          /* Channel 1: the custom-property API crosses the boundary */
+          .demo-22-10 pe-badge {
+            --pe-badge-surface: oklch(95% 0.03 275);
+            --pe-badge-ink: oklch(35% 0.08 275);
+          }
+          .demo-22-10 pe-badge[variant="danger"] {
+            --pe-badge-surface: oklch(95% 0.04 25);
+            --pe-badge-ink: oklch(40% 0.16 25);
+          }
+          /* Channel 2: ::part() styles the explicitly exported node */
+          .demo-22-10 pe-badge::part(label) {
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 0.75em;
+          }
+          /* Channel 3: :state() — kept in its own rule so browsers
+             without it drop only this rule, not a shared list */
+          .demo-22-10 pe-badge:state(active) {
+            --pe-badge-surface: oklch(60% 0.16 150);
+            --pe-badge-ink: oklch(99% 0.01 150);
+          }
+          /* Fallback channel while :state() support settles */
+          .demo-22-10 pe-badge[data-active] {
+            --pe-badge-surface: oklch(60% 0.16 150);
+            --pe-badge-ink: oklch(99% 0.01 150);
+          }
+        </style>
+        <div class="demo-22-10">
+          <pe-badge>Deploys</pe-badge>
+          <pe-badge>Reviews</pe-badge>
+          <pe-badge variant="danger">Incidents</pe-badge>
+        </div>
+        <script>
+          (function () {
+            if (!('customElements' in window) || customElements.get('pe-badge')) return;
+
+            var css =
+              ':host { display: inline-flex; align-items: center; gap: 0.45em;' +
+              '  padding: 0.4em 0.85em; border-radius: 999px; cursor: pointer;' +
+              '  background: var(--pe-badge-surface, oklch(94% 0.02 270));' +
+              '  color: var(--pe-badge-ink, oklch(35% 0.02 270));' +
+              '  font: 600 0.9rem/1.2 system-ui, sans-serif; user-select: none; }' +
+              ':host(:focus-visible) { outline: 2px solid currentColor; outline-offset: 2px; }' +
+              '.dot { inline-size: 0.55em; block-size: 0.55em; border-radius: 50%;' +
+              '  background: currentColor; opacity: 0.5; }';
+
+            /* One parsed sheet, adopted by every instance's shadow root */
+            var sheet = null;
+            try {
+              sheet = new CSSStyleSheet();
+              sheet.replaceSync(css);
+            } catch (e) { /* constructable stylesheets unsupported */ }
+
+            function PeBadgeFactory() {
+              return class PeBadge extends HTMLElement {
+                constructor() {
+                  super();
+                  var root = this.attachShadow({ mode: 'open' });
+                  if (sheet && 'adoptedStyleSheets' in root) {
+                    root.adoptedStyleSheets = [sheet];
+                  } else {
+                    var style = document.createElement('style');
+                    style.textContent = css;
+                    root.appendChild(style);
+                  }
+                  var dot = document.createElement('span');
+                  dot.className = 'dot';
+                  dot.setAttribute('aria-hidden', 'true');
+                  var label = document.createElement('span');
+                  label.setAttribute('part', 'label');
+                  label.appendChild(document.createElement('slot'));
+                  root.appendChild(dot);
+                  root.appendChild(label);
+
+                  this._states = null;
+                  if (this.attachInternals) {
+                    var internals = this.attachInternals();
+                    this._states = internals.states || null;
+                  }
+                  this.setAttribute('role', 'button');
+                  this.setAttribute('aria-pressed', 'false');
+                  this.tabIndex = 0;
+                  this.addEventListener('click', this._toggle.bind(this));
+                  this.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      this._toggle();
+                    }
+                  }.bind(this));
+                }
+                _toggle() {
+                  var on = !this.hasAttribute('data-active');
+                  this.toggleAttribute('data-active', on);       // fallback channel
+                  if (this._states) {                            // :state() channel
+                    on ? this._states.add('active') : this._states.delete('active');
+                  }
+                  this.setAttribute('aria-pressed', String(on));
+                }
+              };
+            }
+            customElements.define('pe-badge', PeBadgeFactory());
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <p>The editor preview cannot run JavaScript, so it cannot define custom elements — instead, this light-DOM replica mirrors the component's structure so you can design its custom-property API contract in pure CSS.</p>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;!-- Light-DOM replica of &lt;pe-badge&gt;'s template --&gt;
+&lt;span class="pe-badge"&gt;
+  &lt;span class="dot"&gt;&lt;/span&gt;
+  &lt;span class="label"&gt;Deploys&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class="pe-badge" data-variant="danger"&gt;
+  &lt;span class="dot"&gt;&lt;/span&gt;
+  &lt;span class="label"&gt;Incidents&lt;/span&gt;
+&lt;/span&gt;
+&lt;span class="pe-badge" data-active&gt;
+  &lt;span class="dot"&gt;&lt;/span&gt;
+  &lt;span class="label"&gt;Active&lt;/span&gt;
+&lt;/span&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 2rem; display: flex; gap: 0.75rem; }
+
+/* ===== The public API: custom properties only ===== */
+.pe-badge {
+  --pe-badge-surface: oklch(95% 0.03 275);
+  --pe-badge-ink: oklch(35% 0.08 275);
+}
+.pe-badge[data-variant="danger"] {
+  --pe-badge-surface: oklch(95% 0.04 25);
+  --pe-badge-ink: oklch(40% 0.16 25);
+}
+.pe-badge[data-active] {  /* stand-in for :state(active) */
+  --pe-badge-surface: oklch(60% 0.16 150);
+  --pe-badge-ink: oklch(99% 0.01 150);
+}
+
+/* ===== "Shadow" internals: consume the API, never expose it ===== */
+.pe-badge {
+  display: inline-flex; align-items: center; gap: 0.45em;
+  padding: 0.4em 0.85em; border-radius: 999px;
+  background: var(--pe-badge-surface);
+  color: var(--pe-badge-ink);
+  font: 600 0.9rem/1.2 system-ui;
+}
+.pe-badge .dot {
+  width: 0.55em; height: 0.55em; border-radius: 50%;
+  background: currentColor; opacity: 0.5;
+}
+.pe-badge .label {  /* stand-in for ::part(label) */
+  letter-spacing: 0.04em; text-transform: uppercase; font-size: 0.75em;
+}
+
+/* Try: add a --pe-badge-border token to the API with a
+   sensible default, then expose it on the danger variant. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Extend the demo's <code>&lt;pe-badge&gt;</code> with a second part — stamp <code>part="dot"</code> on the dot span — and style it from page CSS via <code>pe-badge::part(dot)</code>. Then write the one-paragraph API document this component now requires: its custom properties (with defaults), its parts, and its states, each marked stable or experimental. If documenting it feels like overkill, that is the decision table talking — this component probably belongs in the light DOM with <code>@scope</code> (Lesson 8.2).</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-22.9-css-linting-enforcement.html">&larr; Lesson 22.9</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
