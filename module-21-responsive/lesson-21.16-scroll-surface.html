@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21.16 — The Scroll Surface: Scrollbars, Overscroll &amp; Scroll Margins · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 21</a>
+      <span>Lesson 21.16</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 21.16 · Fluid Systems</p>
+      <h1>The Scroll Surface: Scrollbars, Overscroll &amp; Scroll Margins</h1>
+      <p class="lead">Every overflow container is a designed surface — and it is the surface most teams never style deliberately. The result is familiar: layouts that shift when a scrollbar appears, modals that scroll the page behind them, and anchor links that bury their target under a sticky header. Each of those is a one-or-two-line fix once you know which property owns it.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The scroll container is a designed surface</h2>
+      <p>A scroll container has more designable parts than any other box: the gutter the scrollbar occupies, the scrollbar itself, the behavior at its boundaries (chaining, bouncing, pull-to-refresh), the inset that programmatic scrolls respect, and the anchoring logic that keeps content stable while things load above it. CSS now exposes every one of those as a property. This lesson walks the surface from the outside in.</p>
+
+      <h2>scrollbar-gutter: ending the scrollbar layout shift</h2>
+      <p>Root cause first: with <code>overflow: auto</code>, a classic (non-overlay) scrollbar appears only when content overflows — and when it does, it <em>takes its width from the content box</em>. Everything reflows: text rewraps, centered columns lurch sideways. Lesson 21.13 hit this as "the scrollbar problem" on large screens, where a centered max-width column visibly jumps when navigation changes the page height. <code>scrollbar-gutter: stable</code> reserves the space whether or not the scrollbar is currently shown:</p>
+      <pre><code>html { scrollbar-gutter: stable; }      /* the page itself */
+.pane { overflow-y: auto; scrollbar-gutter: stable; }
+
+/* Symmetric reservation — keeps centered content truly
+   centered by reserving a matching gutter on both sides */
+.reader { scrollbar-gutter: stable both-edges; }</code></pre>
+      <p>Production: Chrome 94+, Firefox 97+, Safari 18.2+. Note that overlay scrollbars (macOS default, most mobile) occupy no gutter — <code>stable</code> reserves nothing there, which is correct: the shift never existed. You are fixing Windows and Linux users' experience, which is exactly why the bug survives so long on Mac-only design teams.</p>
+
+      <h2>Styling: scrollbar-color and scrollbar-width</h2>
+      <p>The standard styling surface is deliberately small — two properties, set on the scroll container (or <code>html</code> for the page):</p>
+      <pre><code>.pane {
+  scrollbar-width: thin;                       /* auto | thin | none */
+  scrollbar-color: oklch(60% 0.1 275) transparent;  /* thumb, track */
+}
+
+/* Progressive: Safari has not shipped these yet — gate them */
+@supports (scrollbar-color: red blue) {
+  .pane { scrollbar-color: oklch(60% 0.1 275) transparent; }
+}</code></pre>
+      <p>Support is Progressive, not Production: Chrome 121+, Firefox 64+, Safari planned. The fallback is the platform scrollbar — perfectly acceptable, which is what makes this safe to ship ungated too; the <code>@supports</code> block matters only when surrounding design depends on the styled result. One accessibility warning, non-negotiable: <code>scrollbar-width: none</code> removes the <em>only</em> visual affordance that a region scrolls. Reserve it for surfaces with redundant cues (a carousel with visible overflow peeking, or paging dots) — never for a primary content pane.</p>
+
+      <h2>The legacy ::-webkit-scrollbar family</h2>
+      <p>Before the standard properties, WebKit exposed <code>::-webkit-scrollbar</code>, <code>::-webkit-scrollbar-thumb</code>, <code>::-webkit-scrollbar-track</code> and friends — a non-standard pseudo-element zoo that never worked in Firefox. The standard properties supersede it, and there is an interop trap to know cold: in Chromium, the moment <code>scrollbar-color</code> or <code>scrollbar-width</code> applies to a scrollbar, the engine <em>ignores every</em> <code>::-webkit-scrollbar</code> rule for it. Mixing both "for safety" silently discards your detailed webkit styling. Pick one strategy: standard properties going forward, the webkit family only if you must support detailed thumb/track design in older Chromium and accept default scrollbars in Firefox.</p>
+
+      <h2>overscroll-behavior: stopping scroll chaining</h2>
+      <p>When a scroll container hits its boundary, the scroll <em>chains</em> to its ancestor — usually the page. That is why the page behind an open drawer creeps when you over-scroll the drawer's list. The fix is one line on the inner scroller, and it belongs in the modal pattern from Lesson 11.4:</p>
+      <pre><code>.drawer-list, dialog .body {
+  overscroll-behavior: contain;   /* boundary stops here; no chaining */
+}
+
+/* none additionally suppresses the boundary effects themselves:
+   pull-to-refresh on Android Chrome, the navigation glow/bounce */
+html { overscroll-behavior-y: none; }   /* app-like surfaces only */</code></pre>
+      <p><code>contain</code> is the everyday tool: chaining stops, native bounce inside the container stays. Reserve <code>none</code> for genuinely app-like UIs where pull-to-refresh would fight a custom gesture — disabling refresh on a content site is user-hostile.</p>
+
+      <h2>scroll-padding vs. scroll-margin</h2>
+      <p>The sticky-header bug: anchor links and <code>:target</code> jumps scroll the target to the very top of the scrollport — directly underneath your fixed header. Two properties fix it from opposite sides, and the distinction is worth being precise about:</p>
+      <pre><code>/* CONTAINER-side: an inset applied to the scrollport itself.
+   One declaration covers every target inside. */
+html { scroll-padding-block-start: 4.5rem; }   /* header height */
+
+/* TARGET-side: an outset on individual elements — for
+   per-element exceptions and elements that need extra air */
+h2[id] { scroll-margin-block-start: 4.5rem; }</code></pre>
+      <p>Decision rule: one shared sticky header → <code>scroll-padding</code> on the container, once. Element-specific adjustments → <code>scroll-margin</code> on those targets. They sum, so a global padding plus a per-target margin composes cleanly. The same pair tunes scroll snapping: Lesson 11.5's sticky TOC needs the container padding so its section jumps land visibly, and Lesson 14.13's carousel uses <code>scroll-padding-inline</code> so snapped cards align to the peeking inset rather than the hard edge.</p>
+
+      <h2>scroll-behavior: smooth — gated</h2>
+      <p><code>scroll-behavior: smooth</code> animates anchor jumps and JS scrolls. It is also sustained, whole-viewport motion — exactly what <code>prefers-reduced-motion</code> exists for. Never ship it unconditionally; the gate is the pattern:</p>
+      <pre><code>@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+/* Users who opt out get instant jumps — the correct default. */</code></pre>
+
+      <h2>overflow: clip vs. overflow: hidden</h2>
+      <p>These look interchangeable and are not. <code>hidden</code> still creates a scroll container — no scrollbars, but the box remains programmatically scrollable: <code>scrollTo()</code> works, and a stray <code>focus()</code> on an off-screen child will silently scroll it (the classic "my layout shifted sideways and nothing in DevTools explains it" bug). <code>clip</code> forbids <em>all</em> scrolling, including programmatic; no scroll container is created, which is also cheaper — the engine skips the scroll machinery entirely:</p>
+      <pre><code>/* Decorative cropping: clip is almost always what you meant */
+.badge-holder {
+  overflow: clip;
+  overflow-clip-margin: 6px;   /* let shadows/focus rings survive
+                                  slightly past the clip edge */
+}
+
+/* hidden is right only when you WANT a scrollable box without
+   visible scrollbars — e.g. a JS-driven virtualized list */
+.virtual-list { overflow: hidden; }</code></pre>
+      <p>Production everywhere (Chrome 90+, Firefox 81+, Safari 16+). Default to <code>clip</code> for visual cropping; choose <code>hidden</code> only when something will deliberately scroll the box.</p>
+
+      <h2>overflow-anchor: scroll anchoring</h2>
+      <p>Browsers anchor your scroll position to nearby content, so things loading <em>above</em> the viewport (late images, injected ads) don't shove what you're reading. This default is almost always right — leave it alone. The exception is UIs that manage scroll position themselves: a chat log that prepends history while pinned to the bottom fights the anchoring heuristic. Opt that one container out:</p>
+      <pre><code>.chat-log { overflow-anchor: none; }   /* we own the scroll position */</code></pre>
+      <p>Caveat for your mental model: Safari has not implemented scroll anchoring, so <code>overflow-anchor: none</code> is a no-op there — your JS must position correctly regardless, treating anchoring as an enhancement you sometimes need to switch off.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Stable gutters and anchor jumps that land right</h2>
+      <p>Toggle the content length. The left pane has no gutter reservation: when content overflows, the scrollbar steals width and the text reflows. The right pane reserves the gutter with <code>scrollbar-gutter: stable</code>, styles it via gated <code>scrollbar-color</code>, and uses <code>scroll-padding</code> so the anchor links land below its sticky header. (On overlay-scrollbar platforms like macOS trackpads, the left shift won't appear — that is the point of the lesson's Windows note.)</p>
+      <div class="demo-frame">
+        <style>
+          .demo-21-16 { font-family: system-ui, sans-serif; display: grid; gap: 1rem; }
+          .demo-21-16 .controls { display: flex; gap: .75rem; align-items: center; }
+          .demo-21-16 .toggle {
+            padding: .45rem .9rem; border: 0; border-radius: .5rem; cursor: pointer;
+            font: 600 .85rem system-ui; color: #fff; background: oklch(48% 0.22 275);
+          }
+          .demo-21-16 .panes { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+          .demo-21-16 .pane {
+            block-size: 14rem; overflow-y: auto;
+            border: 1px solid oklch(88% 0.01 264); border-radius: .5rem;
+            background: oklch(98% 0.003 264); font-size: .85rem; line-height: 1.6;
+          }
+          .demo-21-16 .pane .inner { padding: .75rem 1rem; }
+          .demo-21-16 .pane .ruler {
+            block-size: .5rem; border-radius: 999px; margin-block-end: .75rem;
+            background: repeating-linear-gradient(90deg,
+              oklch(48% 0.22 275) 0 .5rem, oklch(85% 0.05 275) .5rem 1rem);
+          }
+          .demo-21-16 .pane h4 { margin: 0 0 .5rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: oklch(50% 0.02 264); }
+          .demo-21-16 .pane p { margin: 0 0 .75rem; }
+          .demo-21-16 .extra { display: none; }
+          .demo-21-16.long .extra { display: block; }
+          .demo-21-16 .stable {
+            scrollbar-gutter: stable;
+            scroll-padding-block-start: 2.75rem;  /* sticky header height */
+            scrollbar-width: thin;
+          }
+          @supports (scrollbar-color: red blue) {
+            .demo-21-16 .stable { scrollbar-color: oklch(60% 0.12 275) transparent; }
+          }
+          .demo-21-16 .stable .pane-head {
+            position: sticky; inset-block-start: 0; z-index: 1;
+            display: flex; gap: .75rem; align-items: center;
+            padding: .6rem 1rem; background: oklch(94% 0.02 275);
+            border-block-end: 1px solid oklch(86% 0.03 275);
+            font-size: .75rem;
+          }
+          .demo-21-16 .stable .pane-head a { color: oklch(45% 0.2 275); font-weight: 600; text-decoration: none; }
+          .demo-21-16 .stable .pane-head a:hover { text-decoration: underline; }
+          .demo-21-16 .stable section { padding: .75rem 1rem; border-block-end: 1px dashed oklch(90% 0.01 264); }
+          .demo-21-16 .stable h5 { margin: 0 0 .4rem; font-size: .85rem; }
+        </style>
+        <div class="demo-21-16" id="demo2116">
+          <div class="controls">
+            <button class="toggle" type="button" data-toggle>Add long content</button>
+            <span style="font-size:.8rem;color:#666">watch the left pane's ruler and text width</span>
+          </div>
+          <div class="panes">
+            <div class="pane">
+              <div class="inner">
+                <h4>No gutter reservation</h4>
+                <div class="ruler" aria-hidden="true"></div>
+                <p>While this content fits, the full width belongs to the text. The moment it overflows, a classic scrollbar takes its width from this content box and every line rewraps.</p>
+                <p class="extra">Now the pane overflows. On platforms with classic scrollbars, the ruler above just got shorter and this paragraph rewrapped — that reflow is the layout shift users feel as a flicker.</p>
+                <p class="extra">Nothing about the content caused this. The container simply never reserved space for its own scrollbar.</p>
+                <p class="extra">Toggle back and forth and watch the width pump. That is the bug.</p>
+              </div>
+            </div>
+            <div class="pane stable">
+              <div class="pane-head">
+                <strong>stable gutter</strong>
+                <a href="#d2116-a">A</a><a href="#d2116-b">B</a><a href="#d2116-c">C</a>
+              </div>
+              <div class="inner">
+                <div class="ruler" aria-hidden="true"></div>
+                <p>This pane declares <code>scrollbar-gutter: stable</code>: the gutter exists whether or not the scrollbar is shown, so toggling content never reflows the text.</p>
+              </div>
+              <section id="d2116-a"><h5>Section A</h5><p>Jump here from the sticky header. <code>scroll-padding-block-start</code> on the pane makes the jump land below the header instead of underneath it.</p></section>
+              <section id="d2116-b" class="extra"><h5>Section B</h5><p>Long-content section. The styled thin scrollbar comes from gated <code>scrollbar-color</code> — Safari users simply get the platform scrollbar.</p></section>
+              <section id="d2116-c" class="extra"><h5>Section C</h5><p>Remove the pane's <code>scroll-padding-block-start</code> in DevTools and click "C" again to see the sticky header swallow this heading.</p></section>
+            </div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo2116');
+            if (!root) return;
+            var btn = root.querySelector('[data-toggle]');
+            btn.addEventListener('click', function () {
+              var long = root.classList.toggle('long');
+              btn.textContent = long ? 'Remove long content' : 'Add long content';
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="pane"&gt;
+  &lt;header&gt;
+    Docs
+    &lt;nav&gt;&lt;a href="#one"&gt;One&lt;/a&gt; &lt;a href="#two"&gt;Two&lt;/a&gt; &lt;a href="#three"&gt;Three&lt;/a&gt;&lt;/nav&gt;
+  &lt;/header&gt;
+  &lt;section id="one"&gt;&lt;h3&gt;One&lt;/h3&gt;&lt;p&gt;Click the header links: each jump lands
+  below the sticky header thanks to scroll-padding on the pane.&lt;/p&gt;&lt;/section&gt;
+  &lt;section id="two"&gt;&lt;h3&gt;Two&lt;/h3&gt;&lt;p&gt;The gutter is reserved with
+  scrollbar-gutter: stable, so content never reflows when the
+  scrollbar appears.&lt;/p&gt;&lt;/section&gt;
+  &lt;section id="three"&gt;&lt;h3&gt;Three&lt;/h3&gt;&lt;p&gt;The thin tinted scrollbar is a
+  gated enhancement — platforms without scrollbar-color show their
+  own. Over-scrolling this pane never scrolls the page behind it:
+  overscroll-behavior: contain.&lt;/p&gt;&lt;/section&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; margin: 0; padding: 1rem; background: #0c0c1a; }
+
+.pane {
+  max-width: 28rem; height: 15rem; margin-inline: auto;
+  overflow-y: auto;
+  border-radius: .5rem; background: #14142a; color: #dcdcf0;
+  font-size: .85rem; line-height: 1.6;
+
+  /* the scroll surface, designed deliberately */
+  scrollbar-gutter: stable;
+  scroll-padding-block-start: 3rem;  /* sticky header height */
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+@supports (scrollbar-color: red blue) {
+  .pane { scrollbar-color: #6e5cf0 transparent; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pane { scroll-behavior: smooth; }
+}
+
+.pane header {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .6rem 1rem; background: #1d1d3d;
+  font-weight: 700;
+}
+.pane header a { color: #a99cff; margin-inline-start: .6rem; }
+
+.pane section { padding: 1rem; min-height: 9rem; border-bottom: 1px dashed #2c2c52; }
+.pane h3 { margin: 0 0 .4rem;
+  /* per-target outset composes with the pane's scroll-padding */
+  scroll-margin-block-start: .5rem;
+}
+.pane p { margin: 0; }
+
+/* Try: delete scroll-padding-block-start, click a link, and
+   watch the sticky header bury the heading. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Audit one real scroll surface in your current project — the page itself or your tallest inner scroller — and design it deliberately. (1) Add <code>scrollbar-gutter: stable</code> (or <code>stable both-edges</code> for a centered reader column) and verify on Windows that growing content no longer shifts layout. (2) Set <code>scroll-padding-block-start</code> to your sticky header's height, then click every anchor link and heading permalink — each must land fully visible. (3) Add <code>overscroll-behavior: contain</code> to any modal or drawer scroller (Lesson 11.4's dialog is the usual suspect) and confirm the page behind no longer creeps. (4) Gate <code>scroll-behavior: smooth</code> behind <code>prefers-reduced-motion: no-preference</code>, and gate <code>scrollbar-color</code> behind <code>@supports</code>. (5) Find one <code>overflow: hidden</code> that is really decorative cropping and convert it to <code>overflow: clip</code> — then check whether a shadow needs <code>overflow-clip-margin</code> to breathe.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-21.15-round-fluid-sizing.html">&larr; Lesson 21.15</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

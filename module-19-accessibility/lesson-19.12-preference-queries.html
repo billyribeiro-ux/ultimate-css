@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19.12 — Every User Preference: The Complete Media Query Set · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 19</a>
+      <span>Lesson 19.12</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 19.12 · Inclusive Design</p>
+      <h1>Every User Preference: The Complete Media Query Set</h1>
+      <p class="lead">This module has already honored three user signals: <code>prefers-reduced-motion</code> (19.3), <code>prefers-color-scheme</code> (19.7), and <code>forced-colors</code> (19.6). But the platform exposes far more — contrast, transparency, data, inversion, refresh rate, scripting, even how the app was launched. This lesson completes the set, then shows the PE7 move: answer all of them in one place, at the token level.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The principle: no user signal ignored</h2>
+      <p>Every one of these media features exists because a user, somewhere in their OS settings, told the platform something about their body, their hardware, or their budget. Ignoring the signal is not neutral — it actively overrides a stated need. The good news: each query costs a few lines of CSS, and because they are media queries, unsupported ones are simply skipped. There is no fallback work to do; the un-matched state <em>is</em> the fallback.</p>
+
+      <h2>prefers-contrast: more / less / custom</h2>
+      <p>Production-ready (Chrome 96+, Firefox 101+, Safari 14.1+). At <code>more</code>, strengthen the cues that low-vision users rely on: thicker borders, darker text, no "subtle gray on white" anywhere. At <code>less</code> (rare, but real — light sensitivity, migraine triggers), soften harsh pure-black-on-white. <code>custom</code> fires when the user runs a forced palette — it matches <em>alongside</em> <code>forced-colors: active</code> (Lesson 19.6), so treat it as "the OS owns colors now, defer to system keywords":</p>
+      <pre><code>@media (prefers-contrast: more) {
+  :root {
+    --border-w: 2px;
+    --ink: oklch(12% 0.02 270);      /* was 35% */
+    --ink-muted: oklch(25% 0.02 270); /* "muted" must still pass AAA */
+  }
+}
+
+@media (prefers-contrast: custom) {
+  /* forced palette active — system colors take over (see 19.6) */
+  :root { --ink: CanvasText; --surface: Canvas; }
+}</code></pre>
+
+      <h2>prefers-reduced-transparency</h2>
+      <p>Progressive (Chrome 118+, others planned). Every frosted-glass surface this course built — Apple's nav (14.3), Fluent acrylic (14.22), animated glassmorphism (15.10) — assumes the user can read text over a blurred, shifting backdrop. Vestibular and low-vision users often cannot. The query asks for solid surfaces, and the fix is two token flips:</p>
+      <pre><code>@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --surface-glass: oklch(98% 0.01 270);  /* was / 0.6 alpha */
+    --surface-blur: 0px;                   /* backdrop-filter: blur(var(--surface-blur)) */
+  }
+}</code></pre>
+
+      <h2>prefers-reduced-data</h2>
+      <p>Experimental (behind flags in Chromium; no other engine yet). The user is saying "bytes cost me money." Honor it by skipping decorative downloads: background images become gradients, webfonts (Lesson 20.6) yield to system fonts. Because it is a media query, the browser never even requests assets referenced only inside a non-matching block:</p>
+      <pre><code>.hero { background-image: var(--hero-image, none); }
+
+@media (prefers-reduced-data: no-preference) {
+  :root { --hero-image: image-set("hero.avif" type("image/avif")); }
+  /* @font-face loading can live here too */
+}</code></pre>
+      <p>Note the inversion: gate the <em>expensive</em> path behind <code>no-preference</code> so flag-less browsers still load it, while opted-in users skip it the moment support lands.</p>
+
+      <h2>inverted-colors</h2>
+      <p>Progressive (Safari, plus recent Chrome). OS-level color inversion is a long-standing low-vision aid — but it turns photographs and video into negatives. Faces become ghoulish; charts lie. The defensive rule is one line — re-invert continuous-tone media so it survives the round trip:</p>
+      <pre><code>@media (inverted-colors: inverted) {
+  img, video, .photo { filter: invert(1); }
+}</code></pre>
+
+      <h2>update and scripting: the environment queries</h2>
+      <p><code>update</code> reports how fast the display can repaint: <code>fast</code> (typical screens), <code>slow</code> (e-ink, some embedded displays), <code>none</code> (print). On slow/none, animation is at best wasted and at worst unreadable smearing — and color-only cues fade on grayscale e-ink, so prefer structural cues like underlines:</p>
+      <pre><code>@media (update: slow), (update: none) {
+  * { animation: none !important; transition: none !important; }
+  a { text-decoration: underline; } /* never color-only on e-ink */
+}</code></pre>
+      <p><code>scripting: enabled / initial-only / none</code> styles no-JS states declaratively — the modern replacement for <code>.no-js</code> class flipping, and a direct continuation of Lesson 11.1's philosophy:</p>
+      <pre><code>@media (scripting: none) {
+  .needs-js { display: none; }
+  .static-fallback { display: block; }
+}</code></pre>
+
+      <h2>display-mode and input capabilities</h2>
+      <p><code>display-mode</code> reports how the app was launched. This very course is an installable PWA — when it runs standalone, there is no browser chrome, so "open in app" banners are redundant and safe-area padding matters:</p>
+      <pre><code>@media (display-mode: standalone) {
+  .install-banner { display: none; }
+  .site-header { padding-block-start: env(safe-area-inset-top); }
+}</code></pre>
+      <p>And recall the input queries from Lesson 19.8: <code>pointer</code>/<code>hover</code> describe the primary input, <code>any-pointer</code>/<code>any-hover</code> describe all of them. The input-adaptive density pattern — bigger touch targets when the primary pointer is coarse, hover-revealed affordances only when hover truly exists — is the same preference-respecting instinct applied to hardware.</p>
+
+      <h2>The preference cascade: answer everything at the token level</h2>
+      <p>The PE7 synthesis: components must never branch on preferences. If every card, nav, and button carries its own stack of <code>@media</code> blocks, you will miss one — guaranteed. Instead, each preference flips <em>tokens</em> in one auditable place, and components consume tokens as usual (Lesson 4.8's aliasing made this cheap):</p>
+      <pre><code>:root {
+  --border-w: 1px;
+  --ink: oklch(35% 0.02 270);
+  --surface-glass: oklch(98% 0.01 270 / 0.6);
+  --surface-blur: 12px;
+  --hero-image: none;
+  --motion: 1;  /* multiply durations: calc(300ms * var(--motion)) */
+}
+
+@media (prefers-contrast: more)               { :root { --border-w: 2px; --ink: oklch(12% 0.02 270); } }
+@media (prefers-reduced-transparency: reduce) { :root { --surface-glass: oklch(98% 0.01 270); --surface-blur: 0px; } }
+@media (prefers-reduced-motion: reduce)       { :root { --motion: 0; } }
+@media (update: slow), (update: none)         { :root { --motion: 0; } }
+@media (prefers-reduced-data: no-preference)  { :root { --hero-image: url("hero.avif"); } }
+
+/* Components never branch: */
+.card { border: var(--border-w) solid currentColor; color: var(--ink); }</code></pre>
+      <p>One file, every signal, zero per-component audits. New preference query ships? You add one line here, and the whole system responds.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — A preference dashboard</h2>
+      <p>A page cannot change your OS settings, so the checkboxes below mirror each media query onto <code>data-</code> attributes with a small script — the real <code>@media</code> rules sit alongside the simulated ones in the stylesheet, and in production you would ship only the <code>@media</code> half. Toggle each preference and watch the card adapt.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-19-12 { font-family: system-ui, sans-serif; display: grid; gap: 1.25rem; }
+          .demo-19-12 .toggles {
+            display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem;
+            font-size: 0.85rem; color: oklch(35% 0.03 275);
+          }
+          .demo-19-12 .toggles label { display: flex; align-items: center; gap: 0.4rem; }
+          .demo-19-12 .stage { border-radius: 0.75rem; overflow: hidden; }
+          .demo-19-12 .card {
+            position: relative;
+            background: linear-gradient(135deg, oklch(75% 0.14 300), oklch(70% 0.13 220));
+            border: 1px solid oklch(75% 0.05 275);
+            border-radius: 0.75rem;
+            overflow: hidden;
+          }
+          .demo-19-12 .card-header {
+            display: flex; align-items: center; gap: 0.6rem;
+            padding: 0.75rem 1rem;
+            background: oklch(98% 0.01 270 / 0.55);
+            backdrop-filter: blur(12px);
+            font-weight: 600; color: oklch(30% 0.04 275);
+          }
+          .demo-19-12 .live-dot {
+            inline-size: 0.6rem; block-size: 0.6rem; border-radius: 50%;
+            background: oklch(65% 0.2 150);
+            animation: demo-19-12-pulse 1.2s infinite;
+          }
+          @keyframes demo-19-12-pulse { 50% { opacity: 0.25; } }
+          .demo-19-12 .card-body {
+            padding: 1rem; display: flex; gap: 1rem; align-items: center;
+            background: oklch(98% 0.01 270 / 0.8);
+          }
+          .demo-19-12 .photo {
+            inline-size: 64px; block-size: 64px; border-radius: 0.5rem; flex: none;
+            background: linear-gradient(160deg, oklch(85% 0.12 70), oklch(55% 0.18 30));
+            display: grid; place-items: center; font-size: 1.6rem;
+          }
+          .demo-19-12 .card-body p { margin: 0; font-size: 0.85rem; color: oklch(45% 0.02 275); }
+
+          /* ===== Real preference rules (production) ===== */
+          @media (prefers-contrast: more) {
+            .demo-19-12 .card { border-width: 2px; border-color: oklch(20% 0.02 275); }
+            .demo-19-12 .card-body p { color: oklch(15% 0.02 275); }
+          }
+          @media (prefers-reduced-transparency: reduce) {
+            .demo-19-12 .card-header { background: oklch(98% 0.01 270); backdrop-filter: none; }
+          }
+          @media (inverted-colors: inverted) {
+            .demo-19-12 .photo { filter: invert(1); }
+          }
+          @media (update: slow), (update: none) {
+            .demo-19-12 .live-dot { animation: none; }
+          }
+
+          /* ===== Simulated mirrors (demo only) ===== */
+          .demo-19-12[data-contrast="more"] .card { border-width: 2px; border-color: oklch(20% 0.02 275); }
+          .demo-19-12[data-contrast="more"] .card-body p { color: oklch(15% 0.02 275); }
+          .demo-19-12[data-transparency="reduce"] .card-header { background: oklch(98% 0.01 270); backdrop-filter: none; }
+          .demo-19-12[data-inverted] .stage { filter: invert(1); }
+          .demo-19-12[data-inverted] .photo { filter: invert(1); } /* un-inverted: faces stay faces */
+          .demo-19-12[data-update="slow"] .live-dot { animation: none; }
+        </style>
+        <div class="demo-19-12" id="demo1912">
+          <div class="toggles">
+            <label><input type="checkbox" data-pref="contrast" data-value="more"> prefers-contrast: more</label>
+            <label><input type="checkbox" data-pref="transparency" data-value="reduce"> prefers-reduced-transparency</label>
+            <label><input type="checkbox" data-pref="inverted" data-value="inverted"> inverted-colors</label>
+            <label><input type="checkbox" data-pref="update" data-value="slow"> update: slow</label>
+          </div>
+          <div class="stage">
+            <div class="card">
+              <div class="card-header"><span class="live-dot" aria-hidden="true"></span> Deploy status: live</div>
+              <div class="card-body">
+                <div class="photo" aria-hidden="true">&#128247;</div>
+                <p>Frosted header, animated status dot, photographic content — each one adapts to a different user preference. The un-inverted photo is why <code>inverted-colors</code> matters.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo1912');
+            if (!root) return;
+            var boxes = root.querySelectorAll('input[data-pref]');
+            Array.prototype.forEach.call(boxes, function (box) {
+              box.addEventListener('change', function () {
+                var attr = 'data-' + box.getAttribute('data-pref');
+                if (box.checked) {
+                  root.setAttribute(attr, box.getAttribute('data-value'));
+                } else {
+                  root.removeAttribute(attr);
+                }
+              });
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <p>This sample is pure CSS — use the DevTools Rendering panel to emulate <code>prefers-contrast</code> and <code>prefers-reduced-transparency</code> against the preview, or flip your OS settings for the real thing.</p>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="card"&gt;
+  &lt;header&gt;Token-driven card&lt;/header&gt;
+  &lt;p&gt;Every preference flips a token above — this component
+  never branches. Emulate prefers-contrast: more in the
+  DevTools Rendering panel and watch the border thicken.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">/* The preference cascade: one place, every signal */
+:root {
+  --border-w: 1px;
+  --ink: oklch(40% 0.02 270);
+  --surface: oklch(98% 0.01 270 / 0.7);
+}
+
+@media (prefers-contrast: more) {
+  :root { --border-w: 2px; --ink: oklch(12% 0.02 270); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root { --surface: oklch(98% 0.01 270); }
+}
+@media (prefers-color-scheme: dark) {
+  :root { --ink: oklch(90% 0.01 270); --surface: oklch(22% 0.02 270 / 0.85); }
+}
+
+/* Components only consume tokens */
+body {
+  font-family: system-ui;
+  padding: 2rem;
+  background: linear-gradient(135deg, #7c6cf0, #4aa3c0);
+}
+.card {
+  max-width: 28rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: var(--border-w) solid currentColor;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+.card header { font-weight: 700; margin-bottom: 0.5rem; }
+.card p { margin: 0; font-size: 0.9rem; line-height: 1.5; }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Audit a project you have built in this course (the glassmorphism card from 15.10 is a good candidate) against the complete set: does it respond to <code>prefers-contrast: more</code>, <code>prefers-reduced-transparency</code>, <code>update: slow</code>, and <code>inverted-colors</code>? Refactor every adaptation into a single preference-cascade token block at the top of the stylesheet — no <code>@media</code> allowed inside component rules — then verify each one with the DevTools Rendering panel's emulation dropdowns.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-19.11-accessibility-audit-checklist.html">&larr; Lesson 19.11</a>
+      <a href="./project/index.html">Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

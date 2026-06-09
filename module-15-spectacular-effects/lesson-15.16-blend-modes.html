@@ -96,9 +96,9 @@ difference: C = |Cs − Cb|        /* self-inverting             */</code></pre>
 }</code></pre>
       <h3>(f) plus-lighter — perfect crossfades</h3>
       <p>Crossfading two stacked images with plain opacity dims at the midpoint (0.5 over 0.5 ≠ 1). <code>plus-lighter</code> adds the premultiplied colors, so the two layers always sum to full intensity — this is the same operator the browser uses internally for view transitions:</p>
-      <pre><code>.crossfade > img { position: absolute; inset: 0; mix-blend-mode: plus-lighter; }
-.crossfade > .from { opacity: calc(1 - var(--t)); }
-.crossfade > .to   { opacity: var(--t); }
+      <pre><code>.crossfade &gt; img { position: absolute; inset: 0; mix-blend-mode: plus-lighter; }
+.crossfade &gt; .from { opacity: calc(1 - var(--t)); }
+.crossfade &gt; .to   { opacity: var(--t); }
 /* at every --t, from + to = the original brightness — no mid-fade dip */</code></pre>
 
       <h2>isolation: isolate — fencing the blend</h2>
