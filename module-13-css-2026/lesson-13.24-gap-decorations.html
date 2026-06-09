@@ -120,7 +120,7 @@
 }</code></pre>
 
       <h2>Multicol today: train your hands now</h2>
-      <p>The syntax is not speculative — <code>column-rule</code> has worked on <code>columns</code>-based multicol layouts in every engine for over a decade. Gap Decorations is deliberately an <em>extension</em> of that primitive, not a new invention: same shorthand shape, same longhands. Patterns you write for multicol article layouts today are the same muscle memory you will use on grid and flex tomorrow.</p>
+      <p>The syntax is not speculative — <code>column-rule</code> has worked on <code>columns</code>-based multicol layouts in every engine for over a decade (Lesson 7.9 covers the multicol primitive in depth). Gap Decorations is deliberately an <em>extension</em> of that primitive, not a new invention: same shorthand shape, same longhands. Patterns you write for multicol article layouts today are the same muscle memory you will use on grid and flex tomorrow.</p>
 
       <h2>Shipping policy: learn and watch</h2>
       <p>This feature is Experimental tier, so the PE7 rule is absolute: the layout must be fully acceptable with no rules at all, and the rules ship only inside an <code>@supports</code> gate. One precision matters here — <strong>do not gate on <code>column-rule-color</code></strong>. That property has parsed in every engine since multicol shipped, so the test is a false positive everywhere. Gate on the genuinely new syntax, <code>row-rule</code>:</p>
