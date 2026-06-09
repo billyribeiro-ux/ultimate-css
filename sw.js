@@ -2,7 +2,7 @@
    Cache-first for CSS/JS/icons (the shell), network-first for HTML lessons
    so that edits to a lesson show up immediately when online.
 */
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL_CACHE = `ultimate-css-shell-${VERSION}`;
 const PAGE_CACHE  = `ultimate-css-pages-${VERSION}`;
 

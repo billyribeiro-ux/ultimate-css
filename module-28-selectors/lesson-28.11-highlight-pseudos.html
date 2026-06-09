@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 28.11 — Highlight Pseudo-Elements & the Custom Highlight API · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 28</a>
+      <span>Lesson 28.11</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 28.11 · Reference</p>
+      <h1>Highlight Pseudo-Elements &amp; the Custom Highlight API</h1>
+      <p class="lead">The pseudo-elements in Lesson 28.6 generate boxes — <code>::before</code> and <code>::after</code> participate in layout. Highlight pseudo-elements are a different mechanism entirely: they paint styling over arbitrary <em>ranges</em> of already-laid-out text, with no extra DOM and no layout impact. That model powers <code>::selection</code>, deep-link highlighting, spellcheck squiggles — and, through the Custom Highlight API, your own named ranges.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>A different kind of pseudo-element</h2>
+      <p>A highlight pseudo-element represents a set of text ranges, not a box. The browser lays out the text exactly as if no highlight existed, then paints the highlight's styling over the affected glyphs during the paint phase. This is the root cause of every rule in this lesson: because no box exists and layout is already done, only properties that can be applied <em>at paint time</em> are honored. The family: <code>::selection</code>, <code>::target-text</code>, <code>::spelling-error</code>, <code>::grammar-error</code>, and the parameterized <code>::highlight(name)</code>.</p>
+
+      <h2>::selection done right</h2>
+      <p>Only a small set of properties applies — the spec allows roughly: <code>color</code>, <code>background-color</code>, <code>text-decoration</code> (and its longhands), <code>text-shadow</code>, plus <code>text-emphasis-color</code> and stroke/fill for SVG text. <code>font-size</code>, <code>padding</code>, <code>display</code> — anything that would change geometry — is ignored, because honoring it would force a relayout every time the user dragged a selection.</p>
+      <pre><code>::selection {
+  background-color: oklch(45% 0.18 275);
+  color: oklch(98% 0.01 275);
+}
+/* Set BOTH color and background-color together. Styling only one
+   risks an unreadable combination against the UA default of the
+   other — the classic white-on-pale-blue bug. */</code></pre>
+      <p>Accessibility is non-negotiable here: selection is a functional state, not decoration. Keep at least 4.5:1 contrast between your selection foreground and background, and never set <code>background-color: transparent</code> as a "minimal" aesthetic — users lose the only visual confirmation of what they are about to copy.</p>
+
+      <h2>::target-text and scroll-to-text fragments</h2>
+      <p>URLs can deep-link to <em>text</em>, not just IDs: a fragment of the form <code>#:~:text=some%20phrase</code> makes the browser scroll to and highlight the first match. <code>::target-text</code> styles that highlight, replacing the UA default (typically purple-on-yellow) with something on-brand. <strong>Production</strong> — text fragments and <code>::target-text</code> are supported in all three engines (Chrome&nbsp;89+, Safari&nbsp;18.2+, Firefox&nbsp;131+).</p>
+      <pre><code>/* https://example.com/article#:~:text=key%20finding */
+::target-text {
+  background-color: oklch(85% 0.17 95);
+  color: oklch(20% 0.02 95);
+}</code></pre>
+      <p>The same painted-range property restrictions apply. This is worth styling in any documentation or content product: search engines, LLM citations, and "copy link to highlight" features all generate text-fragment URLs into your pages whether you style them or not.</p>
+
+      <h2>::spelling-error and ::grammar-error</h2>
+      <p>These style the ranges the browser's checker flags in editable text. The honored property set is the same, plus the two purpose-built decoration values <code>text-decoration-line: spelling-error</code> and <code>grammar-error</code>, which reproduce the native squiggle so you can recolor without redrawing it. <strong>Progressive</strong> — shipped in Chromium and Firefox, not yet in Safari; unsupported engines simply keep their native squiggles, so no <code>@supports</code> gate is needed.</p>
+      <pre><code>::spelling-error {
+  text-decoration-line: spelling-error;
+  text-decoration-color: oklch(60% 0.24 25);
+}
+::grammar-error {
+  text-decoration-line: grammar-error;
+  text-decoration-color: oklch(55% 0.15 230);
+}</code></pre>
+
+      <h2>The Custom Highlight API</h2>
+      <p>The previous pseudos style ranges the <em>browser</em> chooses. The Custom Highlight API lets you register your own: build <code>Range</code> objects in JavaScript, group them into a <code>Highlight</code>, and register it in the <code>CSS.highlights</code> map under a name. CSS then paints it via <code>::highlight(name)</code> — the JS defines <em>where</em>, the CSS defines <em>how</em>. <strong>Production</strong> as of 2026: Chrome&nbsp;105+, Safari&nbsp;17.2+, Firefox&nbsp;140+.</p>
+      <pre><code>// JS — define the ranges
+const range = new Range();
+range.setStart(textNode, 10);
+range.setEnd(textNode, 24);
+
+const hits = new Highlight(range /*, ...moreRanges */);
+CSS.highlights.set('search-hits', hits);
+
+/* CSS — paint them */
+::highlight(search-hits) {
+  background-color: oklch(88% 0.16 95);
+  color: oklch(22% 0.03 95);
+}</code></pre>
+      <p>Feature-detect with <code>'highlights' in CSS</code> on the JS side. There is nothing to gate in the CSS — an unmatched <code>::highlight()</code> rule is inert.</p>
+
+      <h2>The highlight inheritance model</h2>
+      <p>Highlight pseudos do not inherit from their originating element. They inherit through a parallel <em>highlight chain</em>: an element's <code>::selection</code> inherits from its parent's <code>::selection</code>, and so on up to the root. Two practical consequences. First, a root-level <code>::selection</code> theme genuinely cascades to all text — the old advice to write <code>*::selection</code> is obsolete (and worse, since per-element universal rules block chain inheritance of later overrides). Second, custom properties used inside highlight styles resolve against the <em>originating element</em>, so token-driven highlight theming works exactly as you would expect.</p>
+      <pre><code>:root::selection { background-color: var(--selection-bg); }
+/* every element's ::selection inherits this via the highlight
+   chain — no universal selector needed */
+
+.danger-zone { --selection-bg: oklch(50% 0.2 25); }
+/* custom properties resolve against the element — local retheme */</code></pre>
+
+      <h2>What custom highlights are for</h2>
+      <p>The defining win is styling text ranges <strong>without mutating the DOM</strong>. The traditional find-in-page implementation wraps every hit in a <code>&lt;mark&gt;</code> or <code>&lt;span&gt;</code> — which splits text nodes, invalidates layout, breaks user selections and caret position, fights frameworks that own the DOM, and must be carefully unwrapped afterwards. Registering a <code>Highlight</code> does none of that: zero DOM mutation, zero layout cost, paint-only updates. Production patterns:</p>
+      <ul>
+        <li><strong>Search-hit highlighting</strong> in long documents — thousands of ranges paint cheaply where thousands of injected spans would jank.</li>
+        <li><strong>Collaborative presence</strong> — each remote user's cursor/selection becomes one named highlight (<code>::highlight(user-ada)</code>), updated on every websocket message without touching the document.</li>
+        <li><strong>Editor hints</strong> — syntax emphasis or lint underlines painted over a <code>contenteditable</code> surface whose DOM must stay clean.</li>
+      </ul>
+
+      <h2>Overlapping highlights: priority and stacking</h2>
+      <p>Ranges overlap, so the spec defines a deterministic paint order. Custom highlights stack in <em>registration order</em> in the <code>CSS.highlights</code> map (later paints over earlier) unless you set the <code>priority</code> property on a <code>Highlight</code> — higher numbers paint on top. Native highlights have fixed positions in the stack: spelling and grammar errors sit above custom highlights, and <code>::selection</code> paints above everything, which is why selecting across your search hits always remains visible. For each property, the topmost highlight that sets it wins; properties it does not set show through from highlights below. Selector specificity behaves normally otherwise — <code>::highlight(x)</code> contributes like any pseudo-element, and conflicts between <em>rules for the same highlight</em> resolve by the ordinary cascade from Lesson 28.10's world: keep these selectors flat and let layers order them.</p>
+      <pre><code>const spell = new Highlight(...ranges);
+spell.priority = 2;            // paint above 'search-hits'
+CSS.highlights.set('lint', spell);</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — search hits with zero extra DOM</h2>
+      <p>The script below walks the paragraph's text, builds a <code>Range</code> over every occurrence of the word "range", and registers them as one custom highlight — no spans injected, as the unchanged DOM in your inspector will confirm. Select some text to see the themed <code>::selection</code> paint over the hits, and follow the deep link to see <code>::target-text</code>.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-28-11 { font-family: system-ui, sans-serif; padding: 1rem; background: oklch(97% 0.005 264); border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; }
+          .demo-28-11 p { margin: 0 0 .75rem; line-height: 1.6; color: oklch(30% 0.02 264); }
+          .demo-28-11 .meta { font-size: .8rem; color: oklch(50% 0.02 264); }
+          .demo-28-11 ::selection {
+            background-color: oklch(45% 0.18 275);
+            color: oklch(98% 0.01 275);
+          }
+          .demo-28-11 ::target-text {
+            background-color: oklch(85% 0.17 95);
+            color: oklch(20% 0.02 95);
+          }
+          ::highlight(demo-mark) {
+            background-color: oklch(88% 0.16 95);
+            color: oklch(22% 0.03 95);
+            text-decoration: underline;
+            text-decoration-color: oklch(65% 0.15 95);
+          }
+        </style>
+        <div class="demo-28-11" id="demo2811">
+          <p data-haystack>A highlight is a set of ranges painted over text. Each range is
+          built in JavaScript, but every range is styled from CSS — the DOM
+          beneath this paragraph contains no marker elements at all.</p>
+          <p class="meta" data-status>Custom Highlight API: checking…</p>
+          <p class="meta"><a href="lesson-28.11-highlight-pseudos.html#:~:text=painted%20over%20text">Open this page via a text fragment</a> to see ::target-text styling.</p>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo2811');
+            if (!root) return;
+            var status = root.querySelector('[data-status]');
+            if (!('highlights' in CSS)) {
+              status.textContent = 'Custom Highlight API: not supported here — text renders unhighlighted (graceful).';
+              return;
+            }
+            var node = root.querySelector('[data-haystack]').firstChild; // single text node
+            var text = node.textContent.toLowerCase();
+            var ranges = [];
+            var i = text.indexOf('range');
+            while (i !== -1) {
+              var r = new Range();
+              r.setStart(node, i);
+              r.setEnd(node, i + 'range'.length);
+              ranges.push(r);
+              i = text.indexOf('range', i + 1);
+            }
+            CSS.highlights.set('demo-mark', new Highlight(...ranges));
+            status.textContent = 'Custom Highlight API: ' + ranges.length + ' ranges registered, 0 DOM nodes added.';
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;h1&gt;Highlight theming&lt;/h1&gt;
+  &lt;p&gt;Select this paragraph with your pointer to see the
+  themed ::selection — foreground and background are set
+  as a pair, so contrast stays readable.&lt;/p&gt;
+  &lt;p class="danger"&gt;Selecting inside this block uses a local
+  theme via a custom property on the element.&lt;/p&gt;
+  &lt;p contenteditable="true" spellcheck="true" lang="en"&gt;
+    Click here and tipe some missspelled words — engines with
+    ::spelling-error restyle the squiggle below them.
+  &lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; max-inline-size: 34rem; }
+
+:root { --selection-bg: oklch(45% 0.18 275); }
+
+/* Inherits to every element via the highlight chain —
+   no universal selector needed. */
+:root::selection {
+  background-color: var(--selection-bg);
+  color: oklch(98% 0.01 275);
+}
+
+/* Custom properties resolve against the originating element,
+   so this block gets a local selection theme. */
+.danger { --selection-bg: oklch(50% 0.2 25); }
+
+/* Progressive: Chromium + Firefox restyle the squiggle,
+   Safari keeps its native one. */
+::spelling-error {
+  text-decoration-line: spelling-error;
+  text-decoration-color: oklch(60% 0.24 25);
+  background-color: oklch(95% 0.04 25);
+}
+
+[contenteditable] {
+  border: 1px solid oklch(85% 0.01 264);
+  border-radius: .5rem;
+  padding: .75rem;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a dependency-free find-in-page. (1) Add a text input and a long article to a page; on input, walk the article's text nodes with a <code>TreeWalker</code>, build a <code>Range</code> for each match, and register them as <code>CSS.highlights.set('find', new Highlight(...ranges))</code>. (2) Style <code>::highlight(find)</code> with a background/foreground pair that passes 4.5:1. (3) Add a second highlight named <code>find-current</code> for the active match with <code>priority = 1</code> and confirm it paints above the others. (4) Open the DOM inspector while searching and verify the document never changes — then select across the hits and observe <code>::selection</code> painting above both, exactly as the native stacking order specifies.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-28.10-performance-best-practices.html">← Lesson 28.10</a>
+      <a href="./project/index.html">Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

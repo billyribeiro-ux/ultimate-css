@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.17 — CSS Masking Mastery: mask-image, mask-composite &amp; Gradient Masks · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.17</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.17 · Spectacular Effects</p>
+      <h1>CSS Masking Mastery: mask-image, mask-composite &amp; Gradient Masks</h1>
+      <p class="lead">A mask is the alpha channel you control: an image whose pixels decide, per pixel, how visible the element is. We have used masks tactically — the spotlight in 15.14, the masked borders in 14.9 — but this lesson is the full system: gradient masks, the longhands, multi-layer compositing with <code>mask-composite</code>, SVG sources, and animation.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The mental model: mask vs. clip-path</h2>
+      <p>Both hide parts of an element, but they are different machines. <code>clip-path</code> (Lesson 15.5) is <strong>geometry</strong>: a vector boundary, every pixel fully in or fully out, edges always hard. <code>mask</code> is <strong>imagery</strong>: a raster alpha map where every pixel can be 0%, 100%, or anything between — soft edges, feathered fades, photographic stencils. The rule of thumb:</p>
+      <pre><code>/* hard geometric boundary → clip-path */
+clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+
+/* per-pixel transparency, soft edges, image-based → mask */
+mask-image: linear-gradient(to bottom, black 60%, transparent);</code></pre>
+      <p>In a mask, <strong>opaque means visible</strong> and <strong>transparent means hidden</strong> — partial alpha gives partial visibility. The spotlight in Lesson 15.14 was exactly this: a radial gradient from solid to transparent acting as a circular alpha window.</p>
+
+      <h2>Gradient masks: the workhorse</h2>
+      <p>Because every gradient is a CSS-generated image, every gradient is a free, resolution-independent, animatable mask. Three patterns cover most production use:</p>
+      <pre><code>/* 1 — edge-fade scroller: hint that a list keeps going */
+.scroller {
+  overflow-x: auto;
+  mask-image: linear-gradient(to right,
+    transparent, black 2.5rem, black calc(100% - 2.5rem), transparent);
+}
+
+/* 2 — vignette / spotlight (Lesson 15.14) */
+.vignette {
+  mask-image: radial-gradient(ellipse at center, black 55%, transparent 95%);
+}
+
+/* 3 — text fade-out "read more" */
+.excerpt {
+  max-block-size: 8lh;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black 60%, transparent);
+}</code></pre>
+      <p>The edge-fade pattern deserves its reputation: it replaces JavaScript scroll-shadow listeners with one declaration, and because the mask rides on the element (not the content), it stays put while the content scrolls beneath it.</p>
+
+      <h2>The longhands, precisely</h2>
+      <p>Masks are background-shaped: the longhands mirror <code>background-*</code> almost one-to-one.</p>
+      <dl>
+        <dt><code>mask-size</code>, <code>mask-position</code>, <code>mask-repeat</code></dt>
+        <dd>Exactly like their background twins — and, like them, animatable. An oversized mask plus an animated <code>mask-position</code> is the standard reveal mechanic (see the demo).</dd>
+        <dt><code>mask-mode: alpha | luminance | match-source</code></dt>
+        <dd>Which channel drives visibility. <code>alpha</code> reads the alpha channel (a transparent-to-black gradient works; <em>white vs. black is irrelevant</em>). <code>luminance</code> reads brightness (white shows, black hides — the SVG tradition). The default <code>match-source</code> flips per source: CSS images and SVG <code>&lt;mask&gt;</code> elements referenced by fragment default to luminance semantics for that element kind, while plain image/gradient sources are read as alpha. If a mask "mysteriously" shows everything, you are usually reading the wrong channel — set <code>mask-mode</code> explicitly.</dd>
+        <dt><code>mask-clip</code>, <code>mask-origin</code></dt>
+        <dd>The painting and positioning boxes (<code>border-box</code>, <code>padding-box</code>, <code>content-box</code>) — the same knobs that made the 14.9 masked-border trick possible.</dd>
+      </dl>
+
+      <h2>Multiple layers and mask-composite</h2>
+      <p>Like backgrounds, <code>mask-image</code> takes a comma-separated list — first layer on top. <code>mask-composite</code> then defines how each layer combines with the accumulated layers below it: <code>add</code> (union, the default), <code>subtract</code> (this layer minus the ones below), <code>intersect</code> (only where both are opaque), <code>exclude</code> (XOR). Subtraction is the headline act — punching holes:</p>
+      <pre><code>/* a full rectangle, minus a circle = a notch cutout */
+.ticket {
+  mask-image:
+    linear-gradient(black, black),                          /* everything */
+    radial-gradient(circle 18px at 100% 50%, black 98%, transparent); /* the bite */
+  mask-composite: subtract;
+}</code></pre>
+      <p>This is how ticket stubs, avatar status-dot cutouts, and tooltip notches are built with soft anti-aliased edges and no extra DOM. <code>intersect</code> is the other production value: intersect a shape mask with an edge-fade gradient to get a shaped <em>and</em> faded element in one element.</p>
+
+      <h2>SVG sources and the inline-SVG aside</h2>
+      <p>Gradients cannot draw a logo. For crisp arbitrary shapes, point <code>mask-image</code> at SVG — a file, a data URI, or an SVG <code>&lt;mask&gt;</code> fragment:</p>
+      <pre><code>/* knockout: the element shows only inside the logo shape */
+.brand-knockout {
+  mask-image: url("data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' \
+viewBox='0 0 24 24'&gt;&lt;path d='M12 2 22 22 2 22Z'/&gt;&lt;/svg&gt;");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+/* or reference an SVG &lt;mask&gt; element (luminance by default) */
+.photo { mask-image: url(#brand-mask); }</code></pre>
+      <p><strong>Aside — styling inline SVG:</strong> masks pair constantly with inline SVG icons, so remember that inline SVG is styleable CSS territory: <code>fill: currentColor</code> makes an icon inherit text color, <code>stroke</code> and <code>stroke-width</code> are plain properties, and the same custom properties that drive your mask gradients can drive the SVG's geometry colors. One color token, icon and mask in lockstep.</p>
+
+      <h2>Animating masks</h2>
+      <p><code>mask-position</code> and <code>mask-size</code> interpolate exactly like their background counterparts — an oversized gradient mask slid across an element is the canonical "reveal sweep". For gradient <em>stops</em>, the gradient itself is not interpolable — unless the stop positions are <code>@property</code>-registered custom properties (Lesson 4.7), in which case the browser interpolates the variable and rebuilds the gradient every frame, exactly as the 15.14 spotlight animated <code>--spot-x</code>/<code>--spot-y</code>:</p>
+      <pre><code>@property --reveal { syntax: "&lt;percentage&gt;"; inherits: false; initial-value: 0%; }
+.reveal {
+  mask-image: linear-gradient(90deg, black var(--reveal), transparent calc(var(--reveal) + 12%));
+  transition: --reveal 0.8s ease;
+}
+.reveal.is-open { --reveal: 100%; }</code></pre>
+      <p>This also retroactively explains Lesson 14.9's masked border: two composited mask layers carved the element down to a ring, and the conic spotlight was a third, animated layer intersected with it. You now own every part of that trick.</p>
+
+      <h2>Performance and support</h2>
+      <p>Masks rasterize at <strong>paint</strong> time — the same budget category as filters (Lesson 20.2). A static mask is cheap; an animated mask forces repaints of the masked subtree every frame, so keep animated masked regions small, prefer <code>mask-position</code> sweeps (the mask image itself is reused) over regenerating gradients, and silence sweeps under <code>prefers-reduced-motion</code>.</p>
+      <p><strong>Support:</strong> production, unprefixed across all engines — Chrome 120+, Firefox 53+, Safari 15.4+. You will still meet <code>-webkit-mask-image</code> and friends in older codebases (and in this course's earlier demos, written defensively); new code targeting current browsers can drop the prefix, or keep it as a one-line courtesy to long-tail WebKit.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Edge fades, a composited cutout, and a mask-position reveal</h2>
+      <p>Three masks at work: a horizontally scrolling strip whose edges fade to nothing, a notched ticket cut with <code>mask-composite: subtract</code>, and a headline revealed by sliding an oversized gradient mask with <code>mask-position</code>.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-15-17 {
+            font-family: system-ui, sans-serif;
+            display: grid;
+            gap: 1.25rem;
+          }
+          .demo-15-17 .panel-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: oklch(65% 0.12 300);
+            margin: 0 0 0.5rem;
+          }
+
+          /* 1 — edge-faded scroller */
+          .demo-15-17 .strip {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding-block: 0.5rem;
+            mask-image: linear-gradient(to right,
+              transparent, black 2.5rem, black calc(100% - 2.5rem), transparent);
+          }
+          .demo-15-17 .strip > div {
+            flex: 0 0 9rem;
+            block-size: 4.5rem;
+            border-radius: 0.6rem;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 700;
+            background: linear-gradient(135deg, oklch(55% 0.22 280), oklch(60% 0.2 200));
+          }
+          .demo-15-17 .strip > div:nth-child(even) {
+            background: linear-gradient(135deg, oklch(58% 0.22 340), oklch(65% 0.18 60));
+          }
+
+          /* 2 — mask-composite subtract cutout */
+          .demo-15-17 .ticket {
+            position: relative;
+            max-inline-size: 26rem;
+            padding: 1.25rem 3rem 1.25rem 1.25rem;
+            border-radius: 0.75rem;
+            color: white;
+            background: linear-gradient(120deg, oklch(45% 0.2 290), oklch(35% 0.12 250));
+            mask-image:
+              linear-gradient(black, black),
+              radial-gradient(circle 20px at 100% 50%, black 98%, transparent);
+            mask-composite: subtract;
+          }
+          .demo-15-17 .ticket h3 { margin: 0; font-size: 1.1rem; }
+          .demo-15-17 .ticket p { margin: 0.25rem 0 0; font-size: 0.85rem; opacity: 0.85; }
+
+          /* 3 — reveal via animated mask-position */
+          .demo-15-17 .reveal-line {
+            font-size: clamp(1.6rem, 5cqi + 1rem, 2.6rem);
+            font-weight: 800;
+            margin: 0;
+            color: oklch(80% 0.16 300);
+            mask-image: linear-gradient(105deg,
+              black 40%, transparent 60%);
+            mask-size: 250% 100%;
+            mask-repeat: no-repeat;
+            animation: mask-sweep-15-17 3.5s ease-in-out infinite alternate;
+          }
+          @keyframes mask-sweep-15-17 {
+            from { mask-position: 100% 0; }
+            to   { mask-position: 0% 0; }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-17 .reveal-line { animation: none; mask-position: 0% 0; }
+          }
+        </style>
+        <div class="demo-15-17">
+          <div>
+            <p class="panel-label">1 · edge-fade scroller — scroll the strip</p>
+            <div class="strip" tabindex="0">
+              <div>One</div><div>Two</div><div>Three</div><div>Four</div>
+              <div>Five</div><div>Six</div><div>Seven</div><div>Eight</div>
+            </div>
+          </div>
+          <div>
+            <p class="panel-label">2 · mask-composite: subtract — punched notch</p>
+            <div class="ticket">
+              <h3>Admit One</h3>
+              <p>The circular bite on the right edge is a subtracted mask layer — the gradient background flows through, no extra DOM.</p>
+            </div>
+          </div>
+          <div>
+            <p class="panel-label">3 · animated mask-position reveal</p>
+            <p class="reveal-line">Masked, swept, revealed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="strip"&gt;
+  &lt;div&gt;One&lt;/div&gt;&lt;div&gt;Two&lt;/div&gt;&lt;div&gt;Three&lt;/div&gt;
+  &lt;div&gt;Four&lt;/div&gt;&lt;div&gt;Five&lt;/div&gt;&lt;div&gt;Six&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="ticket"&gt;
+  &lt;h3&gt;Admit One&lt;/h3&gt;
+  &lt;p&gt;Notch punched with mask-composite.&lt;/p&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { margin: 0; font-family: system-ui; padding: 1.5rem;
+  background: #0e0e1a; color: white; }
+
+/* Edge-fade: the mask rides the element,
+   the content scrolls beneath it */
+.strip {
+  display: flex; gap: .75rem;
+  overflow-x: auto; padding-block: .5rem;
+  mask-image: linear-gradient(to right,
+    transparent, black 2.5rem,
+    black calc(100% - 2.5rem), transparent);
+}
+.strip > div {
+  flex: 0 0 8rem; height: 4rem;
+  display: grid; place-items: center;
+  border-radius: .6rem; font-weight: 700;
+  background: linear-gradient(135deg, #6a3df5, #2fb8c6);
+}
+
+/* Cutout: full rect minus a circle */
+.ticket {
+  margin-top: 1.5rem; max-width: 24rem;
+  padding: 1.25rem 3rem 1.25rem 1.25rem;
+  border-radius: .75rem;
+  background: linear-gradient(120deg, #5b2bd6, #233168);
+  mask-image:
+    linear-gradient(black, black),
+    radial-gradient(circle 20px at 100% 50%,
+      black 98%, transparent);
+  mask-composite: subtract;
+}
+.ticket h3 { margin: 0; }
+.ticket p { margin: .25rem 0 0; opacity: .85; }
+
+/* Try: change subtract to intersect or exclude.
+   Try: move the bite with `at 50% 0` for a top notch. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a "torn ticket" card: (1) punch <em>two</em> circular bites (left and right edges) by adding a third mask layer and keeping <code>mask-composite: subtract</code> on the layers above the base. (2) Add a perforation line with a fourth layer: a <code>repeating-linear-gradient</code> of thin transparent slots, composited with <code>subtract</code>. (3) Then intersect the whole result with a bottom edge-fade so the ticket dissolves at its base — write out which <code>mask-composite</code> value each layer needs and verify your reasoning matches the render. Bonus: register a <code>--bite-r</code> with <code>@property</code> (Lesson 4.7) and transition the bite radius on hover.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.16-blend-modes.html">&larr; Lesson 15.16</a>
+      <a href="./project/index.html">Module Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

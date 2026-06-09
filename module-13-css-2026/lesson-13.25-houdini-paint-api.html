@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.25 — CSS Houdini: The Paint API &amp; Typed OM · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.25</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Experimental · Paint API: Chrome/Edge only · @property: all modern browsers</p>
+      <p class="badge">Lesson 13.25</p>
+      <h1>CSS Houdini: The Paint API &amp; Typed OM</h1>
+      <p class="lead">Houdini is the umbrella name for the APIs that open the browser's styling pipeline to JavaScript — letting you register typed properties, paint custom backgrounds, and manipulate styles as numbers instead of strings. This lesson is an honest status report: one piece of Houdini you have used all course without knowing it, one piece worth learning with a strict fallback discipline, and two pieces that quietly stalled.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Houdini: opening the styling pipeline</h2>
+      <p>Normally CSS is a black box: you hand the engine declarations, it parses, cascades, lays out, and paints. Houdini exposes hooks into those stages. The Properties &amp; Values API hooks <em>parsing</em> (custom properties with real types). The Paint API hooks <em>painting</em> (your code draws wherever CSS expects an image). The Layout and Animation Worklet APIs were meant to hook layout and compositing. The promise was "polyfill the future in user-space"; the reality, eight years on, is more selective — and a principal engineer plans around the reality.</p>
+
+      <h2>The honest status report</h2>
+      <dl>
+        <dt>Shipped everywhere: <code>@property</code> (Properties &amp; Values API)</dt>
+        <dd>This is Houdini, and you have been using it since Lesson 4.7. Registering a custom property with a syntax, inheritance behavior, and initial value is the one Houdini idea every engine adopted — because it moved into pure CSS and needed no worklets.</dd>
+        <dt>Shipped Chrome-only: the Paint API, and Typed OM in part</dt>
+        <dd>Chrome and Edge have shipped <code>CSS.paintWorklet</code> since Chrome 65. Firefox and Safari have not shipped it and show no current intent. Typed OM is complete in Chromium and only partially implemented elsewhere — feature-detect before relying on it.</dd>
+        <dt>Stalled: the Layout API and Animation Worklet</dt>
+        <dd>The Layout API never left origin trials. Animation Worklet was effectively superseded by scroll-driven animations (Lesson 9.3) — declarative CSS won that race, which is the recurring Houdini lesson: when a shipped CSS primitive can express the design, it beats a worklet every time.</dd>
+      </dl>
+
+      <h2>Anatomy of a paint worklet</h2>
+      <p>The Paint API has four moving parts. A worklet file defines a painter class; <code>static inputProperties</code> declares which custom properties it reads (register them with <code>@property</code> so they arrive typed); <code>paint(ctx, size, props)</code> draws with a Canvas-like context every time the element needs repainting; and CSS invokes it anywhere an image is valid:</p>
+      <pre><code>/* checker.js — runs in the worklet scope, not the page */
+class CheckerPainter {
+  static get inputProperties() {
+    return ['--tint', '--density'];
+  }
+  paint(ctx, size, props) {
+    const density = parseFloat(props.get('--density')) || 8;
+    const tint = String(props.get('--tint')).trim();
+    const cell = size.width / density;
+    for (let y = 0; y * cell &lt; size.height; y++) {
+      for (let x = 0; x &lt; density; x++) {
+        if ((x + y) % 2 === 0) {
+          ctx.fillStyle = tint;
+          ctx.fillRect(x * cell, y * cell, cell, cell);
+        }
+      }
+    }
+  }
+}
+registerPaint('checker', CheckerPainter);</code></pre>
+      <pre><code>// page script: load the module once
+if ('paintWorklet' in CSS) {
+  CSS.paintWorklet.addModule('/worklets/checker.js');
+}</code></pre>
+      <pre><code>/* page CSS */
+@property --density {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 8;
+}
+
+.tile {
+  --tint: oklch(70% 0.18 300);
+  --density: 8;
+  background-image: paint(checker);
+  transition: --density 400ms ease;  /* registered → animatable */
+}
+.tile:hover { --density: 16; }</code></pre>
+      <p>Because <code>--density</code> is listed in <code>inputProperties</code> and registered via <code>@property</code>, changing or transitioning it automatically re-invokes <code>paint()</code> each frame — the engine treats your painter like any other image source that depends on style.</p>
+
+      <h2>Typed OM: numbers, not strings</h2>
+      <p>The other Houdini piece worth knowing is the Typed Object Model. <code>el.style</code> traffics in strings — every read parses, every write re-parses, and a typo produces a silently ignored declaration. Typed OM exchanges real value objects:</p>
+      <pre><code>// String OM: parse → math → stringify → re-parse, every frame
+el.style.width = (parseFloat(el.style.width) + 10) + 'px';
+
+// Typed OM: numbers stay numbers
+const w = el.attributeStyleMap.get('width');   // CSSUnitValue {value: 120, unit: 'px'}
+el.attributeStyleMap.set('width', CSS.px(w.value + 10));
+
+// Invalid values throw at set time instead of failing silently
+el.attributeStyleMap.set('width', CSS.deg(45)); // TypeError, immediately</code></pre>
+      <p>For animation-heavy JavaScript this is both faster (no string round-trips in the hot path — the same concern Lesson 20.11 weighs when choosing CSS vs JS animation) and safer (type errors surface at the call site). It is complete in Chromium and partial elsewhere, so feature-detect: <code>if (el.attributeStyleMap) { … }</code>.</p>
+
+      <h2>The PE7 verdict: fallback-first, primitives-first</h2>
+      <p>Paint API code never ships without a fallback, and CSS hands you the mechanism for free: an engine that does not recognize <code>paint()</code> treats the declaration as invalid at parse time and keeps the previous one. So declare the boring background first and the painter second. There is a second failure mode people miss: in a <em>supporting</em> engine, <code>paint(checker)</code> parses even if the worklet module never loaded — and an unregistered painter draws nothing. The later declaration still wins the cascade, hiding your gradient. Defend both flanks:</p>
+      <pre><code>.tile {
+  background-color: oklch(28% 0.06 300);          /* 1. always paints   */
+  background-image: linear-gradient(135deg,        /* 2. parse-time      */
+    oklch(70% 0.18 300), oklch(55% 0.2 260));      /*    fallback        */
+  background-image: paint(checker);                /* 3. enhancement     */
+}</code></pre>
+      <p>Better still: apply <code>paint()</code> from a class your script adds only after <code>addModule()</code> resolves (the demo below does exactly this). And before reaching for a worklet at all, ask whether a shipped primitive expresses the design — gradients (Lesson 14.6), masks, or a custom <code>@function</code> (Lesson 10.3) cover most "custom background" briefs with zero JavaScript and universal support.</p>
+
+      <h2>Browser support</h2>
+      <p>Experimental tier overall. Paint API: Chrome 65+ and Edge only; Firefox and Safari do not ship it and have no announced plans. Typed OM: complete in Chromium, partial in Safari and Firefox — feature-detect <code>attributeStyleMap</code>. <code>@property</code>: production-ready everywhere (Chrome 85+, Firefox 128+, Safari 15.4+ — see Lesson 4.7). Treat <code>paint()</code> as a decorative bonus layer, never as the only rendering of meaningful UI.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — A live paint worklet with an honest fallback</h2>
+      <p>If this browser ships the Paint API, the tile below is drawn by a checkerboard painter loaded from a Blob URL — drag the slider to change <code>--pe-density</code> and watch it repaint. Everywhere else, the script never applies <code>paint()</code>, a notice appears, and you see the gradient fallback that production users would get.</p>
+      <div class="demo-frame">
+        <style>
+          @property --pe-density {
+            syntax: "<number>";
+            inherits: false;
+            initial-value: 8;
+          }
+          .demo-13-25 {
+            font-family: system-ui, sans-serif;
+            display: grid;
+            gap: 1rem;
+          }
+          .demo-13-25 .support-note {
+            margin: 0;
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.5rem;
+            background: oklch(96% 0.05 85);
+            border: 1px solid oklch(82% 0.1 85);
+            color: oklch(38% 0.09 70);
+            font-size: 0.85rem;
+          }
+          .demo-13-25 .paint-tile {
+            --pe-tint: oklch(68% 0.17 300);
+            --pe-density: 8;
+            min-block-size: 160px;
+            border-radius: 0.75rem;
+            border: 1px solid oklch(35% 0.05 300);
+            /* 1. always-safe underlayer */
+            background-color: oklch(24% 0.05 300);
+            /* 2. parse-time fallback for non-supporting engines */
+            background-image: linear-gradient(135deg,
+              oklch(68% 0.17 300 / 0.7), oklch(50% 0.16 260 / 0.7));
+          }
+          /* 3. applied only after addModule() resolves */
+          .demo-13-25.has-paint .paint-tile {
+            background-image: paint(pe-checker);
+          }
+          .demo-13-25 .controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: oklch(40% 0.02 270);
+          }
+          .demo-13-25 .controls input { flex: 1; }
+          .demo-13-25 .controls b {
+            font-family: monospace;
+            color: oklch(45% 0.18 300);
+          }
+        </style>
+        <div class="demo-13-25" id="demo1325">
+          <p class="support-note" hidden>Paint API not supported in this browser — showing the gradient fallback, exactly as production users would see it.</p>
+          <div class="paint-tile"></div>
+          <label class="controls">
+            <span>--pe-density</span>
+            <input type="range" min="4" max="32" step="1" value="8">
+            <b data-readout>8</b>
+          </label>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo1325');
+            if (!root) return;
+            var tile = root.querySelector('.paint-tile');
+            var note = root.querySelector('.support-note');
+            var range = root.querySelector('input[type="range"]');
+            var readout = root.querySelector('[data-readout]');
+            if ('paintWorklet' in CSS) {
+              var src =
+                "class PeChecker {" +
+                "  static get inputProperties() { return ['--pe-tint', '--pe-density']; }" +
+                "  paint(ctx, size, props) {" +
+                "    var density = Math.max(2, Math.round(parseFloat(props.get('--pe-density')) || 8));" +
+                "    var tint = String(props.get('--pe-tint')).trim() || '#7c6cf0';" +
+                "    var cell = size.width / density;" +
+                "    for (var y = 0; y * cell < size.height; y++) {" +
+                "      for (var x = 0; x < density; x++) {" +
+                "        if ((x + y) % 2 === 0) {" +
+                "          ctx.fillStyle = tint;" +
+                "          ctx.fillRect(x * cell, y * cell, cell + 0.5, cell + 0.5);" +
+                "        }" +
+                "      }" +
+                "    }" +
+                "  }" +
+                "}" +
+                "registerPaint('pe-checker', PeChecker);";
+              var url = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+              CSS.paintWorklet.addModule(url).then(function () {
+                root.classList.add('has-paint');
+              });
+            } else {
+              note.hidden = false;
+            }
+            range.addEventListener('input', function () {
+              tile.style.setProperty('--pe-density', range.value);
+              readout.textContent = range.value;
+            });
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <p>The editor preview cannot run JavaScript, so no worklet can ever register here — which makes it the perfect lab for the fallback cascade itself. Firefox/Safari discard <code>paint()</code> at parse time and show the gradient; Chrome parses it, gets an unregistered (empty) painter, and shows the solid underlayer. Three declarations, zero broken users.</p>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="swatch"&gt;
+  &lt;span&gt;fallback cascade&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="swatch gradient-only"&gt;
+  &lt;span&gt;gradient only (control)&lt;/span&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1.5rem; display: grid; gap: 1rem; }
+
+.swatch {
+  min-height: 110px;
+  border-radius: 0.75rem;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 0.85rem;
+
+  /* 1. always-safe underlayer — survives even an
+        unregistered painter in a supporting engine */
+  background-color: #2a2a55;
+
+  /* 2. parse-time fallback every engine understands */
+  background-image: repeating-linear-gradient(45deg,
+    #7c6cf0 0 12px, transparent 12px 24px);
+
+  /* 3. enhancement — engines without the Paint API
+        discard this invalid declaration and keep #2 */
+  background-image: paint(pe-checker);
+}
+
+/* Control: comment out declaration #3 above and both
+   swatches should match in every browser. */
+.gradient-only { background-image: repeating-linear-gradient(45deg,
+  #7c6cf0 0 12px, transparent 12px 24px); }</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>In a Chromium browser, open the demo and rewrite the worklet to draw diagonal stripes instead of a checkerboard (hint: <code>ctx.rotate()</code> or stepped <code>fillRect</code> offsets), keeping <code>--pe-density</code> as the stripe count. Then open the console and move the tile with Typed OM — <code>$0.attributeStyleMap.set('width', CSS.px(420))</code> — and compare with the string equivalent. Finally, disable JavaScript in DevTools and reload: confirm the demo degrades to the gradient with the notice visible, proving the fallback chain end to end.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.24-gap-decorations.html">&larr; Lesson 13.24</a>
+      <a href="./project/index.html">Module 13 Project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

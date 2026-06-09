@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15.16 — Blend Modes: mix-blend-mode, background-blend-mode &amp; isolation · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 15</a>
+      <span>Lesson 15.16</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 15.16 · Spectacular Effects</p>
+      <h1>Blend Modes: mix-blend-mode, background-blend-mode &amp; isolation</h1>
+      <p class="lead">Every effect in this module so far changed <em>what an element paints</em>. Blend modes change what happens <em>after</em> painting: at the compositing stage, the browser recomputes each pixel of an element from the pixels already painted beneath it. Sixteen modes, three properties, and one fencing keyword (<code>isolation</code>) — all production-grade for years.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Blending is a compositing-stage operation</h2>
+      <p>Normally an element's pixels simply replace (or alpha-composite over) whatever is behind them. With a blend mode, every result pixel becomes a <em>function of two inputs</em>: the <strong>source</strong> (the element's own painted color, <code>Cs</code>) and the <strong>backdrop</strong> (everything painted beneath it so far in the same stacking context, <code>Cb</code>). The mode is the function:</p>
+      <pre><code>/* result = blend(source, backdrop), per pixel, per channel */
+multiply:   C = Cs × Cb          /* can only darken            */
+screen:     C = 1 − (1−Cs)(1−Cb) /* can only lighten           */
+difference: C = |Cs − Cb|        /* self-inverting             */</code></pre>
+      <p>This is why blend results are <strong>content-dependent</strong>: the same element looks different over every backdrop. That is the entire point — and, as we will see, the entire risk.</p>
+      <p>Three properties drive it. <code>mix-blend-mode</code> blends an <em>element</em> against its backdrop. <code>background-blend-mode</code> blends an element's own background layers <em>against each other</em> (no other element is involved). And <code>isolation</code> decides how far up the tree a blend is allowed to reach.</p>
+
+      <h2>Sixteen modes, five families</h2>
+      <p>Do not memorize sixteen formulas — memorize five families and the one representative you will actually ship from each:</p>
+      <dl>
+        <dt>Darkening — <code>multiply</code>, <code>darken</code>, <code>color-burn</code></dt>
+        <dd>White becomes transparent in effect; black survives. <code>multiply</code> is the workhorse; <code>darken</code> takes the per-channel minimum; <code>color-burn</code> darkens with aggressive contrast.</dd>
+        <dt>Lightening — <code>screen</code>, <code>lighten</code>, <code>color-dodge</code>, <code>plus-lighter</code></dt>
+        <dd>Black becomes transparent in effect; light accumulates. <code>screen</code> is the inverse of multiply; <code>plus-lighter</code> is a true additive (Porter–Duff "plus") operator, perfect for crossfades.</dd>
+        <dt>Contrast — <code>overlay</code>, <code>soft-light</code>, <code>hard-light</code></dt>
+        <dd>Multiply in the shadows, screen in the highlights. <code>overlay</code> lets the backdrop decide; <code>hard-light</code> lets the source decide; <code>soft-light</code> is the gentle photographic variant.</dd>
+        <dt>Inversion / comparative — <code>difference</code>, <code>exclusion</code></dt>
+        <dd>Subtract the two layers. <code>difference</code> gives full inversion against white; <code>exclusion</code> is the same idea with lower contrast.</dd>
+        <dt>Component (non-separable) — <code>hue</code>, <code>saturation</code>, <code>color</code>, <code>luminosity</code></dt>
+        <dd>These do not mix channels independently; they swap whole perceptual components. <code>color</code> takes hue+saturation from the source and luminosity from the backdrop — instant tinting. <code>luminosity</code> is its mirror.</dd>
+      </dl>
+
+      <h2>The signature production patterns</h2>
+      <h3>(a) multiply — kill the white box</h3>
+      <p>A logo, signature scan, or stamp delivered as a JPEG on white. <code>multiply</code> makes white mathematically inert (<code>1 × Cb = Cb</code>) while black ink survives untouched (<code>0 × Cb = 0</code>) — no Photoshop round-trip:</p>
+      <pre><code>.partner-logo img {
+  mix-blend-mode: multiply; /* white pixels vanish on any light surface */
+}</code></pre>
+      <h3>(b) screen — glow composites on dark</h3>
+      <p>The inverse trick: on a dark theme, <code>screen</code> makes black inert and lets light stack up. Layer the neon glows from Lesson 15.6 with <code>screen</code> and overlapping halos brighten each other instead of occluding:</p>
+      <pre><code>.glow-layer {
+  mix-blend-mode: screen; /* black disappears; light adds up */
+}</code></pre>
+      <h3>(c) difference — self-inverting text over unknown imagery</h3>
+      <p>The classic fixed-header-over-hero problem: you cannot know what the text will sit on. White text in <code>difference</code> mode computes <code>|1 − Cb|</code> — it inverts whatever is behind it, staying light over dark imagery and flipping dark over light imagery:</p>
+      <pre><code>.hero-title {
+  color: white;
+  mix-blend-mode: difference;
+}</code></pre>
+      <h3>(d) color / luminosity — one-line tinting</h3>
+      <p>Put a brand-colored element behind (or in front of) a photo and blend with a component mode. <code>color</code> paints your hue over the photo's light-and-dark structure; <code>luminosity</code> keeps the photo's structure and adopts the surface's hue:</p>
+      <pre><code>.tinted-figure { background: oklch(55% 0.22 290); }
+.tinted-figure img { mix-blend-mode: luminosity; }</code></pre>
+      <h3>(e) background-blend-mode — multi-layer compositing inside one element</h3>
+      <p>The duotone hero with zero extra DOM: stack a gradient and an image as two background layers of the <em>same</em> element and blend them. Crucially, the element's text and children are not part of the blend — only the background layers are:</p>
+      <pre><code>.hero {
+  background-image:
+    linear-gradient(135deg, oklch(50% 0.25 300), oklch(72% 0.18 45)),
+    url("team.jpg");
+  background-size: cover;
+  background-blend-mode: color; /* try multiply or luminosity */
+}</code></pre>
+      <h3>(f) plus-lighter — perfect crossfades</h3>
+      <p>Crossfading two stacked images with plain opacity dims at the midpoint (0.5 over 0.5 ≠ 1). <code>plus-lighter</code> adds the premultiplied colors, so the two layers always sum to full intensity — this is the same operator the browser uses internally for view transitions:</p>
+      <pre><code>.crossfade > img { position: absolute; inset: 0; mix-blend-mode: plus-lighter; }
+.crossfade > .from { opacity: calc(1 - var(--t)); }
+.crossfade > .to   { opacity: var(--t); }
+/* at every --t, from + to = the original brightness — no mid-fade dip */</code></pre>
+
+      <h2>isolation: isolate — fencing the blend</h2>
+      <p>Root cause first: a blended element composites against <strong>everything beneath it in its stacking context</strong> — including the page background, ancestors' backgrounds, and unrelated siblings. Drop a <code>difference</code> badge into a card component and it will happily invert the body background showing through. The blend <em>leaks</em> because nothing between the element and the root established a new backdrop boundary.</p>
+      <p>A stacking context is exactly that boundary: blending flattens at the nearest stacking context and cannot reach past it. <code>isolation: isolate</code> creates a stacking context that does <em>nothing else</em> — no paint, no layout change — purely to fence the blend at the component:</p>
+      <pre><code>.card {
+  isolation: isolate; /* blends inside compose against the card, not the page */
+}</code></pre>
+      <p><strong>Debugging tip:</strong> many other properties create stacking contexts as a side effect — <code>opacity &lt; 1</code>, <code>transform</code>, <code>filter</code>, <code>will-change</code>, <code>position: fixed</code>. If a blend mysteriously "stops working" after you add a hover transform to an ancestor, that transform fenced it. Conversely, if a blend leaks, the fix is one declarative line of <code>isolation: isolate</code> on the component root — never a structural rewrite.</p>
+
+      <h2>Accessibility: contrast becomes content-dependent</h2>
+      <p>With <code>difference</code> or <code>overlay</code> text, the rendered contrast is a runtime function of the backdrop — your design tool cannot certify it. At the exact moment a <code>difference</code> headline crosses a mid-gray region, <code>|1 − 0.5| = 0.5</code>: the text matches its backdrop and contrast collapses to zero. Test blended text against the <em>worst-case</em> region of every backdrop it can encounter (the WCAG procedure from Lesson 19.2), and keep a solid-color fallback path — a scrim or text-shadow — for content where legibility is non-negotiable. Decorative blends are fine; blended <em>body text</em> over arbitrary imagery is a contrast bug waiting to ship.</p>
+
+      <h2>Performance: blending is paint-stage work</h2>
+      <p>Blend modes are evaluated during paint/compositing of the layer tree — they are cheap in steady state but force the engine to keep the backdrop available and re-resolve the blend whenever either input changes. The budget rules from Lessons 20.1 and 20.2 apply directly: animating <em>within</em> a blended subtree (especially animating the blended element's position over a complex backdrop) triggers continuous repaints. Prefer animating something cheap underneath a static blended layer (as the demo below does with <code>background-position</code>), keep blended regions small, and never combine large blended surfaces with <code>backdrop-filter</code> on low-end targets.</p>
+      <p><strong>Support:</strong> all of this is ancient, production-safe CSS — <code>mix-blend-mode</code> and <code>background-blend-mode</code> have shipped in every engine since ~2015. The one newer value, <code>plus-lighter</code>, is also cross-browser (Chrome 100+, Firefox 100+, Safari 15.4+). No <code>@supports</code> required.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Difference text, a duotone hero, and the isolation fence</h2>
+      <p>Three panels. First, a static <code>difference</code> headline while a split light/dark background sweeps beneath it — the letters self-invert as the boundary crosses. Second, a duotone hero built from two background layers of one element. Third, the same blended chip with and without <code>isolation: isolate</code> on its group.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-15-16 {
+            font-family: system-ui, sans-serif;
+            display: grid;
+            gap: 1.25rem;
+          }
+          .demo-15-16 h3 { margin: 0; }
+          .demo-15-16 .panel-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: oklch(65% 0.12 300);
+            margin: 0 0 0.5rem;
+          }
+
+          /* 1 — difference headline over a sliding split backdrop */
+          .demo-15-16 .diff-scene {
+            position: relative;
+            display: grid;
+            place-items: center;
+            block-size: 110px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: linear-gradient(90deg,
+              oklch(97% 0.01 270) 0 50%,
+              oklch(12% 0.02 270) 50% 100%);
+            background-size: 200% 100%;
+            animation: split-sweep-15-16 5s ease-in-out infinite alternate;
+          }
+          .demo-15-16 .diff-scene h3 {
+            font-size: clamp(1.5rem, 5cqi + 1rem, 2.5rem);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: white;
+            mix-blend-mode: difference;
+          }
+          @keyframes split-sweep-15-16 {
+            from { background-position: 0% 0; }
+            to   { background-position: 100% 0; }
+          }
+
+          /* 2 — duotone hero: gradient + faux "photo", one element */
+          .demo-15-16 .duotone {
+            border-radius: 0.75rem;
+            padding: 2rem 1.5rem;
+            color: white;
+            background-image:
+              linear-gradient(135deg, oklch(50% 0.25 300), oklch(72% 0.18 45)),
+              radial-gradient(circle at 75% 25%, oklch(92% 0 0), oklch(30% 0 0) 65%),
+              repeating-linear-gradient(45deg, oklch(22% 0 0) 0 18px, oklch(70% 0 0) 18px 36px);
+            background-blend-mode: color, multiply, normal;
+          }
+          .demo-15-16 .duotone h3 { font-size: 1.5rem; font-weight: 800; }
+          .demo-15-16 .duotone p { margin: 0.35rem 0 0; max-inline-size: 42ch; opacity: 0.9; }
+
+          /* 3 — isolation on/off */
+          .demo-15-16 .iso-compare {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+          }
+          .demo-15-16 .iso-scene {
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            background: linear-gradient(120deg,
+              oklch(80% 0.16 90), oklch(55% 0.24 300), oklch(70% 0.2 190));
+          }
+          .demo-15-16 .iso-group {
+            display: grid;
+            place-items: center;
+            padding: 1.25rem;
+            border: 2px dashed oklch(100% 0 0 / 0.6);
+            border-radius: 0.5rem;
+          }
+          .demo-15-16 .iso-group.isolated { isolation: isolate; }
+          .demo-15-16 .iso-chip {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            background: oklch(85% 0.1 90);
+            mix-blend-mode: difference;
+          }
+          .demo-15-16 .iso-scene p {
+            margin: 0.75rem 0 0;
+            font-size: 0.8rem;
+            color: oklch(20% 0.02 270);
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .demo-15-16 .diff-scene { animation: none; background-position: 50% 0; }
+          }
+        </style>
+        <div class="demo-15-16">
+          <div>
+            <p class="panel-label">1 · mix-blend-mode: difference</p>
+            <div class="diff-scene"><h3>SELF-INVERTING</h3></div>
+          </div>
+          <div>
+            <p class="panel-label">2 · background-blend-mode duotone — zero extra DOM</p>
+            <div class="duotone">
+              <h3>Duotone Hero</h3>
+              <p>The gradient and the grayscale "photo" are background layers of this one element, blended with <code>color</code> + <code>multiply</code>. This text is not part of the blend.</p>
+            </div>
+          </div>
+          <div>
+            <p class="panel-label">3 · the leak, and the fence</p>
+            <div class="iso-compare">
+              <div class="iso-scene">
+                <div class="iso-group"><span class="iso-chip">difference</span></div>
+                <p>No isolation — the chip blends through its group and inverts the scene gradient.</p>
+              </div>
+              <div class="iso-scene">
+                <div class="iso-group isolated"><span class="iso-chip">difference</span></div>
+                <p><code>isolation: isolate</code> — the group fences the blend; the chip keeps its own color.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="hero"&gt;
+  &lt;h1&gt;DUOTONE&lt;/h1&gt;
+  &lt;p&gt;Two background layers, one element, blended.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="split"&gt;
+  &lt;h2&gt;DIFFERENCE&lt;/h2&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { margin: 0; font-family: system-ui; }
+
+/* Duotone: gradient blended over a grayscale "image" */
+.hero {
+  padding: 3rem 2rem;
+  color: white;
+  background-image:
+    linear-gradient(135deg, #7a2bd6, #ff8a3c),
+    radial-gradient(circle at 70% 30%, #eee, #222 65%),
+    repeating-linear-gradient(45deg, #333 0 16px, #aaa 16px 32px);
+  background-blend-mode: color, multiply, normal;
+}
+.hero h1 { margin: 0; font-size: 2.5rem; }
+.hero p { margin: .25rem 0 0; opacity: .9; }
+
+/* Self-inverting heading over a split backdrop */
+.split {
+  display: grid;
+  place-items: center;
+  min-height: 30vh;
+  background: linear-gradient(90deg,
+    #f5f5fa 0 50%, #14141f 50% 100%);
+}
+.split h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  color: white;
+  mix-blend-mode: difference;
+}
+
+/* Try: change `color` to `luminosity` in the hero.
+   Try: add isolation: isolate to .split and see
+   the blend fence (here the backdrop is local anyway). */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a card component containing a <code>difference</code>-blended price badge, and place the card on a page with a vivid gradient body background. (1) Observe the leak: the badge inverts the page gradient, not the card. (2) Fence it with <code>isolation: isolate</code> on the card. (3) Now add <code>transform: translateY(-2px)</code> on card hover and remove <code>isolation</code> — confirm the transform's implicit stacking context fences the blend identically, and write a one-line comment in your CSS explaining why. (4) Finally, find the worst-case backdrop pixel for the badge text and check it against the contrast procedure from Lesson 19.2.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-15.15-mega-scroll-experience.html">&larr; Lesson 15.15</a>
+      <a href="./lesson-15.17-masking-mastery.html">Lesson 15.17 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

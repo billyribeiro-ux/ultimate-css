@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.9 — Variable Fonts, Font Features & Color Fonts · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.9</p>
+      <h1>Variable Fonts, Font Features &amp; Color Fonts</h1>
+      <p class="lead">A traditional font family ships one file per weight — four weights, four network requests, and nothing in between. Variable fonts collapse the whole design space into a single file with continuous axes, and OpenType features unlock the typographic detail that is already sitting inside it. This lesson covers the high-level CSS that drives both, and the color-font layer (<code>COLRv1</code>, <code>font-palette</code>) that sits on top.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why static weights waste bandwidth and design range</h2>
+      <p>The root problem is quantization. A static family exposes a handful of points — 400, 500, 700 — sampled from a continuous design. Every weight you ship costs another file (often 20–60&nbsp;KB of woff2 each), and every weight you <em>don't</em> ship is a design decision you can never make. A variable font stores the extremes plus interpolation deltas, so one file (typically 1.2–1.8× the size of a <em>single</em> static weight) yields every weight from 100 to 900, every width, every optical size. Fewer requests, smaller total payload, and <code>font-weight: 580</code> becomes a legitimate, renderable value.</p>
+      <pre><code>/* One @font-face rule covers the whole weight range */
+@font-face {
+  font-family: "Inter Var";
+  src: url("/fonts/inter-var.woff2") format("woff2") tech(variations);
+  font-weight: 100 900;   /* a RANGE, not a point */
+  font-style: normal;
+  font-display: swap;     /* loading strategy: Lesson 20.6 */
+}</code></pre>
+
+      <h2>The five registered axes — drive them with high-level properties</h2>
+      <p>OpenType registers five standard axes, and each one maps to an existing CSS property. This mapping is the most important fact in the lesson: when a registered axis exists, the high-level property is the correct interface.</p>
+      <pre><code>/* wght — weight: any number in the font's range */
+font-weight: 580;
+
+/* wdth — width: percentage via font-stretch */
+font-stretch: 87.5%;          /* (being renamed font-width; */
+                              /*  font-stretch is the compat name) */
+
+/* slnt — slant: oblique with an angle.
+   Gotcha: oblique 12deg maps to slnt = -12 (sign is negated). */
+font-style: oblique 12deg;
+
+/* ital — italic: a 0/1 switch, not an angle */
+font-style: italic;
+
+/* opsz — optical size: tracked automatically from font-size */
+font-optical-sizing: auto;    /* the initial value — leave it on */</code></pre>
+      <p><code>font-optical-sizing: auto</code> deserves a sentence of mechanics: fonts with an <code>opsz</code> axis redraw themselves for the size they are rendered at — higher contrast and tighter spacing at display sizes, sturdier strokes and open apertures at caption sizes. The browser feeds the computed <code>font-size</code> into the axis for you. Only set it to <code>none</code> when you deliberately want display-cut letterforms at small sizes.</p>
+
+      <h2>font-variation-settings — the low-level escape hatch</h2>
+      <p><code>font-variation-settings</code> addresses axes by four-character tag, which is the only way to reach <em>custom</em> axes (<code>GRAD</code>, <code>YTAS</code>, <code>CASL</code>…). But it is deliberately low-level, and it has two sharp edges. First, it <strong>overrides the high-level properties</strong>: a <code>"wght" 700</code> here silently beats any <code>font-weight</code> in the cascade, including ones set later. Second, it does not compose — each declaration replaces the entire axis list, so a child that sets only <code>"GRAD"</code> wipes out an inherited <code>"wght"</code>. The PE7 rule: high-level properties for registered axes, <code>font-variation-settings</code> only for custom axes, and route values through custom properties so there is exactly one place each axis is written.</p>
+      <pre><code>:root { --grade: 0; --casual: 0; }
+
+.recursive-sample {
+  font-weight: 450;                       /* registered axis: high-level */
+  font-variation-settings: "CASL" var(--casual),
+                           "GRAD" var(--grade);  /* custom axes only */
+}
+/* Change an axis by changing the custom property —
+   never by writing a second font-variation-settings rule. */</code></pre>
+
+      <h2>Animating axes</h2>
+      <p>Axis values are numbers, so they interpolate. The simple case needs nothing special: with a variable font loaded, <code>transition: font-weight 200ms</code> animates smoothly through every intermediate weight — a beautiful hover affordance for nav links. <code>font-variation-settings</code> also transitions, but only when the start and end values list the <em>same axes in the same order</em>; otherwise it falls back to a discrete flip. To animate a single custom axis independently, register a custom property with <code>@property</code> so the engine knows it is a <code>&lt;number&gt;</code> and can interpolate it, then feed it into the settings list.</p>
+      <pre><code>@property --grade {
+  syntax: "&lt;number&gt;";
+  inherits: false;
+  initial-value: 0;
+}
+.link {
+  --grade: 0;
+  font-variation-settings: "GRAD" var(--grade);
+  transition: --grade 200ms ease-out;   /* the NUMBER animates */
+}
+.link:hover { --grade: 150; }
+
+/* Registered axes are simpler still: */
+.nav-link { transition: font-weight 200ms; }
+.nav-link:hover { font-weight: 700; }</code></pre>
+      <p>One caution: weight changes alter glyph advance widths, so animating <code>font-weight</code> on inline text causes layout shift mid-animation. Reserve it for single-line UI text, or pick a font with a <code>GRAD</code> axis, which changes stroke weight <em>without</em> changing widths — that is literally what the axis is for.</p>
+
+      <h2>OpenType features: font-variant-* before font-feature-settings</h2>
+      <p>The same high-level/low-level split applies to OpenType features. <code>font-feature-settings</code> is the tag-based escape hatch with the same replace-don't-compose behavior; the <code>font-variant-*</code> family is the cascading, composable, self-documenting interface. The ones that earn their place in a base layer:</p>
+      <pre><code>/* Data tables, timers, anything that must align vertically:
+   every digit gets the same advance width. */
+.stats td, .timer { font-variant-numeric: tabular-nums; }
+
+/* Book-style prose: lowercase-height figures that sit in text */
+.prose { font-variant-numeric: oldstyle-nums; }
+
+/* Ligatures: common ones are on by default; discretionary opt-in */
+.display { font-variant-ligatures: discretionary-ligatures; }
+code     { font-variant-ligatures: none; }  /* != stays two glyphs */
+
+/* Small caps — uses REAL small-cap glyphs when the font has them */
+abbr { font-variant-caps: small-caps; }</code></pre>
+      <p>The small-caps caveat is a classic root-cause item: if the font has no <code>smcp</code> feature, the browser <em>synthesizes</em> small caps by scaling down capitals — visibly too light, with mismatched stroke weight. <code>font-synthesis: none</code> (or the granular <code>font-synthesis-small-caps: none</code>) disables the fake and falls back to normal lowercase, which is usually the better failure mode. The same property suppresses faux-bold and faux-italic when a variable font's real axes should be doing the work.</p>
+
+      <h2>font-size-adjust — fallback fonts that match</h2>
+      <p>While your variable font loads, the fallback renders — and if its x-height ratio differs, the swap reflows the page (the layout-shift mechanics are Lesson 20.6's territory). <code>font-size-adjust</code> scales the fallback so its x-height matches a target ratio, and the modern <code>from-font</code> value reads that ratio straight from the first available font:</p>
+      <pre><code>body {
+  font-family: "Inter Var", system-ui, sans-serif;
+  font-size-adjust: from-font;  /* fallbacks inherit Inter's x-height */
+}</code></pre>
+      <p>Pair this with the <code>size-adjust</code>, <code>ascent-override</code>, and <code>descent-override</code> descriptors in a fallback <code>@font-face</code> for near-zero-CLS font loading — the full recipe lives in Lesson 20.6, and the type tokens these settings hang off were defined in Lesson 4.5.</p>
+
+      <h2>Color fonts: COLRv1 and font-palette</h2>
+      <p>COLRv1 fonts carry vector color layers — gradients, compositing — inside the glyph data, which makes them tiny compared to bitmap-emoji formats and fully recolorable from CSS. The font ships one or more <em>palettes</em>; <code>font-palette</code> picks one, and <code>@font-palette-values</code> defines your own by starting from a base palette and overriding indexed entries:</p>
+      <pre><code>@font-palette-values --brand {
+  font-family: "Nabla";        /* must name the family it applies to */
+  base-palette: 1;             /* start from the font's palette #1 */
+  override-colors:
+    0 oklch(70% 0.19 280),     /* recolor palette entry 0 */
+    1 oklch(85% 0.10 200);
+}
+
+h1.fancy {
+  font-family: "Nabla", sans-serif;
+  font-palette: --brand;       /* also: normal | light | dark */
+}</code></pre>
+      <p>The <code>light</code> and <code>dark</code> keywords select palettes the font itself marks as scheme-appropriate — combine with Lesson 6.7's <code>color-scheme</code> work for color glyphs that follow the user's theme.</p>
+
+      <h2>Support status and feature detection</h2>
+      <p>Everything in this lesson is <strong>production</strong>: variable-font axes, <code>font-optical-sizing</code>, the <code>font-variant-*</code> family, and <code>font-size-adjust</code> are supported across all three engines; <code>font-palette</code> shipped in Chrome&nbsp;101+, Firefox&nbsp;107+, and Safari&nbsp;15.4+. The one thing worth gating is the <em>font file format</em> you serve, and <code>@supports</code> grew dedicated functions for exactly this:</p>
+      <pre><code>@supports font-tech(color-COLRv1) {
+  h1.fancy { font-family: "Nabla", sans-serif; }
+}
+@supports not font-tech(color-COLRv1) {
+  h1.fancy { color: oklch(70% 0.19 280); }  /* flat-color fallback */
+}
+
+/* Also available: format detection */
+@supports font-format(woff2) { /* ... */ }</code></pre>
+      <p>The same belt-and-braces logic exists at <code>@font-face</code> level: <code>src</code> entries with <code>tech(color-COLRv1)</code> are skipped by browsers that cannot render them, falling through to the next source. Use the <code>src</code> list for file selection and <code>@supports font-tech()</code> for styling differences.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — a type specimen panel</h2>
+      <p>This demo runs entirely on <code>system-ui</code> — the system fonts on macOS (SF&nbsp;Pro) and Windows (Segoe UI Variable) are themselves variable fonts, so the weight sweep below interpolates smoothly on most machines with zero font downloads. Compare the numeral columns, then flip the feature toggles.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-6-9 { font-family: system-ui, sans-serif; display: grid; gap: 1rem; }
+          .demo-6-9 .panel { padding: 1rem; background: oklch(97% 0.005 264); border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; }
+          .demo-6-9 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-6-9 .sweep { display: flex; flex-wrap: wrap; gap: .25rem 1rem; align-items: baseline; font-size: 1.5rem; }
+          .demo-6-9 .sweep span { font-weight: var(--w); }
+          .demo-6-9 .sweep small { display: block; font-size: .65rem; font-weight: 400; color: oklch(55% 0.02 264); font-variant-numeric: tabular-nums; }
+          .demo-6-9 .live { font-size: 2rem; font-weight: 100; }
+          @media (prefers-reduced-motion: no-preference) {
+            .demo-6-9 .live { animation: demo-6-9-sweep 3s ease-in-out infinite alternate; }
+          }
+          @keyframes demo-6-9-sweep { from { font-weight: 100; } to { font-weight: 900; } }
+          .demo-6-9 .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .demo-6-9 .clock { margin: .15rem 0; font-size: 1.1rem; }
+          .demo-6-9 .tab .clock { font-variant-numeric: tabular-nums; }
+          .demo-6-9 .nums p.note { margin: .5rem 0 0; font-size: .75rem; color: oklch(45% 0.02 264); font-variant-numeric: normal; }
+          .demo-6-9 .toggles label { margin-inline-end: 1.25rem; font-size: .85rem; }
+          .demo-6-9 .sample { margin: .75rem 0 0; font-size: 1.35rem; }
+          .demo-6-9 .panel:has(.t-caps:checked) .sample { font-variant-caps: small-caps; }
+          .demo-6-9 .panel:has(.t-ligs:checked) .sample { font-variant-ligatures: common-ligatures; }
+          .demo-6-9 .panel:not(:has(.t-ligs:checked)) .sample { font-variant-ligatures: none; }
+        </style>
+        <div class="demo-6-9">
+          <div class="panel">
+            <h4>One file, every weight — wght axis</h4>
+            <div class="sweep">
+              <span style="--w: 100">Aa<small>100</small></span>
+              <span style="--w: 250">Aa<small>250</small></span>
+              <span style="--w: 400">Aa<small>400</small></span>
+              <span style="--w: 580">Aa<small>580</small></span>
+              <span style="--w: 700">Aa<small>700</small></span>
+              <span style="--w: 900">Aa<small>900</small></span>
+            </div>
+            <p class="live">Interpolated, not faked</p>
+          </div>
+          <div class="nums">
+            <div class="panel prop">
+              <h4>Proportional (default)</h4>
+              <p class="clock">00:09:41.118</p>
+              <p class="clock">11:11:11.111</p>
+              <p class="note">Ones are narrow — columns wobble as a timer ticks.</p>
+            </div>
+            <div class="panel tab">
+              <h4>font-variant-numeric: tabular-nums</h4>
+              <p class="clock">00:09:41.118</p>
+              <p class="clock">11:11:11.111</p>
+              <p class="note">Every digit shares one width — rock-solid alignment.</p>
+            </div>
+          </div>
+          <div class="panel toggles">
+            <h4>Feature toggles</h4>
+            <label><input type="checkbox" class="t-caps"> small-caps</label>
+            <label><input type="checkbox" class="t-ligs" checked> ligatures</label>
+            <p class="sample">The Official Afflicted Waffle Office</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article class="specimen"&gt;
+  &lt;h1&gt;Variable specimen&lt;/h1&gt;
+  &lt;p class="w"&gt;Weight 350 — between the static cuts.&lt;/p&gt;
+  &lt;p class="w" style="--w: 580"&gt;Weight 580 — pick any number.&lt;/p&gt;
+  &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Region&lt;/th&gt;&lt;th class="num"&gt;Revenue&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;North&lt;/td&gt;&lt;td class="num"&gt;1,118.41&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;South&lt;/td&gt;&lt;td class="num"&gt;7,090.13&lt;/td&gt;&lt;/tr&gt;
+  &lt;/table&gt;
+  &lt;p&gt;Defined in the &lt;abbr&gt;css&lt;/abbr&gt; spec as &lt;abbr&gt;colr&lt;/abbr&gt; v1.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; }
+/* system-ui is variable on macOS and Windows — intermediate
+   weights below interpolate instead of snapping to 400/700. */
+
+.specimen h1 {
+  font-weight: 650;
+  font-optical-sizing: auto;
+  margin: 0 0 .5rem;
+}
+
+.w { font-weight: var(--w, 350); margin: .25rem 0; }
+
+table { border-collapse: collapse; margin-block: 1rem; }
+td, th { border: 1px solid oklch(85% 0.01 264); padding: .35rem .6rem; }
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;  /* try removing this */
+}
+
+abbr {
+  font-variant-caps: small-caps;
+  font-synthesis: none;   /* no faux small caps if unsupported */
+  text-decoration: none;
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Upgrade a static-font project to variable. (1) Replace the multiple <code>@font-face</code> weight files with one variable file and a <code>font-weight: 100 900</code> range descriptor, then delete every now-redundant rule. (2) Find one data table or timer and apply <code>font-variant-numeric: tabular-nums</code> — confirm the columns stop wobbling as values change. (3) Add <code>font-synthesis: none</code> to your base layer and check whether anything was secretly relying on faux-bold or synthesized small caps. (4) Add a hover transition on <code>font-weight</code> to your nav links and verify it interpolates smoothly — then check the layout-shift caveat by watching the adjacent links move, and decide whether a <code>GRAD</code>-axis font would serve better.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.8-margin-trim-text-details.html">&larr; Lesson 6.8</a>
+      <a href="./lesson-6.10-international-typography.html">Lesson 6.10 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

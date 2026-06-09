@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10.7 — Trigonometry &amp; Advanced Math: sin(), cos(), atan2() &amp; pow() · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 10</a>
+      <span>Lesson 10.7</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 10.7</p>
+      <h1>Trigonometry &amp; Advanced Math: sin(), cos(), atan2() &amp; pow()</h1>
+      <p class="lead">CSS now ships a full scientific calculator: trigonometry, exponentials, real constants. That sounds academic until you realize what it buys — circular layouts without hand-computed coordinates, organic wave choreography, distance-based scaling, and type scales that are <em>computed</em> from a ratio instead of hardcoded from one. All of it production-ready.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The math CSS was missing</h2>
+      <p>Lesson 13.4 covered the stepped-value functions — <code>round()</code>, <code>mod()</code>, <code>rem()</code>, <code>sign()</code>, <code>abs()</code> — and Lesson 21.15 put <code>round()</code> + <code>clamp()</code> to work. This lesson completes the set:</p>
+      <pre><code>/* Trigonometric */
+sin(x)  cos(x)  tan(x)          /* angle (or number = radians) in, NUMBER out */
+asin(x) acos(x) atan(x)         /* number in, ANGLE out */
+atan2(y, x)                     /* two values in, quadrant-correct ANGLE out */
+
+/* Exponential */
+pow(base, exp)  sqrt(x)         /* sqrt(x) === pow(x, 0.5) */
+hypot(a, b, …)                  /* √(a² + b² + …) — true euclidean distance */
+log(x, base?)   exp(x)          /* natural log by default; exp(x) === pow(e, x) */
+
+/* Constants — usable anywhere a number is */
+e  pi  infinity  -infinity  NaN
+
+--circumference: calc(2 * pi * var(--radius));
+inline-size: calc(infinity * 1px);   /* the "max it out" pill-radius idiom */</code></pre>
+
+      <h2>Types: angles in, numbers out</h2>
+      <p>The mechanic everything else builds on: <code>sin()</code>, <code>cos()</code>, <code>tan()</code> accept an angle in any unit — <code>deg</code>, <code>rad</code>, <code>turn</code>, <code>grad</code> — or a bare number, which is treated as radians. They return a unitless <strong>number</strong> between −1 and 1. To turn that number back into geometry, multiply it by a length. This is the single most important pattern in the lesson:</p>
+      <pre><code>:root {
+  --angle: 60deg;
+  --radius: 120px;
+  --x: calc(cos(var(--angle)) * var(--radius));  /* number × length = length */
+  --y: calc(sin(var(--angle)) * var(--radius));
+}
+.node { translate: var(--x) var(--y); }</code></pre>
+      <p>The inverse functions go the other way — <code>asin()</code>/<code>acos()</code>/<code>atan()</code>/<code>atan2()</code> take numbers (or, for <code>atan2()</code>, two same-type values) and return an <strong>angle</strong>, ready to feed straight into <code>rotate</code> or a gradient direction.</p>
+
+      <h2>Application 1 — the circular menu</h2>
+      <p>The canonical use case: N items evenly distributed on a ring. One formula computes the angle from the index; <code>cos()</code>/<code>sin()</code> convert polar to cartesian. No design tool, no JS, no hand-typed coordinate table:</p>
+      <pre><code>.menu {
+  --count: 8;
+  --r: 110px;
+  position: relative;
+}
+.menu .item {
+  /* −90deg starts the first item at 12 o'clock */
+  --angle: calc(360deg / var(--count) * var(--i) - 90deg);
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate:
+    calc(cos(var(--angle)) * var(--r) - 50%)
+    calc(sin(var(--angle)) * var(--r) - 50%);
+}
+
+/* Feed --i from sibling-index() where supported (Lesson 9.6
+   used the same enhancement); per-item --i is the fallback */
+@supports (width: calc(sibling-index() * 1px)) {
+  .menu .item { --i: calc(sibling-index() - 1); }
+}</code></pre>
+      <p>Because everything derives from <code>--count</code>, adding a ninth item is a one-token change — the ring redistributes itself. Lesson 9.9's <code>ray()</code> achieves similar placement declaratively; use the trig version when you need the raw x/y values for shadows, gradients, or anchored decorations.</p>
+
+      <h2>Application 2 — wave choreography with sin()</h2>
+      <p>Lesson 9.6's stagger was linear: delay grows in equal steps, motion arrives as a uniform sweep. Feed the index through <code>sin()</code> instead and the row undulates — amplitude rises and falls organically, like a crowd wave:</p>
+      <pre><code>.bar {
+  /* one full wave across 10 items: 360° ÷ 10 = 36° per index */
+  --wave: sin(calc(var(--i) * 36deg));         /* −1 … 1 */
+  block-size: calc(2.5rem + var(--wave) * 2rem);
+  translate: 0 calc(var(--wave) * -0.5rem);
+  animation-delay: calc((var(--wave) + 1) * 150ms);
+}</code></pre>
+      <p>The shift in thinking: the index stops being a counter and becomes a <em>sample position on a curve</em>. Swap <code>sin()</code> for <code>cos()</code> to phase-shift, multiply the angle to add more wave cycles, sum two waves for interference patterns.</p>
+
+      <h2>Application 3 — hypot() for true distance</h2>
+      <p><code>hypot()</code> returns the euclidean length of a vector — which means "distance from a focal point" becomes a pure CSS expression. Scale a grid of cells by their distance from the center cell and you get a fisheye falloff with two custom properties:</p>
+      <pre><code>.cell {
+  --dx: calc(var(--col) - 2);     /* center column = 2 */
+  --dy: calc(var(--row) - 2);     /* center row    = 2 */
+  --d: hypot(var(--dx), var(--dy));   /* 0 at center, √8 at corners */
+  scale: calc(1 / (1 + var(--d) * 0.25));
+  opacity: calc(1 - var(--d) * 0.18);
+}</code></pre>
+      <p>Compare with the naive <code>abs(var(--col) - 2)</code>: that is Manhattan distance, and the falloff looks diamond-shaped. <code>hypot()</code> gives the circular falloff your eye expects.</p>
+
+      <h2>Application 4 — pow() for computable scales</h2>
+      <p>Lesson 4.5 built a modular type scale on a 1.25 ratio — with every step hardcoded, because CSS could not compute <code>ratio<sup>n</sup></code>. Now it can. The ratio becomes a single token and the scale becomes arithmetic:</p>
+      <pre><code>:root {
+  --ratio: 1.25;                 /* one knob: try 1.2 or 1.333 */
+  --step-0: 1rem;
+  --step--1: calc(var(--step-0) * pow(var(--ratio), -1)); /* 0.8rem  */
+  --step-1:  calc(var(--step-0) * pow(var(--ratio), 1));  /* 1.25rem */
+  --step-2:  calc(var(--step-0) * pow(var(--ratio), 2));  /* 1.563rem */
+  --step-3:  calc(var(--step-0) * pow(var(--ratio), 3));  /* 1.953rem */
+  --step-4:  calc(var(--step-0) * pow(var(--ratio), 4));  /* 2.441rem */
+}</code></pre>
+      <p>The same trick generates exponential spacing scales and easing-like falloffs (<code>pow(0.5, var(--i))</code> halves a value per index). <code>sqrt()</code> and <code>log()</code> round out the family — <code>log()</code> is the tool when you need "how many doublings fit", the inverse question of <code>pow()</code>.</p>
+
+      <h2>Application 5 — atan2() for aiming</h2>
+      <p><code>atan2(y, x)</code> converts a vector into the angle that points along it — quadrant-correct, and safe when <code>x</code> is zero (where naive <code>atan(y / x)</code> divides by zero). Give an element the vector to its target as two custom properties and it aims itself:</p>
+      <pre><code>.arrow {
+  /* vector to the target; same type for both args:
+     two numbers, or two lengths */
+  --dx: 120;
+  --dy: -80;
+  rotate: atan2(var(--dy), var(--dx));   /* returns an &lt;angle&gt; */
+}</code></pre>
+      <p>Static uses: connector arrows between cards whose offsets you know at build time. Dynamic uses: JS writes <code>--dx</code>/<code>--dy</code> from pointer position (two style writes), and CSS owns the rotation, the units, and the rendering — a clean division of labor.</p>
+
+      <h2>Browser support</h2>
+      <p>Production across the board: the trigonometric and exponential functions plus the <code>e</code>/<code>pi</code>/<code>infinity</code> constants shipped together in Chrome 111+, Firefox 108+, and Safari 15.4+. No <code>@supports</code> gate needed. The only progressive piece in this lesson is the optional <code>sibling-index()</code> feed for <code>--i</code> — keep per-item custom properties as the universal fallback, exactly as in Lesson 9.6.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — A trig-placed ring and a sine wave</h2>
+      <p>Eight nodes placed on a circle purely with <code>cos()</code>/<code>sin()</code> custom-property math — no coordinates were typed — above a bar row whose heights are sampled from <code>sin()</code> by index. Change nothing but <code>--count</code> or the per-index angle and both redistribute.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-10-7 { display: grid; gap: 1.5rem; justify-items: center; padding-block: 1rem; }
+          .demo-10-7 .ring {
+            --count: 8;
+            --r: calc(min(240px, 60vw) / 2 - 1.5rem);
+            position: relative;
+            inline-size: min(240px, 60vw);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 1px dashed oklch(85% 0.02 275);
+          }
+          .demo-10-7 .node {
+            --angle: calc(360deg / var(--count) * var(--i) - 90deg);
+            position: absolute;
+            inset: 50% auto auto 50%;
+            inline-size: 2.25rem; aspect-ratio: 1; border-radius: 50%;
+            display: grid; place-items: center;
+            font: 700 .8rem system-ui;
+            color: #fff;
+            background: oklch(55% 0.2 calc(var(--i) * 45 + 250));
+            translate:
+              calc(cos(var(--angle)) * var(--r) - 50%)
+              calc(sin(var(--angle)) * var(--r) - 50%);
+          }
+          .demo-10-7 .wave {
+            display: flex; align-items: center; gap: .375rem;
+            block-size: 6rem;
+          }
+          .demo-10-7 .wave i {
+            --s: sin(calc(var(--i) * 30deg));        /* −1 … 1 */
+            inline-size: .875rem;
+            block-size: calc(2.75rem + var(--s) * 2.25rem);
+            border-radius: 999px;
+            background: oklch(calc(60% + var(--s) * 15%) 0.18 275);
+          }
+        </style>
+        <div class="demo-10-7" aria-hidden="true">
+          <div class="ring">
+            <span class="node" style="--i: 0">1</span>
+            <span class="node" style="--i: 1">2</span>
+            <span class="node" style="--i: 2">3</span>
+            <span class="node" style="--i: 3">4</span>
+            <span class="node" style="--i: 4">5</span>
+            <span class="node" style="--i: 5">6</span>
+            <span class="node" style="--i: 6">7</span>
+            <span class="node" style="--i: 7">8</span>
+          </div>
+          <div class="wave">
+            <i style="--i: 0"></i><i style="--i: 1"></i><i style="--i: 2"></i>
+            <i style="--i: 3"></i><i style="--i: 4"></i><i style="--i: 5"></i>
+            <i style="--i: 6"></i><i style="--i: 7"></i><i style="--i: 8"></i>
+            <i style="--i: 9"></i><i style="--i: 10"></i><i style="--i: 11"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="ring"&gt;
+  &lt;span class="node" style="--i: 0"&gt;A&lt;/span&gt;
+  &lt;span class="node" style="--i: 1"&gt;B&lt;/span&gt;
+  &lt;span class="node" style="--i: 2"&gt;C&lt;/span&gt;
+  &lt;span class="node" style="--i: 3"&gt;D&lt;/span&gt;
+  &lt;span class="node" style="--i: 4"&gt;E&lt;/span&gt;
+  &lt;span class="node" style="--i: 5"&gt;F&lt;/span&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  background: #0c0c1a; font-family: system-ui;
+}
+
+.ring {
+  --count: 6;     /* change me — the ring redistributes */
+  --r: 100px;
+  position: relative;
+  width: 260px; aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px dashed #3a3a5c;
+}
+
+.node {
+  /* index → angle → x/y, all in CSS */
+  --angle: calc(360deg / var(--count) * var(--i) - 90deg);
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 44px; aspect-ratio: 1; border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 700; color: #fff;
+  background: oklch(60% 0.2 calc(var(--i) / var(--count) * 360));
+  translate:
+    calc(cos(var(--angle)) * var(--r) - 50%)
+    calc(sin(var(--angle)) * var(--r) - 50%);
+}
+
+/* Try:
+   1. --count: 8 (and add nodes G, H)
+   2. scale each node by distance from node 0:
+      scale: calc(1 - abs(var(--i) - 0) * 0.06);
+   3. a pow() scale: width: calc(28px * pow(1.15, var(--i))); */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build a "radar" component that uses four of the five applications at once. (1) Place 8 blips on a ring with the <code>cos()</code>/<code>sin()</code> pattern, driven by <code>--count</code> so the math survives a change to 12. (2) Size each blip with <code>pow(0.85, var(--i))</code> so they shrink exponentially, not linearly — compare both and notice the difference. (3) Add a center "sweep" arm and aim it at blip 3 using <code>atan2()</code> with the blip's <code>--dx</code>/<code>--dy</code>. (4) Underneath, render a 12-bar signal strip whose heights sample <code>sin(calc(var(--i) * 30deg))</code>, then sum a second wave — <code>sin(calc(var(--i) * 75deg)) * 0.5</code> — and watch interference appear. If you animate the sweep, gate it behind <code>prefers-reduced-motion: no-preference</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-10.6-target-current-scrollspy.html">← Lesson 10.6</a>
+      <a href="./project/index.html">Module 10 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

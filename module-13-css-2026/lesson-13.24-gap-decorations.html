@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.24 — Gap Decorations: Rules Between Grid &amp; Flex Tracks · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.24</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Experimental · Chrome 149 (June 2026) · Firefox/Safari planned</p>
+      <p class="badge">Lesson 13.24</p>
+      <h1>Gap Decorations: Rules Between Grid &amp; Flex Tracks</h1>
+      <p class="lead">"Put a thin line between these items" has been a one-sentence design request and a multi-hour CSS problem for a decade. The CSS Gap Decorations module finally answers it directly: <code>column-rule</code> and the new <code>row-rule</code> now apply to grid and flex containers, drawing dividers <em>inside</em> the gaps you already have — with zero layout change.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The decade-old problem, and why every hack breaks</h2>
+      <p>The root cause is simple: gaps are empty space, and CSS had no property that paints <em>into</em> that space. So we decorated the items instead — and every workaround fails for a structural reason, not a stylistic one:</p>
+      <ul>
+        <li><strong>Borders on items</strong> (<code>li + li { border-inline-start: 1px solid }</code>). Works for a single row. The moment the container wraps, the sibling combinator cannot know which item starts a new row — the first item of row two still has a left border, now floating at the row's leading edge. Shared edges double up to 2px, and the border participates in layout, so toggling it shifts content.</li>
+        <li><strong>Background showing through the gap</strong> (container background + opaque item backgrounds). The "rule" is as thick as the entire gap — you cannot draw a 1px line inside a 24px gap without collapsing the gap to 1px. It cannot be dashed or partial, and any container padding paints the divider color around the outer perimeter too, framing the whole component in your divider color.</li>
+        <li><strong>Pseudo-element separators</strong> (absolutely positioned <code>::before</code> lines). These encode the column count into <code>:nth-child()</code> math. The instant <code>repeat(auto-fit, …)</code> or a viewport change alters the count, the separators land in the wrong places. They are decorations guessing at layout instead of reading it.</li>
+      </ul>
+      <p>Multicol never had this problem — <code>column-rule</code> has painted lines between columns since CSS3. The fix was always obvious: extend that primitive to the layouts we actually use.</p>
+
+      <h2>The fix: rules that live in the gap</h2>
+      <p>The CSS Gap Decorations module does exactly that. The <code>column-rule</code> family now applies to grid and flex containers, joined by a symmetric <code>row-rule</code> family for the other axis. Each is a shorthand over three longhands, mirroring <code>border</code>:</p>
+      <pre><code>.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 2rem;
+
+  /* vertical lines between columns */
+  column-rule: 1px solid oklch(88% 0.02 270);
+  /* horizontal lines between rows */
+  row-rule: 1px dashed oklch(88% 0.02 270);
+}
+
+/* Longhands, exactly like border:
+   column-rule-width / column-rule-style / column-rule-color
+   row-rule-width    / row-rule-style    / row-rule-color   */</code></pre>
+      <p>Because the browser is painting from its own layout data, the rules are correct by construction: between tracks, never at the container edge, regardless of how many tracks <code>auto-fit</code> produces today.</p>
+
+      <h2>Extent control: outset, break, and paint order</h2>
+      <p>Three companion properties govern how far each rule extends and what happens where row and column rules cross:</p>
+      <pre><code>.grid {
+  /* Where does a rule break?
+     none            → one continuous line across the whole axis
+     spanning-item   → breaks around items that span tracks
+     intersection    → a separate segment per gap intersection */
+  column-rule-break: intersection;
+  row-rule-break: spanning-item;
+
+  /* How far past the item edges does each segment extend?
+     50% (initial) → halfway into the crossing gap, so
+     perpendicular rules meet cleanly; 0 stops flush with
+     item edges; negative values pull segments shorter. */
+  column-rule-outset: 0;
+  row-rule-outset: 50%;
+
+  /* Which rule paints on top where they cross? */
+  rule-paint-order: row-over-column;  /* or column-over-row */
+}</code></pre>
+      <p>This is the difference between a spreadsheet (continuous rules, <code>none</code>) and a card wall (per-cell segments, <code>intersection</code>) — one property, not a rewrite.</p>
+
+      <h2>Rules render inside the gap — no layout change</h2>
+      <p>This is the property family's most important production characteristic: gap rules are <strong>pure paint</strong>. They are centered within the gap, they consume no space, and they do not alter track sizing, item position, or scroll dimensions. <code>gap: 2rem</code> with a rule is byte-for-byte the same layout as <code>gap: 2rem</code> without one. That makes them the rare feature that is progressive enhancement by physics, not by discipline — turning them off cannot shift a single pixel of content.</p>
+
+      <h2>Worked patterns</h2>
+      <p><strong>The wrapping toolbar</strong> — the classic killer case. Separators between items within a row, a hairline between wrapped rows, and nothing at the edges. Notice there is no <code>:nth-child()</code> anywhere; the browser knows where the rows are because it made them:</p>
+      <pre><code>.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  column-rule: 1px solid var(--color-border);
+  row-rule: 1px solid var(--color-border);  /* appears ONLY when it wraps */
+}</code></pre>
+      <p><strong>The pricing table</strong> — vertical rules between plans, no rule trailing the last column:</p>
+      <pre><code>.pricing {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 3rem;
+  column-rule: 1px solid oklch(90% 0.02 275);
+}</code></pre>
+      <p><strong>The dashboard</strong> — subtle horizontal rhythm between widget rows, broken per intersection so each card reads as its own region:</p>
+      <pre><code>.widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.5rem;
+  row-rule: 1px solid oklch(92% 0.01 270);
+  row-rule-break: intersection;
+  row-rule-outset: 0;
+}</code></pre>
+
+      <h2>Multicol today: train your hands now</h2>
+      <p>The syntax is not speculative — <code>column-rule</code> has worked on <code>columns</code>-based multicol layouts in every engine for over a decade. Gap Decorations is deliberately an <em>extension</em> of that primitive, not a new invention: same shorthand shape, same longhands. Patterns you write for multicol article layouts today are the same muscle memory you will use on grid and flex tomorrow.</p>
+
+      <h2>Shipping policy: learn and watch</h2>
+      <p>This feature is Experimental tier, so the PE7 rule is absolute: the layout must be fully acceptable with no rules at all, and the rules ship only inside an <code>@supports</code> gate. One precision matters here — <strong>do not gate on <code>column-rule-color</code></strong>. That property has parsed in every engine since multicol shipped, so the test is a false positive everywhere. Gate on the genuinely new syntax, <code>row-rule</code>:</p>
+      <pre><code>/* Base layout: complete and shippable on its own */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+/* Enhancement: parsed only where Gap Decorations exists */
+@supports (row-rule: 1px solid red) {
+  .toolbar {
+    column-rule: 1px solid var(--color-border);
+    row-rule: 1px solid var(--color-border);
+  }
+}</code></pre>
+      <p>Because rules are paint-only, there is no fallback "hole" to fill — non-supporting browsers simply see clean gaps. Resist the urge to polyfill with the border hacks above; you would be reintroducing the exact bug classes this feature retires.</p>
+
+      <h2>Browser support</h2>
+      <p>Experimental. Chrome 149 (June 2026) ships grid and flex gap decorations; Firefox and Safari have signalled positive positions but have not shipped. <code>column-rule</code> on <em>multicol</em> remains production-ready everywhere. Ship gap rules on grid/flex only behind the <code>@supports (row-rule: …)</code> gate shown above, and re-check support before promoting it to a default.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Gap rules behind @supports, honest in any browser</h2>
+      <p>In a browser with Gap Decorations, the stat panel gets column and row rules and the toolbar grows a hairline between wrapped rows. Everywhere else, an <code>@supports not (…)</code> rule reveals a notice and you see the untouched fallback layout — which is the whole point: it is fully presentable on its own.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-13-24 {
+            font-family: system-ui, sans-serif;
+            display: grid;
+            gap: 1.5rem;
+          }
+          .demo-13-24 .support-note {
+            display: none;
+            margin: 0;
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.5rem;
+            background: oklch(96% 0.05 85);
+            border: 1px solid oklch(82% 0.1 85);
+            color: oklch(38% 0.09 70);
+            font-size: 0.85rem;
+          }
+          @supports not (row-rule: 1px solid red) {
+            .demo-13-24 .support-note { display: block; }
+          }
+          .demo-13-24 .panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+            gap: 1.5rem;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            background: oklch(98% 0.01 270);
+            border: 1px solid oklch(90% 0.02 270);
+          }
+          .demo-13-24 .stat b {
+            display: block;
+            font-size: 1.4rem;
+            color: oklch(40% 0.18 275);
+          }
+          .demo-13-24 .stat span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: oklch(55% 0.02 270);
+          }
+          .demo-13-24 .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: 0.75rem;
+            background: oklch(98% 0.01 270);
+            border: 1px solid oklch(90% 0.02 270);
+          }
+          .demo-13-24 .toolbar button {
+            border: none;
+            background: none;
+            font-size: 0.85rem;
+            color: oklch(35% 0.05 275);
+            padding: 0.25rem 0;
+            cursor: pointer;
+          }
+          @supports (row-rule: 1px solid red) {
+            .demo-13-24 .panel {
+              column-rule: 1px solid oklch(86% 0.03 270);
+              row-rule: 1px dashed oklch(86% 0.03 270);
+            }
+            .demo-13-24 .toolbar {
+              column-rule: 1px solid oklch(86% 0.03 270);
+              row-rule: 1px solid oklch(86% 0.03 270);
+            }
+          }
+        </style>
+        <div class="demo-13-24">
+          <p class="support-note">This browser does not support gap decorations yet — you are seeing the un-decorated fallback layout, which is exactly what users would get in production.</p>
+          <div class="panel">
+            <div class="stat"><b>4.2k</b><span>Deploys</span></div>
+            <div class="stat"><b>99.98%</b><span>Uptime</span></div>
+            <div class="stat"><b>312ms</b><span>p95 LCP</span></div>
+            <div class="stat"><b>0</b><span>!important</span></div>
+            <div class="stat"><b>7</b><span>Layers</span></div>
+            <div class="stat"><b>100</b><span>a11y score</span></div>
+          </div>
+          <div class="toolbar">
+            <button type="button">Cut</button>
+            <button type="button">Copy</button>
+            <button type="button">Paste</button>
+            <button type="button">Bold</button>
+            <button type="button">Italic</button>
+            <button type="button">Link</button>
+            <button type="button">Quote</button>
+            <button type="button">Code</button>
+            <button type="button">Undo</button>
+            <button type="button">Redo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="pricing"&gt;
+  &lt;div class="plan"&gt;&lt;h2&gt;Starter&lt;/h2&gt;&lt;p&gt;$9/mo&lt;/p&gt;&lt;/div&gt;
+  &lt;div class="plan"&gt;&lt;h2&gt;Team&lt;/h2&gt;&lt;p&gt;$29/mo&lt;/p&gt;&lt;/div&gt;
+  &lt;div class="plan"&gt;&lt;h2&gt;Scale&lt;/h2&gt;&lt;p&gt;$99/mo&lt;/p&gt;&lt;/div&gt;
+  &lt;div class="plan"&gt;&lt;h2&gt;PE7&lt;/h2&gt;&lt;p&gt;Priceless&lt;/p&gt;&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1.5rem; }
+
+/* The base layout is complete without any rules. */
+.pricing {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1.5rem 2.5rem;
+}
+
+.plan h2 { margin: 0; font-size: 1rem; color: oklch(35% 0.1 275); }
+.plan p  { margin: 0.25rem 0 0; color: oklch(50% 0.02 270); }
+
+/* Gate on row-rule — the NEW syntax. Gating on
+   column-rule-color would pass everywhere, because
+   multicol has parsed it for a decade. */
+@supports (row-rule: 1px solid red) {
+  .pricing {
+    column-rule: 1px solid oklch(85% 0.03 275);
+    row-rule: 1px dashed oklch(85% 0.03 275);
+  }
+}
+
+/* Try: narrow the preview so plans wrap, and confirm
+   no divider ever appears at the outer edges. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Rebuild the wrapping toolbar from this lesson with old-school hacks first: try <code>button + button { border-inline-start: 1px solid }</code> and resize until it wraps — note the orphaned border at the start of row two. Then delete the hack and add <code>column-rule</code> + <code>row-rule</code> inside an <code>@supports (row-rule: 1px solid red)</code> block. Finally, toggle the <code>@supports</code> block on and off in DevTools and verify the layout does not shift by a single pixel — gap rules are paint, not layout.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.23-shape-function.html">&larr; Lesson 13.23</a>
+      <a href="./lesson-13.25-houdini-paint-api.html">Lesson 13.25 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

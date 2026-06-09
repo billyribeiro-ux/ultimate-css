@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.9 — Motion Paths: offset-path, ray() &amp; Orbital Animation · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.9</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.9</p>
+      <h1>Motion Paths: offset-path, ray() &amp; Orbital Animation</h1>
+      <p class="lead">Keyframes that animate <code>translate</code> can only draw straight lines between stops — a real curve takes a pile of keyframes that approximate it badly. The Motion Path module gives an element an actual track to ride: <code>offset-path</code> defines the geometry, <code>offset-distance</code> animates the position along it, and <code>offset-rotate</code> keeps the element facing where it is going.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why translate can't turn</h2>
+      <p>Interpolation between two keyframes is linear in value space. Animate <code>translate</code> from <code>0 0</code> to <code>100px 0</code> to <code>100px 100px</code> and you get an L-shape with a hard corner — not an arc. To fake a quarter-circle you need dozens of keyframes sampling the curve, and the easing between each pair still flattens it.</p>
+      <pre><code>/* The L-shape problem: three keyframes, two straight lines */
+@keyframes corner {
+  0%   { translate: 0 0; }
+  50%  { translate: 100px 0; }    /* straight east  */
+  100% { translate: 100px 100px; } /* hard 90° turn, straight south */
+}</code></pre>
+      <p>SVG solved this in 2001 with SMIL's <code>&lt;animateMotion&gt;</code>, and for two decades web apps reached for JavaScript — GSAP's MotionPathPlugin chief among them (Lesson 9.8) — just to fly a toast along a curve. The platform answer is the Motion Path module: the browser resolves the geometry once and interpolates <em>along the path</em>, not between points.</p>
+
+      <h2>The offset model: a track and a position</h2>
+      <p>Four longhands (plus the <code>offset</code> shorthand) define the model. The entire animation pattern is: set the track once, then animate <code>offset-distance</code> from <code>0%</code> to <code>100%</code>.</p>
+      <pre><code>.satellite {
+  offset-path: circle(120px);   /* the track geometry            */
+  offset-distance: 0%;          /* position along the track      */
+  offset-rotate: auto;          /* face the direction of travel  */
+  offset-anchor: auto;          /* which point of the box rides
+                                   the path (default: center)    */
+  animation: travel 8s linear infinite;
+}
+@keyframes travel { to { offset-distance: 100%; } }
+
+/* offset-rotate options, precisely:
+   auto        → rotate to match the path's tangent
+   auto 90deg  → tangent plus a constant offset
+   0deg        → fixed angle: element stays upright
+   reverse     → tangent + 180° (travel "backwards")           */</code></pre>
+      <p>Note what <code>offset-rotate: auto</code> buys you for free: banking into turns. A JS implementation has to differentiate the path to compute the tangent per frame; CSS does it natively. For UI elements that must stay readable (a toast, a card), pin it with <code>offset-rotate: 0deg</code>.</p>
+
+      <h2>Path sources: path(), basic shapes, shape() and ray()</h2>
+      <p><code>offset-path</code> accepts several geometry sources, and choosing the right one is mostly a question of how the coordinates resolve:</p>
+      <pre><code>/* 1. path() — an SVG path string. CAVEAT: coordinates are raw
+   px frozen in the containing block's coordinate space. The
+   curve does NOT scale with the container. Design it for a
+   known stage size, or generate it per breakpoint. */
+offset-path: path("M 0,0 C 50,-80 150,-80 200,0");
+
+/* 2. Basic shapes — percentage-friendly, fully responsive */
+offset-path: circle(40%);             /* ring inside the box   */
+offset-path: inset(10% round 1rem);   /* rounded-rect circuit  */
+
+/* 3. shape() — curves with responsive units; the modern fix
+   for path()'s fixed coordinate space (ahead in Lesson 13.23) */
+offset-path: shape(from 0% 100%, curve to 100% 100% with 50% 0%);
+
+/* 4. ray() — polar coordinates from a center point */
+offset-path: ray(45deg closest-side);</code></pre>
+
+      <h3>ray(): polar positioning</h3>
+      <p><code>ray()</code> turns the offset model into a polar coordinate system. The ray starts at the point given by <code>offset-position</code> (default: the center of the containing block) and shoots outward at the given angle; <code>offset-distance</code> becomes the radius. Place N items at N angles and you have a radial layout with zero trigonometry — Lesson 10.7 computes the same geometry explicitly with <code>cos()</code>/<code>sin()</code> when you need the x/y values for other purposes.</p>
+      <pre><code>.spoke {
+  offset-position: 50% 50%;                        /* the hub   */
+  offset-path: ray(calc(var(--i) * 60deg) closest-side);
+  offset-distance: 80%;                            /* the radius */
+  offset-rotate: 0deg;                             /* stay upright */
+}</code></pre>
+
+      <h2>The orbital pattern</h2>
+      <p>Put N items on the same circular track and either distribute them statically with per-item <code>offset-distance</code>, or give them all the <em>same</em> revolve animation staggered by negative delays. The negative delay starts each item mid-cycle — they hold formation forever because they share one clock.</p>
+      <pre><code>.orbit { position: relative; inline-size: 240px; aspect-ratio: 1; }
+.orbit .item {
+  position: absolute;
+  offset-path: circle(40%);
+  /* static placement: distribute by index */
+  offset-distance: calc(100% / var(--count) * var(--i));
+}
+
+/* live orbit: one animation, staggered into formation */
+.orbit .item {
+  animation: revolve 12s linear infinite;
+  animation-delay: calc(var(--i) * (12s / var(--count)) * -1);
+}
+@keyframes revolve { to { offset-distance: 100%; } }
+
+/* --i can come from sibling-index() where supported (Lesson 9.6),
+   with a per-item custom property as the universal fallback */
+@supports (animation-delay: calc(sibling-index() * 1ms)) {
+  .orbit .item { --i: calc(sibling-index() - 1); }
+}</code></pre>
+
+      <h2>A curved fly-in entrance</h2>
+      <p>The same model handles one-shot choreography. A toast that arcs in from off-screen is a <code>path()</code> plus a single <code>offset-distance</code> animation — pair it with opacity and you have motion no <code>translate</code> keyframe can produce:</p>
+      <pre><code>.toast {
+  offset-path: path("M 240,-40 C 160,-40 60,20 0,0");
+  offset-rotate: 0deg;          /* keep the text upright */
+  animation: fly-in 600ms cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes fly-in {
+  from { offset-distance: 0%;   opacity: 0; }
+  to   { offset-distance: 100%; opacity: 1; }
+}</code></pre>
+
+      <h2>Performance: offset rides the compositor</h2>
+      <p>The <code>offset-*</code> properties are composited exactly like <code>transform</code> and <code>opacity</code> (Lesson 20.2). The path geometry is resolved once; each frame is just a new transform matrix computed on the compositor thread — no layout, no paint, immune to main-thread jank. The rule that follows: animate <code>offset-distance</code>, never <code>offset-path</code> itself. Changing the geometry mid-flight forces re-resolution and is not what the model is optimized for.</p>
+
+      <h2>Reduced motion is non-negotiable</h2>
+      <p>Orbits and curved fly-ins are precisely the large-translation, sustained motion that triggers vestibular disorders — the contract from Lesson 9.1 applies with full force. Two clean strategies: <em>pause</em> infinite loops (the negative-delay trick means paused items hold their distributed formation), and <em>jump</em> one-shot entrances to their final state.</p>
+      <pre><code>@media (prefers-reduced-motion: reduce) {
+  .orbit .item { animation-play-state: paused; } /* formation kept */
+  .toast { animation: none; offset-distance: 100%; opacity: 1; }
+}</code></pre>
+
+      <h2>Browser support</h2>
+      <p>Production. <code>offset-path: path()</code> has shipped in all three engines for years. The full source set — basic shapes, <code>ray()</code>, <code>shape()</code>, and the coord-box keywords — is complete in Chrome 116+, Firefox 122+, and Safari 17+. No <code>@supports</code> gate is required for current targets; if you must serve older Safari, gate <code>ray()</code>/<code>shape()</code> usages and fall back to <code>path()</code> or static placement.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — A six-moon orbital system and a curved comet</h2>
+      <p>Six moons share one <code>revolve</code> animation on <code>offset-path: circle(40%)</code>, staggered into formation with negative delays. Below, a comet loops along a fixed <code>path()</code> with <code>offset-rotate: auto</code> so it banks through the curve. Under <code>prefers-reduced-motion: reduce</code>, the moons pause in formation and the comet rests on its path.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-9-9 { display: grid; gap: 1.5rem; justify-items: center; padding-block: 1rem; }
+          .demo-9-9 .orbit {
+            position: relative;
+            inline-size: min(240px, 70vw);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle, oklch(20% 0.05 280) 0%, transparent 70%);
+          }
+          .demo-9-9 .core {
+            position: absolute;
+            inset: 50% auto auto 50%;
+            translate: -50% -50%;
+            inline-size: 2.25rem; aspect-ratio: 1; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, oklch(85% 0.15 85), oklch(60% 0.2 50));
+          }
+          .demo-9-9 .moon {
+            position: absolute;
+            inline-size: 1rem; aspect-ratio: 1; border-radius: 50%;
+            background: oklch(72% 0.18 calc(var(--i) * 60));
+            offset-path: circle(40%);
+            animation: d99-revolve 12s linear infinite;
+            animation-delay: calc(var(--i) * -2s); /* 12s ÷ 6 moons */
+          }
+          .demo-9-9 .flight {
+            position: relative;
+            inline-size: min(420px, 90%);
+            block-size: 120px;
+            border-radius: 0.5rem;
+            background: oklch(96% 0.005 264);
+            overflow: hidden;
+          }
+          .demo-9-9 .comet {
+            position: absolute;
+            inline-size: 1.75rem; block-size: 0.625rem; border-radius: 999px;
+            background: linear-gradient(90deg, transparent, oklch(48% 0.22 275));
+            offset-path: path("M 20,90 C 110,10 230,10 320,90 S 480,150 560,40");
+            offset-rotate: auto;
+            animation: d99-fly 5s ease-in-out infinite;
+          }
+          @keyframes d99-revolve { to { offset-distance: 100%; } }
+          @keyframes d99-fly { to { offset-distance: 100%; } }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-9-9 .moon { animation-play-state: paused; } /* formation kept */
+            .demo-9-9 .comet { animation: none; offset-distance: 60%; }
+          }
+        </style>
+        <div class="demo-9-9" aria-hidden="true">
+          <div class="orbit">
+            <span class="core"></span>
+            <i class="moon" style="--i: 0"></i>
+            <i class="moon" style="--i: 1"></i>
+            <i class="moon" style="--i: 2"></i>
+            <i class="moon" style="--i: 3"></i>
+            <i class="moon" style="--i: 4"></i>
+            <i class="moon" style="--i: 5"></i>
+          </div>
+          <div class="flight">
+            <span class="comet"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="orbit"&gt;
+  &lt;span class="core"&gt;&lt;/span&gt;
+  &lt;i class="dot" style="--i: 0"&gt;&lt;/i&gt;
+  &lt;i class="dot" style="--i: 1"&gt;&lt;/i&gt;
+  &lt;i class="dot" style="--i: 2"&gt;&lt;/i&gt;
+  &lt;i class="dot" style="--i: 3"&gt;&lt;/i&gt;
+  &lt;i class="dot" style="--i: 4"&gt;&lt;/i&gt;
+  &lt;i class="dot" style="--i: 5"&gt;&lt;/i&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body {
+  display: grid; place-items: center;
+  min-height: 100vh; margin: 0;
+  background: #0c0c1a;
+}
+
+.orbit {
+  --count: 6;
+  --period: 12s;
+  position: relative;
+  width: 240px; aspect-ratio: 1;
+}
+
+.core {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  width: 36px; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffd27a, #e0762f);
+}
+
+.dot {
+  position: absolute;
+  width: 18px; aspect-ratio: 1; border-radius: 50%;
+  background: oklch(72% 0.18 calc(var(--i) * 60));
+  offset-path: circle(45%);
+  animation: revolve var(--period) linear infinite;
+  /* one clock, staggered into formation */
+  animation-delay: calc(var(--i) * (var(--period) / var(--count)) * -1);
+}
+
+@keyframes revolve { to { offset-distance: 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dot { animation-play-state: paused; } /* held in formation */
+}
+
+/* Try: change --period; or set offset-rotate: auto and make
+   .dot an 18×8px rounded bar to watch it bank into the turns. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Extend the orbital system into a small solar system, then add a curved entrance. (1) Add two more dots and update <code>--count</code> to 8 — confirm the formation redistributes itself because the delays are arithmetic, not hand-computed. (2) Give the dots <code>offset-rotate: auto</code> and a non-circular shape to see tangent-following in action. (3) Replace the animation with static placement: delete the keyframes and set <code>offset-distance: calc(100% / var(--count) * var(--i))</code> — same geometry, zero motion. (4) Build the toast fly-in from this lesson with <code>path()</code>, <code>offset-rotate: 0deg</code>, and a <code>prefers-reduced-motion</code> override that jumps it to <code>offset-distance: 100%</code>.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.8-gsap-integration.html">← Lesson 9.8</a>
+      <a href="./lesson-9.10-animation-composition.html">Lesson 9.10 →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

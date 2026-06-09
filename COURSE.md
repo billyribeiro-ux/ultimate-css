@@ -31,11 +31,16 @@ Module 21 — Advanced Responsive Design: Beyond Breakpoints
 Module 22 — CSS at Scale: Architecture for Teams
 Module 23 — CSS Beyond the Browser: Print & Email
 Module 24 — CSS Challenges: Test Your Mastery (12 challenges)
+Module 25 — CSS Custom Properties Mastery
+Module 26 — CSS Grid Mastery: Every Pattern, Every Trick
+Module 27 — CSS Flexbox Mastery
+Module 28 — CSS Selectors: The Complete Reference
 ```
 
 - **Total modules:** 28
-- **Total lessons:** 284+
+- **Total lessons:** 310 (298 lessons + 12 challenges)
 - **Total projects:** 12 (one per module) + 80 mini-exercises
+- **Coverage:** the complete CSS platform as shipped through June 9, 2026 — see `AUDIT.md` for the full coverage audit
 - **Open** `index.html` in the repo root to start.
 
 ## Repository layout

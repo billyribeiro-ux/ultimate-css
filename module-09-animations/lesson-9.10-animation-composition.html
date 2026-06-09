@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9.10 — animation-composition, Individual Transforms &amp; Discrete Transitions · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 9</a>
+      <span>Lesson 9.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 9.10</p>
+      <h1>animation-composition, Individual Transforms &amp; Discrete Transitions</h1>
+      <p class="lead">Three modern mechanics that each delete an entire class of animation bugs: individual <code>translate</code>/<code>rotate</code>/<code>scale</code> properties end the "one transform property, many hands" fight; <code>animation-composition</code> lets simultaneous animations layer instead of clobber; and <code>transition-behavior: allow-discrete</code> finally makes exit animations work on <code>display</code>. All three are production-ready.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The single-property problem</h2>
+      <p><code>transform</code> is <em>one</em> property holding a list of functions. The cascade and the animation model both resolve a property to exactly one value — so whenever two sources write <code>transform</code>, one of them silently wins and the other is obliterated. The two classic crime scenes:</p>
+      <pre><code>/* Crime scene 1: hover obliterates centering */
+.tooltip { transform: translate(-50%, -50%); }   /* centered  */
+.tooltip:hover { transform: scale(1.05); }       /* …and now it
+   jumps to the corner: the translate is GONE, not combined */
+
+/* Crime scene 2: a running animation swallows hover */
+.card { animation: bob 2s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-8px); } }
+.card:hover { transform: scale(1.05); }
+/* Nothing happens on hover: running animations sit above
+   normal author declarations, so the keyframe value wins. */</code></pre>
+      <p>Root cause in both: there is no "merge" step for a single property. The fix is not cleverer selectors — it is to stop forcing four geometric channels through one property.</p>
+
+      <h2>Individual transform properties: translate, rotate, scale</h2>
+      <p>Production since 2022 (Chrome 104+, Firefox 72+, Safari 14.1+): <code>translate</code>, <code>rotate</code>, and <code>scale</code> are standalone properties. Each one cascades, transitions, and animates independently — a keyframe on <code>translate</code> and a hover on <code>scale</code> never touch each other.</p>
+      <pre><code>.card {
+  translate: 0 0;
+  scale: 1;
+  animation: bob 2s ease-in-out infinite;  /* owns translate */
+  transition: scale 200ms ease-out;        /* owns scale     */
+}
+@keyframes bob { 50% { translate: 0 -8px; } }
+.card:hover { scale: 1.05; }   /* composes with the bob — no fight */
+
+/* transform-origin still applies to rotate and scale,
+   exactly as it does inside transform */</code></pre>
+
+      <h2>Order of operations: fixed, and that's the trade</h2>
+      <p>Inside <code>transform</code>, <em>you</em> choose the function order, and order matters: <code>rotate(45deg) translateX(100px)</code> moves along the rotated axis; <code>translateX(100px) rotate(45deg)</code> moves, then spins in place. The individual properties apply in a <strong>fixed</strong> order — <code>translate</code>, then <code>rotate</code>, then <code>scale</code> (and any <code>transform</code> list applies after them). That fixed order is what makes independent animation possible, and it covers the overwhelming majority of UI motion. The moment you need rotate-then-translate (orbiting around an external point), fall back to <code>transform</code> — or better, use a motion path (Lesson 9.9).</p>
+
+      <h2>animation-composition: replace, add, accumulate</h2>
+      <p>Individual properties solve <em>different channels</em>. <code>animation-composition</code> solves <em>the same channel</em>: two simultaneous animations targeting the same property. The default, <code>replace</code>, means the last animation in the list wins outright. <code>add</code> and <code>accumulate</code> make the effect value <em>compose with</em> the underlying value instead:</p>
+      <pre><code>.buoy {
+  /* an infinite bob plus a slower drift, both on translate */
+  animation:
+    drift 4s   ease-in-out infinite alternate,
+    bob   1.2s ease-in-out infinite alternate;
+  animation-composition: accumulate;  /* layer, don't clobber */
+}
+@keyframes drift { to { translate: 80px 0; } }
+@keyframes bob   { to { translate: 0 -14px; } }
+/* replace    → only bob runs (last in list wins)
+   accumulate → the bob rides on top of the drift */</code></pre>
+
+      <h3>add vs. accumulate, precisely</h3>
+      <p>The difference only appears on multiplicative channels. Given an underlying <code>scale: 2</code> and an animation effect of <code>scale: 1.5</code>:</p>
+      <pre><code>animation-composition: replace;    /* result: 1.5 — underlying discarded */
+animation-composition: add;        /* result: 3   — effect appended to the
+                                      transform list: 2 × 1.5            */
+animation-composition: accumulate; /* result: 2.5 — components combine,
+                                      one shared identity removed:
+                                      2 + (1.5 − 1)                      */
+
+/* For translate the two coincide: underlying 10px + effect 20px
+   → 30px under add AND accumulate. Translations are additive;
+   scales are multiplicative under add, additive-minus-identity
+   under accumulate. */</code></pre>
+      <p>Rule of thumb: <code>add</code> behaves like "do this <em>after</em> the underlying motion" (matrix concatenation); <code>accumulate</code> behaves like "blend the dials together" — and is usually what layered organic motion wants.</p>
+
+      <h2>transition-behavior: allow-discrete</h2>
+      <p>Discrete properties — <code>display</code>, <code>overlay</code>, <code>content-visibility</code> — have no midpoint to interpolate, so transitions historically ignored them. The fatal consequence: setting <code>display: none</code> removes the element instantly, killing any exit animation mid-flight. <code>transition-behavior: allow-discrete</code> opts a discrete property into the transition with precise flip timing: transitioning <em>away from</em> <code>display: none</code>, the value flips at 0% (visible for the whole entrance); transitioning <em>to</em> <code>none</code>, it flips at 100% (visible for the whole exit). Other discrete pairs flip at 50%. <code>overlay</code> gets the same treatment so popovers stay in the top layer while leaving.</p>
+
+      <h2>The full enter/exit pattern</h2>
+      <p>Combine <code>allow-discrete</code> with <code>@starting-style</code> (Lesson 9.2) and one block of CSS handles both directions for a popover — no JavaScript classes, no <code>setTimeout</code> before removal:</p>
+      <pre><code>[popover] {
+  /* EXIT target state + the transition itself */
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 200ms ease-out,
+    translate 200ms ease-out,
+    display 200ms allow-discrete,
+    overlay 200ms allow-discrete;
+}
+[popover]:popover-open {
+  opacity: 1;
+  translate: 0 0;
+}
+/* ENTER starting point: where the open state animates FROM */
+@starting-style {
+  [popover]:popover-open {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}</code></pre>
+      <p>Read it as a state machine: <code>@starting-style</code> supplies the before-first-frame value for the entrance; the base <code>[popover]</code> block is both the exit destination and the place the element eases back to; <code>allow-discrete</code> on <code>display</code>/<code>overlay</code> keeps the element rendered (and in the top layer) until the exit finishes.</p>
+
+      <h2>Support and reduced motion</h2>
+      <p>All production: individual transforms since Chrome 104+/Firefox 72+/Safari 14.1+; <code>animation-composition</code> since Chrome 112+/Firefox 115+/Safari 16+; <code>transition-behavior</code> with <code>@starting-style</code> since Chrome 117+/Firefox 129+/Safari 17.4+. As always (Lesson 9.1), every layered or looping motion ships with a reduced-motion override — composition makes motion richer, which makes the override <em>more</em> important, not less:</p>
+      <pre><code>@media (prefers-reduced-motion: reduce) {
+  .buoy, .card { animation: none; translate: none; scale: none; }
+  [popover] { transition-duration: 1ms; }  /* keep state changes, drop motion */
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fighting vs. composing</h2>
+      <p>Hover each card. The left card animates <code>transform</code> and declares a hover <code>transform</code> — the running animation swallows the hover entirely. The middle card bobs on the <code>translate</code> property and scales on hover via the <code>scale</code> property — both compose. The right card layers two simultaneous <code>translate</code> animations with <code>animation-composition: accumulate</code>.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-9-10 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); padding-block: 1.5rem; }
+          .demo-9-10 .panel { display: grid; gap: .75rem; justify-items: center; }
+          .demo-9-10 .panel h3 { margin: 0; font: 600 .75rem system-ui; text-transform: uppercase; letter-spacing: .08em; color: oklch(50% 0.02 264); }
+          .demo-9-10 .chip {
+            inline-size: 6rem; block-size: 4rem; border-radius: .75rem;
+            display: grid; place-items: center;
+            font: 600 .8rem system-ui; color: #fff;
+          }
+          .demo-9-10 .fight {
+            background: oklch(55% 0.2 25);
+            animation: d910-bob-t 1.4s ease-in-out infinite;
+          }
+          .demo-9-10 .fight:hover { transform: scale(1.12); } /* swallowed */
+          .demo-9-10 .compose {
+            background: oklch(55% 0.17 150);
+            animation: d910-bob 1.4s ease-in-out infinite;
+            transition: scale 180ms ease-out;
+          }
+          .demo-9-10 .compose:hover { scale: 1.12; } /* composes */
+          .demo-9-10 .layer {
+            background: oklch(48% 0.22 275);
+            animation:
+              d910-drift 3.2s ease-in-out infinite alternate,
+              d910-bob 1.4s ease-in-out infinite;
+            animation-composition: accumulate;
+          }
+          @keyframes d910-bob-t { 50% { transform: translateY(-10px); } }
+          @keyframes d910-bob   { 50% { translate: 0 -10px; } }
+          @keyframes d910-drift { to { translate: 28px 0; } }
+          @media (prefers-reduced-motion: reduce) {
+            .demo-9-10 .fight, .demo-9-10 .compose, .demo-9-10 .layer {
+              animation: none; translate: none; transform: none;
+            }
+          }
+        </style>
+        <div class="demo-9-10">
+          <div class="panel">
+            <h3>transform fights</h3>
+            <div class="chip fight">hover me</div>
+          </div>
+          <div class="panel">
+            <h3>translate + scale</h3>
+            <div class="chip compose">hover me</div>
+          </div>
+          <div class="panel">
+            <h3>accumulate</h3>
+            <div class="chip layer">two anims</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="row"&gt;
+  &lt;div class="card fight"&gt;transform&lt;br&gt;(hover is dead)&lt;/div&gt;
+  &lt;div class="card compose"&gt;translate + scale&lt;br&gt;(hover composes)&lt;/div&gt;
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 3rem; background: #0c0c1a; }
+.row { display: flex; gap: 2rem; }
+
+.card {
+  width: 10rem; padding: 1.5rem 1rem;
+  border-radius: .75rem; text-align: center;
+  color: #fff; font-size: .85rem; line-height: 1.5;
+}
+
+/* One property, two hands: the running animation
+   owns transform, so the hover scale never lands. */
+.fight {
+  background: oklch(55% 0.2 25);
+  animation: bob-transform 1.4s ease-in-out infinite;
+}
+.fight:hover { transform: scale(1.1); }
+@keyframes bob-transform { 50% { transform: translateY(-10px); } }
+
+/* Separate channels: keyframes own translate,
+   hover owns scale. Both apply at once. */
+.compose {
+  background: oklch(55% 0.17 150);
+  animation: bob 1.4s ease-in-out infinite;
+  transition: scale 180ms ease-out;
+}
+.compose:hover { scale: 1.1; }
+@keyframes bob { 50% { translate: 0 -10px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; translate: none; transform: none; }
+}</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Take the composing card further. (1) Add a second animation to <code>.compose</code> — a slow horizontal <code>drift</code> on <code>translate</code> — and watch the default <code>replace</code> composition kill the bob; fix it with <code>animation-composition: accumulate</code>. (2) Add a <code>rotate</code> hover on top and confirm three channels (keyframed translate, hover scale, hover rotate) all compose with zero conflicts. (3) Rebuild the popover enter/exit pattern from this lesson: a "card" that fades and slides in via <code>@starting-style</code> and out via <code>display 200ms allow-discrete</code>, then verify the exit is visible — delete <code>allow-discrete</code> and watch the element vanish instantly instead. (4) Keep the reduced-motion block honest: it must neutralize <em>every</em> channel you added.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-9.9-motion-paths.html">← Lesson 9.9</a>
+      <a href="./project/index.html">Module 9 Project →</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13.23 — shape(): Responsive Curved Clip Paths · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 13</a>
+      <span>Lesson 13.23</span>
+    </nav>
+
+    <header>
+      <p class="badge warning">Progressive enhancement · Chrome 135+ · Safari 18.4+</p>
+      <p class="badge">Lesson 13.23</p>
+      <h1>shape(): Responsive Curved Clip Paths</h1>
+      <p class="lead">Until now you had to choose: <code>polygon()</code> scales responsively but only draws straight lines; <code>path()</code> draws curves but is frozen in pixels. <code>shape()</code> closes the gap — an author-friendly drawing syntax with lines, Bézier curves, and arcs where every coordinate accepts percentages, lengths, <code>calc()</code>, and custom properties.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>The gap, precisely: why path() clip-paths break responsively</h2>
+      <p><code>clip-path: path()</code> takes an SVG path-data string — and SVG path data is a sequence of <em>unitless numbers</em>. CSS has to interpret them somehow, so it maps them 1:1 to pixels in the element's coordinate space. There is no percentage syntax in path data, no <code>calc()</code>, no custom properties — the grammar predates all of them. The consequence: a curve drawn for a 400px card is a 400px curve forever. Resize the element and the clip does not stretch with it; it stays anchored at the top-left while the element grows out from under it. <code>polygon()</code> never had this problem (every vertex is a full CSS <code>&lt;length-percentage&gt;</code>) — but polygons cannot curve. That asymmetry is the entire reason curved section dividers shipped as SVG markup for a decade.</p>
+
+      <h2>The shape() command syntax</h2>
+      <p><code>shape()</code> is a command list, like path data rewritten as CSS. Every coordinate is a real CSS value:</p>
+      <pre><code>clip-path: shape(
+  from &lt;position&gt;,        /* moveto — the starting point        */
+  line  to 100% 0%,        /* straight segment to a point        */
+  hline to 50%,            /* horizontal — only the x changes    */
+  vline to 80%,            /* vertical — only the y changes      */
+  curve to 0% 100%         /* cubic/quadratic Bézier...          */
+    with 50% 80%,          /* ...with one or two control points  */
+  smooth to 20% 50%,       /* Bézier mirroring the last control  */
+  arc to 0% 20% of 16px,   /* elliptical arc of given radii      */
+  close                    /* seal the outline                   */
+);</code></pre>
+      <p>Three details matter in production. First, <code>by</code> variants (<code>line by</code>, <code>arc by</code>) move <em>relative</em> to the current point. Second, <code>arc</code> takes the SVG arc options as keywords: <code>cw</code>/<code>ccw</code> for sweep, <code>large</code>/<code>small</code> for which of the two candidate arcs. Third — the headline — every coordinate slot takes <code>%</code>, lengths, <code>calc()</code>, and <code>var()</code>. Mixed units like <code>calc(100% - 2rem)</code> are exactly how you make fixed-size features (a 16px bite, a 2rem tail) survive on a fluid box.</p>
+
+      <h2>Worked example 1: a responsive speech-bubble tail</h2>
+      <p>The bubble body scales with content; the tail stays a crisp fixed size because its points mix percentages with pixel offsets:</p>
+      <pre><code>.bubble {
+  --tail: 14px;
+  clip-path: shape(
+    from 0% 0%,
+    hline to 100%,
+    vline to calc(100% - var(--tail)),
+    hline to 48px,                          /* tail right edge   */
+    line  to 24px 100%,                     /* tail tip          */
+    line  to 24px calc(100% - var(--tail)), /* tail left edge    */
+    hline to 0%,
+    close
+  );
+  padding-block-end: calc(var(--tail) + 1rem);
+}</code></pre>
+      <p>Resize the bubble to any width: the body tracks 0–100%, the tail keeps its 24px geometry. With <code>path()</code> this required regenerating the string in JavaScript on every resize.</p>
+
+      <h2>Worked example 2: a ticket with proportional arc bites</h2>
+      <p>Two semicircular bites at the vertical midpoint of each edge — <code>calc(50% ± radius)</code> keeps them centered at <em>any</em> height, while the radius stays a fixed length:</p>
+      <pre><code>.ticket {
+  --bite: 12px;
+  clip-path: shape(
+    from 0% 0%,
+    hline to 100%,
+    vline to calc(50% - var(--bite)),
+    arc to 100% calc(50% + var(--bite)) of var(--bite) small ccw,
+    vline to 100%,
+    hline to 0%,
+    vline to calc(50% + var(--bite)),
+    arc to 0% calc(50% - var(--bite)) of var(--bite) small ccw,
+    close
+  );
+}</code></pre>
+
+      <h2>Worked example 3: the angled hero, now with a real curve</h2>
+      <p>The standard angled-hero polygon gains a curved sweep — one <code>curve to</code> replaces the straight diagonal, with the control point pulled in <code>rem</code> so the curve depth is typographically stable:</p>
+      <pre><code>.hero {
+  clip-path: shape(
+    from 0% 0%,
+    hline to 100%,
+    vline to 82%,
+    curve to 0% 100% with 55% calc(100% - 5rem),
+    close
+  );
+}</code></pre>
+
+      <h2>Animating shape()</h2>
+      <p>Two <code>shape()</code> values interpolate when their command lists are <em>compatible</em> — same number of commands, same command types in the same order. This is the identical contract you learned for <code>polygon()</code> morphing in Lesson 15.5 (matching vertex counts), extended to curves: the browser interpolates endpoints and control points numerically. Keep a hover-state shape structurally identical to the rest state — pad with degenerate segments if necessary — and transition <code>clip-path</code> directly, or drive individual coordinates through registered custom properties.</p>
+
+      <h2>Beyond clip-path</h2>
+      <p><code>shape()</code> is a <code>&lt;basic-shape&gt;</code>, not a clip-path special. It already works in <code>offset-path</code> — the motion-path property from Lesson 9.9 — which means responsive, percentage-based motion trajectories that previously demanded a frozen <code>path()</code>. Mask contexts (<code>mask-clip</code> shapes and friends) are specified to accept it as engines catch up. Learn the syntax once; apply it to clipping, motion, and masking.</p>
+
+      <h2>The fallback chain</h2>
+      <p>The production pattern is a two-step ladder: ship a straight-line <code>polygon()</code> approximation unconditionally, then upgrade to the curved <code>shape()</code> behind <code>@supports</code>. Unsupporting engines get the angled hero we have shipped for years; supporting engines get the curve:</p>
+      <pre><code>.hero {
+  /* baseline: every browser, straight diagonal */
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+}
+@supports (clip-path: shape(from 0 0, close)) {
+  .hero {
+    clip-path: shape(
+      from 0% 0%, hline to 100%, vline to 82%,
+      curve to 0% 100% with 55% calc(100% - 5rem), close
+    );
+  }
+}</code></pre>
+      <p>Note the probe value: <code>shape(from 0 0, close)</code> is the smallest valid <code>shape()</code> — a cheap, future-proof feature test.</p>
+
+      <h2>Browser support</h2>
+      <p>Chrome 135+ and Safari 18.4+ for <code>clip-path: shape()</code>; Firefox: planned. Treat it as a progressive enhancement over a <code>polygon()</code> baseline as shown above — the fallback is the well-understood straight-edged version of the same design, so nothing is at risk in trailing engines.</p>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — Fluid curved hero and arc-bitten ticket</h2>
+      <p>Drag the slider to resize the stage. The hero's curved sweep and the ticket's bites are <code>shape()</code> clips mixing percentages with fixed lengths — the curves re-fit the box at every width, with a <code>polygon()</code> fallback underneath for unsupporting browsers.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-13-23 { font-family: system-ui, sans-serif; }
+          .demo-13-23 .stage {
+            inline-size: 100%;
+            display: grid;
+            gap: 1rem;
+          }
+          .demo-13-23 .hero {
+            padding: 2rem 1.5rem 4.5rem;
+            color: white;
+            background: linear-gradient(135deg, oklch(50% 0.23 290), oklch(60% 0.2 220));
+            clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
+          }
+          .demo-13-23 .hero h3 { margin: 0; font-size: 1.4rem; }
+          .demo-13-23 .hero p { margin: 0.4rem 0 0; opacity: 0.9; max-inline-size: 46ch; }
+          .demo-13-23 .ticket {
+            padding: 1.25rem 2.25rem;
+            color: white;
+            background: linear-gradient(120deg, oklch(45% 0.2 350), oklch(40% 0.15 300));
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+          }
+          .demo-13-23 .ticket h3 { margin: 0; font-size: 1.05rem; }
+          .demo-13-23 .ticket p { margin: 0.25rem 0 0; font-size: 0.85rem; opacity: 0.85; }
+
+          @supports (clip-path: shape(from 0 0, close)) {
+            .demo-13-23 .hero {
+              clip-path: shape(
+                from 0% 0%, hline to 100%, vline to 78%,
+                curve to 0% 100% with 55% calc(100% - 3.5rem), close
+              );
+            }
+            .demo-13-23 .ticket {
+              clip-path: shape(
+                from 0% 0%, hline to 100%,
+                vline to calc(50% - 12px),
+                arc to 100% calc(50% + 12px) of 12px small ccw,
+                vline to 100%, hline to 0%,
+                vline to calc(50% + 12px),
+                arc to 0% calc(50% - 12px) of 12px small ccw,
+                close
+              );
+            }
+            .demo-13-23 .no-support { display: none; }
+          }
+          .demo-13-23 .controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-block-start: 1rem;
+            font-size: 0.85rem;
+            color: oklch(45% 0.03 264);
+          }
+          .demo-13-23 .controls input { flex: 1; }
+          .demo-13-23 .controls b { font-family: monospace; min-inline-size: 4ch; }
+          .demo-13-23 .no-support {
+            margin-block-start: 0.75rem;
+            padding: 0.65rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            background: oklch(85% 0.08 85);
+            color: oklch(30% 0.05 85);
+          }
+        </style>
+        <div class="demo-13-23" id="demo1323">
+          <div class="stage">
+            <div class="hero">
+              <h3>Curved hero sweep</h3>
+              <p>The bottom edge is one <code>curve to</code> command. Resize the stage — the curve re-fits because its coordinates are percentages, with a <code>rem</code>-stable depth.</p>
+            </div>
+            <div class="ticket">
+              <h3>Boarding pass · 23A</h3>
+              <p>The edge bites are <code>arc</code> commands centered with <code>calc(50% &#177; 12px)</code> — proportional position, fixed radius.</p>
+            </div>
+          </div>
+          <div class="controls">
+            <label for="demo1323-w">Stage width</label>
+            <input id="demo1323-w" type="range" min="45" max="100" value="100">
+            <b data-width>100%</b>
+          </div>
+          <p class="no-support">This browser has no <code>shape()</code> yet — you are seeing the <code>polygon()</code> fallback layer: straight diagonal, no bites. Same component, fewer curves.</p>
+        </div>
+        <script>
+          (function () {
+            var root = document.getElementById('demo1323');
+            if (!root) return;
+            var range = root.querySelector('input[type="range"]');
+            var stage = root.querySelector('.stage');
+            var out = root.querySelector('[data-width]');
+            function update() {
+              stage.style.inlineSize = range.value + '%';
+              out.textContent = range.value + '%';
+            }
+            range.addEventListener('input', update);
+            update();
+          })();
+        </script>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;div class="hero"&gt;
+  &lt;h1&gt;shape()&lt;/h1&gt;
+  &lt;p&gt;Curves that scale like percentages.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="ticket"&gt;
+  &lt;strong&gt;Admit One&lt;/strong&gt; — arc bites at 50% &amp;#177; 12px
+&lt;/div&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { margin: 0; font-family: system-ui;
+  background: #0f0f1a; color: white; }
+
+.hero {
+  padding: 2.5rem 1.5rem 5rem;
+  background: linear-gradient(135deg, #6a3df5, #2f7bc6);
+  /* baseline for every browser */
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+}
+.hero h1 { margin: 0; }
+.hero p { margin: .4rem 0 0; opacity: .9; }
+
+.ticket {
+  margin: 1rem 1.5rem;
+  padding: 1.25rem 2.25rem;
+  background: linear-gradient(120deg, #b23a78, #5b2bb3);
+}
+
+/* upgrade: curves and bites where supported */
+@supports (clip-path: shape(from 0 0, close)) {
+  .hero {
+    clip-path: shape(
+      from 0% 0%, hline to 100%, vline to 75%,
+      curve to 0% 100% with 55% calc(100% - 4rem),
+      close);
+  }
+  .ticket {
+    clip-path: shape(
+      from 0% 0%, hline to 100%,
+      vline to calc(50% - 12px),
+      arc to 100% calc(50% + 12px) of 12px small ccw,
+      vline to 100%, hline to 0%,
+      vline to calc(50% + 12px),
+      arc to 0% calc(50% - 12px) of 12px small ccw,
+      close);
+  }
+}
+
+/* Try: drag the preview pane narrower — the curve
+   and the bites re-fit; a path() clip would not. */</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Convert one SVG section divider from a real project into pure CSS. (1) Recreate it as <code>clip-path: shape()</code>, using percentages for the structural points and <code>rem</code>/<code>px</code> via <code>calc()</code> for fixed-depth details. (2) Ship the <code>polygon()</code> approximation as the unconditional baseline and the <code>shape()</code> behind <code>@supports (clip-path: shape(from 0 0, close))</code>. (3) Add a hover transition that deepens the curve — keep the command list structurally identical so it interpolates (the 15.5 rule). (4) Bonus: reuse the same <code>shape()</code> as an <code>offset-path</code> (Lesson 9.9) and run a marker dot along your divider's edge.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-13.22-corner-shape.html">&larr; Lesson 13.22</a>
+      <a href="./lesson-13.24-gap-decorations.html">Lesson 13.24 &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>

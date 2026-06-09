@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6.10 — International Typography: CJK, Ruby & Text Polish · PE7 CSS Course</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#4e38d9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a12" media="(prefers-color-scheme: dark)">
+  <meta name="application-name" content="ultimate·css">
+  <meta name="apple-mobile-web-app-title" content="ultimate·css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="../index.html" class="site-brand">ultimate<span>·css</span></a>
+      <nav class="site-nav"><a href="../index.html#modules">Modules</a></nav>
+    </div>
+  </header>
+
+  <main class="container lesson stack">
+    <nav class="crumbs">
+      <a href="../index.html">Course</a>
+      <a href="./index.html">Module 6</a>
+      <span>Lesson 6.10</span>
+    </nav>
+
+    <header>
+      <p class="badge">Lesson 6.10</p>
+      <h1>International Typography: CJK, Ruby &amp; Text Polish</h1>
+      <p class="lead">Most CSS defaults were designed around Latin text: words separated by spaces, emphasis by italics, lines broken at word boundaries. Chinese, Japanese, and Korean follow none of those rules — and a base layer that ignores them ships visibly broken typography to a third of the web's readers. This lesson covers the properties that fix CJK text, plus the finishing details — drop caps, hanging punctuation, language-aware quotes — that polish every locale.</p>
+    </header>
+
+    <section class="lesson-body stack">
+      <h2>Why Latin-centric CSS breaks for global text</h2>
+      <p>The root cause is structural. CJK text has no inter-word spaces, so "break at spaces" produces no useful break opportunities — browsers instead allow a break after almost any character, which is correct but crude: Japanese lines wrap mid-word and mid-phrase. CJK punctuation is full-width, carrying built-in padding that doubles up visually when two marks meet. Emphasis is marked with dots above characters, not slanted glyphs — italicizing Japanese is as wrong as dotting English. None of this can be fixed by a generic reset; it needs language-aware properties, and a base layer that applies them via <code>:lang()</code>.</p>
+
+      <h2>text-spacing-trim — kerning full-width punctuation</h2>
+      <p>Full-width brackets and periods (「」、。) occupy a full em square each. When two land adjacently — a closing bracket followed by a comma — the result is a visible hole in the line. <code>text-spacing-trim</code> tells the engine to trim that built-in spacing contextually, the way professional Japanese typesetting (JIS&nbsp;X&nbsp;4051) requires:</p>
+      <pre><code>:lang(ja), :lang(zh) {
+  text-spacing-trim: normal;     /* trim adjacent full-width punctuation */
+}
+/* Other values: space-all (legacy full spacing),
+   space-first, trim-start */</code></pre>
+      <p><strong>Progressive</strong> — Chrome&nbsp;123+, with other engines planned. It is purely cosmetic refinement, so it can ship unguarded; use <code>@supports (text-spacing-trim: space-all)</code> only if you need to branch other styles on it.</p>
+
+      <h2>word-break: auto-phrase — natural Japanese line breaks</h2>
+      <p>Default CJK breaking is "anywhere", which routinely splits a word like 最先端 (cutting-edge) across two lines. <code>word-break: auto-phrase</code> runs a phrase-segmentation model (Chrome uses BudouX) and moves break opportunities to <em>bunsetsu</em> — natural phrase boundaries — the difference between a machine-wrapped paragraph and one a typesetter would approve.</p>
+      <pre><code>:lang(ja) :is(h1, h2, h3, .standfirst) {
+  word-break: auto-phrase;
+}</code></pre>
+      <p><strong>Progressive</strong> — Chrome&nbsp;119+. Unsupporting engines treat the value as invalid and keep default breaking, so this is a zero-risk enhancement. Note it costs segmentation work; the guidance is headings and short lead text, not ten-thousand-character articles.</p>
+
+      <h2>Precision recap: line-break, word-break, overflow-wrap</h2>
+      <p>Three properties, three different jobs — worth stating precisely because they are chronically confused:</p>
+      <ul>
+        <li><strong><code>line-break</code></strong> tunes the <em>strictness</em> of CJK breaking rules (kinsoku): <code>strict</code> forbids breaks before small kana and prolonged-sound marks; <code>loose</code> permits them for narrow columns.</li>
+        <li><strong><code>word-break</code></strong> changes <em>where breaks are allowed at all</em>: <code>break-all</code> (anywhere, even Latin), <code>keep-all</code> (treat CJK like spaced words — useful for Korean, which has spaces), <code>auto-phrase</code> (above).</li>
+        <li><strong><code>overflow-wrap: break-word</code></strong> is the last-resort emergency break from Lesson 6.8 — it only fires when a word cannot otherwise fit.</li>
+      </ul>
+      <pre><code>:lang(ko) { word-break: keep-all; }   /* Korean has spaces — use them */
+:lang(ja) { line-break: strict; }     /* honor kinsoku rules */</code></pre>
+
+      <h2>Ruby annotations</h2>
+      <p>Ruby is the small annotation text above (or beside) characters — furigana readings in Japanese, pinyin in Chinese learning material. The structure is HTML; CSS controls placement and distribution. All of this is <strong>production</strong> across the three engines.</p>
+      <pre><code>&lt;ruby&gt;漢字&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;かんじ&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;
+
+ruby { ruby-position: over; }   /* or: under */
+rt   { ruby-align: space-around; } /* start | center | space-between */</code></pre>
+      <p>The <code>&lt;rp&gt;</code> elements hold fallback parentheses that only render in museum-grade browsers without ruby support — keep them; they cost nothing. <code>ruby-position: under</code> serves conventions like Taiwanese zhuyin placement in horizontal text and double-sided annotations.</p>
+
+      <h2>Text emphasis marks</h2>
+      <p>Where Latin uses italics, Japanese and Chinese emphasis places a mark — a dot or sesame — over each character (圏点/着重号). <code>text-emphasis</code> draws these without extra markup, and it is <strong>production</strong>:</p>
+      <pre><code>:lang(ja) em {
+  font-style: normal;             /* italics are not Japanese emphasis */
+  text-emphasis: filled dot;      /* also: open circle, sesame, "❀" */
+  text-emphasis-position: over right;  /* under left for some zh styles */
+}</code></pre>
+
+      <h2>:lang() and language-correct quotes</h2>
+      <p>The pattern uniting this lesson: write language rules once, keyed on <code>:lang()</code>, in the base layer. The selector matches the inherited <code>lang</code> attribute, so a single <code>&lt;html lang="ja"&gt;</code> or a per-element override both work. The <code>quotes</code> property is the smallest, highest-value example — <code>&lt;q&gt;</code> elements render the typographically correct marks per language instead of ASCII quotes everywhere:</p>
+      <pre><code>:lang(en) { quotes: "\201C" "\201D" "\2018" "\2019"; }  /* “ ” ‘ ’ */
+:lang(fr) { quotes: "«\202F" "\202F»"; }  /* « guillemets » + thin space */
+:lang(de) { quotes: "\201E" "\201C"; }    /* „low-high“ */
+:lang(ja) { quotes: "「" "」" "『" "』"; }  /* corner brackets */
+
+/* Modern engines do this automatically with: */
+q { quotes: auto; }</code></pre>
+
+      <h2>initial-letter — true drop caps</h2>
+      <p>The classic drop cap was a <code>::first-letter</code> float with hand-tuned negative margins that broke whenever the font, size, or line-height changed (Lesson 16.3's article layout uses exactly that hack). <code>initial-letter</code> states intent directly — sink this letter <em>n</em> lines and size it to span them — and the browser aligns cap height and baseline precisely:</p>
+      <pre><code>.article-opener::first-letter {
+  /* Fallback for engines without initial-letter (Firefox, planned): */
+  float: inline-start;
+  font-size: 3.2em;
+  line-height: 0.8;
+  padding-inline-end: 0.1em;
+}
+@supports (initial-letter: 3) or (-webkit-initial-letter: 3) {
+  .article-opener::first-letter {
+    float: none; font-size: unset; line-height: unset; padding: 0;
+    -webkit-initial-letter: 3;   /* Safari */
+    initial-letter: 3;           /* sink 3 lines, span 3 lines */
+    padding-inline-end: 0.15em;
+  }
+}</code></pre>
+      <p><strong>Progressive</strong> — Chrome&nbsp;110+ and long-standing in Safari (prefixed, then unprefixed); Firefox planned. The float hack is the fallback, which is why the <code>@supports</code> block must <em>undo</em> it before applying the real thing.</p>
+
+      <h2>hanging-punctuation</h2>
+      <p>Optically aligned margins: an opening quote at the start of a line hangs <em>outside</em> the text edge so the letterforms align, the way fine book typography sets it. One declaration, <strong>progressive</strong> — Safari only, harmlessly ignored elsewhere:</p>
+      <pre><code>blockquote, .prose { hanging-punctuation: first allow-end last; }</code></pre>
+
+      <h2>hyphenate-character and hyphenate-limit-chars</h2>
+      <p>Lesson 6.8 turned on <code>hyphens: auto</code>; these two tune it. <code>hyphenate-character</code> swaps the break glyph (some languages and house styles use ⸗ or ‐), and <code>hyphenate-limit-chars</code> stops the engine hyphenating short words or leaving two-letter fragments — the difference between helpful and twitchy hyphenation. Both are additive refinements: unsupporting engines simply keep default hyphenation.</p>
+      <pre><code>:lang(de) .prose {
+  hyphens: auto;
+  hyphenate-limit-chars: 7 4 3;  /* min word 7; ≥4 before, ≥3 after */
+}</code></pre>
+    </section>
+
+    <section class="demo">
+      <h2>Demo — a polyglot polish panel</h2>
+      <p>Three refinements side by side: Japanese phrase-aware wrapping with a ruby-annotated word (compare in Chrome 119+ against the default-breaking copy), a pull quote with hanging punctuation (Safari), and a drop cap that uses <code>initial-letter</code> where supported and the float hack elsewhere.</p>
+      <div class="demo-frame">
+        <style>
+          .demo-6-10 { font-family: system-ui, sans-serif; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+          .demo-6-10 .panel { padding: 1rem; background: oklch(97% 0.005 264); border: 1px solid oklch(85% 0.01 264); border-radius: .5rem; }
+          .demo-6-10 h4 { margin: 0 0 .5rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: oklch(55% 0.02 264); }
+          .demo-6-10 [lang="ja"] { font-size: .95rem; line-height: 1.9; line-break: strict; text-spacing-trim: normal; margin: 0 0 .75rem; }
+          .demo-6-10 .phrase { word-break: auto-phrase; }
+          .demo-6-10 .quote { margin: 0; font-size: 1.05rem; line-height: 1.6; hanging-punctuation: first allow-end last; quotes: "\201C" "\201D"; }
+          .demo-6-10 .quote::before { content: open-quote; }
+          .demo-6-10 .quote::after { content: close-quote; }
+          .demo-6-10 .opener { margin: 0; font-size: .9rem; line-height: 1.55; color: oklch(35% 0.02 264); }
+          .demo-6-10 .opener::first-letter {
+            float: inline-start; font-size: 3.1em; line-height: .8;
+            padding-inline-end: .12em; font-weight: 700; color: oklch(45% 0.18 280);
+          }
+          @supports (initial-letter: 3) or (-webkit-initial-letter: 3) {
+            .demo-6-10 .opener::first-letter {
+              float: none; font-size: unset; line-height: unset;
+              -webkit-initial-letter: 3; initial-letter: 3;
+              padding-inline-end: .15em;
+            }
+          }
+        </style>
+        <div class="demo-6-10">
+          <div class="panel">
+            <h4>Japanese — default breaking vs auto-phrase</h4>
+            <p lang="ja">最先端の<ruby>技術<rp>(</rp><rt>ぎじゅつ</rt><rp>)</rp></ruby>が普及するにつれて、私たちの生活は大きく変わっていきます。</p>
+            <p lang="ja" class="phrase">最先端の<ruby>技術<rp>(</rp><rt>ぎじゅつ</rt><rp>)</rp></ruby>が普及するにつれて、私たちの生活は大きく変わっていきます。</p>
+          </div>
+          <div class="panel">
+            <h4>Hanging punctuation (Safari)</h4>
+            <blockquote class="quote">Typography is the craft of endowing human language with a durable visual form.</blockquote>
+          </div>
+          <div class="panel">
+            <h4>Drop cap — initial-letter with fallback</h4>
+            <p class="opener">Many years later, as he faced the rendering engine, the developer was to remember that distant afternoon when CSS finally learned to set a proper drop cap without a single magic number in sight.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor cq-inline">
+      <h2>Try it yourself</h2>
+      <div class="editor-grid">
+        <label class="editor-pane">
+          <span>HTML</span>
+<textarea data-editor="html" spellcheck="false">&lt;article&gt;
+  &lt;p lang="ja" class="jp"&gt;
+    最先端の&lt;ruby&gt;技術&lt;rp&gt;(&lt;/rp&gt;&lt;rt&gt;ぎじゅつ&lt;/rt&gt;&lt;rp&gt;)&lt;/rp&gt;&lt;/ruby&gt;が
+    普及するにつれて、生活は大きく変わる。
+  &lt;/p&gt;
+  &lt;p lang="fr"&gt;Elle a dit &lt;q&gt;la typographie est un art&lt;/q&gt;.&lt;/p&gt;
+  &lt;p lang="de"&gt;Er sagte &lt;q&gt;Schrift ist Haltung&lt;/q&gt;.&lt;/p&gt;
+  &lt;p class="opener"&gt;Drop caps used to need a fragile float hack;
+  now initial-letter sinks and sizes the glyph for you, with the
+  old hack kept as the fallback for engines still catching up.&lt;/p&gt;
+&lt;/article&gt;</textarea>
+        </label>
+        <label class="editor-pane">
+          <span>CSS</span>
+<textarea data-editor="css" spellcheck="false">body { font-family: system-ui; padding: 1rem; max-inline-size: 30rem; }
+
+.jp {
+  line-height: 1.9;
+  line-break: strict;
+  text-spacing-trim: normal;     /* Chrome 123+ */
+  word-break: auto-phrase;       /* Chrome 119+ */
+}
+ruby { ruby-position: over; }
+
+/* Language-correct quotation marks for &lt;q&gt; */
+:lang(fr) { quotes: "« " " »"; }
+:lang(de) { quotes: "„" "“"; }
+
+.opener::first-letter {          /* fallback hack */
+  float: inline-start;
+  font-size: 3em;
+  line-height: .8;
+  padding-inline-end: .12em;
+}
+@supports (initial-letter: 3) or (-webkit-initial-letter: 3) {
+  .opener::first-letter {        /* the real thing */
+    float: none; font-size: unset; line-height: unset;
+    -webkit-initial-letter: 3;
+    initial-letter: 3;
+    padding-inline-end: .15em;
+  }
+}
+</textarea>
+        </label>
+        <iframe data-editor="preview" title="Live preview" sandbox="allow-same-origin"></iframe>
+      </div>
+      <div class="editor-actions cluster">
+        <button class="btn" type="button" data-editor-action="run">Run</button>
+        <button class="btn btn-ghost" type="button" data-editor-action="reset">Reset</button>
+      </div>
+    </section>
+
+    <section class="callout">
+      <h2>Mini-exercise</h2>
+      <p>Build the international block of your base layer. (1) Add <code>:lang(ja)</code>, <code>:lang(zh)</code>, and <code>:lang(ko)</code> rules: <code>text-spacing-trim: normal</code> and <code>line-break: strict</code> for Japanese and Chinese, <code>word-break: keep-all</code> for Korean, and <code>word-break: auto-phrase</code> on Japanese headings only. (2) Define <code>quotes</code> for every language your product ships, and verify each <code>&lt;q&gt;</code> renders its native marks. (3) Replace one drop-cap float hack with the <code>initial-letter</code> + <code>@supports</code> pattern from this lesson and confirm the fallback still renders in Firefox. (4) Add <code>hanging-punctuation: first allow-end last</code> to your pull quotes and check the optical alignment in Safari — then confirm nothing changes elsewhere, which is exactly what progressive enhancement should look like.</p>
+    </section>
+
+    <nav class="lesson-nav cluster">
+      <a href="./lesson-6.9-variable-fonts-features.html">&larr; Lesson 6.9</a>
+      <a href="./project/index.html">Module 6 project &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="../assets/js/editor.js" defer></script>
+  <script src="../assets/js/pwa.js" defer></script>
+</body>
+</html>
